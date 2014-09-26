@@ -1,0 +1,22 @@
+#if !defined( DPRINTF_H )
+#define DPRINTF_H
+
+// DPRINTF.H
+//	(c) Mircea Neacsu 1999-2000. All rights reserved.
+//
+// Definition of dprintf. This is a printf style function that will write messages
+//	using OutputDebugString.
+//
+//	Message length is limited to 512 characters.
+//
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+void dprintf( char *fmt, ... );
+
+#ifdef __cplusplus
+};
+#endif
+
+#endif //dprintf_h

@@ -1,0 +1,127 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{C6BEA1F0-D8D4-493B-902C-EF57FDA8F477}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>utpp</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IntDir>$(Configuration)\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <IntDir>$(Configuration)\$(ProjectName)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>include/</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>_CR_SECURE_NO_WARNINGS;WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>include/</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="source\utpp\AssertException.cpp" />
+    <ClCompile Include="source\utpp\Checks.cpp" />
+    <ClCompile Include="source\utpp\CurrentTest.cpp" />
+    <ClCompile Include="source\utpp\DeferredTestReporter.cpp" />
+    <ClCompile Include="source\utpp\DeferredTestResult.cpp" />
+    <ClCompile Include="source\utpp\MemoryOutStream.cpp" />
+    <ClCompile Include="source\utpp\ReportAssert.cpp" />
+    <ClCompile Include="source\utpp\Test.cpp" />
+    <ClCompile Include="source\utpp\TestDetails.cpp" />
+    <ClCompile Include="source\utpp\TestList.cpp" />
+    <ClCompile Include="source\utpp\TestReporter.cpp" />
+    <ClCompile Include="source\utpp\TestReporterStdout.cpp" />
+    <ClCompile Include="source\utpp\TestResults.cpp" />
+    <ClCompile Include="source\utpp\TestRunner.cpp" />
+    <ClCompile Include="source\utpp\TimeConstraint.cpp" />
+    <ClCompile Include="source\utpp\TimeHelpers.cpp" />
+    <ClCompile Include="source\utpp\XmlTestReporter.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\utpp\AssertException.h" />
+    <ClInclude Include="include\utpp\CheckMacros.h" />
+    <ClInclude Include="include\utpp\Checks.h" />
+    <ClInclude Include="include\utpp\Config.h" />
+    <ClInclude Include="include\utpp\CurrentTest.h" />
+    <ClInclude Include="include\utpp\DeferredTestReporter.h" />
+    <ClInclude Include="include\utpp\DeferredTestResult.h" />
+    <ClInclude Include="include\utpp\ExecuteTest.h" />
+    <ClInclude Include="include\utpp\MemoryOutStream.h" />
+    <ClInclude Include="include\utpp\ReportAssert.h" />
+    <ClInclude Include="include\utpp\Test.h" />
+    <ClInclude Include="include\utpp\TestDetails.h" />
+    <ClInclude Include="include\utpp\TestList.h" />
+    <ClInclude Include="include\utpp\TestMacros.h" />
+    <ClInclude Include="include\utpp\TestReporter.h" />
+    <ClInclude Include="include\utpp\TestReporterStdout.h" />
+    <ClInclude Include="include\utpp\TestResults.h" />
+    <ClInclude Include="include\utpp\TestRunner.h" />
+    <ClInclude Include="include\utpp\TestSuite.h" />
+    <ClInclude Include="include\utpp\TimeConstraint.h" />
+    <ClInclude Include="include\utpp\timehelpers.h" />
+    <ClInclude Include="include\utpp\utpp.h" />
+    <ClInclude Include="include\utpp\XmlTestReporter.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
