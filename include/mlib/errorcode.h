@@ -138,7 +138,7 @@ int errfac::operator != (const errfac& other) const
 }
 
 
-namespace HY_NAMESPACE {
+namespace MLIBSPACE {
 
 typedef erc errc;
 typedef errfac errfacility;

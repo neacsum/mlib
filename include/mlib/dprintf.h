@@ -1,5 +1,4 @@
-#if !defined( DPRINTF_H )
-#define DPRINTF_H
+#pragma once
 
 // DPRINTF.H
 //	(c) Mircea Neacsu 1999-2000. All rights reserved.
@@ -13,10 +12,8 @@
 extern "C" {
 #endif
 
-void dprintf( char *fmt, ... );
+void dprintf (char *fmt, ... );
 
 #ifdef __cplusplus
 };
 #endif
-
-#endif //dprintf_h

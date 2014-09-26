@@ -1,5 +1,4 @@
-#ifndef OPTIONS_H
-#define OPTIONS_H
+#pragma once
 
 /*  \file OPTIONS.H - Command line parser
 */
@@ -40,4 +39,3 @@ private:
   string app;
   string usage_;
 };
-#endif

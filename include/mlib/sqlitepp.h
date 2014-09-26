@@ -1,13 +1,13 @@
+#pragma once
 /*!
   \file SQLITEPP.H - C++ wrapper for SQLITE3
 */
-#pragma once
 
 #include <string>
 #include <map>
 
-#include <mlib/sqlite3.h>
-#include <mlib/errorcode.h>
+#include "sqlite3.h"
+#include "errorcode.h"
 
 #ifdef MLIBSPACE
 namespace MLIBSPACE {

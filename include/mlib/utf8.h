@@ -1,5 +1,4 @@
-#ifndef UTF8_H
-#define UTF8_H
+#pragma once
 
 #ifndef _STRING_
 #include <string>
@@ -18,5 +17,3 @@ char **get_utf8argv (int *argc);
 void free_utf8argv (int argc, char **argv);
 
 std::vector<std::string> get_utf8argv ();
-
-#endif

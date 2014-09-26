@@ -33,5 +33,11 @@
     <ClCompile Include="source\mlib\tests\tests_sqlitepp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="source\mlib\tests\tests_crc32.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\mlib\tests\tests_httpd.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

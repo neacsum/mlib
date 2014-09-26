@@ -82,28 +82,56 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\mlib\basename.h" />
+    <ClInclude Include="include\mlib\crc32.h" />
+    <ClInclude Include="include\mlib\critsect.h" />
     <ClInclude Include="include\mlib\defs.h" />
     <ClInclude Include="include\mlib\dprintf.h" />
     <ClInclude Include="include\mlib\errorcode.h" />
+    <ClInclude Include="include\mlib\event.h" />
+    <ClInclude Include="include\mlib\firewall.h" />
+    <ClInclude Include="include\mlib\httpd.h" />
+    <ClInclude Include="include\mlib\inaddr.h" />
     <ClInclude Include="include\mlib\log.h" />
+    <ClInclude Include="include\mlib\md5.h" />
+    <ClInclude Include="include\mlib\mutex.h" />
     <ClInclude Include="include\mlib\options.h" />
     <ClInclude Include="include\mlib\profile.h" />
+    <ClInclude Include="include\mlib\semaphore.h" />
+    <ClInclude Include="include\mlib\shmem.h" />
     <ClInclude Include="include\mlib\sqlite3.h" />
     <ClInclude Include="include\mlib\sqlite3ext.h" />
     <ClInclude Include="include\mlib\sqlitepp.h" />
+    <ClInclude Include="include\mlib\syncbase.h" />
+    <ClInclude Include="include\mlib\tcpserv.h" />
+    <ClInclude Include="include\mlib\thread.h" />
     <ClInclude Include="include\mlib\trace.h" />
     <ClInclude Include="include\mlib\utf8.h" />
+    <ClInclude Include="include\mlib\wsockstream.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\mlib\basename.cpp" />
+    <ClCompile Include="source\mlib\crc32.c" />
     <ClCompile Include="source\mlib\dprintf.c" />
     <ClCompile Include="source\mlib\errorcode.cpp" />
+    <ClCompile Include="source\mlib\event.cpp" />
+    <ClCompile Include="source\mlib\firewall.cpp" />
+    <ClCompile Include="source\mlib\httpd.cpp" />
+    <ClCompile Include="source\mlib\inaddr.cpp" />
     <ClCompile Include="source\mlib\log.cpp" />
+    <ClCompile Include="source\mlib\md5.c" />
+    <ClCompile Include="source\mlib\mutex.cpp" />
     <ClCompile Include="source\mlib\options.cpp" />
     <ClCompile Include="source\mlib\profile.cpp" />
+    <ClCompile Include="source\mlib\semaphore.cpp" />
+    <ClCompile Include="source\mlib\shmem.cpp" />
     <ClCompile Include="source\mlib\sqlite3.c" />
     <ClCompile Include="source\mlib\sqlitepp.cpp" />
+    <ClCompile Include="source\mlib\syncbase.cpp" />
+    <ClCompile Include="source\mlib\tcpserv.cpp" />
+    <ClCompile Include="source\mlib\thread.cpp" />
     <ClCompile Include="source\mlib\utf8.cpp" />
+    <ClCompile Include="source\mlib\wsockstream.cpp" />
+    <ClCompile Include="source\mlib\wtimer.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

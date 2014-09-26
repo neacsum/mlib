@@ -1,6 +1,4 @@
-#if !defined( TRACE_H )
-#define TRACE_H
-
+#pragma once
 /*  TRACE.H
     (c) Mircea Neacsu 1999-2002. All rights reserved.
 
@@ -19,6 +17,10 @@
     to have very detailed trace information if _TRACE_LEVEL is high with
     diminishing amounts of information as _TRACE_LEVEL is lowered.
 */
+
+
+#include "dprintf.h"
+
 #ifdef _TRACE
 # undef TRACE
 # if defined (_TRACE_SYSLOG)
@@ -61,8 +63,4 @@
 # define TRACE7 1? (void)0 : dprintf
 # define TRACE8 1? (void)0 : dprintf
 # define TRACE9 1? (void)0 : dprintf
-#endif
-
-#include "dprintf.h"
-
 #endif

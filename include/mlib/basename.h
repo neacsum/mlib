@@ -1,5 +1,4 @@
-#ifndef BASENAME_H
-#define BASENAME_H
+#pragma once
 /*!
   \file BASENAME.H - Definitions for Unix-like basename() and dirname() functions.
 */
@@ -10,5 +9,3 @@ char *dirname (const char *filename);
 
 ///Return a pointer to the filename without any path component.
 char *basename (const char* filename);
-
-#endif
