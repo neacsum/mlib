@@ -9,6 +9,7 @@
 #include <string>
 #include <mlib/trace.h>
 #include <mlib/httpd.h>
+#include <mlib/base64.h>
 
 using namespace std;
 
@@ -54,7 +55,6 @@ struct smime
 static int fmt2type (const char *fmt);
 static int url_decode (char *buf);
 static int match (const char *str1, const char *str2);
-unsigned char *base64_decode(const char *data, size_t input_length, size_t *output_length);
 
 //-----------------------------------------------------------------------------
 /*!
@@ -68,7 +68,7 @@ unsigned char *base64_decode(const char *data, size_t input_length, size_t *outp
   HTTP client closes the connection the thread is stopped and destructed.
 
   Users can create derived classes but the parent server must also be a class
-  derived from httpd with an overriden httpd::make_thread function.
+  derived from httpd with an overridden httpd::make_thread function.
 
   The request processing cycle starts with the receiving a client request,
   validating, processing it and sending back the reply. The processing part
@@ -241,11 +241,8 @@ int http_connection::do_auth ()
   }
 
   ptr += 6;
-  size_t outsz;
   char buf[256];
-  char *dec = (char *)base64_decode (ptr, strlen(ptr), &outsz);
-  memcpy (buf, dec, outsz);
-  free (dec);
+  size_t outsz = base64dec (ptr, buf);
   buf[outsz] = 0;
   char *pwd = strchr (buf, ':');
   if (pwd)
@@ -1065,20 +1062,20 @@ bool httpd::add_user (const char *realm, const char *username, const char *pwd)
 
 bool httpd::remove_user(const char *realm, const char *username)
 {
-	if (realms.find(realm) == realms.end())
-		return false;   //no such realm
+  if (realms.find(realm) == realms.end())
+    return false;   //no such realm
 
-	multimap<string, user>::iterator it = credentials.find(realm);
-	
-	while (it != credentials.end() && it->first == realm) {
-		if (it->second.name == username) {
-			credentials.erase(it);	// remove user
-			return true;
-		}
-		it++;
-	}
+  multimap<string, user>::iterator it = credentials.find(realm);
+  
+  while (it != credentials.end() && it->first == realm) {
+    if (it->second.name == username) {
+      credentials.erase(it);	// remove user
+      return true;
+    }
+    it++;
+  }
 
-	return true;
+  return true;
 }
 
 /*!
@@ -1352,79 +1349,16 @@ int url_decode (char *buf)
   *out = 0;
   return 1;
 }
-
 /*!
-  Return number of matching characters at beginning of str1 and str2.
-  Comparison is case insensitive.
+Return number of matching characters at beginning of str1 and str2.
+Comparison is case insensitive.
 */
 int match (const char *str1, const char *str2)
 {
   int n = 0;
-  while (*str1 && *str2 && tolower(*str1++) == tolower(*str2++))
+  while (*str1 && *str2 && tolower (*str1++) == tolower (*str2++))
     n++;
   return n;
 }
 
-static char encoding_table[] = {
-  'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
-  'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f',
-  'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
-  'w', 'x', 'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '/'
-};
 
-static char *decoding_table = NULL;
-
-void build_decoding_table() 
-{
-  decoding_table = (char *)malloc(256);
-
-  for (int i = 0; i < 64; i++)
-    decoding_table[(unsigned char) encoding_table[i]] = i;
-}
-
-void base64_cleanup() 
-{
-    free(decoding_table);
-}
-
-unsigned char *base64_decode(const char *data, size_t input_length, size_t *output_length) 
-{
-
-  if (decoding_table == NULL) 
-    build_decoding_table();
-
-  if (input_length % 4 != 0) 
-    return NULL;
-
-  *output_length = input_length / 4 * 3;
-  if (data[input_length - 1] == '=') 
-    (*output_length)--;
-  if (data[input_length - 2] == '=') 
-    (*output_length)--;
-
-  unsigned char *decoded_data = (unsigned char *)malloc(*output_length);
-  if (decoded_data == NULL) 
-    return NULL;
-
-  for (size_t i = 0, j = 0; i < input_length;) 
-  {
-    unsigned int sextet_a = data[i] == '=' ? 0 & i++ : decoding_table[data[i++]];
-    unsigned int sextet_b = data[i] == '=' ? 0 & i++ : decoding_table[data[i++]];
-    unsigned int sextet_c = data[i] == '=' ? 0 & i++ : decoding_table[data[i++]];
-    unsigned int sextet_d = data[i] == '=' ? 0 & i++ : decoding_table[data[i++]];
-
-    unsigned int triple = (sextet_a << 3 * 6)
-      + (sextet_b << 2 * 6)
-      + (sextet_c << 1 * 6)
-      + (sextet_d << 0 * 6);
-
-    if (j < *output_length) 
-      decoded_data[j++] = (triple >> 2 * 8) & 0xFF;
-    if (j < *output_length) 
-      decoded_data[j++] = (triple >> 1 * 8) & 0xFF;
-    if (j < *output_length) 
-      decoded_data[j++] = (triple >> 0 * 8) & 0xFF;
-  }
-
-  return decoded_data;
-}
