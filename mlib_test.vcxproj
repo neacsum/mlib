@@ -84,6 +84,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="source\mlib\tests\tests_base64.cpp" />
     <ClCompile Include="source\mlib\tests\tests_basename.cpp" />
     <ClCompile Include="source\mlib\tests\tests_crc32.cpp" />
     <ClCompile Include="source\mlib\tests\tests_httpd.cpp" />

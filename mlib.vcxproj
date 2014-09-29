@@ -81,6 +81,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\mlib\base64.h" />
     <ClInclude Include="include\mlib\basename.h" />
     <ClInclude Include="include\mlib\crc32.h" />
     <ClInclude Include="include\mlib\critsect.h" />
@@ -109,6 +110,7 @@
     <ClInclude Include="include\mlib\wsockstream.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="source\mlib\base64.cpp" />
     <ClCompile Include="source\mlib\basename.cpp" />
     <ClCompile Include="source\mlib\crc32.c" />
     <ClCompile Include="source\mlib\dprintf.c" />
