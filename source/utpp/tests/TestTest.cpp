@@ -74,7 +74,7 @@ TEST(ThrowingTestsAreReportedAsFailures)
 }
 
 
-#ifndef _MSC_VER < 1800
+#if _MSC_VER < 1800
 TEST(CrashingTestsAreReportedAsFailures)
 {
     class CrashingTest : public Test
