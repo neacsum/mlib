@@ -107,9 +107,8 @@ void http_connection::run ()
 {
   ws->recvtimeout (HTTPD_TIMEOUT);
   TRACE ("Connection from %s\n", inaddr(ws->name()).hostname());
-    bool running = true;
   try {
-    while (running)
+    while (1)
     {
       bool req_ok = false;
       req_len = 0;
@@ -127,13 +126,13 @@ void http_connection::run ()
         *ptr = ws.get();
 
         if (ws.eof ())
-          goto done;  //client closed 
+          return;  //client closed 
 
         if (!ws.good())
         {
           TRACE ("Timeout!\n");
           respond (408);
-          goto done;
+          return;
         }
 
         if (*ptr == '\r')
@@ -158,7 +157,7 @@ void http_connection::run ()
       {
         TRACE ("Request too long!\n");
         respond (413);
-        goto done;
+        return;
       }
 
       *ptr = 0;   //NULL terminated
@@ -183,12 +182,12 @@ void http_connection::run ()
           process_valid_request ();
         }
         else if (auth_stat < 0)
-          goto done;
+          return;
       }
       else
       {
         respond (400);  //malformed request
-        goto done;
+        return;
       }
 
       //should close connection?
@@ -196,16 +195,22 @@ void http_connection::run ()
       if (!get_ohdr ("Content-Length")  //could not generate content length (shtml pages)
        || ((ph = get_ihdr ("Connection")) && !strcmpi (ph, "Close"))  //client wants to close
        || ((ph = get_ohdr ("Connection")) && !strcmpi (ph, "Close"))) //server wants to close
-        running = false;
+        return;
 
       ws.flush ();
     }
-  } catch (errc &err) {
+  } catch (erc &err) {
     respond (500);
     TRACE ("http_connection errcode=%d\n", err.code());
   }
-done:
-  ws->close();
+
+  //all cleanup is done by term function
+}
+
+bool http_connection::term ()
+{
+  parent.close_connection (*ws.rdbuf ());
+  return thread::term ();
 }
 
 /*
@@ -214,7 +219,7 @@ done:
 
   \return 
     0   = Missing authorization (401)
-    -1  = Bad authorization (403)
+   -1   = Bad authorization (501)
     1   = all good
 
 */

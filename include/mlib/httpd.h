@@ -58,6 +58,7 @@ public:
 protected:
               http_connection (sock& socket, httpd& server);
   void        run ();
+  bool        term ();
 
   httpd&      parent;
   sockstream  ws;

@@ -1,5 +1,5 @@
 /*!
-  \file TCPSERV.CPP Implementation of tcpserv class
+  \file TCPSERV.CPP Implementation of tcpserver class
 
   (c) Mircea Neacsu 2003
 
@@ -65,7 +65,7 @@ tcpserver::~tcpserver ()
 /*!
   Place socket in listen mode.
   
-  Also intializes an event flag to be signaled when a connection request is 
+  Also initializes an event flag to be signalled when a connection request is 
   received. This function is automatically invoked by start ()
 */
 bool tcpserver::init ()
@@ -87,10 +87,10 @@ void tcpserver::run ()
   {
     if (evt.wait (idle) == WAIT_TIMEOUT)
     {
-      TRACE ("tcp_server::run - idle timeout");
+      TRACE ("tcpserver::run - idle timeout");
       end_req = !idle_action ();
     }
-    TRACE ("tcp_server::run - loop again end_req = %d", end_req);    
+    TRACE ("tcpserver::run - loop again end_req = %d", end_req);    
     if (end_req)        //bail out?
       continue;
 
@@ -128,20 +128,19 @@ void tcpserver::run ()
       contab[i]->socket.setevent (0, 0);
       contab[i]->socket.blocking (true);
       
-      TRACE ("conection %d request from %s:%d",count+1, claddr.ntoa(), claddr.port());
+      TRACE ("tcpserver::run contab[%d] - request from %s:%d",i, claddr.ntoa(), claddr.port());
 
       /// - invoke make_thread to get a servicing thread
       contab[i]->thread = make_thread (contab[i]->socket);
       contab[i]->condemned = false;
       count++;
-
       /// - invoke initconn function
       initconn (contab[i]->socket, contab[i]->thread);
       contab_lock.leave ();
     }
     else
     {
-      //check if we've been signaled by close_connection
+      //check if we've been signalled by close_connection
       contab_lock.enter ();
       for (size_t i=0; i<alloc; i++)
         if (contab[i] && contab[i]->condemned)
@@ -156,6 +155,7 @@ void tcpserver::run ()
         }
        contab_lock.leave ();
     }
+    TRACE ("tcpserver::run %d connections active", count);
   }
 }
 
@@ -164,25 +164,32 @@ void tcpserver::run ()
 */
 void tcpserver::close_connection (sock& s)
 {
-  TRACE ("tcpserver::close_connection");
   size_t i;
   for (i=0; i<alloc; i++)
     if ((contab[i] != NULL) && (s == contab[i]->socket))
     {
+#ifdef _TRACE
+    if (contab[i]->socket.is_open ())
+    {
       inaddr peer = contab[i]->socket.peer ();
-      TRACE ("closing connection %d to %s:%d", i, peer.ntoa (), peer.port());
+      TRACE ("tcpserver::close_connection closing contab[%d] to %s:%d",
+        i, peer.ntoa (), peer.port ());
+    }
+    else
+      TRACE ("tcpserver::close_connection closing contab[%d] - socket closed", i);
+#endif
       contab[i]->condemned = true;
       evt.signal ();
       break;
     }
   if (i == alloc)
-    TRACE ("tcpserv::close_connection cannot find client");
+    TRACE ("tcpserver::close_connection cannot find contab entry");
 }
 
 /*!
-  Initializes a conenction.
+  Initializes a connection.
 
-  If the connection has associated a serviceing thread 
+  If the connection has associated a servicing thread 
   (returned by make_thread), this thread is started now.
 */
 void tcpserver::initconn (sock& /*socket*/, thread* th)
