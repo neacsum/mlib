@@ -308,6 +308,7 @@ bool Options::hasopt (const string& option)
     if ((option.length () > 1 && op->olong == option)
      || (option.length () == 1 && op->oshort == option[0]))
       return true;
+    op++;
   }
   return false;
 }
