@@ -51,7 +51,7 @@ static void writesection (char* LocalBuffer, const char* Section, FILE *fp);
 static void writekey (char* buffer, const char* key, const char* value, FILE *fp);
 static int cache_accum (const char* string, int* size, int max);
 static int cache_flush (char* buffer, int* size, FILE* rfp, FILE* wfp, fpos_t* mark);
-static int close_rename(FILE* rfp, FILE* wfp, const char* filename, char* buffer);
+static int close_rename(FILE* rfp, FILE* wfp, const char* filename);
 static char* cleanstring (char* string);
 static int ini_puts (const char *key, const char *value, const char *section, char *filename);
 
@@ -419,23 +419,6 @@ void Profile::PutFont (const char *key, HFONT font, const char *section)
 
   if (!GetObject (font, sizeof(lfont), &lfont))
     return;
-#ifndef _MSC_VER
-  swprintf (buffer, L"%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%s",
-    lfont.lfHeight,
-    lfont.lfWidth,
-    lfont.lfEscapement,
-    lfont.lfOrientation,
-    lfont.lfWeight,
-    lfont.lfItalic,
-    lfont.lfUnderline,
-    lfont.lfStrikeOut,
-    lfont.lfCharSet,
-    lfont.lfOutPrecision,
-    lfont.lfClipPrecision,
-    lfont.lfQuality,
-    lfont.lfPitchAndFamily,
-    lfont.lfFaceName);
-#else
   swprintf (buffer, sizeof(buffer), L"%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%s",
     lfont.lfHeight,
     lfont.lfWidth,
@@ -451,7 +434,6 @@ void Profile::PutFont (const char *key, HFONT font, const char *section)
     lfont.lfQuality,
     lfont.lfPitchAndFamily,
     lfont.lfFaceName);
-#endif
   PutString (key, narrow(buffer).c_str(), section);
 }
 
@@ -512,23 +494,97 @@ void Profile::PutBool (const char *key, bool value, const char *section)
 void Profile::CopySection (const Profile& from_file, const char *from_sect, const char *to_sect)
 {
   assert (from_sect);
+  char buffer[INI_BUFFERSIZE];
 
-	if ( !to_sect )
-		to_sect = from_sect;
-	//erase entire section
-	PutString (to_sect, NULL, NULL);
-	const int size = 16*1024;
-	char *buffer = new char[size]; //buffer for entries names
-	GetPrivateProfileStringA( from_sect, NULL, "", buffer, size, from_file.filename );
-	char *ptr = buffer;
-	while ( *ptr )
-	{
-		char setting[1024];
-		GetPrivateProfileStringA( from_sect, ptr, "", setting, sizeof(setting), from_file.filename );
-		WritePrivateProfileStringA( to_sect, ptr, setting, filename );
-		ptr += strlen( ptr )+1;
-	}
-	delete []buffer;
+  //trivial case: same file, same section
+  if (strcmpi (filename, from_file.File ()) == 0 && (to_sect == NULL || strcmp (from_sect, to_sect) == 0))
+    return;
+
+  //if file doesn't exist create it now
+  if (_waccess (widen (filename).c_str (), 0))
+  {
+    FILE *fp = ini_openwrite (filename);
+    if (fp == NULL)
+      return;
+    fputs ("\xEF\xBB\xBF\r\n", fp); //write BOM mark
+    fclose (fp);
+  }
+
+  if (!to_sect)
+    to_sect = from_sect;
+
+  //locate [from section]
+  int len = strlen (from_sect);
+  FILE *fpfrom = ini_openread (from_file.filename);
+  if (fpfrom == NULL)
+    return;
+  fgets (buffer, INI_BUFFERSIZE, fpfrom);
+  while (!feof (fpfrom))
+  {
+    if (buffer[0] == '[' && strncmp (&buffer[1], from_sect, len) == 0)
+      break;
+    fgets (buffer, INI_BUFFERSIZE, fpfrom);
+  }
+  if (feof (fpfrom))
+  {
+    fclose (fpfrom);  // from_sect not found;
+    return;
+  }
+
+  //locate [to section]
+  len = strlen (to_sect);
+  FILE *fp = ini_openread (filename);
+  if (fp == NULL)
+  {
+    fclose (fpfrom);
+    return;
+  }
+  ini_tempname (buffer, filename, sizeof (buffer));
+
+  FILE *fpt = ini_openwrite (buffer);
+  if (fpt == NULL)
+  {
+    fclose (fpfrom);
+    fclose (fp);
+    return;
+  }
+  fgets (buffer, INI_BUFFERSIZE, fp);
+  while (!feof (fp))
+  {
+    if (buffer[0] == '[' && strncmp (&buffer[1], to_sect, len) == 0)
+      break;
+    fputs (buffer, fpt);
+    fgets (buffer, INI_BUFFERSIZE, fp);
+  }
+
+  // write [to section]
+  writesection (buffer, to_sect, fpt);
+  fgets (buffer, INI_BUFFERSIZE, fpfrom);
+  while (!feof (fpfrom))
+  {
+    if (buffer[0] == '[')
+      break;      //until end of from section
+    fputs (buffer, fpt);
+    fgets (buffer, INI_BUFFERSIZE, fpfrom);
+  }
+  fclose (fpfrom);
+
+  //skip the rest of old [to section]
+  fgets (buffer, INI_BUFFERSIZE, fp);
+  while (!feof (fp))
+  {
+    if (buffer[0] == '[')
+      break;
+    fgets (buffer, INI_BUFFERSIZE, fp);
+  }
+  // write the rest to tmp
+  while (!feof (fp))
+  {
+    fputs (buffer, fpt);
+    fgets (buffer, INI_BUFFERSIZE, fp);
+  }
+
+  close_rename (fp, fpt, filename);
 }
 
 /*!
@@ -810,7 +866,7 @@ static int ini_puts (const char *key, const char *value, const char *section, ch
           writesection(buffer, section, wfp);
           writekey(buffer, key, value, wfp);
         }
-        return close_rename(rfp, wfp, filename, buffer);  /* clean up and rename */
+        return close_rename(rfp, wfp, filename);  /* clean up and rename */
       }
       /* Copy the line from source to dest, but not if this is the section that
        * we are looking for and this section must be removed
@@ -858,7 +914,7 @@ static int ini_puts (const char *key, const char *value, const char *section, ch
           fputs("\r\n", wfp);  /* force a new line behind the last line of the INI file */
         writekey(buffer, key, value, wfp);
       }
-      return close_rename(rfp, wfp, filename, buffer);  /* clean up and rename */
+      return close_rename(rfp, wfp, filename);  /* clean up and rename */
     }
     sp = skipleading(buffer);
     ep = strchr(sp, '='); /* Parse out the equal sign */
@@ -917,7 +973,7 @@ static int ini_puts (const char *key, const char *value, const char *section, ch
     }
   }
   cache_flush(buffer, &cachelen, rfp, wfp, &mark);
-  return close_rename(rfp, wfp, filename, buffer);  /* clean up and rename */
+  return close_rename(rfp, wfp, filename);  /* clean up and rename */
 }
 
 /*!
@@ -1103,14 +1159,37 @@ static int cache_flush (char* buffer, int* size, FILE* rfp, FILE* wfp, fpos_t* m
   return (buffer[pos-1] == '\n');
 }
 
-static int close_rename(FILE* rfp, FILE* wfp, const char* filename, char* buffer)
+/*!
+  Close input and output files and renames the output (temporary) file to
+  input file name. Previous input file is deleted.
+
+  Had an issue with Kaspersky anti-virus that seems to keep opened the old input file
+  making the rename operation to fail. Solved by adding a few retries before 
+  failing.
+*/
+static int close_rename(FILE* rfp, FILE* wfp, const char* filename)
 {
+  const int RETRIES = 50;
+  int i;
+  char tmpname[_MAX_PATH];
   fclose(rfp);
   fclose(wfp);
-  _wremove(widen(filename).c_str());
-  ini_tempname(buffer, filename, INI_BUFFERSIZE);
-  _wrename(widen(buffer).c_str(), widen(filename).c_str());
-  return 1;
+  ini_tempname(tmpname, filename, sizeof(tmpname));
+  wstring wfn = widen (filename);
+  wstring wtmp = widen (tmpname);
+
+  //retry a few times to allow for stupid anti-virus
+  i = 0;
+  while (i++ < RETRIES && _wremove(wfn.c_str()))
+    Sleep(0);
+
+  if (i >= RETRIES)
+    return 0;
+
+  i = 0;
+  while (i++ < RETRIES && _wrename(wtmp.c_str(), wfn.c_str()))
+    Sleep(0);
+  return (i < RETRIES);
 }
 
 #ifdef MLIBSPACE

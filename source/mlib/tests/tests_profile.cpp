@@ -179,3 +179,21 @@ TEST (Quoted_strings)
   CHECK_EQUAL (quoted, buffer);
   _unlink ("test.ini");  
 }
+
+TEST (Copy_section)
+{
+  char buffer[256];
+
+  Profile f1 ("test1.ini");
+  f1.PutString ("key0", "value00", "section0");
+  f1.PutString ("key1", "value01", "section0");
+
+  Profile f2 ("test2.ini");
+  f2.CopySection (f1, "section0", "section1");
+  f2.GetString (buffer, sizeof(buffer), "key0", "section1");
+  CHECK_EQUAL ("value00", buffer);
+  f2.GetString (buffer, sizeof(buffer), "key1", "section1");
+  CHECK_EQUAL ("value01", buffer);
+  _unlink ("test1.ini");
+  _unlink ("test2.ini");
+}
