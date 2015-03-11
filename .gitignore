@@ -8,3 +8,5 @@
 Debug/
 Release/
 *.obj
+*.bak
+doc/
