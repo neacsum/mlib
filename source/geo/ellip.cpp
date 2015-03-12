@@ -18,47 +18,92 @@ namespace MLIBSPACE {
 */
 
 
-/// WGS-84 ellipsoid a = 6378137. f = 1./298.257223563
-const Ellipsoid Ellipsoid::WGS84 (6378137.,1./298.257223563);
-
 /// Known ellipsoids
 static struct ell_data
 {
+  Ellipsoid::well_known wk;
   char *name;
   double a;
-  double f;
+  double f_1;
 } ellip[] = {
-  {  "Airy",                    6377563.396,  299.3249646   },
-  {  "ATS-77",                  6378135.0,    298.257       },
-  {  "Airy Modified",           6377340.189,  299.3249646   },
-  {  "Bessel 1841",             6377397.155,  299.1528128   },
-  {  "Clarke 1866",             6378206.4,    294.9786982   },
-  {  "Clarke 1880",             6378249.145,  293.465       },
-  { "Clarke-1880 (Arc)",        6378249.145,  293.4663077   },
-  {  "Clarke 1880 (IGN)",       6378249.200,  293.466021294,},
-  {  "Everest",                 6377276.345,  300.8017      },
-  {  "Everest (Malay. & Sing)", 6377304.063,  300.8017      },
-  {  "Everest (India 1956)",    6377301.243,  300.8017      },
-  {  "Everest (Sabah Sarawak)", 6377298.556,  300.8017      },
-  {  "Everest (Malaysia 1969)", 6377295.664,  300.8017      },
-  {  "Everest (Pakistan)",      6377309.613,  300.8017      },
-  {  "Fischer 1960 (Mercury)",  6378166.,     298.3         },
-  {  "Fischer 1960 Modified",   6378155.,     298.3         },
-  {  "Fischer 1968",            6378150.,     298.3         },
-  {  "GRS-1967",                6378160.,     298.247167427 },
-  {  "GRS-1980",                6378137.,     298.257222101 },
-  {  "Helmert 1906",            6378200.,     298.3         },
-  {  "Hough",                   6378270.,     297.          },
-  {  "Indonesian 1974",         6378160.,     298.247       },
-  {  "International",           6378388.,     297.          },
-  {  "Krassovsky",              6378245.,     298.3         },
-  {  "SA-1969 & Australian",    6378160.,     298.25        },
-  {  "WGS-60",                  6378165.,     298.3         },
-  {  "WGS-66",                  6378145.,     298.25        },
-  {  "WGS-72",                  6378135.,     298.26        },
-  {  "WGS-84",                  6378137.,     298.257223563 },
-  {  NULL,                      0,            0             }
+  { Ellipsoid::WGS_84,                "WGS-84",                   6378137.,     298.257223563 },
+  { Ellipsoid::AIRY,                  "Airy",                     6377563.396,  299.3249646 },
+  { Ellipsoid::ATS_77,                "ATS-77",                   6378135.0,    298.257 },
+  { Ellipsoid::AUSTRALIAN,            "Australian National",      6378160.,     298.25 },
+  { Ellipsoid::AIRY_MODIFIED,         "Airy Modified",            6377340.189,  299.3249646 },
+  { Ellipsoid::BESSEL_1841,           "Bessel 1841",              6377397.155,  299.1528128 },
+  { Ellipsoid::CLARKE_1866,           "Clarke 1866",              6378206.4,    294.9786982 },
+  { Ellipsoid::CLARKE_1880,           "Clarke 1880",              6378249.145,  293.465 },
+  { Ellipsoid::CLARKE_1880_ARC,       "Clarke-1880 (Arc)",        6378249.145,  293.4663077 },
+  { Ellipsoid::CLARKE_1880_IGN,       "Clarke 1880 (IGN)",        6378249.200,  293.466021294, },
+  { Ellipsoid::EVEREST,               "Everest",                  6377276.345,  300.8017 },
+  { Ellipsoid::EVEREST_MALAY_SING,    "Everest (Malay. & Sing)",  6377304.063,  300.8017 },
+  { Ellipsoid::EVEREST_INDIA_1956,    "Everest (India 1956)",     6377301.243,  300.8017 },
+  { Ellipsoid::EVEREST_SABAH_SARWAK,  "Everest (Sabah Sarawak)",  6377298.556,  300.8017 },
+  { Ellipsoid::EVEREST_MALAYSIA_1969, "Everest (Malaysia 1969)",  6377295.664,  300.8017 },
+  { Ellipsoid::EVEREST_PAKISTAN,      "Everest (Pakistan)",       6377309.613,  300.8017 },
+  { Ellipsoid::FISCHER_1960,          "Fischer 1960 (Mercury)",   6378166.,     298.3 },
+  { Ellipsoid::FISCHER_1960_MODIFIED, "Fischer 1960 Modified",    6378155.,     298.3 },
+  { Ellipsoid::FISCHER_1968,          "Fischer 1968",             6378150.,     298.3 },
+  { Ellipsoid::GRS_1967,              "GRS-1967",                 6378160.,     298.247167427 },
+  { Ellipsoid::GRS_1980,              "GRS-1980",                 6378137.,     298.257222101 },
+  { Ellipsoid::HELMERT_1906,          "Helmert 1906",             6378200.,     298.3 },
+  { Ellipsoid::HOUGH,                 "Hough",                    6378270.,     297. },
+  { Ellipsoid::INDONESIAN_1974,       "Indonesian 1974",          6378160.,     298.247 },
+  { Ellipsoid::INTERNATIONAL,         "International",            6378388.,     297. },
+  { Ellipsoid::KRASSOVSKY,            "Krassovsky",               6378245.,     298.3 },
+  { Ellipsoid::SOUTH_AMERICAN_1969,   "SA-1969",                  6378160.,     298.25 },
+  { Ellipsoid::WGS_60,                "WGS-60",                   6378165.,     298.3 },
+  { Ellipsoid::WGS_66,                "WGS-66",                   6378145.,     298.25 },
+  { Ellipsoid::WGS_72,                "WGS-72",                   6378135.,     298.26 },
 };
+
+/// Create an ellipsoid object with the given a and f values.
+Ellipsoid::Ellipsoid (double a, double f) :
+a_ (a),
+f_ (f),
+c (0)
+{
+  e2_ = 2.*f_ - f_*f_;
+  e_ = sqrt (e2_);
+  int idx;
+  if ((idx = find_wkidx ()) >= 0)
+    pname = ellip[idx].name;
+  else
+    pname = 0;
+}
+
+/// Create a well-known ellipsoid
+Ellipsoid::Ellipsoid (well_known wk) :
+a_ (6378137.),
+f_ (1./298.257223563) //just to have some reasonable defaults if wk is out of bounds
+{
+  name_ = known (wk, &a_, &f_);
+}
+
+/// Copy Constructor
+Ellipsoid::Ellipsoid (const Ellipsoid& ell) :
+a_ (ell.a_),
+f_ (ell.f_),
+c (0),
+e2_ (ell.e2_),
+e_ (ell.e_),
+name_ (ell.name_)
+{
+}
+
+/// Assignment operator
+Ellipsoid& Ellipsoid::operator= (const Ellipsoid& rhs)
+{
+  delete c;
+  c = 0;
+  a_ = rhs.a_;
+  f_ = rhs.f_;
+  e2_ = rhs.e2_;
+  e_ = rhs.e_;
+  name_ = rhs.name_;
+  return *this;
+}
 
 ///  Return radius of curvature in the prime vertical
 ///  \f$ rn = \frac a{\sqrt{1-e^2*\sin(lat)^2}} \f$
@@ -91,41 +136,50 @@ double Ellipsoid::lm (double lat) const
 }
 
 /*!
-  Return parameters (name, a and f ) of a known ellipsoid
+  Return and and ellipsoidal parameters a and f of a well-known ellipsoid
 
-  \param index    index in table of known ellipsoids
-  \param a        pointer to semi-major axis
-  \param f        pointer to inverse of flattening
+  \param wk       well-known ellipsoid index
+  \param pa       pointer to semi-major axis
+  \param pf       pointer to flattening
   \return         ellipsoid name or NULL if index out of bounds
+
+  The function can be used to enumerate the table of well-known ellipsoids by calling it
+  with increasing index values until it returns NULL.
 */
-const char *Ellipsoid::Known (int index, double *a, double *f)
+const char *Ellipsoid::known (well_known wk, double *pa, double *pf)
 {
-  int max_index = sizeof(ellip)/sizeof(ell_data)-1;
-  assert (a);
-  assert (f);
-  if (index < max_index)
+  const int max_index = sizeof(ellip)/sizeof(ell_data)-1;
+  int i;
+  for (i = 0; i < max_index; i++)
   {
-    *a = ellip[index].a;
-    *f = 1./ellip[index].f;
-    return ellip[index].name;
+    if (ellip[i].wk == wk)
+      break;
+  }
+  if (i < max_index)
+  {
+    if (pa)
+      *pa = ellip[i].a;
+    if (pf)
+      *pf = 1./ellip[i].f_1;
+    return ellip[i].name;
   }
   else
     return NULL;
 }
 
 /*!
-  Search the table of known ellipsoids for a matching ellipsoid and return it's name.
-  If not found return NULL
+  Search the table of known ellipsoids for a matching ellipsoid and return it's index.
+  If not found, the function returns a negative value.
 */
-const char *Ellipsoid::FindName (double a, double f)
+int Ellipsoid::find_wkidx ()
 {
-  f = 1./f;
-  for ( int i=0; ellip[i].name; i++ )
+  const int max_index = sizeof (ellip) / sizeof (ell_data) - 1;
+  for (int i = 0; i < max_index; i++)
   {
-    if ( fabs(a - ellip[i].a) < 1e-4 && fabs( f - ellip[i].f) <1e-10 )
-      return ellip[i].name;
+    if ( fabs(a_ - ellip[i].a) < 1e-4 && fabs( f_ - 1./ellip[i].f_1) <1e-10 )
+      return i;
   }
-  return NULL;
+  return -1;
 }
 
 /*!
@@ -133,7 +187,7 @@ const char *Ellipsoid::FindName (double a, double f)
 
   Formulas from "GPS Satellite Surveying" by Alfred Leick page 184
 */
-void Ellipsoid::Geo2ECEF (double lat, double lon, double height, double *x, double *y, double *z) const
+void Ellipsoid::geo_ECEF (double lat, double lon, double height, double *x, double *y, double *z) const
 {
   double slat = sin(lat);
   double clat = cos(lat);
@@ -149,7 +203,7 @@ void Ellipsoid::Geo2ECEF (double lat, double lon, double height, double *x, doub
   Formulas from "GPS Satellite Surveying" by Alfred Leick page 184-185.
   If both x and y are 0 longitude is set to 0.
 */
-void Ellipsoid::ECEF2Geo (double *lat, double *lon, double *height, double x, double y, double z) const
+void Ellipsoid::ECEF_Geo (double *lat, double *lon, double *height, double x, double y, double z) const
 {
   double rho = hypot( x, y );
   if ( rho == 0. )
@@ -178,11 +232,11 @@ void Ellipsoid::ECEF2Geo (double *lat, double *lon, double *height, double x, do
 }
 
 /*!
-  Calculate geodetic distance between 2 points using Gauss mid-latitude solution. 
+  Calculate geodetic (great circle) distance between 2 points using Gauss mid-latitude solution. 
   
   Formulas from "GPS Satellite Surveying" by Alfred Leick page 281-282
 */
-double Ellipsoid::GCirc (double lat1, double lon1, double lat2, double lon2, double *az)
+double Ellipsoid::gcirc (double lat1, double lon1, double lat2, double lon2, double *az)
 {
   double mid_phi = (lat1 + lat2)/2.;
   double dphi = lat2-lat1;
@@ -208,7 +262,7 @@ double Ellipsoid::GCirc (double lat1, double lon1, double lat2, double lon2, dou
 /*!
   Calculate rhumb line distance between 2 points.
 */
-double Ellipsoid::RLine (double lat1, double lon1, double lat2, double lon2, double *az)
+double Ellipsoid::rhumb (double lat1, double lon1, double lat2, double lon2, double *az)
 {
   double dist;
 
