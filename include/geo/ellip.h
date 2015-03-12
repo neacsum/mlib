@@ -220,7 +220,7 @@ double Ellipsoid::m(double phi) const
 inline 
 std::string Ellipsoid::name() const
 {
-  return (pname? pname : "");
+  return (name_? name_ : "");
 };
 
 /// Return TRUE if the two ellipsoids are equal (same a and f values)
