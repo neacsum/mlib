@@ -11,20 +11,21 @@ namespace MLIBSPACE {
 #endif
 
 /// %Albers Equal Area
-class Albers : public Projection
+class Albers : public ConicalProjection
 {
- public:
-  Albers (PROJPARAMS& pp);
-  const char *Name () const      { return "ALA"; };
-  geoproj Id () const            { return GEOPROJ_ALA; };
+public:
+  Albers ();
+  Albers (const ProjParams& params);
+  Albers& operator= (const ProjParams& p);
 
-  errc XYGeo (double x, double y, double *lat, double *lon) const;
-  errc GeoXY (double *x, double *y, double lat, double lon) const;
+  errc xy_geo (double x, double y, double *lat, double *lon) const;
+  errc geo_xy (double *x, double *y, double lat, double lon) const;
 
   double h (double lat, double lon) const;
   double k (double lat, double lon) const;
 
- private:
+private:
+  void init ();
   double n, c_big, rho0;
 };
 

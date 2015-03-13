@@ -5,59 +5,79 @@
 
 #include <geo/albers.h>
 
+static double sqrarg;
+#define SQR(a) ((sqrarg = (a)) == 0.0 ? 0.0 : sqrarg * sqrarg)
+
 #ifdef MLIBSPACE
 namespace MLIBSPACE {
 #endif
 
 #define MAX_ITER  10    //max number of iterations in reverse formulas
 
+Albers::Albers ()
+{
+}
+
+
 /*!
   Constructor for a Albers Equal Area projection
 */
-Albers::Albers (PROJPARAMS& pp):
-  Projection (pp)
+Albers::Albers (const ProjParams& params):
+  ConicalProjection (params)
 {
-  double m1 = m(north_parallel_);
-  double q1 = q(north_parallel_);
-  if (north_parallel_ == south_parallel_)
-    n = sin(north_parallel_);
+  init ();
+}
+
+Albers& Albers::operator= (const ProjParams& p)
+{
+  par = p;
+  init ();
+  return *this;
+}
+
+void Albers::init ()
+{
+  double m1 = ellipsoid ().m (north_latitude ());
+  double q1 = ellipsoid ().q (north_latitude ());
+  if (north_latitude () == south_latitude ())
+    n = sin (north_latitude ());
   else
   {
-    double m2 = m(south_parallel_);
-    double q2 = q(south_parallel_);
-    n = (m1*m1 - m2*m2) / (q2-q1);
+    double m2 = ellipsoid ().m (south_latitude ());
+    double q2 = ellipsoid ().q (south_latitude ());
+    n = (m1*m1 - m2*m2) / (q2 - q1);
   }
-  c_big = m1*m1+n*q1;
-  rho0 = a() / unit_ * sqrt(c_big - n * q(ref_latitude_)) / n;
-  if ( n == 0 )
-    throw errc (GEOERR_PARM);
+  c_big = m1*m1 + n*q1;
+  rho0 = ellipsoid ().a () / unit () * sqrt (c_big - n * ellipsoid ().q (ref_latitude ())) / n;
+  if (n == 0)
+    throw errc (GEOERR_PARAM);
 }
 
 /*!
   Forward conversion from latitude/longitude to XY
 */
-errc Albers::GeoXY (double *x, double *y, double lat, double lon) const
+errc Albers::geo_xy (double *x, double *y, double lat, double lon) const
 {
-  double theta = (lon - central_meridian_) * n;
-  double rho = a() / unit_ * sqrt(c_big - n * q(lat)) / n;
-  *x = false_east_ + rho * sin(theta);
-  *y = false_north_ + rho0 - rho * cos(theta);
+  double theta = (lon - ref_longitude()) * n;
+  double rho = ellipsoid().a() / unit() * sqrt(c_big - n * ellipsoid().q(lat)) / n;
+  *x = false_east() + rho * sin(theta);
+  *y = false_north() + rho0 - rho * cos(theta);
   return ERR_SUCCESS;
 }
 
 /*!
   Inverse conversion from XY to geographical coordinates.
 */
-errc Albers::XYGeo (double x, double y, double *lat, double *lon) const
+errc Albers::xy_geo (double x, double y, double *lat, double *lon) const
 {
-  x -= false_east_;
-  y -= false_north_;
+  x -= false_east();
+  y -= false_north();
   double yprime = rho0-y;
   double rho = hypot (x,yprime);
   double theta = atan (x/yprime);
-  *lon = theta/n + central_meridian_;
+  *lon = theta/n + ref_longitude();
 
-  double q = (c_big-rho*rho*n*n/(a()*a()/(unit_*unit_)))/n;
+  double q = (c_big-SQR(rho*n*unit()/ellipsoid().a()))/n;
   if (fabs(q) > 2)
       return errc (GEOERR_DOMAIN);
 
@@ -67,8 +87,8 @@ errc Albers::XYGeo (double x, double y, double *lat, double *lon) const
   while (fabs(delta) > 1e-7 && iter++ < 10)
   {
     double sinphi = sin (phi);
-    double v1 = 1 - e2 ()*sinphi*sinphi;
-    delta = v1*v1 / (2 * cos (phi))*(q / (1 - e2 ()) - sinphi / v1 + t (phi));
+    double v1 = 1 - ellipsoid().e2 ()*sinphi*sinphi;
+    delta = v1*v1 / (2 * cos (phi))*(q / (1 - ellipsoid().e2 ()) - sinphi / v1 + ellipsoid().t (phi));
     phi += delta;
   }
   *lat = phi;
@@ -78,17 +98,17 @@ errc Albers::XYGeo (double x, double y, double *lat, double *lon) const
   return ERR_SUCCESS;
 }
 
-double Albers::h (double lat, double lon) const
-{
-  return sqrt(c_big - n * q(lat))/m(lat);
-}
-
 double Albers::k (double lat, double lon) const
 {
+  return sqrt(c_big - n * ellipsoid().q(lat))/ellipsoid().m(lat);
+}
+
+double Albers::h (double lat, double lon) const
+{
   if (fabs(lat) != M_PI_2)
-    return 1/h(lat, lon);
+    return 1/k(lat, lon);
   else
-    throw errc(GEOERR_DOMAIN);
+    throw errc(GEOERR_SINGL);
 }
 
 #ifdef MLIBSPACE

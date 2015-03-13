@@ -68,17 +68,20 @@ c (0)
   e_ = sqrt (e2_);
   int idx;
   if ((idx = find_wkidx ()) >= 0)
-    pname = ellip[idx].name;
+    name_ = ellip[idx].name;
   else
-    pname = 0;
+    name_ = 0;
 }
 
 /// Create a well-known ellipsoid
 Ellipsoid::Ellipsoid (well_known wk) :
 a_ (6378137.),
-f_ (1./298.257223563) //just to have some reasonable defaults if wk is out of bounds
+f_ (1./298.257223563), //just to have some reasonable defaults if wk is out of bounds
+c (0)
 {
   name_ = known (wk, &a_, &f_);
+  e2_ = 2.*f_ - f_*f_;
+  e_ = sqrt (e2_);
 }
 
 /// Copy Constructor

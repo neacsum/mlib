@@ -15,32 +15,31 @@ namespace MLIBSPACE {
 class Mercator : public Projection
 {
 public:
-  Mercator(  PROJPARAMS& pp );
-  errc XYGeo(double x, double y, double *lat, double *lon) const;
-  errc GeoXY(double *x, double *y, double lat, double lon) const;
+  Mercator ();
+  Mercator (const ProjParams& params);
+  Mercator& operator= (const ProjParams& p);
+
+  errc xy_geo (double x, double y, double *lat, double *lon) const;
+  errc geo_xy (double *x, double *y, double lat, double lon) const;
 
   double h (double lat, double lon) const {return k(lat, lon);};
   double k (double lat, double lon) const;
 
-  const char *Name() const      { return "MER"; };
-  geoproj Id() const            { return GEOPROJ_MER; };
-
 private:
+  void init ();
   double sfeq;                  ///< radius of circle of parallel
 };
 
 
 ///CMap %Mercator
-class SMerc : public Projection
+class CMapMercator : public Projection
 {
 public:
-  SMerc (PROJPARAMS& pp);
-  errc XYGeo(double x, double y, double *lat, double *lon) const;
-  errc GeoXY(double *x, double *y, double lat, double lon) const;
+  CMapMercator ();
+  errc xy_geo(double x, double y, double *lat, double *lon) const;
+  errc geo_xy(double *x, double *y, double lat, double lon) const;
   double h (double lat, double lon) const {return k(lat, lon);};
   double k (double lat, double lon) const;
-  const char *Name() const      { return "CME"; };
-  geoproj Id() const            { return GEOPROJ_CME; };
 };
 
 

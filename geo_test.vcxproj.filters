@@ -18,19 +18,16 @@
     <ClCompile Include="source\geo\tests\test_ellip.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\geo\tests\test_lambertcc.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="source\geo\tests\test_projection.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="source\geo\tests\test_transmerc.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="source\geo\tests\tests_main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\geo\tests\tests_stero.cpp">
+    <ClCompile Include="source\geo\tests\test_mercator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\geo\tests\test_lambertcc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\geo\tests\test_albers.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

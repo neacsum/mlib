@@ -5,122 +5,209 @@
 */
 
 #include "ellip.h"
-#include "geostruct.h"
 
 #include <mlib/errorcode.h>
+#include <assert.h>
 
 #ifdef MLIBSPACE
 namespace MLIBSPACE {
 #endif
 
-class Projection : public Ellipsoid
+class ProjParams 
 {
 public:
-  Projection(  PROJPARAMS& pp );
+  ProjParams (const Ellipsoid& ell);
+  ProjParams (Ellipsoid::well_known wk = Ellipsoid::WGS_84);
 
-  /// Return projection's name
-  virtual const char *Name() const = 0;
+  ProjParams& ellipsoid (const Ellipsoid& ell);
+  ProjParams& ellipsoid (Ellipsoid::well_known wk);
+  ProjParams& k0 (double k);
+  ProjParams& unit (double u);
+  ProjParams& ref_latitude (double phi);
+  ProjParams& ref_longitude (double lambda);
+  ProjParams& north_latitude (double phi);
+  ProjParams& south_latitude (double phi);
+  ProjParams& skew_azimuth (double alpha);
+  ProjParams& false_north (double y);
+  ProjParams& false_east (double x);
 
-  /// Return projection's identifier
-  virtual geoproj Id() const = 0;
+private:
+  Ellipsoid ellip_;
+  double k_;
+  double unit_;
+  double reflat_;
+  double reflon_;
+  double fn_;
+  double fe_;
+  double npar_;
+  double spar_;
+  double skew_;
 
-  /// Convert from XY to geographical coordinates
-  virtual errc XYGeo(double x, double y, double *lat, double *lon) const = 0;
+  friend class Projection;
+  friend class ConicalProjection;
+};
 
-  /// Convert from geographical to XY coordinates
-  virtual errc GeoXY(double *x, double *y, double lat, double lon) const = 0;
+class Projection
+{
+public:
+  Projection ();
+  Projection (const ProjParams& params);
 
-  /// Return average scale factor at a given point
-  virtual errc Scale(double x, double y, double *scale);
+  /// \name Parameter accesor functions
+  ///\{
+  double unit () const;
+  double k0 () const;
+  double ref_longitude () const;
+  double ref_latitude () const;
+  double false_east () const;
+  double false_north () const;
+  const Ellipsoid& ellipsoid () const;
+  ///\}
 
-  /// Return scale factor along the latitude
-  virtual double k (double lat, double lon) const;
+  virtual errc xy_geo (double x, double y, double *lat, double *lon) const = 0;
+  virtual errc geo_xy (double *x, double *y, double lat, double lon) const = 0;
 
-  /// Return scale factor along meridian
-  virtual double h (double lat, double lon) const;
-
-  double Unit() const;
-  double ScaleFactor() const;
-  double CentralMeridian() const;
-  double ReferenceLatitude() const;
-  double NorthParallel() const;
-  double SouthParallel() const;
-  double FalseEast() const;
-  double FalseNorth() const;
-  double SkewAzimuth() const;
-  const char *EllipsoidName() const;
+  virtual double h (double lat, double lon) const = 0;
+  virtual double k (double lat, double lon) const = 0;
 
 protected:
-  double LonAdjust( double lon ) const;
-  double k_;
-  double central_meridian_;
-  double ref_latitude_;
-  double north_parallel_, south_parallel_;
-  double skew_azimuth_;
-  double unit_;
-  double false_east_, false_north_;
+  ProjParams par;
 };
+
+class ConicalProjection : public Projection
+{
+public:
+  ConicalProjection ();
+  ConicalProjection (const ProjParams& params);
+
+  double north_latitude () const;
+  double south_latitude () const;
+};
+
+///Error codes
+#define GEOERR_PARAM    1       ///< Invalid projection parameters
+#define GEOERR_SINGL    2       ///< Singularity
+#define GEOERR_DOMAIN   3       ///< Domain error
+#define GEOERR_NCONV    4       ///< Non-convergence
+
 
 /*==================== INLINE FUNCTIONS ===========================*/
 
-/// Return scale factor at origin
+/// Set scale factor at origin
 inline 
-double Projection::ScaleFactor() const { return k_; };
+ProjParams& ProjParams::k0 (double k)
+{
+  k_ = k;
+  return *this;
+}
+
+///Set conversion factor from XY units to meters
+inline
+ProjParams& ProjParams::unit (double u)
+{
+  unit_ = u;
+  return *this;
+}
+
+
+/// Set refernce latitude
+inline
+ProjParams& ProjParams::ref_latitude (double phi)
+{
+  assert (-M_PI / 2 <= phi && phi <= M_PI / 2);
+  reflat_ = phi;
+  return *this;
+}
+
+/// Set reference longitude (central meridian)
+inline
+ProjParams& ProjParams::ref_longitude (double lambda)
+{
+  assert (-M_PI <= lambda && lambda <= M_PI);
+  reflon_ = lambda;
+  return *this;
+}
+
+
+inline
+ProjParams& ProjParams::north_latitude (double phi)
+{
+  assert (-M_PI / 2 <= phi && phi <= M_PI / 2);
+  npar_ = phi;
+  return *this;
+}
+
+inline
+ProjParams& ProjParams::south_latitude (double phi)
+{
+  assert (-M_PI / 2 <= phi && phi <= M_PI / 2);
+  spar_ = phi;
+  return *this;
+}
+
+inline
+ProjParams& ProjParams::skew_azimuth (double alpha)
+{
+  assert (-M_PI <= alpha && alpha <= M_PI);
+  skew_ = alpha;
+  return *this;
+}
+
+inline
+ProjParams& ProjParams::false_east (double x)
+{
+  fe_ = x;
+  return *this;
+}
+
+inline
+ProjParams& ProjParams::false_north (double y)
+{
+  fn_ = y;
+  return *this;
+}
+
+/// Return scale factor at origin
+inline
+double Projection::k0 () const { return par.k_; }
 
 /// Return central meridian
-inline 
-double Projection::CentralMeridian() const { return central_meridian_; };
+inline
+double Projection::ref_longitude () const { return par.reflon_; }
 
 /// Return conversion factor from XY units to meters
-inline 
-double Projection::Unit() const { return unit_; };
+inline
+double Projection::unit () const { return par.unit_; }
 
 /// Return reference latitude
-inline 
-double Projection::ReferenceLatitude() const { return ref_latitude_; };
-
-/// Return north parallel
-inline 
-double Projection::NorthParallel() const { return north_parallel_; };
-
-/// Return south parallel
 inline
-double Projection::SouthParallel() const { return south_parallel_; };
+double Projection::ref_latitude () const { return par.reflat_; }
 
 /// Return X (easting) value at origin
-inline 
-double Projection::FalseEast() const { return false_east_; };
+inline
+double Projection::false_east () const { return par.fe_; }
 
 /// Return Y (northing) value at origin
-inline 
-double Projection::FalseNorth() const { return false_north_; };
-
-/// Return azimuth of skew
 inline
-double Projection::SkewAzimuth() const { return skew_azimuth_; };
+double Projection::false_north () const { return par.fn_; }
 
-/// Return ellipsoid's name or NULL if not known
-inline 
-const char *Projection::EllipsoidName() const { return Ellipsoid::Name(); };
-
-/*!
-  Default implementation for scale along the meridian returns the same value as
-  the scale along the latitude k. This is true only for conformal projections
-  and any derived projection that is not conformal would have to re-implement
-  this function.
-*/
+/// Return projection's ellipsoid
 inline
-double Projection::h (double lat, double lon) const {return k(lat,lon);};
+const Ellipsoid& Projection::ellipsoid () const { return par.ellip_; }
 
+/// Return North parallel
 inline
-double Projection::k (double lat, double lon) const {return 1.;};
+double ConicalProjection::north_latitude () const { return par.npar_; }
+
+/// Return South parallel
+inline
+double ConicalProjection::south_latitude () const { return par.spar_; }
+
+
+//========================= Helper functions ==================================
 
 ///  Return an adjusted longitude between -M_PI and M_PI.
-inline
-double Projection::LonAdjust( double lon ) const
-{
-  return ((lon>=0)?1:-1)*(fmod(fabs(lon)+M_PI, 2*M_PI)-M_PI);
-}
+double lon_adjust (double lon);
 
 #ifdef MLIBSPACE
 };

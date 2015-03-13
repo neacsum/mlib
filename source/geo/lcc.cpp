@@ -1,5 +1,5 @@
 /*!
-  \file LAMBERT.CPP - \ref Lambert "Lambert Conformal Conical" implementation
+  \file LCC.CPP - \ref Lambert "Lambert Conformal Conical" implementation
 
 */
 
@@ -7,7 +7,10 @@
   \class Lambert
   Formulas from Snyder pag. 107-109
 */
-#include <geo/lambert.h>
+#include <geo/lcc.h>
+
+static double sqrarg;
+#define SQR(a) ((sqrarg = (a)) == 0.0 ? 0.0 : sqrarg * sqrarg)
 
 #ifdef MLIBSPACE
 namespace MLIBSPACE {
@@ -18,52 +21,64 @@ namespace MLIBSPACE {
 /*!
   Constructor for a %Lambert Conformal Conical projection
 */
-Lambert::Lambert (PROJPARAMS& pp):
-  Projection (pp)
+Lambert::Lambert (const ProjParams& params):
+  ConicalProjection (params)
 {
-  double m1 = cos(north_parallel_)/sqrt(1-e2()*sin(north_parallel_)*sin(north_parallel_));
-  double t1 = tfunc(north_parallel_);
-  if ( north_parallel_ == south_parallel_ )
-    n = sin(north_parallel_);
+  init ();
+}
+
+Lambert& Lambert::operator= (const ProjParams& p)
+{
+  par = p;
+  init ();
+  return *this;
+}
+
+void Lambert::init()
+{
+  double m1 = cos(north_latitude()) / sqrt(1 - ellipsoid().e2()*SQR(sin(north_latitude())));
+  double t1 = tfunc(north_latitude());
+  if (north_latitude()== south_latitude())
+    n = sin(north_latitude());
   else
   {
-    double m2 = cos(south_parallel_)/sqrt(1-e2()*sin(south_parallel_)*sin(south_parallel_));
-    n = log(m1/m2) / log(t1/tfunc(south_parallel_));
+    double m2 = cos(south_latitude()) / sqrt(1 - ellipsoid().e2()*SQR(sin(south_latitude())));
+    n = log(m1 / m2) / log(t1 / tfunc(south_latitude()));
   }
-  af_big = a() / unit_ * k_ * m1/(n*pow(t1,n));
-  rho0 =  af_big * pow(tfunc(ref_latitude_), n);
-  if ( n == 0 )
-    throw errc (GEOERR_PARM);
+  af_big = ellipsoid().a() / unit() * k0() * m1 / (n*pow(t1, n));
+  rho0 = af_big * pow(tfunc(ref_latitude()), n);
+  if (n == 0)
+    throw errc(GEOERR_PARAM);
 }
 
 /*!
   Forward conversion from latitude/longitude to XY
 */
-errc Lambert::GeoXY (double *x, double *y, double lat, double lon) const
+errc Lambert::geo_xy (double *x, double *y, double lat, double lon) const
 {
-  double theta = (lon - central_meridian_) * n;
+  double theta = (lon - ref_longitude()) * n;
   double rho;
   if (fabs(lat) == M_PI_2)
   {
     if (n*lat > 0.)
       rho = 0;
     else
-      return errc (GEOERR_SNGL);
+      return errc (GEOERR_SINGL);
   }
   else
     rho = af_big * pow(tfunc(lat), n);
-  *x = false_east_ + rho * sin(theta);
-  *y = false_north_ + rho0 - rho * cos(theta);
+  *x = false_east() + rho * sin(theta);
+  *y = false_north() + rho0 - rho * cos(theta);
   return ERR_SUCCESS;
 }
 
 /*!
   Inverse conversion from XY to geographical coordinates.
 */
-errc Lambert::XYGeo (double x, double y, double *lat, double *lon) const
+errc Lambert::xy_geo (double x, double y, double *lat, double *lon) const
 {
-  x -= false_east_;
-  y -= false_north_;
+  x -= false_east ();
+  y -= false_north();
   double yprime = rho0-y;
   double rho = hypot (x,yprime);
   double theta;
@@ -74,10 +89,10 @@ errc Lambert::XYGeo (double x, double y, double *lat, double *lon) const
   }
   else
     theta = atan(x/yprime);
-  *lon = theta/n + central_meridian_;
+  *lon = theta/n + ref_longitude();
   double t = pow( rho/af_big, 1/n);
 
-  double e_ = e();
+  double e_ = ellipsoid().e();
   double phi_right = M_PI_2 - 2*atan(t);
   int iter =0;
   double delta = 10;
@@ -98,7 +113,7 @@ errc Lambert::XYGeo (double x, double y, double *lat, double *lon) const
 double Lambert::k (double lat, double lon) const
 {
   double rho = af_big * pow(tfunc(lat), n);
-  return rho*n/(a()*unit_*m(lat));
+  return rho*n/(ellipsoid().a()*unit()*ellipsoid().m(lat));
 }
 
 /// helper function. Not to be confused with the Ellipsoid::t function
@@ -106,7 +121,7 @@ double Lambert::tfunc (double phi) const
 {
   double sval = sin(phi);
   double t1 = (1. - sval) / (1. + sval);
-  double e_ = e();
+  double e_ = ellipsoid().e();
   double t2 = pow((1. + e_ * sval) / (1. - e_ * sval), e_);
   return (sqrt(t1 * t2));
 }
