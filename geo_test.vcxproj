@@ -88,6 +88,7 @@
   <ItemGroup>
     <ClCompile Include="source\geo\tests\tests_main.cpp" />
     <ClCompile Include="source\geo\tests\test_albers.cpp" />
+    <ClCompile Include="source\geo\tests\test_azd.cpp" />
     <ClCompile Include="source\geo\tests\test_ellip.cpp" />
     <ClCompile Include="source\geo\tests\test_lambertcc.cpp" />
     <ClCompile Include="source\geo\tests\test_mercator.cpp" />

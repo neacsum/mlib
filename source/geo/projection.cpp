@@ -24,10 +24,6 @@
 \endcode
 
 
-  see also: Curiously Reccuring Template Pattern
-  http://en.wikipedia.org/wiki/Curiously_recurring_template_pattern
-
-
 */
 
 #ifdef MLIBSPACE

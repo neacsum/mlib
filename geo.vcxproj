@@ -13,16 +13,15 @@
   <ItemGroup>
     <ClInclude Include="include\geo\albers.h" />
     <ClInclude Include="include\geo\aza.h" />
-    <ClInclude Include="include\geo\azimeqd.h" />
-    <ClInclude Include="include\geo\cassini.h" />
+    <ClInclude Include="include\geo\azd.h" />
     <ClInclude Include="include\geo\convert.h" />
+    <ClInclude Include="include\geo\crs.h" />
     <ClInclude Include="include\geo\ellip.h" />
-    <ClInclude Include="include\geo\finterp.h" />
-    <ClInclude Include="include\geo\geodesy.h" />
+    <ClInclude Include="include\geo\fileinterp.h" />
     <ClInclude Include="include\geo\geostruct.h" />
     <ClInclude Include="include\geo\hom.h" />
-    <ClInclude Include="include\geo\lambert.h" />
-    <ClInclude Include="include\geo\mercator.h" />
+    <ClInclude Include="include\geo\lcc.h" />
+    <ClInclude Include="include\geo\mer.h" />
     <ClInclude Include="include\geo\ocy.h" />
     <ClInclude Include="include\geo\ome.h" />
     <ClInclude Include="include\geo\plate.h" />
@@ -31,25 +30,16 @@
     <ClInclude Include="include\geo\rso.h" />
     <ClInclude Include="include\geo\stereo.h" />
     <ClInclude Include="include\geo\tranmerc.h" />
+    <ClInclude Include="include\geo\vertref.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\geo\albers.cpp" />
     <ClCompile Include="source\geo\aza.cpp" />
-    <ClCompile Include="source\geo\azimeqd.cpp" />
-    <ClCompile Include="source\geo\cassini.cpp" />
-    <ClCompile Include="source\geo\convert.cpp" />
+    <ClCompile Include="source\geo\azd.cpp" />
     <ClCompile Include="source\geo\ellip.cpp" />
-    <ClCompile Include="source\geo\hom.cpp" />
-    <ClCompile Include="source\geo\lambert.cpp" />
-    <ClCompile Include="source\geo\mercator.cpp" />
-    <ClCompile Include="source\geo\ocy.cpp" />
-    <ClCompile Include="source\geo\ome.cpp" />
-    <ClCompile Include="source\geo\plate.cpp" />
-    <ClCompile Include="source\geo\polycon.cpp" />
+    <ClCompile Include="source\geo\lcc.cpp" />
+    <ClCompile Include="source\geo\mer.cpp" />
     <ClCompile Include="source\geo\projection.cpp" />
-    <ClCompile Include="source\geo\rso.cpp" />
-    <ClCompile Include="source\geo\stereo.cpp" />
-    <ClCompile Include="source\geo\tranmerc.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{288C8E72-1034-42D4-8A33-B3BADAAC280B}</ProjectGuid>
@@ -82,9 +72,12 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IntDir>$(Configuration)\$(ProjectName)\</IntDir>
+    <PreBuildEventUseInBuild>false</PreBuildEventUseInBuild>
+    <IncludePath>$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IntDir>$(Configuration)\$(ProjectName)\</IntDir>
+    <IncludePath>$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -92,8 +85,8 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>include/</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_TRACE;_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(MLIB_ROOT)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -108,8 +101,8 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>include/</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(MLIB_ROOT)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
