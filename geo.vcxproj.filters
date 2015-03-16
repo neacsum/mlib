@@ -39,9 +39,6 @@
     <ClInclude Include="include\geo\projection.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\geo\geostruct.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\geo\convert.h">
       <Filter>Header Files</Filter>
     </ClInclude>

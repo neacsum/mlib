@@ -45,6 +45,7 @@ private:
 
   friend class Projection;
   friend class ConicalProjection;
+  friend class ObliqueMercator;
 };
 
 class Projection
@@ -53,7 +54,7 @@ public:
   Projection ();
   Projection (const ProjParams& params);
 
-  /// \name Parameter accesor functions
+  /// \name Parameter accessor functions
   ///\{
   double unit () const;
   double k0 () const;
@@ -110,7 +111,7 @@ ProjParams& ProjParams::unit (double u)
 }
 
 
-/// Set refernce latitude
+/// Set reference latitude
 inline
 ProjParams& ProjParams::ref_latitude (double phi)
 {

@@ -18,7 +18,6 @@
     <ClInclude Include="include\geo\crs.h" />
     <ClInclude Include="include\geo\ellip.h" />
     <ClInclude Include="include\geo\fileinterp.h" />
-    <ClInclude Include="include\geo\geostruct.h" />
     <ClInclude Include="include\geo\lcc.h" />
     <ClInclude Include="include\geo\mer.h" />
     <ClInclude Include="include\geo\ocy.h" />
