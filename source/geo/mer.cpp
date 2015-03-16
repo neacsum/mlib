@@ -5,8 +5,6 @@
 
 #include <geo/mer.h>
 
-#include "geohelpers.h"
-
 #ifdef MLIBSPACE
 namespace MLIBSPACE {
 #endif

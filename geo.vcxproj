@@ -19,7 +19,6 @@
     <ClInclude Include="include\geo\ellip.h" />
     <ClInclude Include="include\geo\fileinterp.h" />
     <ClInclude Include="include\geo\geostruct.h" />
-    <ClInclude Include="include\geo\hom.h" />
     <ClInclude Include="include\geo\lcc.h" />
     <ClInclude Include="include\geo\mer.h" />
     <ClInclude Include="include\geo\ocy.h" />
@@ -27,7 +26,6 @@
     <ClInclude Include="include\geo\plate.h" />
     <ClInclude Include="include\geo\polycon.h" />
     <ClInclude Include="include\geo\projection.h" />
-    <ClInclude Include="include\geo\rso.h" />
     <ClInclude Include="include\geo\stereo.h" />
     <ClInclude Include="include\geo\tranmerc.h" />
     <ClInclude Include="include\geo\vertref.h" />
@@ -39,6 +37,7 @@
     <ClCompile Include="source\geo\ellip.cpp" />
     <ClCompile Include="source\geo\lcc.cpp" />
     <ClCompile Include="source\geo\mer.cpp" />
+    <ClCompile Include="source\geo\ome.cpp" />
     <ClCompile Include="source\geo\projection.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

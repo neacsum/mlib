@@ -15,7 +15,7 @@
 #define F1_WGS84  298.257223563         ///< Inverse of flattening for WGS84 ellipsoid
 #define NM2M      1852                  ///< Nautical mile to meters conversion factor
 #define USFOOT    0.3048006096          ///< US Survey foot to meters conversion factor
-
+#define MAS       (M_PI/(180*3600000.)) ///< milli-arcsecond
 
 #define DEG(dd) ((dd)*D2R)
 #define DM(dd,mm) (((dd)+(mm)/60.)*D2R)

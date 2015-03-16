@@ -1,7 +1,7 @@
 #pragma once
 
 /*!
-  \file AZIMEQD.H - \ref AzimuthEqDist "Azimuthal Equidistant" class definition
+  \file AZD.H - \ref AzimuthEqDist "Azimuthal Equidistant" class definition
 
 */
 

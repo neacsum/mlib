@@ -1,5 +1,5 @@
 /*!
-  \file AZIMEQD.CPP - \ref AzimuthEqDist "Azimuthal Equidistant" implementation
+  \file AZD.CPP - \ref AzimuthEqDist "Azimuthal Equidistant" implementation
 
 */
 

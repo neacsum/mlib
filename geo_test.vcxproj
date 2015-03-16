@@ -92,6 +92,7 @@
     <ClCompile Include="source\geo\tests\test_ellip.cpp" />
     <ClCompile Include="source\geo\tests\test_lambertcc.cpp" />
     <ClCompile Include="source\geo\tests\test_mercator.cpp" />
+    <ClCompile Include="source\geo\tests\test_ome.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
