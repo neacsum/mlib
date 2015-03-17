@@ -14,6 +14,7 @@
     <ClInclude Include="include\geo\albers.h" />
     <ClInclude Include="include\geo\aza.h" />
     <ClInclude Include="include\geo\azd.h" />
+    <ClInclude Include="include\geo\cas.h" />
     <ClInclude Include="include\geo\convert.h" />
     <ClInclude Include="include\geo\crs.h" />
     <ClInclude Include="include\geo\ellip.h" />
@@ -26,18 +27,25 @@
     <ClInclude Include="include\geo\polycon.h" />
     <ClInclude Include="include\geo\projection.h" />
     <ClInclude Include="include\geo\stereo.h" />
-    <ClInclude Include="include\geo\tranmerc.h" />
+    <ClInclude Include="include\geo\tme.h" />
     <ClInclude Include="include\geo\vertref.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\geo\albers.cpp" />
     <ClCompile Include="source\geo\aza.cpp" />
     <ClCompile Include="source\geo\azd.cpp" />
+    <ClCompile Include="source\geo\cas.cpp" />
+    <ClCompile Include="source\geo\convert.cpp" />
     <ClCompile Include="source\geo\ellip.cpp" />
     <ClCompile Include="source\geo\lcc.cpp" />
     <ClCompile Include="source\geo\mer.cpp" />
+    <ClCompile Include="source\geo\ocy.cpp" />
     <ClCompile Include="source\geo\ome.cpp" />
+    <ClCompile Include="source\geo\plate.cpp" />
+    <ClCompile Include="source\geo\polycon.cpp" />
     <ClCompile Include="source\geo\projection.cpp" />
+    <ClCompile Include="source\geo\stereo.cpp" />
+    <ClCompile Include="source\geo\tme.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{288C8E72-1034-42D4-8A33-B3BADAAC280B}</ProjectGuid>

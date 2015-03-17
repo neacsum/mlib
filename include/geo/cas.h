@@ -1,7 +1,7 @@
 #pragma once
 
 /*!
-  \file CASSINI.H - Cassini projection definition
+  \file CAS.H - Cassini projection definition
 
 */
 
@@ -15,16 +15,18 @@ namespace MLIBSPACE {
 class Cassini : public Projection
 {
  public:
-  Cassini (PROJPARAMS& pp);
-  const char *Name() const      { return "CAS"; };
-  geoproj Id() const            { return GEOPROJ_CAS; };
+  Cassini () {};
+  Cassini (const ProjParams& params);
 
-  errc XYGeo (double x, double y, double *lat, double *lon) const;
-  errc GeoXY (double *x, double *y, double lat, double lon) const ;
+  Cassini& operator= (const ProjParams& p);
+
+  errc xy_geo (double x, double y, double *lat, double *lon) const;
+  errc geo_xy (double *x, double *y, double lat, double lon) const ;
   double h (double lat, double lon) const;
   double k (double lat, double lon) const {return 1.;};
 
  private:
+   void init ();
    double s0;
 };
 

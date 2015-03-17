@@ -36,5 +36,20 @@
     <ClCompile Include="source\geo\tests\test_ome.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="source\geo\tests\test_tme.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\geo\tests\test_cas.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\geo\tests\test_ocy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\geo\tests\test_polyconic.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\geo\tests\tests_stero.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

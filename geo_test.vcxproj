@@ -87,12 +87,17 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="source\geo\tests\tests_main.cpp" />
+    <ClCompile Include="source\geo\tests\tests_stero.cpp" />
     <ClCompile Include="source\geo\tests\test_albers.cpp" />
     <ClCompile Include="source\geo\tests\test_azd.cpp" />
+    <ClCompile Include="source\geo\tests\test_cas.cpp" />
     <ClCompile Include="source\geo\tests\test_ellip.cpp" />
     <ClCompile Include="source\geo\tests\test_lambertcc.cpp" />
     <ClCompile Include="source\geo\tests\test_mercator.cpp" />
+    <ClCompile Include="source\geo\tests\test_ocy.cpp" />
     <ClCompile Include="source\geo\tests\test_ome.cpp" />
+    <ClCompile Include="source\geo\tests\test_polyconic.cpp" />
+    <ClCompile Include="source\geo\tests\test_tme.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

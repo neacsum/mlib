@@ -1,5 +1,5 @@
 /*!
-  \file PLATE.CPP - Plate Caree implementation
+  \file PLATE.CPP - Plate Carrée implementation
 
 */
 
@@ -9,31 +9,31 @@
 namespace MLIBSPACE {
 #endif
 
-PlateCarree::PlateCarree (PROJPARAMS& pp) :
-  Projection (pp)
+PlateCarree::PlateCarree (const ProjParams& params) :
+  Projection (params)
 {
 }
 
-errc PlateCarree::XYGeo (double x, double y, double *lat, double *lon) const
+errc PlateCarree::xy_geo (double x, double y, double *lat, double *lon) const
 {
-  double xtrue = x - false_east_;
-  double ytrue = y - false_north_;
-  *lat = ytrue / a ();
-  *lon = central_meridian_ + xtrue / (a ()*cos (ref_latitude_));
+  double xtrue = x - false_east();
+  double ytrue = y - false_north();
+  *lat = ytrue / ellipsoid().a ();
+  *lon = ref_longitude() + xtrue / (ellipsoid().a ()*cos (ref_latitude()));
   return ERR_SUCCESS;
 }
 
-errc PlateCarree::GeoXY (double *x, double *y, double lat, double lon) const
+errc PlateCarree::geo_xy (double *x, double *y, double lat, double lon) const
 {
-  lon = LonAdjust (lon - central_meridian_);
-  *x = lon * a () * cos (ref_latitude_) + false_east_;
-  *y = lat * a () + false_north_;
+  lon = lon_adjust (lon - ref_longitude());
+  *x = lon * ellipsoid().a () * cos (ref_latitude()) + false_east();
+  *y = lat * ellipsoid().a () + false_north();
   return ERR_SUCCESS;
 }
 
 double PlateCarree::k (double lat, double lon) const
 {
-  return cos (ref_latitude_) / cos (lat);
+  return cos (ref_latitude()) / cos (lat);
 }
 
 #ifdef MLIBSPACE

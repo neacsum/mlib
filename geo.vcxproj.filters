@@ -33,9 +33,6 @@
     <ClInclude Include="include\geo\stereo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\geo\tranmerc.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\geo\projection.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -66,6 +63,12 @@
     <ClInclude Include="include\geo\azd.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\geo\tme.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\geo\cas.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\geo\ellip.cpp">
@@ -90,6 +93,27 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\geo\ome.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\geo\tme.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\geo\plate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\geo\convert.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\geo\cas.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\geo\ocy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\geo\polycon.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\geo\stereo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -1,6 +1,6 @@
 #pragma once
 /*!
-  \file PLATE.H - Plate Caree projection definition
+  \file PLATE.H - Plate Carrée projection definition
 
 */
 
@@ -10,21 +10,17 @@
 namespace MLIBSPACE {
 #endif
 
-///Plate Carree projection
+///Plate Carrée projection
 class PlateCarree : public Projection
 {
 public:
-  PlateCarree (PROJPARAMS& pp);
-  errc XYGeo (double x, double y, double *lat, double *lon) const;
-  errc GeoXY (double *x, double *y, double lat, double lon) const;
+  PlateCarree (const ProjParams& params);
+
+  errc xy_geo (double x, double y, double *lat, double *lon) const;
+  errc geo_xy (double *x, double *y, double lat, double lon) const;
 
   double h (double lat, double lon) const   { return 1.; };
   double k (double lat, double lon) const;
-
-  const char *Name () const     { return "PLC"; };
-  geoproj Id () const           { return GEOPROJ_DEM; };
-private:
-  double sfeq;                  //radius of circle of parallel
 };
 
 

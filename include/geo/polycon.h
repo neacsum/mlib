@@ -14,19 +14,25 @@ namespace MLIBSPACE {
 class Polyconic : public Projection
 {
 public:
-  Polyconic (PROJPARAMS& pp);
-  const char *Name () const     { return "POL"; };
-  geoproj Id () const           { return GEOPROJ_POL; };
+  Polyconic () {};
+  Polyconic (const ProjParams& params);
+  Polyconic& operator= (const ProjParams& p);
 
-  errc XYGeo (double x, double y, double *lat, double *lon) const;
-  errc GeoXY (double *x, double *y, double lat, double lon) const;
+  errc xy_geo (double x, double y, double *lat, double *lon) const;
+  errc geo_xy (double *x, double *y, double lat, double lon) const;
   double h (double lat, double lon) const;
+  double k (double lat, double lon) const;
 
 private:
+  void init ();
+
   double m1 (double lat) const;
   double m0;
   double c[4];
 };
+
+inline
+double Polyconic::k (double lat, double lon) const { return 1.; }
 
 #ifdef MLIBSPACE
 };

@@ -15,14 +15,18 @@ namespace MLIBSPACE {
 class Stereographic : public Projection
 {
 public:
-  Stereographic (PROJPARAMS& pp);
-  const char *Name () const              { return "OST"; };
-  geoproj Id () const                    { return GEOPROJ_OST; };
-  errc GeoXY (double *x, double *y, double lat, double lon) const;
-  errc XYGeo (double x, double y, double *lat, double *lon) const;
+  Stereographic () {};
+  Stereographic (const ProjParams& params);
+  Stereographic& operator= (const ProjParams& p);
+
+  errc geo_xy (double *x, double *y, double lat, double lon) const;
+  errc xy_geo (double x, double y, double *lat, double *lon) const;
+  
   double k (double lat, double lon) const;
+  double h (double lat, double lon) const;
 
 private:
+  void init ();
   double c1, c2, chi0, lam0s, r0;
   double map_radius;
 };
@@ -31,19 +35,28 @@ private:
 class PolarStereo : public Projection
 {
 public:
-  PolarStereo (PROJPARAMS& pp);
-  const char *Name () const              { return "PST"; };
-  geoproj Id () const                    { return GEOPROJ_PST; };
-  errc GeoXY (double *x, double *y, double lat, double lon) const;
-  errc XYGeo (double x, double y, double *lat, double *lon) const;
+  PolarStereo () {};
+  PolarStereo (const ProjParams& params);
+  PolarStereo& operator= (const ProjParams& p);
+
+  errc geo_xy (double *x, double *y, double lat, double lon) const;
+  errc xy_geo (double x, double y, double *lat, double *lon) const;
   double k (double lat, double lon) const;
+  double h (double lat, double lon) const;
 
 private:
+  void init ();
   double rho (double lat) const;
   double rho1;
   double sc[4];
-  //	double map_radius;
+  double k_;
 };
+
+inline
+double Stereographic::h (double lat, double lon) const { return k (lat, lon); }
+
+inline
+double PolarStereo::h (double lat, double lon) const { return k (lat, lon); }
 
 #ifdef MLIBSPACE
 };
