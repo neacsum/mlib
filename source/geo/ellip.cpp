@@ -221,7 +221,7 @@ void Ellipsoid::ECEF_geo (double *lat, double *lon, double *height, double x, do
     double rn;
     lat0 = atan( 1/(1-e2_) * z/rho );
     lat1 = lat0+1;
-    while (fabs(lat0-lat1) > 1e-9)  /*approx 2 mm*/
+    while (fabs(lat0-lat1) > 9e-10)  /*approx 0.1 mm*/
     {
       double slat = sin( lat0 );
       rn = a_/sqrt(1.-e2_*slat*slat);
