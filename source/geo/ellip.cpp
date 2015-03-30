@@ -206,7 +206,7 @@ void Ellipsoid::geo_ECEF (double lat, double lon, double height, double *x, doub
   Formulas from "GPS Satellite Surveying" by Alfred Leick page 184-185.
   If both x and y are 0 longitude is set to 0.
 */
-void Ellipsoid::ECEF_Geo (double *lat, double *lon, double *height, double x, double y, double z) const
+void Ellipsoid::ECEF_geo (double *lat, double *lon, double *height, double x, double y, double z) const
 {
   double rho = hypot( x, y );
   if ( rho == 0. )
