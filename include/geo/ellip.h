@@ -73,7 +73,7 @@ public:
   double distance (double lat1, double lon1, double lat2, double lon2, double *az = 0, dist_method m=great_circle);
   std::string name () const;
   void geo_ECEF (double lat, double lon, double height, double *x, double *y, double *z) const;
-  void ECEF_Geo (double *lat, double *lon, double *height, double x, double y, double z) const;
+  void ECEF_geo (double *lat, double *lon, double *height, double x, double y, double z) const;
   int operator == (const Ellipsoid& other) const;
   int operator != (const Ellipsoid& other) const;
   Ellipsoid& operator = (const Ellipsoid& rhs);

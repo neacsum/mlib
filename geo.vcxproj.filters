@@ -69,6 +69,9 @@
     <ClInclude Include="include\geo\cas.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\geo\dtrans.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\geo\ellip.cpp">
@@ -114,6 +117,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\geo\stereo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\geo\dtrans.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

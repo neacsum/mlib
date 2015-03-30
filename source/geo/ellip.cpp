@@ -139,7 +139,7 @@ double Ellipsoid::lm (double lat) const
 }
 
 /*!
-  Return and and ellipsoidal parameters a and f of a well-known ellipsoid
+  Return ellipsoidal parameters a and f of a well-known ellipsoid
 
   \param wk       well-known ellipsoid index
   \param pa       pointer to semi-major axis
@@ -206,7 +206,7 @@ void Ellipsoid::geo_ECEF (double lat, double lon, double height, double *x, doub
   Formulas from "GPS Satellite Surveying" by Alfred Leick page 184-185.
   If both x and y are 0 longitude is set to 0.
 */
-void Ellipsoid::ECEF_Geo (double *lat, double *lon, double *height, double x, double y, double z) const
+void Ellipsoid::ECEF_geo (double *lat, double *lon, double *height, double x, double y, double z) const
 {
   double rho = hypot( x, y );
   if ( rho == 0. )
@@ -221,7 +221,7 @@ void Ellipsoid::ECEF_Geo (double *lat, double *lon, double *height, double x, do
     double rn;
     lat0 = atan( 1/(1-e2_) * z/rho );
     lat1 = lat0+1;
-    while (fabs(lat0-lat1) > 1e-9)  /*approx 2 mm*/
+    while (fabs(lat0-lat1) > 9e-10)  /*approx 0.1 mm*/
     {
       double slat = sin( lat0 );
       rn = a_/sqrt(1.-e2_*slat*slat);
