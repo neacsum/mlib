@@ -139,7 +139,7 @@ double Ellipsoid::lm (double lat) const
 }
 
 /*!
-  Return and and ellipsoidal parameters a and f of a well-known ellipsoid
+  Return ellipsoidal parameters a and f of a well-known ellipsoid
 
   \param wk       well-known ellipsoid index
   \param pa       pointer to semi-major axis
