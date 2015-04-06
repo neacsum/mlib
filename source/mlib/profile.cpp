@@ -514,7 +514,7 @@ void Profile::CopySection (const Profile& from_file, const char *from_sect, cons
     to_sect = from_sect;
 
   //locate [from section]
-  int len = strlen (from_sect);
+  int len = (int)strlen (from_sect);
   FILE *fpfrom = ini_openread (from_file.filename);
   if (fpfrom == NULL)
     return;
@@ -532,7 +532,7 @@ void Profile::CopySection (const Profile& from_file, const char *from_sect, cons
   }
 
   //locate [to section]
-  len = strlen (to_sect);
+  len = (int)strlen (to_sect);
   FILE *fp = ini_openread (filename);
   if (fp == NULL)
   {

@@ -55,7 +55,7 @@ size_t base64dec (const char *in, void *out)
     dectab_initialized = true;
   }
 
-  int k = 0, no = olen;
+  int k = 0, no = (int)olen;
   union {
     unsigned char sextet[4];
     int si;
