@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30501.0
+VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mlib", "mlib.vcxproj", "{F9E11AA9-FAB8-40D8-96D9-F92C5725762B}"
 EndProject
@@ -21,6 +21,13 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "geo_test", "geo_test.vcxpro
 		{288C8E72-1034-42D4-8A33-B3BADAAC280B} = {288C8E72-1034-42D4-8A33-B3BADAAC280B}
 		{F9E11AA9-FAB8-40D8-96D9-F92C5725762B} = {F9E11AA9-FAB8-40D8-96D9-F92C5725762B}
 		{C6BEA1F0-D8D4-493B-902C-EF57FDA8F477} = {C6BEA1F0-D8D4-493B-902C-EF57FDA8F477}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "geom", "geom.vcxproj", "{3FF5F1BE-1178-4373-8FB0-E9FC6380221F}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "geom_test", "geom_test.vcxproj", "{3A8FB307-CF89-46CF-BA34-8C52C271C4CF}"
+	ProjectSection(ProjectDependencies) = postProject
+		{3FF5F1BE-1178-4373-8FB0-E9FC6380221F} = {3FF5F1BE-1178-4373-8FB0-E9FC6380221F}
 	EndProjectSection
 EndProject
 Global
@@ -53,6 +60,14 @@ Global
 		{8340C581-6FB6-45F3-9089-B3FA6DEC6FF7}.Debug|Win32.Build.0 = Debug|Win32
 		{8340C581-6FB6-45F3-9089-B3FA6DEC6FF7}.Release|Win32.ActiveCfg = Release|Win32
 		{8340C581-6FB6-45F3-9089-B3FA6DEC6FF7}.Release|Win32.Build.0 = Release|Win32
+		{3FF5F1BE-1178-4373-8FB0-E9FC6380221F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{3FF5F1BE-1178-4373-8FB0-E9FC6380221F}.Debug|Win32.Build.0 = Debug|Win32
+		{3FF5F1BE-1178-4373-8FB0-E9FC6380221F}.Release|Win32.ActiveCfg = Release|Win32
+		{3FF5F1BE-1178-4373-8FB0-E9FC6380221F}.Release|Win32.Build.0 = Release|Win32
+		{3A8FB307-CF89-46CF-BA34-8C52C271C4CF}.Debug|Win32.ActiveCfg = Debug|Win32
+		{3A8FB307-CF89-46CF-BA34-8C52C271C4CF}.Debug|Win32.Build.0 = Debug|Win32
+		{3A8FB307-CF89-46CF-BA34-8C52C271C4CF}.Release|Win32.ActiveCfg = Release|Win32
+		{3A8FB307-CF89-46CF-BA34-8C52C271C4CF}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
