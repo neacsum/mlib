@@ -12,7 +12,8 @@ TEST (PutGetString)
 {
   char val[80];
   _unlink ("test.ini");
-  Profile test("test.ini");
+  Sleep (200);
+  Profile test ("test.ini");
   test.PutString ("key0", "value00", "section0");
   test.PutString ("key1", "value01", "section0");
   test.PutString ("key0", "value10", "section1");
@@ -29,7 +30,8 @@ TEST (PutReplaceGet)
 {
   char val[80];
   _unlink ("test.ini");
-  Profile test("test.ini");
+  Sleep (200);
+  Profile test ("test.ini");
   test.PutString ("key0", "value00", "section0");
   test.PutString ("key0", "newval", "section0");
   int sz = test.GetString (val, sizeof(val), "key0", "section0");
@@ -46,7 +48,8 @@ TEST (PutDelete)
 {
   char val[80];
   _unlink ("test.ini");
-  Profile test("test.ini");
+  Sleep (200);
+  Profile test ("test.ini");
   test.PutString ("key0", "value00", "section0");
   test.PutString ("key1", "value01", "section0");
   test.PutString ("key2", "value02", "section0");
@@ -66,7 +69,8 @@ TEST (GetSections)
 {
   char sections[80];
   _unlink ("test.ini");
-  Profile test("test.ini");
+  Sleep (200);
+  Profile test ("test.ini");
   test.PutString ("key0", "value00", "section0");
   test.PutString ("key1", "value01", "section0");
   test.PutString ("key0", "value10", "section1");
@@ -82,7 +86,8 @@ TEST (GetSections_SmallBuffer)
 {
   char sections[20];
   _unlink ("test.ini");
-  Profile test("test.ini");
+  Sleep (200);
+  Profile test ("test.ini");
   test.PutString ("key0", "value00", "Asection12345678901234567890");
   test.PutString ("key1", "value01", "Bsection12345678901234567890");
 
@@ -97,7 +102,8 @@ TEST (GetKeys)
 {
   char buffer[256];
   _unlink ("test.ini");
-  Profile test("test.ini");
+  Sleep (200);
+  Profile test ("test.ini");
   test.PutString ("key0", "value00", "section0");
   test.PutString ("key1", "value01", "section0");
   test.PutString ("key2", "value02", "section0");
@@ -118,6 +124,7 @@ TEST (GetKeys_SmallBuffer)
 {
   char buffer[20];
   _unlink ("test.ini");
+  Sleep (200);
   Profile test("test.ini");
   test.PutString ("key0", "value00", "section0");
   test.PutString ("key1", "value01", "section0");
@@ -138,7 +145,8 @@ TEST (GetKeys_SmallBuffer)
 TEST (HasSection)
 {
   _unlink ("test.ini");
-  Profile test("test.ini");
+  Sleep (200);
+  Profile test ("test.ini");
   test.PutString ("key0", "value00", "section0");
   test.PutString ("key1", "value01", "section0");
   bool t = test.HasSection ("section0");
@@ -158,6 +166,7 @@ TEST (Greek_filename)
   char strval[80];
 
   _wunlink (widen(filename).c_str());
+  Sleep (200);
   Profile greek (filename);
   greek.PutInt ("Integer", 1, "Keys");
   CHECK_EQUAL (1, greek.GetInt ("Integer", "Keys", 2));
@@ -173,7 +182,8 @@ TEST (Quoted_strings)
   char *quoted = "\"Quoted String with \" in the middle\"";
   char buffer[256];
   _unlink ("test.ini");
-  Profile test("test.ini");
+  Sleep (200);
+  Profile test ("test.ini");
   test.PutString ("key0", quoted, "section");
   test.GetString (buffer, sizeof(buffer), "key0", "section");
   CHECK_EQUAL (quoted, buffer);
