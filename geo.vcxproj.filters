@@ -45,9 +45,6 @@
     <ClInclude Include="include\geo\vertref.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\geo\fileinterp.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\geo\albers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -70,6 +67,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\geo\dtrans.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\geo\grid.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\geo\filegeo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -120,6 +123,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\geo\dtrans.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\geo\grid.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\geo\filegeo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

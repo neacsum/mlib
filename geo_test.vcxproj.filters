@@ -51,5 +51,8 @@
     <ClCompile Include="source\geo\tests\tests_stero.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="source\geo\tests\test_filegeo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
