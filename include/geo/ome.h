@@ -38,7 +38,7 @@ protected:
 
 private:
   errc uvgeo (double u, double v, double *lat, double *lon) const;
-  double A, B, E, lam0;
+  double A, B, E, lam1;
 };
 
 
