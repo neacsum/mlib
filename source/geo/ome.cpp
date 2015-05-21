@@ -50,7 +50,7 @@ void ObliqueMercator::init ()
   double G = (F - 1. / F) / 2;
   gamma0 = asin (sin (skew_azimuth()) / D);
   double delta = asin (G*tan (gamma0)) / B;
-  lam0 = ref_longitude() - asin (G*tan (gamma0)) / B;
+  lam1 = ref_longitude() - asin (G*tan (gamma0)) / B;
 }
 
 errc ObliqueMercator::geo_xy( double *x, double *y, double lat, double lon ) const
@@ -58,10 +58,10 @@ errc ObliqueMercator::geo_xy( double *x, double *y, double lat, double lon ) con
   double Q = E/pow( exptau(lat), B );
   double S = (Q-1./Q)/2.;
   double T = (Q+1./Q)/2.;
-  double V = sin( B*(lon-lam0) );
+  double V = sin( B*(lon-lam1) );
   double U = (-V*cos(gamma0) + S*sin(gamma0))/T;
   double v = A*log((1.-U)/(1.+U))/(2.*B);
-  double u = A/B*atan2(S*cos(gamma0)+V*sin(gamma0),cos(B*(lon-lam0)));
+  double u = A/B*atan2(S*cos(gamma0)+V*sin(gamma0),cos(B*(lon-lam1)));
   deskew( u, v, x, y );
   return ERR_SUCCESS;
 }
@@ -72,11 +72,11 @@ double ObliqueMercator::k(double lat, double lon) const
   double Q = E/pow( exptau(lat), B );
   double S = (Q-1./Q)/2.;
   double T = (Q+1./Q)/2.;
-  double V = sin( B*(lon-lam0) );
+  double V = sin( B*(lon-lam1) );
   double U = (-V*cos(gamma0) + S*sin(gamma0))/T;
-  double u = A/B*atan2(S*cos(gamma0)+V*sin(gamma0),cos(B*(lon-lam0)));
+  double u = A/B*atan2(S*cos(gamma0)+V*sin(gamma0),cos(B*(lon-lam1)));
   scale = A*cos (B*u / A)*sqrt (1 - ellipsoid ().e2 ()*sin (lat)*sin (lat)) / 
-    (ellipsoid ().a ()*cos (lat)*cos (B*(lon - lam0)));
+    (ellipsoid ().a ()*cos (lat)*cos (B*(lon - lam1)));
   return scale;
 }
 
@@ -124,7 +124,7 @@ errc ObliqueMercator::uvgeo(double u, double v, double *lat, double *lon) const
     return GEOERR_NCONV;
 
   *lat = ll;
-  *lon = lam0-atan((S*cos(gamma0)-V*sin(gamma0))/cos(B*u/A))/B;
+  *lon = lam1-atan((S*cos(gamma0)-V*sin(gamma0))/cos(B*u/A))/B;
   return ERR_SUCCESS;
 }
 
