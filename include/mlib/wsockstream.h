@@ -77,7 +77,7 @@ public:
 
   errc              bind (const sockaddr&);
   errc              bind ();
-  errc              connect (const sockaddr&);
+  errc              connect (const sockaddr& peer, int wp_sec = INFINITE);
   errc              listen (int num=SOMAXCONN);
   sockaddr          name () const;
   sockaddr          peer () const;

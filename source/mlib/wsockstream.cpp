@@ -234,9 +234,25 @@ errc sock::bind()
 
 /*!
   Establishes a connection to a specified address
+
+  If a timeout is specified, the socket switches to non-blocking mode and the 
+  the function waits the specified interval for the connection to be established.
+  If it is not established the function returns WSAETIMEDOUT.
 */
-errc sock::connect (const sockaddr& sa)
+errc sock::connect (const sockaddr& sa, int wp_sec)
 {
+  if (wp_sec != INFINITE)
+  {
+    blocking (false);
+    if (!::connect (sl->handle, &sa, sizeof (sa)))
+      return ERR_SUCCESS;
+    DWORD ret = WSAGetLastError ();
+    if (WSAGetLastError () != WSAEWOULDBLOCK)
+      return WSALASTERROR;
+    if (is_writeready (wp_sec))
+      return ERR_SUCCESS;
+    return erc (WSAETIMEDOUT, ERROR_PRI_INFO);
+  }
   if (::connect(sl->handle, &sa, sizeof(sa)) == SOCKET_ERROR)
     return WSALASTERROR;
   return ERR_SUCCESS;
