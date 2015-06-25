@@ -23,6 +23,16 @@
 
 #ifdef _TRACE
 # undef TRACE
+# undef TRACE1
+# undef TRACE2
+# undef TRACE3
+# undef TRACE4
+# undef TRACE5
+# undef TRACE6
+# undef TRACE7
+# undef TRACE8
+# undef TRACE9
+
 # if defined (_TRACE_SYSLOG)
 #  include "log.h"
 #  define TRACE syslog_debug
