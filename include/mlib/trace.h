@@ -63,6 +63,16 @@
 # endif
 #else
 # undef TRACE
+# undef TRACE1
+# undef TRACE2
+# undef TRACE3
+# undef TRACE4
+# undef TRACE5
+# undef TRACE6
+# undef TRACE7
+# undef TRACE8
+# undef TRACE9
+
 # define TRACE 1? (void)0 : dprintf
 # define TRACE1 1? (void)0 : dprintf
 # define TRACE2 1? (void)0 : dprintf
