@@ -14,7 +14,7 @@ struct Snyder_polyconic
 {
   Snyder_polyconic ();
 
-  ProjParams par;
+  Projection::Params par;
   double lam_check, phi_check, x_check, y_check, h_check;
 };
 

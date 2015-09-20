@@ -9,7 +9,7 @@
 namespace MLIBSPACE {
 #endif
 
-PlateCarree::PlateCarree (const ProjParams& params) :
+PlateCarree::PlateCarree (const Params& params) :
   Projection (params)
 {
 }

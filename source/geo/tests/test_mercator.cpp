@@ -52,7 +52,7 @@ SUITE (MercatorTests)
   {
     double xr, yr, kr;
 
-    Mercator prj = ProjParams (Ellipsoid::CLARKE_1866)
+    Mercator prj = Projection::Params (Ellipsoid::CLARKE_1866)
                     .ref_longitude (-180 * D2R);
 
     prj.geo_xy (&xr, &yr, lat, lon);
@@ -66,7 +66,7 @@ SUITE (MercatorTests)
   {
     double latr, lonr;
 
-    Mercator prj = ProjParams (Ellipsoid::CLARKE_1866)
+    Mercator prj = Projection::Params (Ellipsoid::CLARKE_1866)
                     .ref_longitude (-180 * D2R);
 
     prj.xy_geo (x, y, &latr, &lonr);
@@ -77,7 +77,7 @@ SUITE (MercatorTests)
   TEST (OSGEO_Mercator_1SP)
   {
     double xr, yr;
-    Mercator prj = ProjParams ()
+    Mercator prj = Projection::Params ()
                     .ref_longitude (-20 * D2R)
                     .false_east (500000);
 
@@ -90,7 +90,7 @@ SUITE (MercatorTests)
   {
     double xr, yr;
 
-    Mercator prj = ProjParams()
+    Mercator prj = Projection::Params()
                     .ref_longitude (45 * D2R)
                     .ref_latitude (49 * D2R)
                     .false_north (1000000);
@@ -103,7 +103,7 @@ SUITE (MercatorTests)
   TEST (Singularity)
   {
     double xr, yr;
-    Mercator prj  = ProjParams(Ellipsoid::CLARKE_1866);
+    Mercator prj  = Projection::Params(Ellipsoid::CLARKE_1866);
 
     CHECK_THROW_EQUAL (prj.geo_xy (&xr, &yr, M_PI_2, 0), erc, GEOERR_SINGL);
   }

@@ -18,13 +18,13 @@ Mercator::Mercator () :
 {
 }
 
-Mercator::Mercator (const ProjParams& params) :
+Mercator::Mercator (const Params& params) :
   Projection (params)
 {
   init ();
 }
 
-Mercator& Mercator::operator= (const ProjParams& p)
+Mercator& Mercator::operator= (const Params& p)
 {
   par = p;
   init ();
@@ -86,8 +86,9 @@ double Mercator::k (double lat, double lon) const
 */
 const double r0 = 6378388.0;      // Cmap Lat/Lon const
 
-CMapMercator::CMapMercator () : Projection (ProjParams ())
+CMapMercator::CMapMercator ()
 {
+  par = Params (Ellipsoid (r0, 0.));
 }
 
 errc CMapMercator::xy_geo (double x, double y, double *lat, double *lon) const

@@ -16,8 +16,8 @@ class AzimuthEqDist : public Projection
 {
 public:
   AzimuthEqDist ();
-  AzimuthEqDist (const ProjParams& params);
-  AzimuthEqDist& operator= (const ProjParams& p);
+  AzimuthEqDist (const Params& params);
+  AzimuthEqDist& operator= (const Params& p);
 
   errc xy_geo(double x, double y, double *lat, double *lon) const;
   errc geo_xy(double *x, double *y, double lat, double lon) const;

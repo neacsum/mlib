@@ -23,7 +23,7 @@ Albers_Snyder::Albers_Snyder () :
   k_check (0.9915546),
   h_check (1.0085173)
 {
-  prj = ProjParams(Ellipsoid::CLARKE_1866)
+  prj = Projection::Params(Ellipsoid::CLARKE_1866)
     .ref_latitude (23 * D2R)
     .ref_longitude (-96 * D2R)
     .south_latitude (29.5 * D2R)

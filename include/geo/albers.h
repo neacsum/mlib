@@ -15,8 +15,8 @@ class Albers : public ConicalProjection
 {
 public:
   Albers ();
-  Albers (const ProjParams& params);
-  Albers& operator= (const ProjParams& p);
+  Albers (const Params& params);
+  Albers& operator= (const Params& p);
 
   errc xy_geo (double x, double y, double *lat, double *lon) const;
   errc geo_xy (double *x, double *y, double lat, double lon) const;

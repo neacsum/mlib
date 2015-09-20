@@ -10,13 +10,13 @@
 namespace MLIBSPACE {
 #endif
 
-Polyconic::Polyconic (const ProjParams& params) :
+Polyconic::Polyconic (const Params& params) :
   Projection (params)
 {
   init ();
 }
 
-Polyconic& Polyconic::operator= (const ProjParams& p)
+Polyconic& Polyconic::operator= (const Params& p)
 {
   par = p;
   init ();

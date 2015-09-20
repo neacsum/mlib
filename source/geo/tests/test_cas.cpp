@@ -11,7 +11,7 @@ struct Snyder_cas
 {
   Snyder_cas ();
 
-  ProjParams par;
+  Projection::Params par;
   double lam_check, phi_check, x_check, y_check;
 };
 

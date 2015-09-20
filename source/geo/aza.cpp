@@ -22,13 +22,13 @@ AzimuthalEqualArea::AzimuthalEqualArea ()
 {
 }
 
-AzimuthalEqualArea::AzimuthalEqualArea (const ProjParams& params) :
+AzimuthalEqualArea::AzimuthalEqualArea (const Params& params) :
   Projection (params)
 {
   init ();
 }
 
-AzimuthalEqualArea& AzimuthalEqualArea::operator= (const ProjParams& p)
+AzimuthalEqualArea& AzimuthalEqualArea::operator= (const Params& p)
 {
   par = p;
   init ();

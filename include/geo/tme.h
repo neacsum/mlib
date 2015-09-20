@@ -15,9 +15,8 @@ namespace MLIBSPACE {
 class TransverseMercator : public Projection
 {
 public:
-  TransverseMercator () {};
-  TransverseMercator (const ProjParams& pp);
-  TransverseMercator& operator= (const ProjParams& p);
+  TransverseMercator (const Params& pp);
+  TransverseMercator& operator= (const Params& p);
 
   errc xy_geo (double x, double y, double *lat, double *lon) const;
   errc geo_xy (double *x, double *y, double lat, double lon) const;

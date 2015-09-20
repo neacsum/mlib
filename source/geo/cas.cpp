@@ -13,13 +13,13 @@
 namespace MLIBSPACE {
 #endif
 
-Cassini::Cassini (const ProjParams& params):
+Cassini::Cassini (const Params& params):
   Projection (params)
 {
   init ();
 }
 
-Cassini& Cassini::operator= (const ProjParams& p)
+Cassini& Cassini::operator= (const Params& p)
 {
   par = p;
   init ();

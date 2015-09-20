@@ -14,7 +14,7 @@ namespace MLIBSPACE {
 class PlateCarree : public Projection
 {
 public:
-  PlateCarree (const ProjParams& params);
+  PlateCarree (const Params& params);
 
   errc xy_geo (double x, double y, double *lat, double *lon) const;
   errc geo_xy (double *x, double *y, double lat, double lon) const;

@@ -14,17 +14,17 @@ struct Snyder_hom
 {
   Snyder_hom ();
 
-  ProjParams par;
+  Projection::Params par;
   double lam_check, phi_check, x_check, y_check, k_check;
 };
 
 Snyder_hom::Snyder_hom () :
-par (Ellipsoid::CLARKE_1866),
-phi_check (DM(40,48)),
-lam_check (-74*D2R),
-x_check (963436.1),
-y_check (4369142.8),
-k_check (1.0307554)
+  par (Ellipsoid::CLARKE_1866),
+  phi_check (DM(40,48)),
+  lam_check (-74*D2R),
+  x_check (963436.1),
+  y_check (4369142.8),
+  k_check (1.0307554)
 {
   par.k0 (0.9996)
     .ref_latitude (40 * D2R)
@@ -55,17 +55,17 @@ Test vector from NGS datasheet (PID UW8043)
 struct Juneau {
   Juneau ();
 
-  ProjParams par;
+  Projection::Params par;
   double lam_check, phi_check, x_check, y_check, k_check;
 };
 
 Juneau::Juneau () :
-par (Ellipsoid::WGS_84),
-phi_check (DMS(58, 17, 57.74857)),
-lam_check (-DMS(134, 24, 39.09819)),
-x_check (775034.944),
-y_check (720035.558),
-k_check (.99993319)
+  par (Ellipsoid::WGS_84),
+  phi_check (DMS(58, 17, 57.74857)),
+  lam_check (-DMS(134, 24, 39.09819)),
+  x_check (775034.944),
+  y_check (720035.558),
+  k_check (.99993319)
 {
   par.ref_latitude (57 * D2R)
     .ref_longitude (-DM(133, 40))
@@ -107,16 +107,16 @@ TEST_FIXTURE (Juneau, Juneau_scale)
 struct EPSG_rso {
   EPSG_rso ();
 
-  ProjParams par;
+  Projection::Params par;
   double lam_check, phi_check, x_check, y_check;
 };
 
 EPSG_rso::EPSG_rso () :
-par (Ellipsoid::EVEREST_SABAH_SARWAK),
-phi_check (DMS (5, 23, 14.1129)),
-lam_check (DMS (115, 48, 19.8196)),
-x_check (679245.73),
-y_check (596562.78)
+  par (Ellipsoid::EVEREST_SABAH_SARWAK),
+  phi_check (DMS (5, 23, 14.1129)),
+  lam_check (DMS (115, 48, 19.8196)),
+  x_check (679245.73),
+  y_check (596562.78)
 {
   par.ref_latitude (4 * D2R)
     .ref_longitude (115 * D2R)

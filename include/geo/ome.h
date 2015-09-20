@@ -16,9 +16,9 @@ class ObliqueMercator : public Projection
 {
 public:
   ObliqueMercator () {};
-  ObliqueMercator (const ProjParams& params);
+  ObliqueMercator (const Params& params);
 
-  ObliqueMercator& operator= (const ProjParams& p);
+  ObliqueMercator& operator= (const Params& p);
 
   double skew_azimuth () const;
 
@@ -47,8 +47,8 @@ class Hotine : public ObliqueMercator
 {
 public:
   Hotine () {};
-  Hotine (const ProjParams& params) : ObliqueMercator (params) {};
-  Hotine& operator= (const ProjParams& p);
+  Hotine (const Params& params) : ObliqueMercator (params) {};
+  Hotine& operator= (const Params& p);
 
 protected:
   void deskew (double u, double v, double *x, double *y) const;
@@ -60,8 +60,8 @@ class RSO : public ObliqueMercator
 {
 public:
   RSO () {};
-  RSO (const ProjParams& params) : ObliqueMercator (params) {};
-  RSO& operator= (const ProjParams& par);
+  RSO (const Params& params) : ObliqueMercator (params) {};
+  RSO& operator= (const Params& par);
 
 protected:
   void deskew (double u, double v, double *x, double *y) const;
@@ -75,14 +75,14 @@ inline
 double ObliqueMercator::skew_azimuth () const { return par.skew_; }
 
 inline
-Hotine& Hotine::operator= (const ProjParams& par)
+Hotine& Hotine::operator= (const Params& par)
 {
   ObliqueMercator::operator= (par);
   return *this;
 };
 
 inline
-RSO& RSO::operator= (const ProjParams& par) 
+RSO& RSO::operator= (const Params& par) 
 {
   ObliqueMercator::operator= (par); 
   return *this;

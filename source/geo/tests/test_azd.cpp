@@ -13,7 +13,7 @@ using namespace MLIBSPACE;
 struct Snyder_polar {
   Snyder_polar ();
 
-  ProjParams par;
+  Projection::Params par;
   double lam_check, phi_check, x_check, y_check, k_check;
 };
 
@@ -58,7 +58,7 @@ TEST_FIXTURE (Snyder_polar, AZD_polar_scale)
 struct Snyder_oblique {
   Snyder_oblique ();
 
-  ProjParams par;
+  Projection::Params par;
   double lam_check, phi_check, x_check, y_check;
 };
 

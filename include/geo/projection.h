@@ -13,46 +13,47 @@
 namespace MLIBSPACE {
 #endif
 
-class ProjParams 
-{
-public:
-  ProjParams (const Ellipsoid& ell);
-  ProjParams (Ellipsoid::well_known wk = Ellipsoid::WGS_84);
-
-  ProjParams& ellipsoid (const Ellipsoid& ell);
-  ProjParams& ellipsoid (Ellipsoid::well_known wk);
-  ProjParams& k0 (double k);
-  ProjParams& unit (double u);
-  ProjParams& ref_latitude (double phi);
-  ProjParams& ref_longitude (double lambda);
-  ProjParams& north_latitude (double phi);
-  ProjParams& south_latitude (double phi);
-  ProjParams& skew_azimuth (double alpha);
-  ProjParams& false_north (double y);
-  ProjParams& false_east (double x);
-
-private:
-  Ellipsoid ellip_;
-  double k_;
-  double unit_;
-  double reflat_;
-  double reflon_;
-  double fn_;
-  double fe_;
-  double npar_;
-  double spar_;
-  double skew_;
-
-  friend class Projection;
-  friend class ConicalProjection;
-  friend class ObliqueMercator;
-};
 
 class Projection
 {
 public:
+  class Params
+  {
+  public:
+    Params (const Ellipsoid& ell);
+    Params (Ellipsoid::well_known wk = Ellipsoid::WGS_84);
+
+    Params& ellipsoid (const Ellipsoid& ell);
+    Params& ellipsoid (Ellipsoid::well_known wk);
+    Params& k0 (double k);
+    Params& unit (double u);
+    Params& ref_latitude (double phi);
+    Params& ref_longitude (double lambda);
+    Params& skew_azimuth (double alpha);
+    Params& north_latitude (double phin);
+    Params& south_latitude (double phis);
+    Params& false_north (double y);
+    Params& false_east (double x);
+
+  private:
+    Ellipsoid ellip_;
+    double k_;
+    double unit_;
+    double reflat_;
+    double reflon_;
+    double fn_;
+    double fe_;
+    double skew_;
+    double npar_;
+    double spar_;
+
+    friend class Projection;
+    friend class ConicalProjection;
+    friend class ObliqueMercator;
+  };
+
   Projection ();
-  Projection (const ProjParams& params);
+  Projection (const Params& params);
 
   /// \name Parameter accessor functions
   ///\{
@@ -72,14 +73,14 @@ public:
   virtual double k (double lat, double lon) const = 0;
 
 protected:
-  ProjParams par;
+  Params par;
 };
 
 class ConicalProjection : public Projection
 {
 public:
   ConicalProjection ();
-  ConicalProjection (const ProjParams& params);
+  ConicalProjection (const Params& params);
 
   double north_latitude () const;
   double south_latitude () const;
@@ -96,7 +97,7 @@ public:
 
 /// Set scale factor at origin
 inline 
-ProjParams& ProjParams::k0 (double k)
+Projection::Params& Projection::Params::k0 (double k)
 {
   k_ = k;
   return *this;
@@ -104,7 +105,7 @@ ProjParams& ProjParams::k0 (double k)
 
 ///Set conversion factor from XY units to meters
 inline
-ProjParams& ProjParams::unit (double u)
+Projection::Params& Projection::Params::unit (double u)
 {
   unit_ = u;
   return *this;
@@ -113,7 +114,7 @@ ProjParams& ProjParams::unit (double u)
 
 /// Set reference latitude
 inline
-ProjParams& ProjParams::ref_latitude (double phi)
+Projection::Params& Projection::Params::ref_latitude (double phi)
 {
   assert (-M_PI / 2 <= phi && phi <= M_PI / 2);
   reflat_ = phi;
@@ -122,7 +123,7 @@ ProjParams& ProjParams::ref_latitude (double phi)
 
 /// Set reference longitude (central meridian)
 inline
-ProjParams& ProjParams::ref_longitude (double lambda)
+Projection::Params& Projection::Params::ref_longitude (double lambda)
 {
   assert (-M_PI <= lambda && lambda <= M_PI);
   reflon_ = lambda;
@@ -131,23 +132,7 @@ ProjParams& ProjParams::ref_longitude (double lambda)
 
 
 inline
-ProjParams& ProjParams::north_latitude (double phi)
-{
-  assert (-M_PI / 2 <= phi && phi <= M_PI / 2);
-  npar_ = phi;
-  return *this;
-}
-
-inline
-ProjParams& ProjParams::south_latitude (double phi)
-{
-  assert (-M_PI / 2 <= phi && phi <= M_PI / 2);
-  spar_ = phi;
-  return *this;
-}
-
-inline
-ProjParams& ProjParams::skew_azimuth (double alpha)
+Projection::Params& Projection::Params::skew_azimuth (double alpha)
 {
   assert (-M_PI <= alpha && alpha <= M_PI);
   skew_ = alpha;
@@ -155,16 +140,32 @@ ProjParams& ProjParams::skew_azimuth (double alpha)
 }
 
 inline
-ProjParams& ProjParams::false_east (double x)
+Projection::Params& Projection::Params::false_east (double x)
 {
   fe_ = x;
   return *this;
 }
 
 inline
-ProjParams& ProjParams::false_north (double y)
+Projection::Params& Projection::Params::false_north (double y)
 {
   fn_ = y;
+  return *this;
+}
+
+inline
+Projection::Params& Projection::Params::north_latitude (double phin)
+{
+  assert (-M_PI / 2 <= phin && phin <= M_PI / 2);
+  npar_ = phin;
+  return *this;
+}
+
+inline
+Projection::Params& Projection::Params::south_latitude (double phis)
+{
+  assert (-M_PI / 2 <= phis && phis <= M_PI / 2);
+  spar_ = phis;
   return *this;
 }
 

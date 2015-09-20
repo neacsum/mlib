@@ -12,7 +12,7 @@ SUITE (Lambert_Conformal_Conical)
   struct Snyder
   {
     Snyder ();
-    ProjParams par;
+    Projection::Params par;
     double lat_check, lon_check;
     double x_check, y_check, k_check;
   };
@@ -75,7 +75,7 @@ SUITE (Lambert_Conformal_Conical)
   };
 
   Lambert72::Lambert72 () :
-    lcc (ProjParams (Ellipsoid::INTERNATIONAL)
+    lcc (Projection::Params (Ellipsoid::INTERNATIONAL)
     .ref_latitude (90*D2R)
     .ref_longitude (DMS(4, 22, 02.952))
     .north_latitude (DMS(51, 10, 0.00204))
