@@ -42,5 +42,8 @@
     <ClCompile Include="source\mlib\tests\tests_base64.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="source\mlib\tests\tests_sock.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

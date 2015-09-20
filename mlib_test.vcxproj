@@ -103,7 +103,8 @@
       <AdditionalDependencies>mlib.lib;utpp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>"$(TargetPath)"</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -182,6 +183,7 @@
     <ClCompile Include="source\mlib\tests\tests_main.cpp" />
     <ClCompile Include="source\mlib\tests\tests_options.cpp" />
     <ClCompile Include="source\mlib\tests\tests_profile.cpp" />
+    <ClCompile Include="source\mlib\tests\tests_sock.cpp" />
     <ClCompile Include="source\mlib\tests\tests_sqlitepp.cpp" />
     <ClCompile Include="source\mlib\tests\tests_utf8.cpp" />
   </ItemGroup>
