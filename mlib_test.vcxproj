@@ -179,6 +179,7 @@
     <ClCompile Include="source\mlib\tests\tests_base64.cpp" />
     <ClCompile Include="source\mlib\tests\tests_basename.cpp" />
     <ClCompile Include="source\mlib\tests\tests_crc32.cpp" />
+    <ClCompile Include="source\mlib\tests\tests_dogbone.cpp" />
     <ClCompile Include="source\mlib\tests\tests_httpd.cpp" />
     <ClCompile Include="source\mlib\tests\tests_main.cpp" />
     <ClCompile Include="source\mlib\tests\tests_options.cpp" />

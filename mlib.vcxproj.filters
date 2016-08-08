@@ -99,6 +99,9 @@
     <ClInclude Include="include\mlib\base64.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\mlib\dogbone.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\mlib\dprintf.c">
@@ -171,6 +174,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\mlib\base64.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\mlib\dogbone.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -155,6 +155,7 @@
     <ClInclude Include="include\mlib\crc32.h" />
     <ClInclude Include="include\mlib\critsect.h" />
     <ClInclude Include="include\mlib\defs.h" />
+    <ClInclude Include="include\mlib\dogbone.h" />
     <ClInclude Include="include\mlib\dprintf.h" />
     <ClInclude Include="include\mlib\errorcode.h" />
     <ClInclude Include="include\mlib\event.h" />
@@ -182,6 +183,7 @@
     <ClCompile Include="source\mlib\base64.cpp" />
     <ClCompile Include="source\mlib\basename.cpp" />
     <ClCompile Include="source\mlib\crc32.c" />
+    <ClCompile Include="source\mlib\dogbone.c" />
     <ClCompile Include="source\mlib\dprintf.c" />
     <ClCompile Include="source\mlib\errorcode.cpp" />
     <ClCompile Include="source\mlib\event.cpp" />
