@@ -15,7 +15,7 @@
   
   This leads to eminently readable code like:
 \code
-  Mercator prj = ProjParams (Ellipsoid::WGS84)
+  Mercator prj = Projection::Params (Ellipsoid::WGS84)
                    .ref_longitude (45 * D2R)
                    .ref_latitude (49 * D2R)
                    .false_north (1000000);
@@ -30,7 +30,7 @@
 namespace MLIBSPACE {
 #endif
 
-ProjParams::ProjParams (const Ellipsoid& ell) :
+Projection::Params::Params (const Ellipsoid& ell) :
   ellip_ (ell),
   k_ (1.),
   unit_ (1.),
@@ -38,13 +38,11 @@ ProjParams::ProjParams (const Ellipsoid& ell) :
   reflon_ (0.),
   fn_ (0.),
   fe_ (0.),
-  npar_ (0.),
-  spar_ (0.),
   skew_ (0.)
 {
 }
 
-ProjParams::ProjParams (Ellipsoid::well_known wk) :
+Projection::Params::Params (Ellipsoid::well_known wk) :
 ellip_ (wk),
 k_ (1.),
 unit_ (1.),
@@ -52,19 +50,17 @@ reflat_ (0.),
 reflon_ (0.),
 fn_ (0.),
 fe_ (0.),
-npar_ (0.),
-spar_ (0.),
 skew_ (0.)
 {
 }
 
-ProjParams& ProjParams::ellipsoid (const Ellipsoid& ell)
+Projection::Params& Projection::Params::ellipsoid (const Ellipsoid& ell)
 {
   ellip_ = ell;
   return *this;
 }
 
-ProjParams& ProjParams::ellipsoid (Ellipsoid::well_known wk)
+Projection::Params& Projection::Params::ellipsoid (Ellipsoid::well_known wk)
 {
   ellip_ = Ellipsoid (wk);
   return *this;
@@ -74,7 +70,7 @@ Projection::Projection ()
 {
 }
 
-Projection::Projection (const ProjParams& params) :
+Projection::Projection (const Params& params) :
   par (params)
 {
 }
@@ -83,7 +79,7 @@ ConicalProjection::ConicalProjection ()
 {
 }
 
-ConicalProjection::ConicalProjection (const ProjParams& params) :
+ConicalProjection::ConicalProjection (const Params& params) :
   Projection (params)
 {
 }

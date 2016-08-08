@@ -23,7 +23,7 @@ namespace MLIBSPACE {
   - map_radius - radius of the projection sphere
   - r0 -
 */
-Stereographic::Stereographic (const ProjParams& params) :
+Stereographic::Stereographic (const Params& params) :
   Projection (params)
 {
   init ();
@@ -115,7 +115,7 @@ double Stereographic::k (double lat, double lon) const
                       Polar Stereographic projection 
 ==============================================================================*/
 
-PolarStereo::PolarStereo (const ProjParams& params) :
+PolarStereo::PolarStereo (const Params& params) :
 Projection (params)
 {
   init ();

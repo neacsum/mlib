@@ -14,16 +14,16 @@ struct Swiss_ocy
 {
   Swiss_ocy ();
 
-  ProjParams par;
+  Projection::Params par;
   double lam_check, phi_check, x_check, y_check;
 };
 
 Swiss_ocy::Swiss_ocy () :
-par (Ellipsoid::BESSEL_1841),
-phi_check (DMS(46, 52, 42.266489)),
-lam_check (DMS(7, 27, 58.427230)),
-x_check (602030.9709),
-y_check (191774.9438)
+  par (Ellipsoid::BESSEL_1841),
+  phi_check (DMS(46, 52, 42.266489)),
+  lam_check (DMS(7, 27, 58.427230)),
+  x_check (602030.9709),
+  y_check (191774.9438)
 {
   par.ref_longitude (DMS (7, 26, 22.5))
     .ref_latitude (DMS(46, 57, 08.66))
@@ -59,16 +59,16 @@ struct Swiss2
 {
   Swiss2 ();
 
-  ProjParams par;
+  Projection::Params par;
   double lam_check, phi_check, x_check, y_check, k_check;
 };
 Swiss2::Swiss2 () :
-par (Ellipsoid::BESSEL_1841),
-phi_check (DMS (47, 03, 28.95659233)),
-lam_check (DMS (8, 29, 11.11127154)),
-x_check (679520.05),
-y_check (212273.44),
-k_check (1.000001852)
+  par (Ellipsoid::BESSEL_1841),
+  phi_check (DMS (47, 03, 28.95659233)),
+  lam_check (DMS (8, 29, 11.11127154)),
+  x_check (679520.05),
+  y_check (212273.44),
+  k_check (1.000001852)
 {
   par.ref_longitude (DMS (7, 26, 22.5))
     .ref_latitude (DMS (46, 57, 08.66))

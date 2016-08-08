@@ -15,8 +15,8 @@ class AzimuthalEqualArea : public Projection
 {
  public:
   AzimuthalEqualArea ();
-  AzimuthalEqualArea (const ProjParams& params);
-  AzimuthalEqualArea& operator= (const ProjParams& p);
+  AzimuthalEqualArea (const Params& params);
+  AzimuthalEqualArea& operator= (const Params& p);
 
   errc xy_geo(double x, double y, double *lat, double *lon) const;
   errc geo_xy(double *x, double *y, double lat, double lon) const;

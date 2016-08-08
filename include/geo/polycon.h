@@ -14,9 +14,8 @@ namespace MLIBSPACE {
 class Polyconic : public Projection
 {
 public:
-  Polyconic () {};
-  Polyconic (const ProjParams& params);
-  Polyconic& operator= (const ProjParams& p);
+  Polyconic (const Params& params);
+  Polyconic& operator= (const Params& p);
 
   errc xy_geo (double x, double y, double *lat, double *lon) const;
   errc geo_xy (double *x, double *y, double lat, double lon) const;

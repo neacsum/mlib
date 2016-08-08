@@ -16,8 +16,8 @@ class Stereographic : public Projection
 {
 public:
   Stereographic () {};
-  Stereographic (const ProjParams& params);
-  Stereographic& operator= (const ProjParams& p);
+  Stereographic (const Params& params);
+  Stereographic& operator= (const Params& p);
 
   errc geo_xy (double *x, double *y, double lat, double lon) const;
   errc xy_geo (double x, double y, double *lat, double *lon) const;
@@ -36,8 +36,8 @@ class PolarStereo : public Projection
 {
 public:
   PolarStereo () {};
-  PolarStereo (const ProjParams& params);
-  PolarStereo& operator= (const ProjParams& p);
+  PolarStereo (const Params& params);
+  PolarStereo& operator= (const Params& p);
 
   errc geo_xy (double *x, double *y, double lat, double lon) const;
   errc xy_geo (double x, double y, double *lat, double *lon) const;

@@ -15,8 +15,8 @@ class Lambert : public ConicalProjection
 {
 public:
   Lambert ();
-  Lambert (const ProjParams& params);
-  Lambert& operator= (const ProjParams& p);
+  Lambert (const Params& params);
+  Lambert& operator= (const Params& p);
 
   errc xy_geo (double x, double y, double *lat, double *lon) const;
   errc geo_xy (double *x, double *y, double lat, double lon) const;

@@ -11,7 +11,7 @@ struct Snyder_tme
 {
   Snyder_tme ();
 
-  ProjParams par;
+  Projection::Params par;
   double lam_check, phi_check, x_check, y_check, k_check;
 };
 

@@ -16,9 +16,9 @@ class Cassini : public Projection
 {
  public:
   Cassini () {};
-  Cassini (const ProjParams& params);
+  Cassini (const Params& params);
 
-  Cassini& operator= (const ProjParams& p);
+  Cassini& operator= (const Params& p);
 
   errc xy_geo (double x, double y, double *lat, double *lon) const;
   errc geo_xy (double *x, double *y, double lat, double lon) const ;

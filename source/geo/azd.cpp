@@ -13,13 +13,13 @@ AzimuthEqDist::AzimuthEqDist ()
 {
 }
 
-AzimuthEqDist::AzimuthEqDist (const ProjParams& params) :
+AzimuthEqDist::AzimuthEqDist (const Params& params) :
   Projection (params)
 {
   init ();
 }
 
-AzimuthEqDist& AzimuthEqDist::operator= (const ProjParams& p)
+AzimuthEqDist& AzimuthEqDist::operator= (const Params& p)
 {
   par = p;
   init ();

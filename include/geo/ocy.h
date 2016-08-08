@@ -16,8 +16,8 @@ class ObliqueCylindrical : public Projection
 {
 public:
   ObliqueCylindrical () {};
-  ObliqueCylindrical (const ProjParams& params);
-  ObliqueCylindrical& operator= (const ProjParams& p);
+  ObliqueCylindrical (const Params& params);
+  ObliqueCylindrical& operator= (const Params& p);
 
   errc xy_geo (double x, double y, double *lat, double *lon) const;
   errc geo_xy (double *x, double *y, double lat, double lon) const;

@@ -14,13 +14,13 @@ namespace MLIBSPACE {
 static double pd[12] = { -3./2.,  9./16., 15./16., -15./32., -35./48., 315./512.,
                           3./2.,-27./32., 21./16., -55./32., 151./96., 1097./512.};
 
-TransverseMercator::TransverseMercator (const ProjParams& params) :
+TransverseMercator::TransverseMercator (const Params& params) :
   Projection (params)
 {
   init ();
 }
 
-TransverseMercator& TransverseMercator::operator= (const ProjParams& p)
+TransverseMercator& TransverseMercator::operator= (const Params& p)
 {
   par = p;
   init ();

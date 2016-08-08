@@ -10,13 +10,13 @@
 namespace MLIBSPACE {
 #endif
 
-ObliqueCylindrical::ObliqueCylindrical (const ProjParams& params) :
+ObliqueCylindrical::ObliqueCylindrical (const Params& params) :
   Projection (params)
 {
   init ();
 }
 
-ObliqueCylindrical& ObliqueCylindrical::operator= (const ProjParams& p)
+ObliqueCylindrical& ObliqueCylindrical::operator= (const Params& p)
 {
   par = p;
   init ();

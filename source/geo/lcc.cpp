@@ -21,13 +21,13 @@ namespace MLIBSPACE {
 /*!
   Constructor for a %Lambert Conformal Conical projection
 */
-Lambert::Lambert (const ProjParams& params):
+Lambert::Lambert (const Params& params):
   ConicalProjection (params)
 {
   init ();
 }
 
-Lambert& Lambert::operator= (const ProjParams& p)
+Lambert& Lambert::operator= (const Params& p)
 {
   par = p;
   init ();

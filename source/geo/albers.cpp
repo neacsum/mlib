@@ -22,13 +22,13 @@ Albers::Albers ()
 /*!
   Constructor for a Albers Equal Area projection
 */
-Albers::Albers (const ProjParams& params):
+Albers::Albers (const Params& params):
   ConicalProjection (params)
 {
   init ();
 }
 
-Albers& Albers::operator= (const ProjParams& p)
+Albers& Albers::operator= (const Params& p)
 {
   par = p;
   init ();

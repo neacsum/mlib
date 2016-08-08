@@ -16,7 +16,7 @@ http://kadaster.nl
 */
 TEST (Netherlands)
 {
-  ProjParams pp (Ellipsoid::BESSEL_1841);
+  Projection::Params pp (Ellipsoid::BESSEL_1841);
   pp.k0 (0.9999079)
     .ref_longitude (DMS(5, 23, 15.5))
     .ref_latitude (DMS(52, 9, 22.178))
@@ -52,7 +52,7 @@ http://gge.unb.ca/Pubs/TR48.pdf
 */
 TEST (NewBrunswick)
 {
-  ProjParams pp (Ellipsoid::CLARKE_1866);
+  Projection::Params pp (Ellipsoid::CLARKE_1866);
   pp.k0 (0.999912)
     .ref_longitude (-DM (66, 30))
     .ref_latitude (DM (46, 30))
@@ -87,7 +87,7 @@ TEST (NewBrunswick)
 */
 TEST(PolarStereographic_k0)
 {
-  ProjParams pp (Ellipsoid::INTERNATIONAL);
+  Projection::Params pp (Ellipsoid::INTERNATIONAL);
   pp.k0 (0.994)
     .ref_longitude (-DEG (100))
     .ref_latitude (-DEG (90));
@@ -117,7 +117,7 @@ TEST(PolarStereographic_k0)
 */
 TEST(PolarStereographic_phic)
 {
-  PolarStereo pst = ProjParams ()
+  PolarStereo pst = Projection::Params ()
     .ellipsoid (Ellipsoid::INTERNATIONAL)
     .ref_longitude (-DEG (100))
     .ref_latitude (-DEG (71));

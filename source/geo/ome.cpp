@@ -24,13 +24,13 @@ namespace MLIBSPACE {
   function different between the two.
 */
 
-ObliqueMercator::ObliqueMercator (const ProjParams& params) :
+ObliqueMercator::ObliqueMercator (const Params& params) :
   Projection (params)
 {
   init ();
 }
 
-ObliqueMercator& ObliqueMercator::operator= (const ProjParams& p)
+ObliqueMercator& ObliqueMercator::operator= (const Params& p)
 {
   par = p;
   init ();
