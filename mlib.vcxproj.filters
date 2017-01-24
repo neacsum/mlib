@@ -100,6 +100,7 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\mlib\convert.h">
+    <ClInclude Include="include\mlib\dogbone.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -177,6 +178,7 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\mlib\convert.cpp">
+    <ClCompile Include="source\mlib\dogbone.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
