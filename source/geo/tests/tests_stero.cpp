@@ -1,6 +1,6 @@
 #include <utpp/utpp.h>
 #include <geo/stereo.h>
-#include <geo/convert.h>
+#include <mlib/convert.h>
 
 #ifdef MLIBSPACE
 using namespace MLIBSPACE;
