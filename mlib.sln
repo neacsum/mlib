@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+VisualStudioVersion = 12.0.40629.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mlib", "mlib.vcxproj", "{F9E11AA9-FAB8-40D8-96D9-F92C5725762B}"
 EndProject
@@ -34,6 +34,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "geom_test", "geom_test.vcxp
 		{3FF5F1BE-1178-4373-8FB0-E9FC6380221F} = {3FF5F1BE-1178-4373-8FB0-E9FC6380221F}
 		{C6BEA1F0-D8D4-493B-902C-EF57FDA8F477} = {C6BEA1F0-D8D4-493B-902C-EF57FDA8F477}
 	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nmea", "nmea.vcxproj", "{09B3C8EE-0112-4B6F-85CC-5C4584EE23D6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -107,6 +109,12 @@ Global
 		{3A8FB307-CF89-46CF-BA34-8C52C271C4CF}.Release|Win32.Build.0 = Release|Win32
 		{3A8FB307-CF89-46CF-BA34-8C52C271C4CF}.Release|x64.ActiveCfg = Release|x64
 		{3A8FB307-CF89-46CF-BA34-8C52C271C4CF}.Release|x64.Build.0 = Release|x64
+		{09B3C8EE-0112-4B6F-85CC-5C4584EE23D6}.Debug|Win32.ActiveCfg = Debug|Win32
+		{09B3C8EE-0112-4B6F-85CC-5C4584EE23D6}.Debug|Win32.Build.0 = Debug|Win32
+		{09B3C8EE-0112-4B6F-85CC-5C4584EE23D6}.Debug|x64.ActiveCfg = Debug|Win32
+		{09B3C8EE-0112-4B6F-85CC-5C4584EE23D6}.Release|Win32.ActiveCfg = Release|Win32
+		{09B3C8EE-0112-4B6F-85CC-5C4584EE23D6}.Release|Win32.Build.0 = Release|Win32
+		{09B3C8EE-0112-4B6F-85CC-5C4584EE23D6}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
