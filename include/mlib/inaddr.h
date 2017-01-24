@@ -12,8 +12,13 @@
 #include "defs.h"
 #include "errorcode.h"
 
+//get rid of a deprecation warning related to inet_ntoa (MN 22-Jan-17) 
+#ifndef _WINSOCK_DEPRECATED_NO_WARNINGS
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
+#endif
+
 #ifndef _WINSOCK2API_
-#error WINSOCK2 required
+#include <WinSock2.h>
 #endif
 
 #ifdef MLIBSPACE
