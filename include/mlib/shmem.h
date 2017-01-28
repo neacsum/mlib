@@ -28,6 +28,7 @@ public:
   bool    created () const      {return mem_created;};
   bool    is_opened ()          {return mem != NULL;};
   size_t  size () const         {return sz;};
+  const char *name () const     { return name_; };
   
   //get/set function for read/write timeout
   void    wtmo (DWORD msec)     {wtmo_ = msec;};
@@ -54,7 +55,7 @@ protected:
 protected:
 
 #pragma pack (push, 1)
-  /// variables used for access syncronization
+  /// variables used for access synchronization
   struct syncblk
   {
     HANDLE wrex;            ///< writers exclusion mutex
@@ -72,7 +73,7 @@ protected:
   syncblk *syncptr () const     {return syn;};
 
 private:
-  char* name;
+  char* name_;
   LONG in_rdlock;
   LONG in_wrlock;
   bool mem_created;

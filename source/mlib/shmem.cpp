@@ -19,7 +19,7 @@ namespace MLIBSPACE {
 
 
 shmem_base::shmem_base () :
- name (NULL),
+ name_ (NULL),
  mem (NULL),
  file (NULL),
  wrex (INVALID_HANDLE_VALUE),
@@ -35,7 +35,7 @@ shmem_base::shmem_base () :
 }
 
 shmem_base::shmem_base (const char * nam, size_t sz_) :
- name (NULL),
+ name_ (NULL),
  file (NULL),
  mem (NULL),
  wrex (INVALID_HANDLE_VALUE),
@@ -53,9 +53,8 @@ shmem_base::shmem_base (const char * nam, size_t sz_) :
 
 shmem_base::~shmem_base()
 {
-  TRACE2 ("shmem_base (%s) destructor", name);
+  TRACE2 ("shmem_base (%s) destructor", name_);
   close ();
-  delete name;
   TRACE2 ("shmem_base destructor done");
 }
 
@@ -64,10 +63,13 @@ bool shmem_base::open (const char * nam, size_t sz_)
   
   close ();
   assert (nam);
-  std::wstring name = widen(nam);
+  name_ = new char[strlen (nam) + 1];
+  strcpy (name_, nam);
+
+  std::wstring wname = widen(name_);
   std::wstring tmp;
   try {
-    tmp = name + L".MEM";
+    tmp = wname + L".MEM";
     sz = sz_;
     file = CreateFileMapping (INVALID_HANDLE_VALUE,         //memory based
                               NULL,                         //security
@@ -76,16 +78,16 @@ bool shmem_base::open (const char * nam, size_t sz_)
                               tmp.c_str());                   //name
     if (!file)
     {
-      TRACE ("shmem_base::open CreateFileMapping failed!");
+      TRACE ("shmem_base::open(%s) CreateFileMapping failed!", name_);
       throw GetLastError ();
     }
   
-    if (GetLastError () != ERROR_ALREADY_EXISTS)
-      mem_created = true;
+    mem_created = (GetLastError () != ERROR_ALREADY_EXISTS);
+
     mem = MapViewOfFile (file, FILE_MAP_ALL_ACCESS, 0, 0, 0);
     if (!mem)
     {
-      TRACE ("shmem_base::open MapViewOfFile failed!");
+      TRACE ("shmem_base::open(%s) MapViewOfFile failed!", name_);
       throw GetLastError();
     }
 
@@ -93,11 +95,11 @@ bool shmem_base::open (const char * nam, size_t sz_)
     block is AFTER the data */
     data = mem;
     syn = (syncblk*)((char*)mem + sz);
-    tmp = name + L".EVT";
+    tmp = wname + L".EVT";
     rdgate = CreateEvent (NULL, TRUE, TRUE, tmp.c_str());
     if (mem_created)
       syn->rdgate = rdgate;
-    tmp = name + L".MUT";
+    tmp = wname + L".MUT";
     wrex = CreateMutex (NULL, FALSE, tmp.c_str());
     if (mem_created)
     {
@@ -130,6 +132,8 @@ bool shmem_base::close ()
     CloseHandle (rdgate);
   rdgate = wrex = INVALID_HANDLE_VALUE;
   mem_created = false;
+  delete name_;
+  name_ = 0;
   return true;
 }
 

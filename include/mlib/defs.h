@@ -5,8 +5,7 @@
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 #endif
 
-#include <WinSock2.h>
-#include <windows.h>
+#include <winsock2.h>
 
 #define MLIBSPACE mlib
 
