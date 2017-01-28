@@ -1,5 +1,9 @@
 #pragma once
+/**
+  NMEA-0183 parsing library
+  (c) Mircea Neacsu 2017
 
+*/
 int dbs (const char *buf, double *depth);
 int dbt (const char *buf, double *depth);
 int dpt (const char *buf, double *depth, double *offset, double *range);
@@ -34,3 +38,4 @@ int ttm (const char *buf, double *utc, int *num, char *name, double *dist, doubl
 int vtg (const char *buf, double *speed, double *head);
 int zda (const char *buf, double *time, unsigned short *day, unsigned short *month, unsigned short *year);
 
+#pragma comment (lib, "nmea.lib")
