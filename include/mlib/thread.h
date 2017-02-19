@@ -2,7 +2,7 @@
 /*!
   \file thread.h thread class definition.
 
-	(c) Mircea Neacsu 1999
+	(c) Mircea Neacsu 1999-2017
 */
 
 #include "event.h"

@@ -1,7 +1,7 @@
 /*!
   \file SYNCBASE.CPP Member functions of syncbase class
 
-  (c) Mircea Neacsu 1999
+  (c) Mircea Neacsu 1999-2017
 
 */
 #include <assert.h>
@@ -143,7 +143,7 @@ DWORD syncbase::wait_msg (DWORD time_limit, DWORD mask)
 /*!
   \ingroup syncro
 
-  Wait for multiple obejcts
+  Wait for multiple objects
   \param  all     if true wait for all objects to become signaled
   \param  count   number of objects in \p array 
   \param  array   array of objects to wait for
@@ -181,7 +181,7 @@ DWORD multiwait_msg (bool all, int count, syncbase** array, DWORD time_limit, DW
   return result;
 }
 
-/// Busy waiting for a numebr of microseconds
+/// Busy waiting for a number of microseconds
 void udelay (unsigned short usec)
 {
   LARGE_INTEGER interval, crt;

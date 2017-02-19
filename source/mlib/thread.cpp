@@ -23,7 +23,7 @@ namespace MLIBSPACE {
   Useful for accessing properties like id, handle, priority etc.
 */
 
-///Contructor
+///Constructor
 current_thread::current_thread() :
   thread( GetCurrentThread(), GetCurrentThreadId() )
 {
@@ -46,12 +46,12 @@ current_thread::~current_thread()
   the run() function. Thread objects are created in a "suspended animation" 
   state. To start them use the start() function.
 
-  When combining objects and multithreading it is useful to define what 
-  member functions are \e foregin (i.e. can be called by another execution
+  When combining objects and multi-threading it is useful to define what 
+  member functions are \e foreign (i.e. can be called by another execution
   %thread) and what functions are \e native (i.e. can be called only by the same
-  execution %thread. If possible "native" functions should be made private or
-  protected. The object's constructors and destructor are implicitly \e foreign 
-  while the run function is implicitly \e native.
+  execution %thread. If possible, "native" functions should be made private or
+  protected. The object's constructors and destructor are inherently \e foreign 
+  while the run function is inherently \e native.
 */
 
 /*!
@@ -94,7 +94,7 @@ thread::thread (const char *name, bool inherit, DWORD stack_size, PSECURITY_DESC
   When the thread is started (using the start() function), the run function is called
   with the given argument.
 
-  The return return value of the run function becomes the exit code of the thread.
+  The return value of the run function becomes the exit code of the thread.
 */
 thread::thread(int (*pfunc)(void *), void *arg, const char *name) :
   syncbase (name),
@@ -122,7 +122,7 @@ thread::thread(int (*pfunc)(void *), void *arg, const char *name) :
   newly created thread. When the thread is started (using the start() function), 
   the run function is called with the given argument.
 
-  The return return value of the run function becomes the exit code of the thread.
+  The return value of the run function becomes the exit code of the thread.
 */
 thread::thread (std::function<int (void*)> func, void *arg, const char *name) :
   syncbase (name),
@@ -147,12 +147,12 @@ thread::thread (std::function<int (void*)> func, void *arg, const char *name) :
 */
 void thread::initialize ()
 {
-  //create thread in suspened state
+  //create thread in suspended state
   HANDLE handle = (HANDLE)_beginthreadex (&sa, stack, (unsigned int (__stdcall *)(void*))entryProc, this,
                    CREATE_SUSPENDED, (UINT*)&id_);
   assert (handle);
 #if 0
-  /* Duplicate the thread handle now so the object will keep a vaild handle
+  /* Duplicate the thread handle now so the object will keep a valid handle
   even after the thread terminated */
   HANDLE  newhandle;      /* new thread handle */
   HANDLE  prochandle;     /* handle of current process */
@@ -167,7 +167,7 @@ void thread::initialize ()
 #endif
   set_handle (handle);
 
-  //Let thread run the initalization code. This will signal the "created"
+  //Let thread run the initialization code. This will signal the "created"
   //semaphore than wait for "run" semaphore.
   ResumeThread (handle);
 
@@ -247,7 +247,7 @@ void thread::suspend ()
 }
 
 /*!
-  Resume a suspened thread
+  Resume a suspended thread
 */
 void thread::resume()
 {
