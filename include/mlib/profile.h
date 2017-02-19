@@ -39,7 +39,7 @@ public:
   void File (const char *filename);
   
   ///Get a string key
-  int GetString (char *value, int len, const char *key, const char *section, const char *defval="") const;
+  virtual int GetString (char *value, int len, const char *key, const char *section, const char *defval="") const;
 
   ///Return an integer key
   int GetInt (const char *key, const char *section, int defval=0) const;
@@ -60,31 +60,31 @@ public:
   bool HasKey (const char *key, const char *section) const;
 
   /// Write a string key
-  virtual int PutString (const char *key, const char *value, const char *section);
+  virtual bool PutString (const char *key, const char *value, const char *section);
 
   /// Write an integer key
-  void PutInt (const char *key, long value, const char *section);
+  bool PutInt (const char *key, long value, const char *section);
 
   /// Write a font specification key
-  void PutFont (const char *key, HFONT font, const char *section);
+  bool PutFont (const char *key, HFONT font, const char *section);
 
   /// Write a boolean key
-  void PutBool (const char *key, bool value, const char *section);
+  bool PutBool (const char *key, bool value, const char *section);
 
   /// Write a color specification key
-  void PutColor (const char *key, COLORREF value, const char *section);
+  bool PutColor (const char *key, COLORREF value, const char *section);
 
   /// Write a floating point value key
-  void PutDouble (const char *key, double value, const char *section, int dec = 2);
+  bool PutDouble (const char *key, double value, const char *section, int dec = 2);
 
   /// Delete a key
-  void DeleteKey (const char *key, const char *section);
+  bool DeleteKey (const char *key, const char *section);
 
   /// Delete an entire section
-  void DeleteSection (const char *section);
+  bool DeleteSection (const char *section);
 
   /// Copy all keys from one section to another.
-  void CopySection (const Profile& from_file, const char *from_sect, const char *to_sect=NULL);
+  bool CopySection (const Profile& from_file, const char *from_sect, const char *to_sect=NULL);
 
   /// Return \b true if profile contains a non empty section with the given name
   bool HasSection (const char *section);

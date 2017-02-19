@@ -1,6 +1,7 @@
 /*!
   \file PROFILE.CPP Implementation of Profile
 
+  (c) Mircea Neacsu 2017
 
   Reimplemented to UTF-8 compatibility with code base on:
   minIni - Multi-Platform INI file parser, suitable for embedded systems
@@ -31,10 +32,11 @@
 #include <mlib/profile.h>
 #include <stdio.h>
 #include <string.h>
-#include <math.h>				// for atof
-#include <stdlib.h>			// for atoi
+#include <math.h>        // for atof
+#include <stdlib.h>      // for atoi
 #include <assert.h>
 #include <mlib/utf8.h>
+#include <mlib/trace.h>
 
 #ifdef MLIBSPACE
 namespace MLIBSPACE {
@@ -51,17 +53,17 @@ static void writesection (char* LocalBuffer, const char* Section, FILE *fp);
 static void writekey (char* buffer, const char* key, const char* value, FILE *fp);
 static int cache_accum (const char* string, int* size, int max);
 static int cache_flush (char* buffer, int* size, FILE* rfp, FILE* wfp, fpos_t* mark);
-static int close_rename(FILE* rfp, FILE* wfp, const char* filename);
+static bool close_rename(FILE* rfp, FILE* wfp, const char* filename);
 static char* cleanstring (char* string);
-static int ini_puts (const char *key, const char *value, const char *section, char *filename);
+static bool ini_puts (const char *key, const char *value, const char *section, char *filename);
 
 using namespace std;
 
 /*!
-	\class Profile
+  \class Profile
 
-	Profile class provides a handy object oriented encapsulation of functions
-	needed to manipulate INI (profile) files.
+  Profile class provides a handy object oriented encapsulation of functions
+  needed to manipulate INI (profile) files.
   \pre file != NULL
 */
 Profile::Profile (const char *file)
@@ -126,7 +128,7 @@ void Profile::File (const char *fname)
 }
 
 /*!
-	Assignment operator performs a file copy of the passed object.
+  Assignment operator performs a file copy of the passed object.
 */
 Profile& Profile::operator = (const Profile& p)
 {
@@ -146,16 +148,16 @@ bool Profile::HasKey( const char *key, const char *section ) const
   assert (key);
   assert (section);
 
-	char buffer[80];
-	return (GetString (buffer, sizeof(buffer), key, section) != 0);
+  char buffer[80];
+  return (GetString (buffer, sizeof(buffer), key, section) != 0);
 }
 
 /*!
   \param key      key name
   \param section  section name
   \param defval   default value if key is missing
-	\pre key != NULL <br>
-	     section != NULL
+  \pre key != NULL <br>
+       section != NULL
 */
 int Profile::GetInt (const char *key, const char *section, int defval) const
 {
@@ -163,20 +165,20 @@ int Profile::GetInt (const char *key, const char *section, int defval) const
   assert (section);
 
   /*We don't use GetPrivateProfileInt because it returns
-	an UNSIGNED number which isn't very nice.*/
+  an UNSIGNED number which isn't very nice.*/
 
-	char buffer[80];
-	if (!GetString (buffer, sizeof(buffer), key, section))
-	 return defval;
-	return atoi (buffer);
+  char buffer[80];
+  if (!GetString (buffer, sizeof(buffer), key, section))
+   return defval;
+  return atoi (buffer);
 }
 
 /*!
   \param key      key name
   \param section  section name
   \param defval   default value if key is missing
-	\pre key != NULL <br>
-	     section != NULL
+  \pre key != NULL <br>
+       section != NULL
 */
 double Profile::GetDouble (const char *key, const char *section, double defval) const
 {
@@ -185,27 +187,29 @@ double Profile::GetDouble (const char *key, const char *section, double defval) 
   assert (key);
   assert (section);
 
-	if (!GetString (value, sizeof(value), key, section))
-	 return defval;
-	return atof (value);
+  if (!GetString (value, sizeof(value), key, section))
+   return defval;
+  return atof (value);
 }
 
 /*!
   \param key      key name
   \param value    key value
   \param section  section name
-	\pre key != NULL <br>
-	     section != NULL
+  \return         true if successful, false otherwise
+
+  \pre key != NULL <br>
+       section != NULL
 */
-void Profile::PutInt (const char *key, long value, const char *section)
+bool Profile::PutInt (const char *key, long value, const char *section)
 {
-	char buffer[35];
+  char buffer[35];
 
   assert (key);
   assert (section);
 
   _itoa (value, buffer, 10);
-	PutString (key, buffer, section);
+  return PutString (key, buffer, section);
 }
 
 
@@ -214,11 +218,12 @@ void Profile::PutInt (const char *key, long value, const char *section)
   \param value    key value
   \param section  section name
   \param dec      number of decimals
+  \return         true if successful, false otherwise
 
-	\pre key != NULL <br>
-	     section != NULL
+  \pre key != NULL <br>
+       section != NULL
 */
-void Profile::PutDouble (const char *key, double value, const char *section, int dec)
+bool Profile::PutDouble (const char *key, double value, const char *section, int dec)
 {
   char buffer[80];
 
@@ -226,7 +231,7 @@ void Profile::PutDouble (const char *key, double value, const char *section, int
   assert (section);
 
   sprintf (buffer, "%.*lf", dec, value);
-  PutString (key, buffer, section);
+  return PutString (key, buffer, section);
 }
 
 /*!
@@ -237,118 +242,118 @@ void Profile::PutDouble (const char *key, double value, const char *section, int
   \param key      key name
   \param section  section name
   \param defval   default value if key is missing
-	\pre key != NULL <br>
-	     section != NULL
+  \pre key != NULL <br>
+       section != NULL
 */
 HFONT Profile::GetFont (const char *key, const char *section, HFONT defval) const
 {
-	LOGFONT lfont;
-	char value[255];
-	char *szptr = value;
+  LOGFONT lfont;
+  char value[255];
+  char *szptr = value;
 
   assert (key);
   assert (section);
 
-	GetString (value, sizeof(value), key, section);
-	if (*szptr)
-	{
-		lfont.lfHeight = atoi (szptr);
-		szptr = strchr (szptr, ',');
-	}
-	else if (defval)
+  GetString (value, sizeof(value), key, section);
+  if (*szptr)
+  {
+    lfont.lfHeight = atoi (szptr);
+    szptr = strchr (szptr, ',');
+  }
+  else if (defval)
     return defval;
   else
-		return (HFONT)GetStockObject(SYSTEM_FONT);
+    return (HFONT)GetStockObject(SYSTEM_FONT);
 
-	if (szptr && *szptr)
-	{
-		lfont.lfWidth = atoi (++szptr);
-		szptr = strchr (szptr, ',');
-	}
-	else
-		lfont.lfWidth = 0;
-	if (szptr && *szptr)
-	{
-		lfont.lfEscapement = atoi (++szptr);
-		szptr = strchr (szptr, ',');
-	}
-	else
-		lfont.lfEscapement = 0;
-	if (szptr && *szptr)
-	{
-		lfont.lfOrientation = atoi (++szptr);
-		szptr = strchr (szptr, ',');
-	}
-	else
-		lfont.lfOrientation = 0;
-	if (szptr && *szptr)
-	{
-		lfont.lfWeight = atoi (++szptr);
-		szptr = strchr (szptr, ',');
-	}
-	else
-		lfont.lfWeight = FW_NORMAL;
-	if (szptr && *szptr)
-	{
-		lfont.lfItalic = (BYTE)atoi (++szptr);
-		szptr = strchr (szptr, ',');
-	}
-	else
-		lfont.lfItalic = 0;
-	if (szptr && *szptr)
-	{
-		lfont.lfUnderline = (BYTE)atoi (++szptr);
-		szptr = strchr (szptr, ',');
-	}
-	else
-		lfont.lfUnderline = 0;
-	if (szptr && *szptr)
-	{
-		lfont.lfStrikeOut = (BYTE)atoi (++szptr);
-		szptr = strchr (szptr, ',');
-	}
-	else
-		lfont.lfStrikeOut = 0;
-	if (szptr && *szptr)
-	{
-		lfont.lfCharSet = (BYTE)atoi (++szptr);
-		szptr = strchr (szptr, ',');
-	}
-	else
-		lfont.lfCharSet = ANSI_CHARSET;
-	if (szptr && *szptr)
-	{
-		lfont.lfOutPrecision = (BYTE)atoi (++szptr);
-		szptr = strchr (szptr, ',');
-	}
-	else
-		lfont.lfOutPrecision = OUT_DEFAULT_PRECIS;
-	if (szptr && *szptr)
-	{
-		lfont.lfClipPrecision = (BYTE)atoi (++szptr);
-		szptr = strchr (szptr, ',');
-	}
-	else
-		lfont.lfClipPrecision = CLIP_DEFAULT_PRECIS;
-	if (szptr && *szptr)
-	{
-		lfont.lfQuality = (BYTE)atoi (++szptr);
-		szptr = strchr (szptr, ',');
-	}
-	else
-		lfont.lfQuality = DEFAULT_QUALITY;
-	if (szptr && *szptr)
-	{
-		lfont.lfPitchAndFamily = (BYTE)atoi (++szptr);
-		szptr = strchr (szptr, ',');
-	}
-	else
-		lfont.lfPitchAndFamily = DEFAULT_PITCH | FF_DONTCARE;
-	if (szptr && *szptr)
+  if (szptr && *szptr)
+  {
+    lfont.lfWidth = atoi (++szptr);
+    szptr = strchr (szptr, ',');
+  }
+  else
+    lfont.lfWidth = 0;
+  if (szptr && *szptr)
+  {
+    lfont.lfEscapement = atoi (++szptr);
+    szptr = strchr (szptr, ',');
+  }
+  else
+    lfont.lfEscapement = 0;
+  if (szptr && *szptr)
+  {
+    lfont.lfOrientation = atoi (++szptr);
+    szptr = strchr (szptr, ',');
+  }
+  else
+    lfont.lfOrientation = 0;
+  if (szptr && *szptr)
+  {
+    lfont.lfWeight = atoi (++szptr);
+    szptr = strchr (szptr, ',');
+  }
+  else
+    lfont.lfWeight = FW_NORMAL;
+  if (szptr && *szptr)
+  {
+    lfont.lfItalic = (BYTE)atoi (++szptr);
+    szptr = strchr (szptr, ',');
+  }
+  else
+    lfont.lfItalic = 0;
+  if (szptr && *szptr)
+  {
+    lfont.lfUnderline = (BYTE)atoi (++szptr);
+    szptr = strchr (szptr, ',');
+  }
+  else
+    lfont.lfUnderline = 0;
+  if (szptr && *szptr)
+  {
+    lfont.lfStrikeOut = (BYTE)atoi (++szptr);
+    szptr = strchr (szptr, ',');
+  }
+  else
+    lfont.lfStrikeOut = 0;
+  if (szptr && *szptr)
+  {
+    lfont.lfCharSet = (BYTE)atoi (++szptr);
+    szptr = strchr (szptr, ',');
+  }
+  else
+    lfont.lfCharSet = ANSI_CHARSET;
+  if (szptr && *szptr)
+  {
+    lfont.lfOutPrecision = (BYTE)atoi (++szptr);
+    szptr = strchr (szptr, ',');
+  }
+  else
+    lfont.lfOutPrecision = OUT_DEFAULT_PRECIS;
+  if (szptr && *szptr)
+  {
+    lfont.lfClipPrecision = (BYTE)atoi (++szptr);
+    szptr = strchr (szptr, ',');
+  }
+  else
+    lfont.lfClipPrecision = CLIP_DEFAULT_PRECIS;
+  if (szptr && *szptr)
+  {
+    lfont.lfQuality = (BYTE)atoi (++szptr);
+    szptr = strchr (szptr, ',');
+  }
+  else
+    lfont.lfQuality = DEFAULT_QUALITY;
+  if (szptr && *szptr)
+  {
+    lfont.lfPitchAndFamily = (BYTE)atoi (++szptr);
+    szptr = strchr (szptr, ',');
+  }
+  else
+    lfont.lfPitchAndFamily = DEFAULT_PITCH | FF_DONTCARE;
+  if (szptr && *szptr)
     wcscpy (lfont.lfFaceName, widen(++szptr).c_str() );
-	else
-		wcscpy( lfont.lfFaceName, L"Courier" );
-	return CreateFontIndirect (&lfont);
+  else
+    wcscpy( lfont.lfFaceName, L"Courier" );
+  return CreateFontIndirect (&lfont);
 }
 
 /*!
@@ -360,19 +365,19 @@ HFONT Profile::GetFont (const char *key, const char *section, HFONT defval) cons
   \param defval   default value if key is missing
 
   \pre key != NULL <br>
-	     section != NULL
+       section != NULL
 */
 COLORREF Profile::GetColor (const char *key, const char *section, COLORREF defval) const
 {
-	int R=0, G=0, B=0;
-	char value[80];
+  int R=0, G=0, B=0;
+  char value[80];
 
   assert (key);
   assert (section);
 
   if (GetString (value, sizeof(value), key, section)
    && sscanf (value, "%i%i%i", &R, &G, &B) == 3)
-	  return RGB (R,G,B);
+    return RGB (R,G,B);
   else
     return defval;
 }
@@ -383,19 +388,20 @@ COLORREF Profile::GetColor (const char *key, const char *section, COLORREF defva
   \param key      key name
   \param section  section name
   \param c        color specification
+  \return         true if successful, false otherwise
 
   \pre key != NULL <br>
-	     section != NULL
+       section != NULL
 */
-void Profile::PutColor (const char *key, COLORREF c, const char *section)
+bool Profile::PutColor (const char *key, COLORREF c, const char *section)
 {
-	char buffer[80];
+  char buffer[80];
 
   assert (key);
   assert (section);
 
-	sprintf (buffer, "%i %i %i", GetRValue(c), GetGValue(c), GetBValue(c));
-	PutString (key, buffer, section);
+  sprintf (buffer, "%i %i %i", GetRValue(c), GetGValue(c), GetBValue(c));
+  return PutString (key, buffer, section);
 }
 
 
@@ -405,21 +411,22 @@ void Profile::PutColor (const char *key, COLORREF c, const char *section)
   \param key      key name
   \param section  section name
   \param font     key value
+  \return         true if successful, false otherwise
 
   \pre key != NULL <br>
-	     section != NULL
+       section != NULL
 */
-void Profile::PutFont (const char *key, HFONT font, const char *section)
+bool Profile::PutFont (const char *key, HFONT font, const char *section)
 {
   LOGFONT lfont;
-  wchar_t buffer[256];
+  char buffer[256];
 
   assert (key);
   assert (section);
 
   if (!GetObject (font, sizeof(lfont), &lfont))
-    return;
-  swprintf (buffer, sizeof(buffer), L"%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%s",
+    return false;
+  sprintf_s (buffer, sizeof(buffer), "%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%S",
     lfont.lfHeight,
     lfont.lfWidth,
     lfont.lfEscapement,
@@ -434,7 +441,7 @@ void Profile::PutFont (const char *key, HFONT font, const char *section)
     lfont.lfQuality,
     lfont.lfPitchAndFamily,
     lfont.lfFaceName);
-  PutString (key, narrow(buffer).c_str(), section);
+  return PutString (key, buffer, section);
 }
 
 /*!
@@ -446,19 +453,19 @@ void Profile::PutFont (const char *key, HFONT font, const char *section)
   \param defval   default value if key is missing
 
   \pre key != NULL <br>
-	     section != NULL
+       section != NULL
 
 */
 bool Profile::GetBool (const char *key, const char *section, bool defval) const
 {
-	char buffer[80];
+  char buffer[80];
 
   assert (key);
   assert (section);
 
-	if (!GetString (buffer, sizeof(buffer), key, section))
+  if (!GetString (buffer, sizeof(buffer), key, section))
     return defval;
-	return (!_stricmp (buffer, "on") 
+  return (!_stricmp (buffer, "on") 
        || !_stricmp (buffer, "yes") 
        || !_stricmp (buffer, "true")
        || (atoi (buffer) == 1));
@@ -470,13 +477,13 @@ bool Profile::GetBool (const char *key, const char *section, bool defval) const
   \param key      key name
   \param section  section name
   \param value    key value
-
+  \return         true if successful, false otherwise
   \pre key != NULL <br>
-	     section != NULL
+       section != NULL
 */
-void Profile::PutBool (const char *key, bool value, const char *section)
+bool Profile::PutBool (const char *key, bool value, const char *section)
 {
-	PutString (key, (value)?"On":"Off", section);
+  return PutString (key, (value)?"On":"Off", section);
 }
 
 /*!
@@ -484,6 +491,7 @@ void Profile::PutBool (const char *key, bool value, const char *section)
   \param  from_file   source INI file
   \param  from_sect   source section
   \param  to_sect     destination section
+  \return             true if successful, false otherwise
 
   If \p to_sec is NULL the destination section is the same as the source section.
 
@@ -491,21 +499,21 @@ void Profile::PutBool (const char *key, bool value, const char *section)
 
   \pre from_sect != NULL
 */
-void Profile::CopySection (const Profile& from_file, const char *from_sect, const char *to_sect)
+bool Profile::CopySection (const Profile& from_file, const char *from_sect, const char *to_sect)
 {
   assert (from_sect);
   char buffer[INI_BUFFERSIZE];
 
   //trivial case: same file, same section
   if (strcmpi (filename, from_file.File ()) == 0 && (to_sect == NULL || strcmp (from_sect, to_sect) == 0))
-    return;
+    return true;
 
   //if file doesn't exist create it now
   if (_waccess (widen (filename).c_str (), 0))
   {
     FILE *fp = ini_openwrite (filename);
     if (fp == NULL)
-      return;
+      return false;
     fputs ("\xEF\xBB\xBF\r\n", fp); //write BOM mark
     fclose (fp);
   }
@@ -517,7 +525,7 @@ void Profile::CopySection (const Profile& from_file, const char *from_sect, cons
   int len = (int)strlen (from_sect);
   FILE *fpfrom = ini_openread (from_file.filename);
   if (fpfrom == NULL)
-    return;
+    return false;
   fgets (buffer, INI_BUFFERSIZE, fpfrom);
   while (!feof (fpfrom))
   {
@@ -528,7 +536,7 @@ void Profile::CopySection (const Profile& from_file, const char *from_sect, cons
   if (feof (fpfrom))
   {
     fclose (fpfrom);  // from_sect not found;
-    return;
+    return true;
   }
 
   //locate [to section]
@@ -537,7 +545,7 @@ void Profile::CopySection (const Profile& from_file, const char *from_sect, cons
   if (fp == NULL)
   {
     fclose (fpfrom);
-    return;
+    return false;
   }
   ini_tempname (buffer, filename, sizeof (buffer));
 
@@ -546,7 +554,7 @@ void Profile::CopySection (const Profile& from_file, const char *from_sect, cons
   {
     fclose (fpfrom);
     fclose (fp);
-    return;
+    return false;
   }
   fgets (buffer, INI_BUFFERSIZE, fp);
   while (!feof (fp))
@@ -584,7 +592,7 @@ void Profile::CopySection (const Profile& from_file, const char *from_sect, cons
     fgets (buffer, INI_BUFFERSIZE, fp);
   }
 
-  close_rename (fp, fpt, filename);
+  return close_rename (fp, fpt, filename);
 }
 
 /*!
@@ -594,26 +602,27 @@ void Profile::CopySection (const Profile& from_file, const char *from_sect, cons
 */
 bool Profile::HasSection (const char *section)
 {
-	char buffer[256];	//Doesn't matter if buffer is small. We want to check only
-							//if there are any entries
+  char buffer[256];  //Doesn't matter if buffer is small. We want to check only
+              //if there are any entries
   assert (section);
 
-	return GetKeys (buffer, sizeof(buffer), section) != 0;
+  return GetKeys (buffer, sizeof(buffer), section) != 0;
 }
 
 /*!
   \param key      key name
   \param section  section name
+  \return         true if successful, false otherwise
 
   \pre key != NULL <br>
-	     section != NULL
+       section != NULL
 */
-void Profile::DeleteKey( const char *key, const char *section )
+bool Profile::DeleteKey( const char *key, const char *section )
 {
   assert (key);
   assert (section);
 
-	ini_puts (key, NULL, section, filename );
+  return ini_puts (key, NULL, section, filename );
 }
 
 /*!
@@ -621,9 +630,9 @@ void Profile::DeleteKey( const char *key, const char *section )
 
   \pre section != NULL
 */
-void Profile::DeleteSection( const char *section )
+bool Profile::DeleteSection( const char *section )
 {
-	ini_puts (NULL, NULL, section, filename);
+  return ini_puts (NULL, NULL, section, filename);
 }
 
 /*!
@@ -703,27 +712,27 @@ int Profile::GetKeys( char *keys, int sz, const char *section )
   \param key      key name
   \param section  section name
   \param defval   default value
-  \return length of returned string
+  \return         length of returned string
 
   \pre value != NULL <br>
-	     key != NULL <br>
-	     section != NULL <br>
+       key != NULL <br>
+       section != NULL <br>
        defval != NULL
 */
 int Profile::GetString (char *value, int len, const char *key, const char *section, const char *defval ) const
 {
   FILE *fp;
-  int ok = 0;
+  int found = 0;
 
   if (!value || len <= 0 || !key)
     return 0;
   fp = ini_openread (filename);
   if (fp) 
   {
-    ok = getkeystring (fp, section, key, value, len);
+    found = getkeystring (fp, section, key, value, len);
     fclose(fp);
   }
-  if (!ok)
+  if (!found)
     strncpy (value, defval, len);
   return (int)strlen (value);
 }
@@ -732,12 +741,13 @@ int Profile::GetString (char *value, int len, const char *key, const char *secti
   \param value    key value
   \param key      key name
   \param section  section name
+  \return         true if successful, false otherwise
 
   \pre value != NULL <br>
-	     key != NULL <br>
-	     section != NULL <br>
+       key != NULL <br>
+       section != NULL <br>
 */
-int Profile::PutString( const char *key, const char *value, const char *section )
+bool Profile::PutString( const char *key, const char *value, const char *section )
 {
   return ini_puts (key, value, section, filename);
 }
@@ -794,8 +804,18 @@ int Profile::GetSections (char *sects, int sz)
   return cnt;
 }
 
+/*
+  Write a string in the INI file. This is the back engine used by all Get... functions.
 
-static int ini_puts (const char *key, const char *value, const char *section, char *filename)
+  \param  key       name of key to write
+  \param  value     key value
+  \param  section   section name
+  \param  filename  name of INI file
+  \return           true if successful, false otherwise
+
+  All parameters are UTF8 encoded.
+*/
+static bool ini_puts (const char *key, const char *value, const char *section, char *filename)
 {
   FILE* rfp;
   FILE* wfp;
@@ -810,14 +830,17 @@ static int ini_puts (const char *key, const char *value, const char *section, ch
     /* If the .ini file doesn't exist, make a new file */
     if (key != NULL && value != NULL) 
     {
-      if (!(wfp = ini_openwrite(filename)))
-        return 0;
+      if (!(wfp = ini_openwrite (filename)))
+      {
+        TRACE ("Cannot write to new file \"%s\"", filename);
+        return false;
+      }
       fputs ("\xEF\xBB\xBF\r\n", wfp); //write BOM mark
       writesection(buffer, section, wfp);
       writekey(buffer, key, value, wfp);
       fclose(wfp);
     }
-    return 1;
+    return true;
   }
 
   /* If parameters 'key' and 'value' are valid (so this is not an "erase" request)
@@ -831,7 +854,7 @@ static int ini_puts (const char *key, const char *value, const char *section, ch
     if (match && strcmp (buffer, value) == 0) 
     {
       fclose(rfp);
-      return 1;
+      return true;
     }
     /* key not found, or different value -> proceed (but rewind the input file first) */
     fsetpos(rfp, &mark);
@@ -840,8 +863,9 @@ static int ini_puts (const char *key, const char *value, const char *section, ch
   ini_tempname(buffer, filename, INI_BUFFERSIZE);
   if (!(wfp = ini_openwrite(buffer))) 
   {
-    fclose(rfp);
-    return 0;
+    TRACE ("Cannot write to \"%s\"", filename);
+    fclose (rfp);
+    return false;
   }
 
   fgetpos(rfp, &mark);
@@ -1140,6 +1164,8 @@ static int cache_accum (const char* string, int* size, int max)
 static int cache_flush (char* buffer, int* size, FILE* rfp, FILE* wfp, fpos_t* mark)
 {
   int pos = 0;
+  assert (rfp);
+  assert (wfp);
 
   fsetpos (rfp, mark);
   assert (buffer != NULL);
@@ -1167,7 +1193,7 @@ static int cache_flush (char* buffer, int* size, FILE* rfp, FILE* wfp, fpos_t* m
   making the rename operation to fail. Solved by adding a few retries before 
   failing.
 */
-static int close_rename(FILE* rfp, FILE* wfp, const char* filename)
+static bool close_rename(FILE* rfp, FILE* wfp, const char* filename)
 {
   const int RETRIES = 50;
   int i;
@@ -1184,7 +1210,7 @@ static int close_rename(FILE* rfp, FILE* wfp, const char* filename)
     Sleep(0);
 
   if (i >= RETRIES)
-    return 0;
+    return false;
 
   i = 0;
   while (i++ < RETRIES && _wrename(wtmp.c_str(), wfn.c_str()))

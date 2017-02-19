@@ -14,13 +14,25 @@ TEST (PutGetString)
   _unlink ("test.ini");
   Sleep (200);
   Profile test ("test.ini");
-  test.PutString ("key0", "value00", "section0");
-  test.PutString ("key1", "value01", "section0");
-  test.PutString ("key0", "value10", "section1");
-  test.PutString ("key1", "value11", "section1");
-  test.GetString (val, sizeof(val), "key1", "section1", "default");
+  CHECK(test.PutString ("key0", "value00", "section0"));
+  CHECK(test.PutString ("key1", "value01", "section0"));
+  CHECK(test.PutString ("key0", "value10", "section1"));
+  CHECK(test.PutString ("key1", "value11", "section1"));
+  CHECK_EQUAL (strlen("value11"), test.GetString (val, sizeof(val), "key1", "section1", "default"));
   CHECK_EQUAL ("value11", val);
   _unlink ("test.ini");
+}
+
+/*
+  Check PutString, PutDouble, PutInt, PutBool fail when ini file cannot be created
+*/
+TEST (IniNotCreated)
+{
+  Profile test ("inexistent folder\\test.ini");
+  CHECK (!test.PutString ("key0", "value00", "section0"));
+  CHECK (!test.PutDouble ("key1", 123.45, "section0"));
+  CHECK (!test.PutInt ("key1", 123, "section0"));
+  CHECK (!test.PutBool ("key1", true, "section0"));
 }
 
 /*
@@ -32,8 +44,8 @@ TEST (PutReplaceGet)
   _unlink ("test.ini");
   Sleep (200);
   Profile test ("test.ini");
-  test.PutString ("key0", "value00", "section0");
-  test.PutString ("key0", "newval", "section0");
+  CHECK(test.PutString ("key0", "value00", "section0"));
+  CHECK(test.PutString ("key0", "newval", "section0"));
   int sz = test.GetString (val, sizeof(val), "key0", "section0");
   CHECK_EQUAL ("newval", val);
   CHECK_EQUAL (strlen("newval"), sz);
