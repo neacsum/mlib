@@ -87,6 +87,7 @@ thread::thread (const char *name, bool inherit, DWORD stack_size, PSECURITY_DESC
   TRACE2 ("Created thread %s[%x]", name?name:"", id());
 }
 
+#if 0
 /*!
   Make a thread from a function. 
   
@@ -113,7 +114,7 @@ thread::thread(int (*pfunc)(void *), void *arg, const char *name) :
   initialize ();
   TRACE2 ("Created thread %s[%x]", name?name:"", id());
 }
-
+#endif
 /*!
   Make a thread from a function. 
   
@@ -193,7 +194,7 @@ thread::~thread()
     {
       TRACE ("Terminating thread that was not started");
       TerminateThread (handle(), 0);
-		}
+    }
   }
   id_ = 0;
 }

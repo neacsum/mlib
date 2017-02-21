@@ -16,7 +16,7 @@ namespace MLIBSPACE {
 class thread : public syncbase
 {
 public:
-                thread (int (*pfunc)(void *), void *arg=0, const char *name=0);
+//                thread (int (*pfunc)(void *), void *arg=0, const char *name=0);
                 thread (std::function<int (void*)> func, void *arg=0, const char *name=0);
   virtual       ~thread   ();
   virtual void  start     ();
