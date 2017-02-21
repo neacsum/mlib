@@ -90,6 +90,7 @@ static int match (const char *str1, const char *str2);
   convention.
 */
 http_connection::http_connection (sock& socket, httpd& server) :
+thread ("http_connection"),
 parent (server),
 ws (socket),
 req_len (0),
