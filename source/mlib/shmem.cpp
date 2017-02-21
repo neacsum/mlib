@@ -1,8 +1,8 @@
 /*!
-  \file SHMEM.CPP - Impemenation of shared memory areas with support for
+  \file SHMEM.CPP - Implementation of shared memory areas with support for
   single-writer multiple-readers.
 
-    (c) Mircea Neacsu. 2004-2009
+    (c) Mircea Neacsu. 2004-2017
 */
 #ifndef UNICODE
 #define UNICODE
@@ -53,7 +53,6 @@ shmem_base::shmem_base (const char * nam, size_t sz_) :
 
 shmem_base::~shmem_base()
 {
-  TRACE2 ("shmem_base (%s) destructor", name_);
   close ();
   TRACE2 ("shmem_base destructor done");
 }
@@ -84,17 +83,15 @@ bool shmem_base::open (const char * nam, size_t sz_)
   
     mem_created = (GetLastError () != ERROR_ALREADY_EXISTS);
 
-    mem = MapViewOfFile (file, FILE_MAP_ALL_ACCESS, 0, 0, 0);
-    if (!mem)
+    syn = (syncblk*)MapViewOfFile (file, FILE_MAP_ALL_ACCESS, 0, 0, 0);
+    if (!syn)
     {
       TRACE ("shmem_base::open(%s) MapViewOfFile failed!", name_);
       throw GetLastError();
     }
 
-    /* for compatibility with old shared memory protocol, synchronization
-    block is AFTER the data */
-    data = mem;
-    syn = (syncblk*)((char*)mem + sz);
+    /* data is after the sync block */
+    mem = syn + 1;
     tmp = wname + L".EVT";
     rdgate = CreateEvent (NULL, TRUE, TRUE, tmp.c_str());
     if (mem_created)
@@ -103,29 +100,32 @@ bool shmem_base::open (const char * nam, size_t sz_)
     wrex = CreateMutex (NULL, FALSE, tmp.c_str());
     if (mem_created)
     {
+      TRACE ("shmem_base::open(%s) Created shared memory", name_);
       syn->wrex = wrex;
       syn->rc = syn->wc = 0;
       syn->wrid = 0;
-      memset (data, 0, sz);
+      memset (mem, 0, sz);
     }
   } catch (DWORD& x) {
-    TRACE ("Error %ld", x);
+    TRACE ("shmem_base::open(%s) Error %ld", name_, x);
     close ();
     return false;
   }
-
+  TRACE ("shmem_base::open(%s) size %d done", name_, sz);
   return true;
 }
 
 bool shmem_base::close ()
 {
   assert (!in_rdlock && !in_wrlock);
-  if (mem)
-    UnmapViewOfFile (mem);
+  if (name_)
+    TRACE ("shmem_base::close (%s)", name_);
+  if (syn)
+    UnmapViewOfFile (syn);
   if (file)
     CloseHandle (file);
   file = NULL;
-  mem = NULL;
+  mem = syn = NULL;
   if (wrex != INVALID_HANDLE_VALUE)
     CloseHandle (wrex);
   if (rdgate != INVALID_HANDLE_VALUE)
@@ -139,7 +139,7 @@ bool shmem_base::close ()
 
 bool shmem_base::rdlock ()
 {
-  assert (mem);
+  assert (syn);
 
   if (in_rdlock || in_wrlock) //write lock has also read semantics
   {
@@ -166,7 +166,7 @@ bool shmem_base::rdlock ()
 
 void shmem_base::rdunlock ()
 {
-  assert (mem);
+  assert (syn);
   assert (in_rdlock);
   assert (syn->rc > 0);
 
@@ -177,7 +177,7 @@ void shmem_base::rdunlock ()
 
 bool shmem_base::wrlock ()
 {
-  assert (mem);
+  assert (syn);
   DWORD res;
 
   InterlockedIncrement (&syn->wc);
@@ -185,7 +185,7 @@ bool shmem_base::wrlock ()
   if ((res=WaitForSingleObject (wrex, wtmo_)) == WAIT_OBJECT_0)
   {
     DWORD endt;
-    TRACE ("shmem_base::wrlock - Aquired wrex");
+    TRACE ("shmem_base::wrlock - Acquired wrex");
     syn->wrid = GetCurrentThreadId ();
     ResetEvent (rdgate);
     if (wtmo_ != INFINITE)
@@ -228,7 +228,7 @@ bool shmem_base::wrlock ()
 
 void shmem_base::wrunlock()
 {
-  assert (mem);
+  assert (syn);
   assert (in_wrlock);
   assert (syn->wc > 0);
   syn->wrid = 0;
@@ -255,7 +255,7 @@ void shmem_base::get (void *data)
 
 bool shmem_base::write (const void *pData)
 {
-  assert (mem);
+  assert (syn);
 
   if (wrlock ())
   {
@@ -268,7 +268,7 @@ bool shmem_base::write (const void *pData)
 
 bool shmem_base::read (void * pData)
 {
-  assert (mem);
+  assert (syn);
 
   if (rdlock ())
   {
