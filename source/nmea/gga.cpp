@@ -40,11 +40,10 @@ int gga (const char *buf, double *lat, double *lon, double *time, double *height
   IFPAR (height, atof (tok));
   NEXT_TOKEN (tok, 0);    //'M'
   NEXT_TOKEN (tok, 0);
+  double val = atof (tok);
+  IFPAR (undul, val);
   if (height)
-  {
-    *undul = atof(tok);
-    *height += *undul;
-  }
+    *height += val;
   NEXT_TOKEN (tok, 0);  //'M'
   NEXT_TOKEN (tok, 2);
   IFPAR (age, atof (tok));
