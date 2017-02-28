@@ -26,7 +26,7 @@
 namespace MLIBSPACE {
 #endif
 
-int sock_initializer::counter=0;
+int sock_initializer_counter=0;
 
 /*!
   \defgroup sockets Socket streams and related classes
@@ -1052,7 +1052,7 @@ int sockbuf::overflow (int c)
 }
 
 /*!
-  Return number of characters availabe in socket buffer
+  Return number of characters available in socket buffer
 */
 std::streamsize sockbuf::showmanyc ()
 {
@@ -1060,19 +1060,28 @@ std::streamsize sockbuf::showmanyc ()
 }
 
 /*!
-  \class sock_initializer
+  \struct sock_initializer
   \ingroup sockets
 
   This is a wrapper around WSAStartup/WSACleanup functions.
   When the first instance is created it calls WSAStartup and WSACleanup is 
   called when the last instance is destroyed.
+
+  It uses the "Nifty Counter" (https://en.wikibooks.org/wiki/More_C%2B%2B_Idioms/Nifty_Counter)
+  idiom to ensure Winsock library is properly
+  initialized before usage. The header file wsockstream.h contains a declaration
+  of the static object sock_nifty_counter. Because it is a static object there
+  will be one such object in each translation unit that includes the header file.
+  Moreover, because it is declared before any other global object in that translation
+  unit, sock_nifty_counter constructor will be called first. 
+
 */
 
 /// First instance calls WSAStartup to initialize Winsock library
 sock_initializer::sock_initializer ()
 {
-  TRACE ("sock_initializer::sock_initializer cnt=%d", counter);
-  if (counter++ == 0)
+  TRACE ("sock_initializer::sock_initializer cnt=%d", sock_initializer_counter);
+  if (sock_initializer_counter++ == 0)
   {
     WSADATA wsadata; 
     int err = WSAStartup (MAKEWORD(2,0), &wsadata);
@@ -1083,13 +1092,12 @@ sock_initializer::sock_initializer ()
 /// Last instance calls WSACleanup
 sock_initializer::~sock_initializer()
 {
-  if (--counter == 0)
+  if (--sock_initializer_counter == 0)
   {
-    int err = 0;
-    err = WSACleanup ();
+    int err = WSACleanup ();
     TRACE ("sock_initializer - WSACleanup result=%d", err);
   }
-  TRACE ("sock_initializer::~sock_initializer cnt=%d", counter);
+  TRACE ("sock_initializer::~sock_initializer cnt=%d", sock_initializer_counter);
 }
 
 /*!

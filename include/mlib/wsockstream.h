@@ -215,15 +215,11 @@ typedef generic_sockstream<std::iostream> sockstream;
 
 /*---------------------- support classes ------------------------------------*/
 /// Keeps an instance counter for calls to WSAStartup/WSACleanup
-class sock_initializer
+static struct sock_initializer
 {
-public:
   sock_initializer ();
   ~sock_initializer ();
-
-private:
-  static int counter;
-};
+} sock_nifty_counter;
 
 ///Router for socket errors
 class sock_facility : public errfacility
