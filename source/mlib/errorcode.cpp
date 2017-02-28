@@ -1,8 +1,8 @@
 /*!
-		\file errorcode.cpp	Implementation of erc and errfac classes
+    \file errorcode.cpp  Implementation of erc and errfac classes
 
-		Copyright (c) Mircea Neacsu 2000
-		Based on an idea from Marc Guillermont (CUJ 05/2000)
+    Copyright (c) Mircea Neacsu 2000
+    Based on an idea from Marc Guillermont (CUJ 05/2000)
 */
 #include <mlib/errorcode.h>
 #include <string.h>
@@ -97,7 +97,7 @@ name_ (strdup(other.name_))
 /// Release space allocated for name
 errfac::~errfac()
 {
-	free(name_);
+  free(name_);
 }
 
 /// Assignment operator
@@ -142,13 +142,13 @@ void errfac::log_priority (short int level)
 */
 void errfac::raise (const erc& e)
 {
-	if (e.priority_ >= log_level)
-		log (e);
-	if (e.priority_ >= throw_level)
-	{
-		e.thrown = true;
-		throw e;
-	}
+  if (e.priority_ >= log_level)
+    log (e);
+  if (e.priority_ >= throw_level)
+  {
+    e.thrown = true;
+    throw e;
+  }
 }
 
 void errfac::message(const erc& e, char *msg, size_t sz) const
@@ -165,7 +165,7 @@ void errfac::log( const erc& e )
 {
   char msg[1024];
   message (e, msg, sizeof(msg));
-	dprintf (msg);
+  dprintf (msg);
 }
 
 /*!
@@ -192,11 +192,11 @@ void errfac::Default (errfac *facility)
   Default ctor for erc objects creates an inactive error
 */
 erc::erc() :
-	value (0),
-	priority_ (ERROR_PRI_SUCCESS),
-	active (false),
-	thrown (false),
-	facility_ (errfac::Default ())
+  value (0),
+  priority_ (ERROR_PRI_SUCCESS),
+  active (false),
+  thrown (false),
+  facility_ (errfac::Default ())
 {
 }
 
@@ -204,11 +204,11 @@ erc::erc() :
   Ctor for a real erc
 */
 erc::erc (int v, short int l, errfac* f) :
-	value (v),
-	priority_ (l),
-	facility_ (f? f : errfac::Default ()),
-	thrown (false),
-	active (true)
+  value (v),
+  priority_ (l),
+  facility_ (f? f : errfac::Default ()),
+  thrown (false),
+  active (true)
 {
 }
 
@@ -217,17 +217,17 @@ erc::erc (int v, short int l, errfac* f) :
   so if the other error was thrown we shouldn't get thrown again.
 */
 erc::erc (const erc& other) :
-	value (other.value),
-	priority_ (other.priority_),
-	active (other.active),
-	facility_ (other.facility_)
+  value (other.value),
+  priority_ (other.priority_),
+  active (other.active),
+  facility_ (other.facility_)
 {
-	//we become the active error, the other is deactivated
-	other.active = false;
+  //we become the active error, the other is deactivated
+  other.active = false;
 
-	//if the other was thrown make sure we don't get thrown again
-	if (other.thrown)
-		active = false;
+  //if the other was thrown make sure we don't get thrown again
+  if (other.thrown)
+    active = false;
 }
 
 /*! 
@@ -236,8 +236,8 @@ erc::erc (const erc& other) :
 */
 erc::~erc ()
 {
-	if (value && active && priority_ > ERROR_PRI_SUCCESS)
-		facility_->raise (*this);
+  if (value && active && priority_ > ERROR_PRI_SUCCESS)
+    facility_->raise (*this);
 }
 
 /*!
@@ -249,15 +249,15 @@ erc::~erc ()
 */
 erc& erc::operator= (const erc& other)
 {
-	if (active && priority_ > ERROR_PRI_SUCCESS)
-		facility_->raise (*this);
-	value = other.value;
-	priority_ = other.priority_;
-	facility_ = other.facility_;
-	active = other.active;
-	thrown = false;
-	other.active = false;
-	return *this;
+  if (active && priority_ > ERROR_PRI_SUCCESS)
+    facility_->raise (*this);
+  value = other.value;
+  priority_ = other.priority_;
+  facility_ = other.facility_;
+  active = other.active;
+  thrown = false;
+  other.active = false;
+  return *this;
 }
 
 /*!
@@ -267,8 +267,8 @@ erc& erc::operator= (const erc& other)
 */
 erc::operator int () const
 {
-	active = false;
-	return value;
+  active = false;
+  return value;
 }
 
 /*!

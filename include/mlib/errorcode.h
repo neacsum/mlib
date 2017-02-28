@@ -49,7 +49,7 @@ public:
   /// set throw priority
   void          throw_priority (short int pri);
 
-  /// get throw prioriy
+  /// get throw priority
   short int     throw_priority () const        { return throw_level; };
 
   /// set log priority
