@@ -730,12 +730,18 @@ void http_connection::add_ohdr (const char *hdr, const char *value)
   \param  uri redirected uri
 
 */
-void http_connection::redirect (const char *uri)
+void http_connection::redirect (const char *uri, unsigned int code)
 {
   add_ohdr ("Location", uri);
-  respond (303);
-  ws << "<HTML><HEAD><TITLE>Document has moved</TITLE></HEAD>\r\n" \
-    "<BODY>Document has moved <A HREF=\"%s\">here</A></BODY></HTML>";
+  respond (code);
+  /* RFC7231 (https://tools.ietf.org/html/rfc7231#section-6.4) says:
+   Except for responses to a HEAD request, the representation of a 303
+   response ought to contain a short hypertext note with a hyperlink to
+   the same URI reference provided in the Location header field
+   */
+  ws << "<html><head><title>Document has moved</title></head>\r\n" \
+    "<body>Document has moved <a href=\"" << uri <<"\">here</a></body></html>" 
+    << endl;
 }
 
 /*!

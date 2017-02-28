@@ -57,7 +57,7 @@ public:
 
   sockstream& out ();
   void        respond (unsigned int code, const char *reason=0);
-  void        redirect (const char *uri);
+  void        redirect (const char *uri, unsigned int code=303);
   void        serve404 (const char *text = 0);
   int         serve_file (const char *full_path);
   int         serve_buffer(BYTE *full_path, size_t sz);
