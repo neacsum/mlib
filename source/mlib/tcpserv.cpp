@@ -69,7 +69,7 @@ tcpserver::~tcpserver ()
 /*!
   Place socket in listen mode.
   
-  Also initializes an event flag to be signalled when a connection request is 
+  Also initializes an event flag to be signaled when a connection request is 
   received. This function is automatically invoked by start ()
 */
 bool tcpserver::init ()
@@ -144,7 +144,7 @@ void tcpserver::run ()
     }
     else
     {
-      //check if we've been signalled by close_connection
+      //check if we've been signaled by close_connection
       contab_lock.enter ();
       for (size_t i=0; i<alloc; i++)
         if (contab[i] && contab[i]->condemned)
