@@ -5,6 +5,10 @@
 
 
 */
+
+//comment this line if you want debug messages from this module
+#undef _TRACE
+
 #include <mlib/defs.h>
 #include <mlib/tcpserv.h>
 #include <mlib/trace.h>
@@ -216,7 +220,11 @@ void tcpserver::termconn (sock& socket, thread *th)
   try {
     if (socket.handle() != INVALID_SOCKET)
     {
+      //set linger option to avoid socket hanging around after close
+      socket.linger (true, 1);
       socket.shutdown (sock::shut_write);
+
+      //read and discard any pending data
       char buf [256];
       while (socket.recv (buf, sizeof(buf)) != EOF)
         ;
