@@ -1,22 +1,26 @@
 /*!
-	\file wsockstream.cpp Implematation of sock and sock-derived classes
+  \file wsockstream.cpp Implementation of sock and sock-derived classes
 
  Copyright (c) 2001 Mircea Neacsu
 
 
 */
+
+//comment this line if you want debug messages from this module
+#undef _TRACE
+
 #include <mlib/defs.h>
 #include <mlib/wsockstream.h>
 #include <mlib/inaddr.h>
 #include <mlib/dprintf.h>
 #include <mlib/trace.h>
 
-#pragma comment (lib, "ws2_32.lib")
-
 //default buffer size
 #if !defined(BUFSIZ)
 # define BUFSIZ 1024
 #endif
+
+#pragma comment (lib, "ws2_32.lib")
 
 #ifdef MLIBSPACE
 namespace MLIBSPACE {
@@ -45,7 +49,7 @@ errfacility *sockerrors=&error_handler;
   \class sock
   \ingroup sockets
 
-  We keep a life counter associated with each sock object beacause sockets
+  We keep a life counter associated with each sock object because sockets
   cannot be safely duplicated (it seems) and anyway would be more expensive 
   to call DuplicateHandle.
 */
@@ -217,9 +221,9 @@ errc sock::bind (const sockaddr& sa)
 /*!
   Associates a local address with the socket.
   
-  Winsock assigns a unique port to the socket with a value between
-  1024 and 5000. The application can use name() after calling bind to learn
-  the address and the port that has been assigned to it.
+  Winsock assigns a unique port to the socket. The application can use 
+  name() after calling bind to learn the address and the port that has been
+  assigned to it.
 */
 errc sock::bind()
 {
@@ -981,7 +985,7 @@ std::streambuf* sockbuf::setbuf( char *buf, int sz )
     setp( buf, buf+sz-1 );                        //user specified buffer used only for output
   return this;
 }
-			
+
 /*!
   underflow
 */

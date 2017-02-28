@@ -8,6 +8,9 @@
 #define UNICODE
 #endif
 
+//comment this line if you want debug messages from this module
+#undef _TRACE
+
 #include <mlib/shmem.h>
 #include <mlib/trace.h>
 #include <assert.h>
