@@ -26,31 +26,43 @@ namespace MLIBSPACE {
 
 class http_connection;
 
-typedef std::map<std::string, std::string> pairs;
-typedef int (*handler)(const char *uri, http_connection& client, void *info);
+//case insensitive comparison function
+struct ciLess : public std::binary_function<std::string, std::string, bool> {
+  bool operator()(const std::string &lhs, const std::string &rhs) const {
+    return _stricmp (lhs.c_str (), rhs.c_str ()) < 0;
+  }
+};
+
+/// Key-value string pairs used for headers, URL-encoded data, etc.
+/// Keys are case insensitive.
+typedef std::map<std::string, std::string, ciLess> str_pairs;
+
+/// User defined URL handler function
+typedef int (*uri_handler)(const char *uri, http_connection& client, void *info);
 
 class http_connection : public thread
 {
 public:
   friend class httpd;
 
-  const char* get_uri() {return uri;};
-  const char* get_method () {return request;};
-  const char* get_all_ihdr () {return headers;};
+  const char* get_uri();
+  const char* get_method ();
+  const char* get_all_ihdr ();
   void        add_ohdr (const char *hdr, const char *value);
   const char* get_ihdr (const char *hdr);
   const char* get_ohdr (const char *hdr);
+  const char* get_query ();
+  const char* get_body ();
+  int         get_content_length ();
 
-  sockstream& out () {return ws;};
-  const char* get_params () {return param;};
-  const char* get_body () {return body;};
-  void        respond (unsigned int code);
+  sockstream& out ();
+  void        respond (unsigned int code, const char *reason=0);
   void        redirect (const char *uri);
   void        serve404 (const char *text = 0);
   int         serve_file (const char *full_path);
   int         serve_buffer(BYTE *full_path, size_t sz);
   int         serve_shtml (const char *full_path);
-  bool        parse_formbody (pairs& params);
+  bool        parse_formbody (str_pairs& params);
 
   void        respond_part (const char *part_type, const char *bound);
   void        respond_next (bool last);
@@ -73,14 +85,15 @@ private:
 
   char request[HTTPD_MAX_HEADER];
   char *uri;            //!< location
-  char *param;          //!< parameters
+  char *query;          //!< query string
   char *headers;        //!< all headers
   char *body;           //!< request body
+  int  content_len;     //!< content length or -1 if not known
   std::string part_boundary; //!< multi-part boundary
   bool response_sent;   //!< response function has been called
   size_t req_len;
-  pairs oheaders;
-  pairs iheaders;
+  str_pairs oheaders;
+  str_pairs iheaders;
 
   struct user {
     std::string name;
@@ -99,7 +112,7 @@ public:
 
   void        add_ohdr (const char *field, const char *value);
   void        remove_ohdr (const char *field);
-  void        add_handler (const char *uri, handler func, void *info);
+  void        add_handler (const char *uri, uri_handler func, void *info);
   void        add_alias (const char *uri, const char *path);
   bool        add_user (const char *realm, const char *username, const char *pwd);
   bool        remove_user(const char *realm, const char *username);
@@ -132,11 +145,11 @@ protected:
 
 private:
   unsigned short  port_num;       //!< port number
-  pairs           out_headers;    //!< response headers
-  pairs           realms;         //!< access control realms
+  str_pairs       out_headers;    //!< response headers
+  str_pairs       realms;         //!< access control realms
 
   struct handle_info {
-    handler h;
+    uri_handler h;
     void *nfo;
   };
   std::map <std::string, handle_info> handlers;
@@ -167,6 +180,37 @@ private:
   std::string defname;
   std::string servname;
 };
+
+/*==================== INLINE FUNCTIONS ===========================*/
+
+/// Return URI of this connection
+inline
+const char* http_connection::get_uri () { return uri; };
+
+/// Return HTTP method (GET, POST, etc.)
+inline
+const char* http_connection::get_method () { return request; };
+
+/// Return all incoming headers
+inline
+const char* http_connection::get_all_ihdr () { return headers; };
+
+/// Return URI query string (everything after '?')
+inline
+const char* http_connection::get_query () { return query; };
+
+/// Return request body
+inline
+const char* http_connection::get_body () { return body; };
+
+/// Return request body
+inline
+int http_connection::get_content_length () { return content_len; };
+
+/// Return socket object associated with this connection
+inline
+sockstream& http_connection::out () { return ws; };
+
 
 #ifdef MLIBSPACE
 }

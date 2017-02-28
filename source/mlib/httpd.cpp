@@ -15,7 +15,7 @@ using namespace std;
 
 //Defaults
 #define HTTPD_DEFAULT     "index.html"          //!< Default URL
-#define HTTPD_SERVER_NAME "HypackHTTPD 1.0"     //!< Default server name
+#define HTTPD_SERVER_NAME "MNCS_HTTPD 1.0"      //!< Default server name
 
 #define MAX_PAR 1024                            //<! max length of a form parameter
 
@@ -37,24 +37,32 @@ struct smime
   const char *type;
   bool shtml;
 } knowntypes[] = {
-  {"txt",  "text/plain", false},
-  {"htm",  "text/html", false},
-  {"html", "text/html", false},
-  {"shtml","text/html", true},
-  {"css",  "text/css", false},
-  {"gif",  "image/gif", false},
-  {"jpg",  "image/jpeg", false},
-  {"jpeg", "image/jpeg", false},
-  {"png",  "image/png", false},
-  {"ico",  "image/png", false},
-  {"pdf",  "application/pdf", false},
-  {"xml",  "text/xml", false},
-  {0, 0, false}
+  { "txt",    "text/plain", false },
+  { "htm",    "text/html", false },
+  { "html",   "text/html", false },
+  { "shtml",  "text/html", true },
+  { "shtm",   "text/html", true },
+  { "css",    "text/css", false },
+  { "xml",    "text/xml", false },
+  { "json",   "text/json", false },
+  { "gif",    "image/gif", false },
+  { "jpg",    "image/jpeg", false },
+  { "jpeg",   "image/jpeg", false },
+  { "png",    "image/png", false },
+  { "ico",    "image/png", false },
+  { "svg",    "image/svg+xml", false },
+  { "bmp",    "image/bmp", false },
+  { "pdf",    "application/pdf", false },
+  { "xslt",   "application/xml", false },
+  { "js",     "application/x-javascript", false },
+  { 0, 0, false }
 };
 
 static int fmt2type (const char *fmt);
 static int url_decode (char *buf);
 static int match (const char *str1, const char *str2);
+static int hexbyte (char *bin, const char *str);
+static int hexdigit (char *bin, char c);
 
 //-----------------------------------------------------------------------------
 /*!
@@ -95,7 +103,9 @@ parent (server),
 ws (socket),
 req_len (0),
 body (0),
-response_sent (false)
+query (0),
+response_sent (false),
+content_len (-1)
 {
 }
 
@@ -113,6 +123,7 @@ void http_connection::run ()
     {
       bool req_ok = false;
       req_len = 0;
+      content_len = -1;
       char *ptr = request;
       bool eol_seen = false;
       iheaders.clear ();
@@ -172,12 +183,14 @@ void http_connection::run ()
           if (!strcmpi (get_method (), "POST"))
           {
             //read request body
-            int len = atoi (get_ihdr ("Content-Length"));
-            if (len)
+            const char *cl = get_ihdr ("Content-Length");
+            if (cl)
+              content_len = atoi (cl);
+            if (content_len > 0)
             {
-              body = new char[len+1];
-              ws.read (body, len);
-              body[len] = 0;
+              body = new char[content_len+1];
+              ws.read (body, content_len);
+              body[content_len] = 0;
             }
           }
           process_valid_request ();
@@ -197,7 +210,6 @@ void http_connection::run ()
        || ((ph = get_ihdr ("Connection")) && !strcmpi (ph, "Close"))  //client wants to close
        || ((ph = get_ohdr ("Connection")) && !strcmpi (ph, "Close"))) //server wants to close
         return;
-
       ws.flush ();
     }
   } catch (erc &err) {
@@ -381,7 +393,7 @@ bool http_connection::parse_headers ()
   return true;
 }
 
-bool http_connection::parse_formbody (pairs& params)
+bool http_connection::parse_formbody (str_pairs& params)
 {
   char *ptr = body;
   char *val, *next;
@@ -398,15 +410,17 @@ bool http_connection::parse_formbody (pairs& params)
     else
       next = ptr + strlen(ptr);
 
-    val = strchr (ptr, '=');
-    if (!val)
-      return false;
-    *val++ = 0;
+    if (val = strchr (ptr, '='))
+    {
+      *val++ = 0;
+      strcpy (v, val);
+      url_decode (v);
+    }
+    else
+      *v = 0;
     strcpy (k, ptr);
-    strcpy (v, val);
     url_decode (k);
-    url_decode (v);
-    string key(k);
+    string key (k);
     params[ptr] = string(v);
     ptr = next;
   }
@@ -679,17 +693,17 @@ bool http_connection::parse_url()
     return false;
   headers = ptr+1;
   
-  //parse eventual parameters
+  //parse eventual query string
   ptr = uri;
   while (*ptr && *ptr != '?')
     ptr++;
   if (*ptr == '?')
   {
     *ptr = 0;
-    param = ptr+1;
+    query = ptr+1;
   }  
   else
-    param = 0;
+    query = 0;
 
   return true;
 }
@@ -705,7 +719,9 @@ bool http_connection::parse_url()
 */
 void http_connection::add_ohdr (const char *hdr, const char *value)
 {
-  oheaders[hdr] = value;
+  string key (hdr);
+  string val (value);
+  oheaders[key] = val;
 }
 
 /*!
@@ -726,6 +742,7 @@ void http_connection::redirect (const char *uri)
   Send the beginning of HTTP response.
 
   \param  code HTTP response code
+  \param  reason reason-phrase. If NULL a standard reason-phrase is used.
 
   First time the function sends the status line and headers of the HTTP response:
   \verbatim
@@ -738,7 +755,7 @@ void http_connection::redirect (const char *uri)
 
   In subsequent calls it sends only connection headers (to support multi-part responses)
 */
-void http_connection::respond (unsigned int code)
+void http_connection::respond (unsigned int code, const char *reason)
 {
   static struct {
     int code;
@@ -766,7 +783,7 @@ void http_connection::respond (unsigned int code)
     {505, "HTTP Version not supported"},    {0,0}
   };
 
-  pairs::iterator idx;
+  str_pairs::iterator idx;
   if(code!=200)
      TRACE ("response %d\n", code);
   if (!response_sent)
@@ -777,7 +794,7 @@ void http_connection::respond (unsigned int code)
     if (!respcodes[ic].code)
       return;   //unknown code
 
-    ws << "HTTP/1.1 " << code << " " << respcodes[ic].text << "\r\n";
+    ws << "HTTP/1.1 " << code << " " << (reason?reason:respcodes[ic].text) << "\r\n";
 
     //output server headers
     idx = parent.out_headers.begin ();
@@ -809,8 +826,10 @@ void http_connection::respond (unsigned int code)
 */
 const char *http_connection::get_ihdr(const char *hdr)
 {
-  pairs::iterator idx;
-  if ((idx = iheaders.find (hdr)) != iheaders.end ())
+  char tmp[256];
+  strcpy (tmp, hdr);
+  auto idx = iheaders.find (_strlwr(tmp));
+  if (idx != iheaders.end ())
     return idx->second.c_str();
 
   return 0;
@@ -826,7 +845,7 @@ const char *http_connection::get_ihdr(const char *hdr)
 */
 const char *http_connection::get_ohdr(const char *hdr)
 {
-  pairs::iterator idx = parent.out_headers.find (hdr);
+  auto idx = parent.out_headers.find (hdr);
   if (idx != parent.out_headers.end ())
     return idx->second.c_str ();
   
@@ -951,11 +970,11 @@ void httpd::add_ohdr (const char *field, const char *value)
 
 /*!
   Remove a server response header.
-  \param filed    Header name
+  \param field    Header name
 */
 void httpd::remove_ohdr (const char *field)
 {
-  pairs::iterator idx = out_headers.find (field);
+  auto idx = out_headers.find (field);
   if (idx != out_headers.end ())
     out_headers.erase (idx);
 }
@@ -970,7 +989,7 @@ void httpd::remove_ohdr (const char *field)
   user-defined handler function passing the uri, the connection info and the
   handler specific information.
 */
-void httpd::add_handler(const char *uri, handler func, void *info)
+void httpd::add_handler(const char *uri, uri_handler func, void *info)
 {
   handle_info hi = {func, info};
   
@@ -1095,7 +1114,7 @@ bool httpd::remove_user(const char *realm, const char *username)
 bool httpd::is_protected (const char *uri, string& realm)
 {
   int len = 0;
-  pairs::iterator it = realms.begin ();
+  auto it = realms.begin ();
   while (it != realms.end ())
   {
     int n = match (uri, it->second.c_str());
@@ -1139,7 +1158,7 @@ bool httpd::authenticate (const char *realm, const char *user, const char *pwd)
 int httpd::invoke_handler (const char *uri, http_connection& client)
 {
   int ret = 0;
-  map <string, handle_info>::iterator idx = handlers.find (uri);
+  auto idx = handlers.find (uri);
   if (idx != handlers.end())
   {
     TRACE ("Invoking handler for %s", uri);
@@ -1177,7 +1196,7 @@ void httpd::add_alias (const char *uri, const char *path)
 
 bool httpd::find_alias (const char *uri, char *path)
 {
-  map <string, string>::iterator idx = aliases.begin();
+  auto idx = aliases.begin();
   while (idx != aliases.end ())
   {
     size_t len = idx->first.length();
@@ -1203,6 +1222,7 @@ bool httpd::find_alias (const char *uri, char *path)
   \verbatim
     <!--#echo var="name" -->
   \endverbatim
+
   When the page is served the SSI construct is replaced by the current value of
   the named variable, eventually multiplied by \a multiplier factor and formatted 
   as text using the \a fmt string.
@@ -1251,7 +1271,7 @@ string httpd::get_var(const char *name)
 const char *httpd::guess_mimetype (const char *file, bool& shtml)
 {
   const char *ext = strrchr (file, '.');
-  deque<mimetype>::iterator ptr = types.begin ();
+  auto ptr = types.begin ();
 
   if (ext)
   {
