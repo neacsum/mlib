@@ -1,5 +1,6 @@
 /*!
   \file HTTPD.CPP - Implementation of httpd and http_connection classes
+  (c) Mircea Neacsu 2007-2017. All rights reserved.
 
 */
 #include <mlib/errorcode.h>
@@ -14,8 +15,9 @@
 using namespace std;
 
 //Defaults
-#define HTTPD_DEFAULT     "index.html"          //!< Default URL
+#define HTTPD_DEFAULT_URI "index.html"          //!< Default URL
 #define HTTPD_SERVER_NAME "MNCS_HTTPD 1.0"      //!< Default server name
+#define HTTPD_TIMEOUT     30
 
 #define MAX_PAR 1024                            //<! max length of a form parameter
 
@@ -326,7 +328,7 @@ void http_connection::process_valid_request ()
   }
 
   if (fullpath[strlen(fullpath)-1] == '/' || fullpath[strlen(fullpath)-1] == '\\')
-    strcat (fullpath, parent.default_file ());
+    strcat (fullpath, parent.default_uri ());
   if (!_access (fullpath, 4))
   {
     bool shtml = false;
@@ -350,7 +352,7 @@ void http_connection::process_valid_request ()
 
 void http_connection::serve404 (const char* text)
 {
-  static const char* std404 = "<html><head><title>SURVEY page not found</title></head>"
+  static const char* std404 = "<html><head><title>Page not found</title></head>"
     "<body><h1>Oops! 404 error: File not found</h1>"
     "<p>The page you requested was not found.</body></html>";
 
@@ -917,11 +919,9 @@ httpd::httpd (unsigned short port, unsigned int maxconn) :
 tcpserver (maxconn),
 port_num (port),
 root ("."),
-defname (HTTPD_DEFAULT),
+defuri (HTTPD_DEFAULT_URI),
 servname (HTTPD_SERVER_NAME)
 {
-  inaddr me ((unsigned long)INADDR_ANY, port_num);
-  bind (me);
   smime *ptr = knowntypes;
   while (ptr->suffix)
   {
@@ -936,6 +936,39 @@ servname (HTTPD_SERVER_NAME)
 */
 httpd::~httpd()
 {
+}
+
+/*!
+  This function is called automatically as part of the server startup process.
+  It binds the listening socket on all interfaces.
+*/
+bool httpd::init ()
+{
+  try {
+    if (!is_open ())
+      open (SOCK_STREAM);
+    inaddr me ((unsigned long)INADDR_ANY, port_num);
+    bind (me);
+  }
+  catch (erc& x)
+  {
+    x.deactivate ();
+    TRACE ("httpd::init Error %x", (int)x);
+    return false;
+  }
+  return tcpserver::init ();
+}
+
+/*!
+  Change port number where server will be listening.
+  \param  portnum new port number
+
+  This function is effective only until the server is started.
+*/
+void httpd::port (unsigned short portnum)
+{
+  if (!is_running ())
+    port_num = portnum;
 }
 
 /*!

@@ -10,14 +10,13 @@
 #include <map>
 #include <deque>
 
-#define HTTPD_MAX_HEADER  8192
-#define HTTPD_TIMEOUT     30
-
+#define HTTPD_MAX_HEADER      8192
+#define HTTPD_DEFAULT_PORT    80
 ///Error codes
-#define HTTPD_OK           0      ///< Success
-#define HTTPD_ERR_WRITE   -1      ///< Socket write failure
-#define HTTPD_ERR_FOPEN   -2      ///< File open failure
-#define HTTPD_ERR_FREAD   -3      ///< File read failure
+#define HTTPD_OK              0      ///< Success
+#define HTTPD_ERR_WRITE       -1      ///< Socket write failure
+#define HTTPD_ERR_FOPEN       -2      ///< File open failure
+#define HTTPD_ERR_FREAD       -3      ///< File read failure
 
 
 #ifdef MLIBSPACE
@@ -107,7 +106,7 @@ private:
 class httpd : public tcpserver
 {
 public:
-  httpd       (unsigned short port, unsigned int maxconn=0);
+  httpd       (unsigned short port=HTTPD_DEFAULT_PORT, unsigned int maxconn=0);
   ~httpd      ();
 
   void        add_ohdr (const char *field, const char *value);
@@ -123,9 +122,11 @@ public:
   void        docroot (const char *path) {root = path;};
   const char* docroot () {return root.c_str();};
 
-  void        default_file (const char *name) {defname = name;};
-  const char* default_file () {return defname.c_str();};
+  void        default_uri (const char *name) {defuri = name;};
+  const char* default_uri () {return defuri.c_str();};
 
+  unsigned short port ();
+  void        port (unsigned short portnum);
   void        server_name (const char *name);
   const char* server_name () {return servname.c_str();};
 
@@ -142,6 +143,8 @@ protected:
   bool        find_alias (const char *uri, char *path);
   const char* guess_mimetype (const char *file, bool& shtml);
   http_connection* make_thread(sock& connection);
+
+  bool        init ();
 
 private:
   unsigned short  port_num;       //!< port number
@@ -177,7 +180,7 @@ private:
   std::deque <mimetype> types;
 
   std::string root;
-  std::string defname;
+  std::string defuri;
   std::string servname;
 };
 
@@ -210,6 +213,10 @@ int http_connection::get_content_length () { return content_len; };
 /// Return socket object associated with this connection
 inline
 sockstream& http_connection::out () { return ws; };
+
+/// Return port number where server is listening
+inline
+unsigned short httpd::port () { return port_num; }
 
 
 #ifdef MLIBSPACE

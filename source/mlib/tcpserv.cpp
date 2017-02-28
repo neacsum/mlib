@@ -46,7 +46,6 @@ contab (new conndata* [ALLOC_INCR]),
 end_req (false),
 idle (idle_timeout)
 {
-  open (SOCK_STREAM); //init virtual base in case derived-most didn't do it
   memset (contab, 0, alloc*sizeof (conndata*));
 }
 
@@ -74,6 +73,8 @@ tcpserver::~tcpserver ()
 */
 bool tcpserver::init ()
 {
+  if (!is_open ())
+    open (SOCK_STREAM); 
   setevent (evt.handle (), FD_ACCEPT);
   listen ();
   return thread::init ();
