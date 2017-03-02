@@ -1,9 +1,7 @@
 #include <mlib/sqlitepp.h>
 #include <utpp/utpp.h>
 
-#ifdef MLIBSPACE
-using namespace MLIBSPACE;
-#endif
+using namespace mlib;
 
 TEST (NotConnectedDbObject)
 {

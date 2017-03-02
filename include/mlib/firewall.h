@@ -3,9 +3,7 @@
 #include <netfw.h>
 #include "errorcode.h"
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 class firewall
 {
@@ -29,6 +27,4 @@ private:
 
 extern errfac *fw_errptr;
 
-#ifdef MLIBSPACE
 };
-#endif

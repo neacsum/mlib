@@ -2,16 +2,14 @@
 /*!
   \file SYNCBASE.H syncbase class definition.
 
-	(c) Mircea Neacsu 1999
+  (c) Mircea Neacsu 1999
 */
 
 #include "defs.h"
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
-/// Base class for all named syncronization objects
+/// Base class for all named synchronization objects
 class syncbase
 {
 public:
@@ -64,6 +62,4 @@ DWORD multiwait (bool all, int count, syncbase** array, DWORD time_limit=INFINIT
 DWORD multiwait_msg (bool all, int count, syncbase** array, DWORD time_limit=INFINITE, DWORD mask=QS_ALLINPUT);
 void udelay (unsigned short usec);
 
-#ifdef MLIBSPACE
-};  //namespace
-#endif
+}  //namespace

@@ -6,9 +6,7 @@
 */
 #include <geo/aza.h>
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 #define MAX_ITER  10    //max number of iterations in reverse formulas
 
@@ -137,7 +135,5 @@ double AzimuthalEqualArea::k (double lat, double lon) const
   return sqrt (q_p-ellipsoid().q(lat))/ellipsoid().m(lat);
 }
 
-#ifdef MLIBSPACE
-};
-#endif
+} //namespace
 

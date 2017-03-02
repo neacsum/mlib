@@ -8,9 +8,7 @@
 #include "defs.h"
 #include <stdexcept>
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 
 class shmem_base
@@ -196,6 +194,4 @@ lockw<S, B>::lockw (shmem<S, B>& mem_) : mem(mem_)
     throw std::runtime_error ("wrlock failed");
 };
 
-#ifdef MLIBSPACE
-}
-#endif
+} //namespace

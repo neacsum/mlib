@@ -3,9 +3,7 @@
 #include <geo/azd.h>
 #include <mlib/convert.h>
 
-#ifdef MLIBSPACE
-using namespace MLIBSPACE;
-#endif
+using namespace mlib;
 
 /*
   Test vectors from Snyder page 338-339

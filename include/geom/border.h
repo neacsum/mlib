@@ -7,9 +7,7 @@
 
 #include <deque>
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 
 class Border
@@ -29,6 +27,4 @@ private:
   int closing_outside;
 };
 
-#ifdef MLIBSPACE
-};
-#endif
+} //namespace

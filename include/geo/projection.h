@@ -9,9 +9,7 @@
 #include <mlib/errorcode.h>
 #include <assert.h>
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 
 class Projection
@@ -211,6 +209,4 @@ double ConicalProjection::south_latitude () const { return par.spar_; }
 ///  Return an adjusted longitude between -M_PI and M_PI.
 double lon_adjust (double lon);
 
-#ifdef MLIBSPACE
-};
-#endif
+} //namespace

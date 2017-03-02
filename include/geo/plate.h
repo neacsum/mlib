@@ -6,9 +6,7 @@
 
 #include <geo/projection.h>
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 ///Plate Carrée projection
 class PlateCarree : public Projection
@@ -24,6 +22,4 @@ public:
 };
 
 
-#ifdef MLIBSPACE
-};
-#endif
+} //namespace

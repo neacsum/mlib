@@ -9,9 +9,7 @@
 */
 #include <geo/cas.h>
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 Cassini::Cassini (const Params& params):
   Projection (params)
@@ -74,6 +72,4 @@ double Cassini::h (double lat, double lon) const
   return 1/sqrt(1-pow(cos(lat)*sin(lon-ref_longitude()), 2));
 }
 
-#ifdef MLIBSPACE
-};
-#endif
+} //namespace

@@ -1,7 +1,7 @@
 /*!
   \file wtimer.cpp Implementation of timer class
 
-	(c) Mircea Neacsu 1999
+  (c) Mircea Neacsu 1999
 
 */
 #ifndef UNICODE
@@ -12,9 +12,7 @@
 #include <assert.h>
 #include <mlib/utf8.h>
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 /*!
   \class timer
@@ -24,7 +22,7 @@ namespace MLIBSPACE {
   A waitable %timer object is set to signaled when the specified due time
   arrives. There are two types of waitable timers that can be created: 
   manual and automatic (called synchronization timers in Windows documentation).
-  Automatic timers are reset to thier non-signaled state when a %thread 
+  Automatic timers are reset to their non-signaled state when a %thread 
   completes a wait operation on the object (similar to automatic events).
 
   Manual timers remain signaled until restarted.
@@ -32,7 +30,7 @@ namespace MLIBSPACE {
   A %timer of either type can also be a periodic %timer.
 
   When signaled, waitable timers can call the #at_timer function as an APC 
-  (Asyncronous Procedure Call) to be executed in the context of the %thread
+  (Asynchronous Procedure Call) to be executed in the context of the %thread
   that created the %timer. To use this feature you need to derive another class
   that reimplements the #at_timer function.
 */
@@ -93,6 +91,4 @@ void CALLBACK timer::timerProc( timer *obj, DWORD loval, DWORD hival )
   obj->at_timer( loval, hival );
 }
 
-#ifdef MLIBSPACE
-};
-#endif
+} //namespace

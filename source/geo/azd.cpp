@@ -5,9 +5,7 @@
 
 #include <geo/azd.h>
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 AzimuthEqDist::AzimuthEqDist ()
 {
@@ -108,6 +106,4 @@ double AzimuthEqDist::k (double lat, double lon) const
   return 1.;
 }
 
-#ifdef MLIBSPACE
-};
-#endif
+} //namespace

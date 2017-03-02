@@ -3,9 +3,7 @@
 #include <geo/albers.h>
 #include <mlib/convert.h>
 
-#ifdef MLIBSPACE
-using namespace MLIBSPACE;
-#endif
+using namespace mlib;
 
 //Fixture. Test vector from Snyder pg 292-293
 struct Albers_Snyder

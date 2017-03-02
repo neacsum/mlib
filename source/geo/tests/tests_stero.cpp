@@ -2,17 +2,15 @@
 #include <geo/stereo.h>
 #include <mlib/convert.h>
 
-#ifdef MLIBSPACE
-using namespace MLIBSPACE;
-#endif
+using namespace mlib;
 
 /*
 Source:
-Coördinaattransformaties en kaartprojecties
-Formules en parameters
-3e herziene uitgave December 2000
+  Coördinaattransformaties en kaartprojecties
+  Formules en parameters
+  3e herziene uitgave December 2000
+  http://kadaster.nl
 
-http://kadaster.nl
 */
 TEST (Netherlands)
 {

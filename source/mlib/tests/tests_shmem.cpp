@@ -4,7 +4,7 @@
 #include <string>
 #include <mlib/thread.h>
 
-using namespace MLIBSPACE;
+using namespace mlib;
 using namespace std;
 
 struct S{

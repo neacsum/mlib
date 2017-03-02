@@ -1,15 +1,13 @@
 #pragma once
 
 /*!
-  \file MERCATOR.H - Mercator and \ref SMerc "CMAP Mercator" projections
+  \file MER.H - Mercator and \ref SMerc "CMAP Mercator" projections
 
 */
 
 #include "projection.h"
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 /// %Mercator projection
 class Mercator : public Projection
@@ -43,7 +41,5 @@ public:
 };
 
 
-#ifdef MLIBSPACE
-};
-#endif
+} //namespace
 

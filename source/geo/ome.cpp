@@ -5,9 +5,7 @@
 
 #include <geo/ome.h>
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 /*!
   \class ObliqueMercator
@@ -193,6 +191,4 @@ void RSO::skew (double *u, double *v, double x, double y) const
 }
 
 
-#ifdef MLIBSPACE
-};
-#endif
+} //namespace

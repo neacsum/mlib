@@ -26,9 +26,7 @@
 
 */
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 Projection::Params::Params (const Ellipsoid& ell) :
   ellip_ (ell),
@@ -90,6 +88,4 @@ double lon_adjust (double lon)
   return ((lon >= 0) ? 1 : -1)*(fmod (fabs (lon) + M_PI, 2 * M_PI) - M_PI);
 }
 
-#ifdef MLIBSPACE
-};
-#endif
+} //namespace

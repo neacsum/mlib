@@ -5,9 +5,7 @@
 
 #include <geo/plate.h>
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 PlateCarree::PlateCarree (const Params& params) :
   Projection (params)
@@ -36,6 +34,4 @@ double PlateCarree::k (double lat, double lon) const
   return cos (ref_latitude()) / cos (lat);
 }
 
-#ifdef MLIBSPACE
-};
-#endif
+} //namespace

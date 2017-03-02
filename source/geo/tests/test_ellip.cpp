@@ -3,9 +3,7 @@
 #include <geo/ellip.h>
 #include <mlib/convert.h>
 
-#ifdef MLIBSPACE
-using namespace MLIBSPACE;
-#endif
+using namespace mlib;
 
 TEST (Ellip_SemiminorAxis)
 {

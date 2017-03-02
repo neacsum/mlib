@@ -5,9 +5,7 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 
 /*!
@@ -137,6 +135,4 @@ bool Point<T>::collinear (const Point& a, const Point& b) const
   return abs((a.x - x)*(b.y - y) - (a.y - y)*(b.x - x)) <= point_traits<T>::tolerance ();
 }
 
-#ifdef MLIBSPACE
-};
-#endif
+} //namespace

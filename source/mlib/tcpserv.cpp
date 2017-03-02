@@ -16,9 +16,7 @@
 ///Allocation increment for connections table
 #define ALLOC_INCR 5
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 /*!
   \class    tcpserver 
@@ -288,6 +286,4 @@ void tcpserver::maxconn(unsigned int new_max)
   limit = new_max;
 }
 
-#ifdef MLIBSPACE
-};
-#endif
+} //namespace

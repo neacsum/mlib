@@ -7,9 +7,7 @@
 
 #include "projection.h"
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 /// Cassini-Soldner projection
 class Cassini : public Projection
@@ -30,6 +28,4 @@ class Cassini : public Projection
    double s0;
 };
 
-#ifdef MLIBSPACE
 };
-#endif

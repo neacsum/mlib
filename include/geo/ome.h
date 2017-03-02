@@ -7,9 +7,7 @@
 
 #include "projection.h"
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 ///Oblique %Mercator
 class ObliqueMercator : public Projection
@@ -88,6 +86,4 @@ RSO& RSO::operator= (const Params& par)
   return *this;
 };
 
-#ifdef MLIBSPACE
-};
-#endif
+} //namespace

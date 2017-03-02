@@ -6,9 +6,7 @@
 
 #include "projection.h"
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 /// %Albers Equal Area
 class Albers : public ConicalProjection
@@ -29,7 +27,5 @@ private:
   double n, c_big, rho0;
 };
 
-#ifdef MLIBSPACE
-};
-#endif
+} //namespace
 

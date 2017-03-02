@@ -8,9 +8,7 @@
 
 #include "syncbase.h"
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 class mutex : public syncbase
 {
@@ -24,6 +22,4 @@ public:
 inline
 void mutex::signal () { ReleaseMutex (handle ()); }
 
-#ifdef MLIBSPACE
 };
-#endif

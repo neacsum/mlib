@@ -1,5 +1,5 @@
 /*!
-  \file TRANMERC.CPP - Implementation of TransverseMercator projection
+  \file TME.CPP - Implementation of TransverseMercator projection
 
 */
 
@@ -7,9 +7,7 @@
 #include <geo/tme.h>
 
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 static double pd[12] = { -3./2.,  9./16., 15./16., -15./32., -35./48., 315./512.,
                           3./2.,-27./32., 21./16., -55./32., 151./96., 1097./512.};
@@ -144,6 +142,4 @@ double TransverseMercator::k (double lat, double lon) const
   return scale;
 }
 
-#ifdef MLIBSPACE
-};
-#endif
+} //namespace

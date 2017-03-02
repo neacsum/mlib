@@ -1,7 +1,7 @@
 /*!
   \file semaphore.cpp semaphore class implementation
 
-	(c) Mircea Neacsu 1999
+  (c) Mircea Neacsu 1999
 
 */
 #ifndef UNICODE
@@ -13,14 +13,12 @@
 #include <assert.h>
 #include <mlib/utf8.h>
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 /*!
   \class semaphore
   \ingroup syncro
-  \brief Wrapper for Windows %semaphore objects.
-  A %semaphore is a counter incremented by signal and decremented by wait'.
+  \brief Wrapper for Windows semaphore objects.
+  A semaphore is a counter incremented by signal and decremented by wait'.
   If counter is negative any waiting thread is blocked until counter becomes
   positive.
 */
@@ -46,7 +44,7 @@ int semaphore::signal (int cnt)
   return (int)prev;
 }
 
-/// Test if %semaphore is signaled
+/// Test if semaphore is signaled
 semaphore::operator bool()
 {
   bool result = syncbase::operator bool();
@@ -54,6 +52,4 @@ semaphore::operator bool()
   return result;
 }
 
-#ifdef MLIBSPACE
-};
-#endif
+} //namespace

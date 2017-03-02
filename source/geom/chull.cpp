@@ -35,9 +35,7 @@
 
 #include <geom/chull.h>
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 
 int ccw (dpoint *P, int i, int j, int k)
@@ -90,7 +88,5 @@ int convex_hull (dpoint *P, int n)
   return u + make_chain (P + u, n - u + 1, cmph);  /* make upper hull */
 }
 
-#ifdef MLIBSPACE
-};
-#endif
+} //namespace
 

@@ -9,9 +9,7 @@
 #include "sqlite3.h"
 #include "errorcode.h"
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 class Query;
 
@@ -214,6 +212,4 @@ bool Query::iless::operator () (const std::string& left, const std::string& righ
 }
 
 
-#ifdef MLIBSPACE
-};
-#endif
+} //namespace

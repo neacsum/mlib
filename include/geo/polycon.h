@@ -6,9 +6,7 @@
 
 #include "projection.h"
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 /// %Polyconic
 class Polyconic : public Projection
@@ -33,6 +31,4 @@ private:
 inline
 double Polyconic::k (double lat, double lon) const { return 1.; }
 
-#ifdef MLIBSPACE
-};
-#endif
+} //namespace

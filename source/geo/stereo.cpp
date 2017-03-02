@@ -1,16 +1,14 @@
 /*!
-  \file STEREO.CPP - Implementation of %Sterographic and Polar %Stereograpic projections  
+  \file STEREO.CPP - Implementation of Sterographic and Polar Stereograpic projections  
 
 */
 
 #include <geo/stereo.h>
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 /*!
-  Ctor for %Sterographic projection. 
+  Ctor for Sterographic projection. 
   Formulas from:<blockquote>
     A manual for geodetic coordinate transformations in the maritime provinces, 
     D.B. Thomson, E.J. Krakiwsky, R.R. Steeves, Technical Report No. 48, July 
@@ -202,6 +200,4 @@ double PolarStereo::rho (double lat) const
   return t*rho1;
 }
 
-#ifdef MLIBSPACE
-};
-#endif
+} //namespace

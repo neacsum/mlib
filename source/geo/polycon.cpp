@@ -6,9 +6,7 @@
 #include <geo/polycon.h>
 #include <mlib/convert.h>
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 Polyconic::Polyconic (const Params& params) :
   Projection (params)
@@ -116,6 +114,4 @@ double Polyconic::m1 (double lat) const
   return c[0] - c[1] * cos (2 * lat) + c[2] * cos (4 * lat) + c[3] * cos (6 * lat);
 }
 
-#ifdef MLIBSPACE
-};
-#endif
+} //namespace

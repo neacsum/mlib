@@ -11,9 +11,7 @@
 #include "event.h"
 #include "critsect.h"
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 ///Connections iteration function
 typedef void (*conn_iter_func)(sock& conn, void *param);
@@ -34,7 +32,7 @@ public:
 
   void maxconn (unsigned int new_max);
 
-  ///Return maxiumum number of conenctions accepted
+  ///Return maximum number of connections accepted
   unsigned int maxconn () const {return limit;};
 
 protected:
@@ -91,6 +89,4 @@ bool tcpserver::idle_action ()
   return true;
 };
 
-#ifdef MLIBSPACE
-};
-#endif
+}   //namespace

@@ -12,9 +12,7 @@
 static double sqrarg;
 #define SQR(a) ((sqrarg = (a)) == 0.0 ? 0.0 : sqrarg * sqrarg)
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 #define MAX_ITER  10    //max number of iterations in reverse formulas
 
@@ -126,7 +124,5 @@ double Lambert::tfunc (double phi) const
   return (sqrt(t1 * t2));
 }
 
-#ifdef MLIBSPACE
-};
-#endif
+} //namespace
 

@@ -21,9 +21,7 @@
 #include <WinSock2.h>
 #endif
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 
 ///SOCKADDR wrapper
@@ -98,6 +96,4 @@ int inaddr::operator != (const inaddr& other) const
 }
 
 
-#ifdef MLIBSPACE
 }
-#endif

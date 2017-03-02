@@ -3,9 +3,7 @@
 #include <geo/tme.h>
 #include <mlib/convert.h>
 
-#ifdef MLIBSPACE
-using namespace MLIBSPACE;
-#endif
+using namespace mlib;
 
 struct Snyder_tme
 {

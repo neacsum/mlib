@@ -1,15 +1,13 @@
 #pragma once
 
 /*!
-  \file STEREO.H - Definition of sterographic and Polar %Stereograpic projections  
+  \file STEREO.H - Definition of stereographic and Polar %Stereograpic projections  
 
 */
 
 #include "projection.h"
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 /// %Stereographic projection
 class Stereographic : public Projection
@@ -58,6 +56,4 @@ double Stereographic::h (double lat, double lon) const { return k (lat, lon); }
 inline
 double PolarStereo::h (double lat, double lon) const { return k (lat, lon); }
 
-#ifdef MLIBSPACE
-};
-#endif
+} //namespace

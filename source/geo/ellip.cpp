@@ -6,9 +6,7 @@
 #include <geo/ellip.h>
 #include <assert.h>
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 /*!
   \class Ellipsoid
@@ -287,6 +285,4 @@ double Ellipsoid::rhumb (double lat1, double lon1, double lat2, double lon2, dou
   return dist;
 }
 
-#ifdef MLIBSPACE
-};
-#endif
+} //namespace

@@ -6,9 +6,7 @@
 
 #include "defs.h"
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 #define INI_BUFFERSIZE  1024
 
@@ -102,6 +100,4 @@ private:
 };
 
 
-#ifdef MLIBSPACE
 }
-#endif

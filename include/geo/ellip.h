@@ -11,9 +11,7 @@
 #include <math.h>
 
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 class Ellipsoid
 {
@@ -244,6 +242,4 @@ double Ellipsoid::distance (double lat1, double lon1, double lat2, double lon2, 
   return (m == great_circle)? gcirc (lat1, lon1, lat2, lon2, az) : rhumb (lat1, lon1, lat2, lon2, az);
 }
 
-#ifdef MLIBSPACE
-};
-#endif
+} //namespace

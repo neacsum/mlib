@@ -3,7 +3,7 @@
 #include <mlib/utf8.h>
 #include <utpp/utpp.h>
 
-using namespace MLIBSPACE;
+using namespace mlib;
 
 /* 
   Write some keys and verify their retrieval.

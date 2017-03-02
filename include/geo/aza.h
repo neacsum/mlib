@@ -6,9 +6,7 @@
 
 #include "projection.h"
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 /// Azimuthal Equal Area
 class AzimuthalEqualArea : public Projection
@@ -32,6 +30,4 @@ class AzimuthalEqualArea : public Projection
    bool polar;
 };
 
-#ifdef MLIBSPACE
-};
-#endif
+} //namespace

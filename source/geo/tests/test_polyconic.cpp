@@ -3,9 +3,7 @@
 #include <geo/polycon.h>
 #include <mlib/convert.h>
 
-#ifdef MLIBSPACE
-using namespace MLIBSPACE;
-#endif
+using namespace mlib;
 
 /* Snyder page 274. This is the variant A numerical example (with 2 points on
 central line converted into a variant B by back-calculating the longitude

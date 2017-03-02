@@ -6,9 +6,7 @@
 
 #include "projection.h"
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 /// %Lambert Conformal Conical
 class Lambert : public ConicalProjection
@@ -31,6 +29,4 @@ private:
 };
 
 
-#ifdef MLIBSPACE
-};
-#endif
+} //namespace

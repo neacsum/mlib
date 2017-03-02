@@ -7,9 +7,7 @@
 
 #include "projection.h"
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 /// Transverse %Mercator projection
 class TransverseMercator : public Projection
@@ -38,6 +36,4 @@ double TransverseMercator::h (double lat, double lon) const
   return k (lat, lon);
 }
 
-#ifdef MLIBSPACE
-};
-#endif
+} //namespace

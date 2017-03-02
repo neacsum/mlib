@@ -2,13 +2,9 @@
 
 #include <geom/point.h>
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 int convex_hull(dpoint *p, int n);
 
-#ifdef MLIBSPACE
-};
-#endif
+}
 

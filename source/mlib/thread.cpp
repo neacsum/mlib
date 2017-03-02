@@ -1,7 +1,7 @@
 /*!
   \file thread.cpp thread class implementation.
 
-	(c) Mircea Neacsu 1999
+  (c) Mircea Neacsu 1999
 
 */
 
@@ -11,9 +11,7 @@
 #include <mlib/thread.h>
 
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 //----------------- current_thread member functions -------------------
 /*!
@@ -257,6 +255,4 @@ void thread::resume()
   ResumeThread (handle());
 }
 
-#ifdef MLIBSPACE
-};
-#endif
+} //namespace

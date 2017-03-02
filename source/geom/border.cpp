@@ -8,9 +8,7 @@
 
 using namespace std;
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 /*!
   \class Border Representation of a simple, non-intersecting polygon that
@@ -110,6 +108,4 @@ bool Border::inside (double x, double y)
   return (c != closing_outside);
 }
 
-#ifdef MLIBSPACE
-}
-#endif
+} //namespace

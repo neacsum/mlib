@@ -3,9 +3,7 @@
 #include <geo/mer.h>
 #include <mlib/convert.h>
 
-#ifdef MLIBSPACE
-using namespace MLIBSPACE;
-#endif
+using namespace mlib;
 
 /*
   OSGEO test vectors are from:

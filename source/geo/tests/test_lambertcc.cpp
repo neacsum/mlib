@@ -3,9 +3,7 @@
 #include <geo/lcc.h>
 #include <mlib/convert.h>
 
-#ifdef MLIBSPACE
-using namespace MLIBSPACE;
-#endif
+using namespace mlib;
 
 SUITE (Lambert_Conformal_Conical)
 {

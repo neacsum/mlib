@@ -9,9 +9,7 @@
 #include <mlib/wsockstream.h>
 #include <mlib/trace.h>
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 
 #define WSALASTERROR (errc( WSAGetLastError(), ERROR_PRI_ERROR, sockerrors))
@@ -149,6 +147,4 @@ unsigned inaddr::localhost ()
   return ntohl ((lcl_addr.sin_addr.s_addr));
 }
 
-#ifdef MLIBSPACE
-};
-#endif
+} //namespace

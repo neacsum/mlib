@@ -5,9 +5,7 @@
 
 #include <geo/mer.h>
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 static double sqrarg__;
 #define SQR(a) ((sqrarg__=(a)) == 0.?0.:sqrarg__*sqrarg__)
@@ -110,6 +108,4 @@ double CMapMercator::k (double lat, double lon) const
   return 1/cos(lat);
 }
 
-#ifdef MLIBSPACE
-}
-#endif
+} //namespace

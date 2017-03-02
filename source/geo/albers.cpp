@@ -8,9 +8,7 @@
 static double sqrarg;
 #define SQR(a) ((sqrarg = (a)) == 0.0 ? 0.0 : sqrarg * sqrarg)
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 #define MAX_ITER  10    //max number of iterations in reverse formulas
 
@@ -111,6 +109,4 @@ double Albers::h (double lat, double lon) const
     throw errc(GEOERR_SINGL);
 }
 
-#ifdef MLIBSPACE
-};
-#endif
+} //namespace

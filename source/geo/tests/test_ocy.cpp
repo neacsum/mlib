@@ -3,9 +3,7 @@
 #include <geo/ocy.h>
 #include <mlib/convert.h>
 
-#ifdef MLIBSPACE
-using namespace MLIBSPACE;
-#endif
+using namespace mlib;
 
 /*
   Swiss CH03 system with an older test point

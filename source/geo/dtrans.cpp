@@ -4,9 +4,7 @@
 */
 #include <geo/dtrans.h>
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 void DatumTransformation::transform (double& x, double& y, double& z)
 {
@@ -24,6 +22,4 @@ void DatumTransformation::transform_geo (const Ellipsoid& from, const Ellipsoid&
   to.ECEF_geo (&lat, &lon, &h, x, y, z);
 }
 
-#ifdef MLIBSPACE
-};
-#endif
+} //namespace

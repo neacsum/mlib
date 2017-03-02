@@ -5,9 +5,7 @@
 */
 #include <geo/ellip.h>
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 struct DatumTransformation {
   double dx, dy, dz;
@@ -18,6 +16,4 @@ struct DatumTransformation {
   void transform (double& x, double& y, double& z);
 };
 
-#ifdef MLIBSPACE
-};
-#endif
+} //namespace

@@ -7,7 +7,5 @@
 
 #include <winsock2.h>
 
-#define MLIBSPACE mlib
-
 #pragma comment (lib, "mlib.lib")
 

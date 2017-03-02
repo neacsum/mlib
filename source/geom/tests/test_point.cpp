@@ -1,7 +1,7 @@
 #include <utpp/utpp.h>
 #include <geom/point.h>
 
-using namespace MLIBSPACE;
+using namespace mlib;
 
 TEST (point_dist) {
   dpoint O, A (3, 0), B (0, 4);

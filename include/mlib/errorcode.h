@@ -138,8 +138,8 @@ int errfac::operator != (const errfac& other) const
 }
 
 
-namespace MLIBSPACE {
-
+namespace mlib {
+// old names kept for compatibility with some older code
 typedef erc errc;
 typedef errfac errfacility;
 

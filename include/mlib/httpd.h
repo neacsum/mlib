@@ -19,9 +19,7 @@
 #define HTTPD_ERR_FREAD       -3      ///< File read failure
 
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 class http_connection;
 
@@ -219,6 +217,4 @@ inline
 unsigned short httpd::port () { return port_num; }
 
 
-#ifdef MLIBSPACE
 }
-#endif

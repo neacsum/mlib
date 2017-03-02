@@ -3,9 +3,7 @@
 #include <geo/filegeo.h>
 #include <mlib/convert.h>
 
-#ifdef MLIBSPACE
-using namespace MLIBSPACE;
-#endif
+using namespace mlib;
 
 struct geo_file {
   geo_file ();

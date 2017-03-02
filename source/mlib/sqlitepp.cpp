@@ -11,9 +11,7 @@
 
 using namespace std;
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 /*!
   Error facility used by Database and Query objects. Keeps track of the last
@@ -650,6 +648,4 @@ sqerc::sqerc (int value, sqlite3* db, short int pri) :
     f->db = db;
 }
 
-#ifdef MLIBSPACE
-};
-#endif
+} //namespace

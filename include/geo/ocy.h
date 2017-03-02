@@ -7,9 +7,7 @@
 
 #include "projection.h"
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 /// Oblique Cylindrical
 class ObliqueCylindrical : public Projection
@@ -30,6 +28,4 @@ private:
   double map_radius, c1, c2, chi0;
 };
 
-#ifdef MLIBSPACE
-};
-#endif
+} //namespace

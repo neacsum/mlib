@@ -7,9 +7,7 @@
 
 BSTR ConvertStringToBSTR(const char* in);
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 errfac fw_errors("Firewall error");
 errfac *fw_errptr = &fw_errors;

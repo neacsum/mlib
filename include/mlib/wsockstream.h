@@ -17,9 +17,7 @@
 #include "errorcode.h"
 #include "inaddr.h"
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 
 ///Error facility used by all sock derived classes.
@@ -230,7 +228,5 @@ public:
   const char *msg (const errc& e);
 };
 
-#ifdef MLIBSPACE
-}
-#endif
+} //namespace
 

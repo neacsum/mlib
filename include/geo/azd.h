@@ -7,9 +7,7 @@
 
 #include "projection.h"
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 /// Azimuthal Equidistant
 class AzimuthEqDist : public Projection
@@ -33,6 +31,4 @@ private:
 };
 
 
-#ifdef MLIBSPACE
-};
-#endif
+} //namespace

@@ -38,9 +38,7 @@
 #include <mlib/utf8.h>
 #include <mlib/trace.h>
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 static int getkeystring (FILE* fp, const char* Section, const char* Key, char* Buffer, int BufferSize);
 static char* skipleading (char* str);
@@ -1218,7 +1216,5 @@ static bool close_rename(FILE* rfp, FILE* wfp, const char* filename)
   return (i < RETRIES);
 }
 
-#ifdef MLIBSPACE
-}
-#endif
+} //namespace
 

@@ -28,9 +28,7 @@ using namespace std;
 #undef INADDR_ANY
 #define INADDR_ANY (unsigned int)0
 
-#ifdef MLIBSPACE
-using namespace MLIBSPACE;
-#endif
+using namespace mlib;
 
 //Table of known mime types
 struct smime

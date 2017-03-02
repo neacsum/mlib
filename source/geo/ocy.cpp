@@ -6,9 +6,7 @@
 #include <geo/ocy.h>
 #include <mlib/convert.h>
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 ObliqueCylindrical::ObliqueCylindrical (const Params& params) :
   Projection (params)
@@ -97,6 +95,4 @@ double ObliqueCylindrical::k (double lat, double lon) const
   return kval;
 }
 
-#ifdef MLIBSPACE
-};
-#endif
+} //namespace

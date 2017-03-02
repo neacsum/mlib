@@ -1,8 +1,6 @@
 #include <mlib/base64.h>
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 static char enctab[64] = {
   'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
@@ -135,6 +133,4 @@ size_t base64enc (const void* in, char* out, size_t ilen)
   return olen;
 }
 
-#ifdef MLIBSPACE
-};
-#endif
+} //namespace

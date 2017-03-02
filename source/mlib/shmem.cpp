@@ -16,9 +16,7 @@
 #include <assert.h>
 #include <mlib/utf8.h>
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 
 shmem_base::shmem_base () :
@@ -282,7 +280,5 @@ bool shmem_base::read (void * pData)
   return false;
 }
 
-#ifdef MLIBSPACE
-}
-#endif
+} //namespace
 

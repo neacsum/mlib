@@ -204,7 +204,7 @@ static const char *processname (char *name)
 void set_log_ini_param (char* inifile, char *section)
 {
   dprintf ("Setting syslog ini params from %s [%s]", inifile, section);
-  MLIBSPACE::Profile ini(inifile);
+  mlib::Profile ini(inifile);
   char tmp[256];
   if (!ini.GetString (tmp, sizeof(tmp), SERVER_INI_KEY, section))
     _snprintf (tmp, sizeof(tmp), "%s:%d", DEFAULT_SERVERNAME, LOG_PORT);
