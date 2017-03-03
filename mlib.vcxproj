@@ -177,6 +177,7 @@
     <ClInclude Include="include\mlib\tcpserv.h" />
     <ClInclude Include="include\mlib\thread.h" />
     <ClInclude Include="include\mlib\trace.h" />
+    <ClInclude Include="include\mlib\ui.h" />
     <ClInclude Include="include\mlib\utf8.h" />
     <ClInclude Include="include\mlib\wsockstream.h" />
   </ItemGroup>
@@ -204,6 +205,7 @@
     <ClCompile Include="source\mlib\syncbase.cpp" />
     <ClCompile Include="source\mlib\tcpserv.cpp" />
     <ClCompile Include="source\mlib\thread.cpp" />
+    <ClCompile Include="source\mlib\ui.cpp" />
     <ClCompile Include="source\mlib\utf8.cpp" />
     <ClCompile Include="source\mlib\wsockstream.cpp" />
     <ClCompile Include="source\mlib\wtimer.cpp" />

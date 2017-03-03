@@ -101,8 +101,11 @@
     </ClInclude>
     <ClInclude Include="include\mlib\convert.h">
       <Filter>Header Files</Filter>
-    </ClInclude>    
+    </ClInclude>
     <ClInclude Include="include\mlib\dogbone.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\mlib\ui.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -183,6 +186,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\mlib\dogbone.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\mlib\ui.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
