@@ -1,5 +1,5 @@
 /*!
-  \file AzimuthalEqualArea.CPP - Implementation of Azimuthal Equal Area projection
+  \file AZA.CPP - Implementation of Azimuthal Equal Area projection
 
   Formulas from Snyder pag. 187-190
 

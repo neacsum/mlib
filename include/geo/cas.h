@@ -12,6 +12,7 @@ namespace MLIBSPACE {
 #endif
 
 /// Cassini-Soldner projection
+/// \ingroup geo
 class Cassini : public Projection
 {
  public:

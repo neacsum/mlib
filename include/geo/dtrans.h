@@ -9,6 +9,8 @@
 namespace MLIBSPACE {
 #endif
 
+/// 7-parameters datum transformation
+/// \ingroup geo
 struct DatumTransformation {
   double dx, dy, dz;
   double drx, dry, drz;

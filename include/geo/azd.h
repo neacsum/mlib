@@ -12,6 +12,7 @@ namespace MLIBSPACE {
 #endif
 
 /// Azimuthal Equidistant
+/// \ingroup geo
 class AzimuthEqDist : public Projection
 {
 public:

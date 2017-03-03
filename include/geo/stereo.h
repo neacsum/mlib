@@ -12,6 +12,7 @@ namespace MLIBSPACE {
 #endif
 
 /// %Stereographic projection
+/// \ingroup geo
 class Stereographic : public Projection
 {
 public:

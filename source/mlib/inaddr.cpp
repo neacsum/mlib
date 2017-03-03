@@ -42,7 +42,7 @@ inaddr::inaddr (const sockaddr& s)
 }
 
 /*!
-  Fill SOCKADDR structure after resolving hostname
+  Fill sockaddr structure after resolving hostname
 */
 inaddr::inaddr (const char *hostname, unsigned short port)
 {
@@ -78,7 +78,7 @@ errc inaddr::host (const char *hostname)
 }
 
 /*!
-  Find hostname from the host address in SOCKADDR
+  Find hostname from the host address in sockaddr
 */
 const char* inaddr::hostname ()
 {
@@ -117,9 +117,9 @@ unsigned inaddr::localhost ()
 {
   char lcl_host [256];
   HOSTENT *hostent;
-  SOCKADDR_IN lcl_addr;
-  SOCKADDR_IN rmt_addr;
-  int addr_size = sizeof(SOCKADDR);
+  sockaddr_in lcl_addr;
+  sockaddr_in rmt_addr;
+  int addr_size = sizeof(sockaddr);
   SOCKET sock;
 
   // Init local address (to zero)
@@ -142,8 +142,8 @@ unsigned inaddr::localhost ()
     rmt_addr.sin_family = AF_INET;
     rmt_addr.sin_port   = htons (IPPORT_ECHO);
     rmt_addr.sin_addr.s_addr = inet_addr ("128.127.50.1");
-    if (connect (sock, (SOCKADDR *)&rmt_addr, sizeof(SOCKADDR)) != SOCKET_ERROR)
-      getsockname (sock, (SOCKADDR *)&lcl_addr, &addr_size);	// Get local address
+    if (connect (sock, (sockaddr *)&rmt_addr, sizeof(sockaddr)) != SOCKET_ERROR)
+      getsockname (sock, (sockaddr *)&lcl_addr, &addr_size);	// Get local address
     closesocket (sock);   // we're done with the socket
   }
   return ntohl ((lcl_addr.sin_addr.s_addr));

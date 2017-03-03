@@ -12,6 +12,7 @@ namespace MLIBSPACE {
 #endif
 
 /// Oblique Cylindrical
+/// \ingroup geo
 class ObliqueCylindrical : public Projection
 {
 public:

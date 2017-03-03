@@ -12,6 +12,7 @@ namespace MLIBSPACE {
 
 /*!
   \class Point
+  \ingroup geom
 
   Template class which builds a 2D point from a pair of
   coordinates. It has functions to compute distance between two points,

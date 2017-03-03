@@ -11,6 +11,7 @@ namespace MLIBSPACE {
 #endif
 
 /// %Polyconic
+/// \ingroup geo
 class Polyconic : public Projection
 {
 public:

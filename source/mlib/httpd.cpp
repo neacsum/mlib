@@ -68,7 +68,8 @@ static int hexdigit (char *bin, char c);
 
 //-----------------------------------------------------------------------------
 /*!
-  \class http_connection - Representation of a HTTP client connection request
+  \class http_connection
+  \ingroup  sockets
 
   This is the thread created by the httpd server object in response to a new 
   connection request. 
@@ -888,7 +889,8 @@ void http_connection::respond_next (bool last)
 
 //-----------------------------------------------------------------------------
 /*!
-  \class httpd Small multi-threaded HTTP server
+  \class httpd
+  \ingroup sockets
 
   This class is derived from tcpserver class and implements a basic HTTP server.
   After construction, the main server thread has to be started by calling start()
@@ -1228,8 +1230,8 @@ void httpd::add_alias (const char *uri, const char *path)
   After processing the alias table, any part of the original URI that was not
   mapped is appended to the resulting path. For instance if the alias table
   contains an entry mapping 'doc' to 'documentation' and docroot is set as
-  'c:\local folder\', an URI like '/doc/project1/file.html' will be mapped to 
-  'c:\local folder\documentation\project1\file.html'.
+  'c:\local folder\', an URI like '/doc/project1/filename.html' will be mapped to 
+  'c:\local folder\documentation\project1\filename.html'.
 
 */
 

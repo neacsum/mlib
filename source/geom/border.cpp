@@ -8,12 +8,18 @@
 
 using namespace std;
 
+/*!
+  \defgroup geom Geometry concepts and algorithms
+*/
+
 #ifdef MLIBSPACE
 namespace MLIBSPACE {
 #endif
 
 /*!
-  \class Border Representation of a simple, non-intersecting polygon that
+  \class Border 
+  \ingroup geom
+  \brief Representation of a simple, non-intersecting polygon that
   partitions the 2D space in two regions.
 
   The polygon is represented by its vertexes and it is always assumed that

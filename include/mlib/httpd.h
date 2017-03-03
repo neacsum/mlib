@@ -39,6 +39,7 @@ typedef std::map<std::string, std::string, ciLess> str_pairs;
 /// User defined URL handler function
 typedef int (*uri_handler)(const char *uri, http_connection& client, void *info);
 
+///Representation of a HTTP client connection request
 class http_connection : public thread
 {
 public:
@@ -102,7 +103,7 @@ private:
 
 };
 
-
+/// Small multi-threaded HTTP server
 class httpd : public tcpserver
 {
 public:

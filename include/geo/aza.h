@@ -11,6 +11,7 @@ namespace MLIBSPACE {
 #endif
 
 /// Azimuthal Equal Area
+/// \ingroup geo
 class AzimuthalEqualArea : public Projection
 {
  public:

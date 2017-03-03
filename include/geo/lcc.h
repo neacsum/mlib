@@ -11,6 +11,7 @@ namespace MLIBSPACE {
 #endif
 
 /// %Lambert Conformal Conical
+/// \ingroup geo
 class Lambert : public ConicalProjection
 {
 public:

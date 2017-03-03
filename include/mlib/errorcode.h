@@ -1,6 +1,6 @@
 #pragma once
 /*!
-  \file errorcode.h  Definition of erc and errorfacility classes
+  \file errorcode.h  Definition of erc and erfac classes
 
   Copyright (c) Mircea Neacsu 2000
   Based on an idea from Marc Guillermont (CUJ 05/2000)
@@ -139,10 +139,12 @@ int errfac::operator != (const errfac& other) const
 
 
 namespace MLIBSPACE {
+/// Alias name for erc objects
+/// \ingroup 
+typedef erc errc;           
 
-typedef erc errc;
-typedef errfac errfacility;
-
+/// Alias name for errfac
+typedef errfac errfacility; 
 };
 
 /// The SUCCESS indicator

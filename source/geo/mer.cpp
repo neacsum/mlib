@@ -12,6 +12,13 @@ namespace MLIBSPACE {
 static double sqrarg__;
 #define SQR(a) ((sqrarg__=(a)) == 0.?0.:sqrarg__*sqrarg__)
 
+/*!
+  \class Mercator
+  \ingroup geo
+
+  Classic %Mercator projection.
+  Formulas from Snyder pag. 44-45
+*/
 
 Mercator::Mercator () :
   sfeq (0.)
@@ -79,6 +86,8 @@ double Mercator::k (double lat, double lon) const
 
 /*!
   \class CMapMercator
+  \ingroup geo
+
   This is a simplified %Mercator projection using equations for
   a spherical Earth. It is used by CMap charts (CM93 Version 2).
 

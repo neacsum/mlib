@@ -3,7 +3,7 @@
 */
 
 #include <geo/grid.h>
-#include <geo/convert.h>
+#include <mlib/convert.h>
 
 #include <mlib/utf8.h>
 #include <mlib/mathval.h>
@@ -15,6 +15,28 @@
 #ifdef MLIBSPACE
 namespace MLIBSPACE {
 #endif
+
+/*!
+  \class Gridded
+
+  This is an abstract class that captures common properties between memory
+  and file based data. The data can be gridded either on a latitude/longitude
+  or a planar grid.
+
+  The main function, Interpolate, finds the grid square where the interpolated
+  point lies and calls the required interpolation function to do the interpolation
+  between the 4 corners of the grid.
+
+  The interpolation method can be one of the following:
+  - bilinear interpolation
+  - spline (cubic spline)
+  - quadratic
+  - biquadratic
+  - DMA MSL algorithm
+
+  A grid can contain more than one data plane. Each plane is interpolated
+  independently of the other data planes.
+*/
 
 /// Default error facility for griding errors
 errfacility errors("Grid Error");

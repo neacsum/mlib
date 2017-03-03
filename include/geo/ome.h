@@ -11,7 +11,8 @@
 namespace MLIBSPACE {
 #endif
 
-///Oblique %Mercator
+/// Oblique %Mercator
+/// \ingroup geo
 class ObliqueMercator : public Projection
 {
 public:

@@ -1,12 +1,18 @@
 /*!
-  \file TRANMERC.CPP - Implementation of TransverseMercator projection
+  \file TME.CPP - Implementation of TransverseMercator projection
 
 */
 
 
 #include <geo/tme.h>
 
+/*!
+  \class TransverseMercator
+  \ingroup geo
 
+  Transverse %Mercator projection.
+  Formulas from Snyder pag. 60-64
+*/
 #ifdef MLIBSPACE
 namespace MLIBSPACE {
 #endif

@@ -1,6 +1,6 @@
 #pragma once
 /*!
-  \file PROJECTI.H	- Projection class definition
+  \file PROJECTION.H - Projection class definition
 
 */
 
@@ -76,6 +76,7 @@ protected:
   Params par;
 };
 
+/// Common base for conical projections
 class ConicalProjection : public Projection
 {
 public:

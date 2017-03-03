@@ -1,7 +1,7 @@
 #pragma once
 
 /*!
-  \file MERCATOR.H - Mercator and \ref SMerc "CMAP Mercator" projections
+  \file MER.H - Mercator and \ref CMapMercator "CMAP Mercator" projections
 
 */
 

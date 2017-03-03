@@ -4,7 +4,7 @@
 
   (c) Mircea Neacsu 2002. All rights reserved.
 
-  inaddr is a wrapper class for SOCKADDR structure.
+  inaddr is a wrapper class for sockaddr structure.
 */
 
 //#include <winsock2.h>   //MS
@@ -26,25 +26,25 @@ namespace MLIBSPACE {
 #endif
 
 
-///SOCKADDR wrapper
+///sockaddr wrapper
 class inaddr
 {
 public:
   inaddr (unsigned long host=INADDR_ANY, unsigned short port=0);
   inaddr (const char *hostname, unsigned short port);
-  inaddr (const SOCKADDR& adr);
+  inaddr (const sockaddr& adr);
   inaddr& operator =(const inaddr& rhs);
 
-  /// convert to a pointer to SOCKADDR
-  operator SOCKADDR* () const             { return (SOCKADDR*)&sa; };
+  /// convert to a pointer to sockaddr
+  operator sockaddr* () const             { return (sockaddr*)&sa; };
   int operator ==(const inaddr& other) const;
   int operator != (const inaddr& other) const;
 
-  /// convert to a reference to SOCKADDR (const variant)
-  operator const SOCKADDR& () const       { return *(SOCKADDR*)&sa; };
+  /// convert to a reference to sockaddr (const variant)
+  operator const sockaddr& () const       { return *(sockaddr*)&sa; };
 
-  /// convert to a reference to SOCKADDR (nonconst variant)
-  operator SOCKADDR& ()                   { return *(SOCKADDR*)&sa; };
+  /// convert to a reference to sockaddr (nonconst variant)
+  operator sockaddr& ()                   { return *(sockaddr*)&sa; };
 
   /// return port number in host order
   unsigned short port () const            { return ntohs(sa.sin_port); };

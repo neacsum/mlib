@@ -12,6 +12,7 @@ namespace MLIBSPACE {
 
 /*!
   \class Ellipsoid
+  \ingroup geo
   Define an ellipsoid using the semi major axis and flattening.
   All other significant values are calculated based on a and f.
   Note that "f" is defined as (a-b)/a

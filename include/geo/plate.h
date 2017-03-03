@@ -10,7 +10,8 @@
 namespace MLIBSPACE {
 #endif
 
-///Plate Carrée projection
+/// Plate Carrée projection
+/// \ingroup geo
 class PlateCarree : public Projection
 {
 public:

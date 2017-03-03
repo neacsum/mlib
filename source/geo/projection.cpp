@@ -1,12 +1,24 @@
 /*!
-  \file PROJECTI.CPP - Projection class implementation
+  \file PROJECTION.CPP - Projection class implementation
 
 */
 
 #include <geo/projection.h>
 
 /*!
+  \defgroup geo Geodesy
+  \brief Geodesy and map projection classes
+
+  For most projection classes, formulas are taken from
+
+  Snyder, John Parr,
+  Map projections--A Working Manual.
+  (U.S . Geological Survey professional paper ; 1395)
+*/
+
+/*!
   \class Projection
+  \ingroup geo
   It is an abstract class which serves as a base to different projection systems.
 
   The parameters that are used by all or most projection systems (unit, scale factor
@@ -75,6 +87,11 @@ Projection::Projection (const Params& params) :
 {
 }
 
+/*!
+  \class ConicalProjection
+  Conical projections have two more parameters, north and south latitude,
+  that define the intersection between ellipsoid and projection cone.
+*/
 ConicalProjection::ConicalProjection ()
 {
 }
