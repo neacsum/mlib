@@ -1,7 +1,7 @@
 #pragma once
 
 /*!
-  \file STEREO.H - Definition of sterographic and Polar %Stereograpic projections  
+  \file STEREO.H - Definition of stereographic and Polar %Stereograpic projections  
 
 */
 

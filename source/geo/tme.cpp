@@ -150,6 +150,4 @@ double TransverseMercator::k (double lat, double lon) const
   return scale;
 }
 
-#ifdef MLIBSPACE
-};
-#endif
+} //namespace

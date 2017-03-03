@@ -2,7 +2,7 @@
 /*!
   \file SYNCBASE.H syncbase class definition.
 
-	(c) Mircea Neacsu 1999
+  (c) Mircea Neacsu 1999
 */
 
 #include "defs.h"
@@ -11,7 +11,7 @@
 namespace MLIBSPACE {
 #endif
 
-/// Base class for all named syncronization objects
+/// Base class for all named synchronization objects
 class syncbase
 {
 public:

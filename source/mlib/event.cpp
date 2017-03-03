@@ -1,6 +1,6 @@
 /*!
   \file EVENT.CPP event class implementation.
-	(c) Mircea Neacsu 1999
+  (c) Mircea Neacsu 1999
 
 */
 

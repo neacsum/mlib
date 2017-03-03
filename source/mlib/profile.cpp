@@ -1218,7 +1218,5 @@ static bool close_rename(FILE* rfp, FILE* wfp, const char* filename)
   return (i < RETRIES);
 }
 
-#ifdef MLIBSPACE
-}
-#endif
+} //namespace
 

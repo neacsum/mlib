@@ -3,12 +3,8 @@
 /*!
   \file semaphore.h semaphore class implementation
 
-	(c) Mircea Neacsu 1999
+  (c) Mircea Neacsu 1999
 
-\verbatim
-  $Revision$
-  $Author$
-\endverbatim
 */
 
 #include "syncbase.h"

@@ -34,7 +34,7 @@ public:
 
   void maxconn (unsigned int new_max);
 
-  ///Return maxiumum number of conenctions accepted
+  ///Return maximum number of connections accepted
   unsigned int maxconn () const {return limit;};
 
 protected:

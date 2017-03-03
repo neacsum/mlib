@@ -1,7 +1,7 @@
 /*!
   \file mutex.cpp mutex class implementation
 
-	(c) Mircea Neacsu 1999
+  (c) Mircea Neacsu 1999
 
 */
 #ifndef UNICODE
@@ -20,8 +20,8 @@ namespace MLIBSPACE {
   \brief Wrapper for Windows mutexes.
   \ingroup syncro
 
-  Only one %thread can aquire the object using a 'wait' function. Any
-  other threads trying to aquire the %mutex will be blocked until the object
+  Only one %thread can acquire the object using a 'wait' function. Any
+  other threads trying to acquire the %mutex will be blocked until the object
   is freed using the 'signal' function.
 */
 
@@ -37,7 +37,7 @@ mutex::mutex (const char *name) :
 /*!
   Check if %mutex is free (signaled).
 
-  If the %mutex is aquired (i.e. it was free) it is released back imediately.
+  If the %mutex is acquired (i.e. it was free) it is released back immediately.
 */
 mutex::operator bool ()
 {

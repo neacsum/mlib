@@ -1,7 +1,7 @@
 /*!
   \file thread.cpp thread class implementation.
 
-	(c) Mircea Neacsu 1999
+  (c) Mircea Neacsu 1999
 
 */
 
