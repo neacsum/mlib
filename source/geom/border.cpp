@@ -5,11 +5,13 @@
 #include <geom/border.h>
 #include <stdio.h>
 #include <algorithm>
+#include <mlib/utf8.h>
 
 using namespace std;
 
 /*!
-  \defgroup geom Geometry concepts and algorithms
+  \defgroup geom Geometry 
+  \brief Geometry concepts and algorithms
 */
 
 #ifdef MLIBSPACE
@@ -50,7 +52,7 @@ Border::Border (const char *fname)
   closing.x = 0;
   closing.y = 0;
   closing_outside = 0;
-  FILE *f = fopen (fname, "r");
+  FILE *f = _wfopen (widen(fname).c_str(), L"r");
   if (!f)
     return;
 
