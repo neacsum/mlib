@@ -1,3 +1,9 @@
+/*!
+  \file UTF8.H - UTF8 Conversion functions
+  (c) Mircea Neacsu 2014-2017
+
+  \addtogroup other
+*/
 #pragma once
 
 #ifndef _STRING_

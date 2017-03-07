@@ -25,7 +25,7 @@ namespace MLIBSPACE {
 
 class http_connection;
 
-//case insensitive comparison function
+///Case insensitive comparison function
 struct ciLess : public std::binary_function<std::string, std::string, bool> {
   bool operator()(const std::string &lhs, const std::string &rhs) const {
     return _stricmp (lhs.c_str (), rhs.c_str ()) < 0;

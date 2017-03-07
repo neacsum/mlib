@@ -3,7 +3,7 @@
   \file CONVERT.H Conversion functions and frequently used constants
 
 
-  \addtogroup  convert Conversion Functions and Useful Constants
+  \addtogroup other Other Functions
 @{
 */
 

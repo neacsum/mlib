@@ -29,7 +29,7 @@ namespace MLIBSPACE {
 int sock_initializer_counter=0;
 
 /*!
-  \defgroup sockets Socket streams and related classes
+  \defgroup sockets Networking Objects
 */
 
 

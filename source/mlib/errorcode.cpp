@@ -13,7 +13,7 @@
 #include <mlib/dprintf.h>
 
 /*!
-  \defgroup errors Error Codes and Error Facilities
+  \defgroup errors Error Error Handling
   \brief Unified error handling.
 
   erc objects are a cross between exceptions and return values. A function
