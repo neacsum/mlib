@@ -13,12 +13,12 @@
 
 using namespace std;
 
+/// The JSON data dictionary
+extern mlib::JSONVAR json_dict[];
+
 #ifdef MLIBSPACE
 namespace MLIBSPACE {
 #endif
-
-/// The JSON data dictionary
-extern JSONVAR json_dict[];
 
 #define MAX_JSONRESPONSE 8192
 
