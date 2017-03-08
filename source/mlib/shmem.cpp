@@ -78,13 +78,14 @@ bool shmem_base::open (const char * nam, size_t sz_)
                               PAGE_READWRITE,               //protection
                               0, (DWORD)(sz+sizeof(syncblk)), //size MSW and LSW
                               tmp.c_str());                   //name
+    DWORD ret = GetLastError ();
     if (!file)
     {
       TRACE ("shmem_base::open(%s) CreateFileMapping failed!", name_);
-      throw GetLastError ();
+      throw ret;
     }
   
-    mem_created = (GetLastError () != ERROR_ALREADY_EXISTS);
+    mem_created = (ret != ERROR_ALREADY_EXISTS);
 
     syn = (syncblk*)MapViewOfFile (file, FILE_MAP_ALL_ACCESS, 0, 0, 0);
     if (!syn)
