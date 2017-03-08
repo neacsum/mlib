@@ -78,13 +78,13 @@ TEST (ReadWrite_shmem)
 
 TEST (TwoTheard_shmem)
 {
-  shmem<S> smem ("Shared");       //create shared memory
-
   thread t1 ([](void *)->int
   {
-    memset (&rd, 0, sizeof (S));
+    shmem<S> smem ("Shared");       //create shared memory
+    CHECK (smem.is_opened ());
+    CHECK (smem.created ());
 
-    shmem<S> smem ("Shared");     //open shared memory
+    memset (&rd, 0, sizeof (S));
     shwr.wait ();                 //wait for other thread to populate it
     smem >> rd;
     return (!memcmp (&wr, &rd, sizeof (S)));  //return 1 if rd == wr
@@ -93,7 +93,10 @@ TEST (TwoTheard_shmem)
 
   thread t2 ([](void *)->int
   {
+    Sleep (50);
     shmem<S> smem ("Shared");       //open shared memory
+    CHECK (smem.is_opened ());
+    CHECK (!smem.created ());
     smem << wr;                     //write data
     shwr.signal ();                 //signal memory full
     return 0;
@@ -104,7 +107,7 @@ TEST (TwoTheard_shmem)
   t1.start ();
   t2.start ();
 
-  Sleep (50);                     //let them finish
+  Sleep (100);                     //let them finish
   CHECK (!t1.is_running ());      //verify they have finished
   CHECK (!t2.is_running ());
   CHECK (t1.exitcode ());        //verify rd == wr
