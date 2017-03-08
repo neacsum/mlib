@@ -26,7 +26,7 @@ public:
   virtual bool close ();
 
   bool    created () const      {return mem_created;};
-  bool    is_opened ()          {return mem != NULL;};
+  bool    is_opened () const    {return mem != NULL;};
   size_t  size () const         {return sz;};
   const char *name () const     { return name_; };
   
