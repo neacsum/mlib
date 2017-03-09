@@ -10,6 +10,7 @@
 #include <string>
 #include <math.h>
 
+#pragma comment (lib, "geo.lib")
 
 #ifdef MLIBSPACE
 namespace MLIBSPACE {

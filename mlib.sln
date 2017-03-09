@@ -42,6 +42,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		readme.md = readme.md
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ui-sample", "samples\ui-sample\ui-sample.vcxproj", "{B12E80A7-75C8-4EE7-86C2-62252DC28C12}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -120,6 +122,12 @@ Global
 		{09B3C8EE-0112-4B6F-85CC-5C4584EE23D6}.Release|Win32.ActiveCfg = Release|Win32
 		{09B3C8EE-0112-4B6F-85CC-5C4584EE23D6}.Release|Win32.Build.0 = Release|Win32
 		{09B3C8EE-0112-4B6F-85CC-5C4584EE23D6}.Release|x64.ActiveCfg = Release|Win32
+		{B12E80A7-75C8-4EE7-86C2-62252DC28C12}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B12E80A7-75C8-4EE7-86C2-62252DC28C12}.Debug|Win32.Build.0 = Debug|Win32
+		{B12E80A7-75C8-4EE7-86C2-62252DC28C12}.Debug|x64.ActiveCfg = Debug|Win32
+		{B12E80A7-75C8-4EE7-86C2-62252DC28C12}.Release|Win32.ActiveCfg = Release|Win32
+		{B12E80A7-75C8-4EE7-86C2-62252DC28C12}.Release|Win32.Build.0 = Release|Win32
+		{B12E80A7-75C8-4EE7-86C2-62252DC28C12}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

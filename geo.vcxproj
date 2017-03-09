@@ -23,7 +23,6 @@
     <ClInclude Include="include\geo\aza.h" />
     <ClInclude Include="include\geo\azd.h" />
     <ClInclude Include="include\geo\cas.h" />
-    <ClInclude Include="include\geo\crs.h" />
     <ClInclude Include="include\geo\dtrans.h" />
     <ClInclude Include="include\geo\ellip.h" />
     <ClInclude Include="include\geo\filegeo.h" />
@@ -46,7 +45,6 @@
     <ClCompile Include="source\geo\cas.cpp" />
     <ClCompile Include="source\geo\dtrans.cpp" />
     <ClCompile Include="source\geo\ellip.cpp" />
-    <ClCompile Include="source\geo\filegeo.cpp" />
     <ClCompile Include="source\geo\grid.cpp" />
     <ClCompile Include="source\geo\lcc.cpp" />
     <ClCompile Include="source\geo\mer.cpp" />
