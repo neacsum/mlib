@@ -735,6 +735,9 @@ void http_connection::add_ohdr (const char *hdr, const char *value)
 */
 void http_connection::redirect (const char *uri, unsigned int code)
 {
+  if (!uri || !strlen (uri))
+    uri = "/";
+
   add_ohdr ("Location", uri);
   respond (code);
   /* RFC7231 (https://tools.ietf.org/html/rfc7231#section-6.4) says:
