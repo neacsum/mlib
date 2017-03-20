@@ -29,18 +29,18 @@ SOFTWARE.
 
 
 ##Contents:
-+ Projects:
-  - mlib - main library
+Projects:
+  - mlib - Main Library
   - utpp - UnitTest++
-  - geo  - Geodesy and map projections
-  - geom - Geometry concepts and algorithms
+  - geo  - Geodesy and Map Projections
+  - geom - Geometry Objects and algorithms
   - nmea - NMEA-0183 
   
-+ UnitTests:
+UnitTests:
   - mlib_test
-  - utpp_test - tests for UnitTest++
-  - geo_tests - tests for geodesy and map projections
-  - geom_tests - tests for geometry objects
+  - utpp_test   - Tests for UnitTest++
+  - geo_tests   - Tests for Geodesy and Map Projections
+  - geom_tests  - Tests for Geometry Objects
 
 ##Installation
 All projects have been tested under Visual Studio 2013. The libraries can be 

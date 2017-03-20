@@ -1,6 +1,6 @@
 #pragma once
 /*!
-  \file ui.h - Definition of ui_context class
+  \file jbrideg.h - Definition of JSONBridge class
   
   (c) Mircea Neacsu 2017. All rights reserved.
 */
@@ -10,7 +10,7 @@
 namespace MLIBSPACE {
 #endif
 
-/// JSON variable types
+/// JSON dictionary entry types
 enum js_type {
   JT_SHORT,     ///< short int
   JT_USHORT,    ///< unsigned short int
@@ -22,6 +22,10 @@ enum js_type {
   JT_DBL,       ///< double
   JT_PSTR,      ///< char*
   JT_STR,       ///< char
+  JT_BOOL,      ///< bool
+  JT_OBJECT,    ///< start of a composite object
+  JT_ENDOBJ,    ///< end of composite object
+  JT_POSTFUN,   ///< POST function call
 };
 
 //JSON data dictionary entry
@@ -35,10 +39,10 @@ typedef struct jsonvar_t {
 
 
 /// Mark the beginning of JSON dictionary
-#define JSD_START JSONVAR json_dict[] ={
+#define JSD_STARTDIC JSONVAR json_dict[] ={
 
 /// Mark the end of JSON dictionary
-#define JSD_END {0, 0, JT_INT, 0, 0} }
+#define JSD_ENDDIC {0, 0, JT_INT, 0, 0} }
 
 /*!
   Generates an entry in JSON dictionary for a variable that has the same
@@ -62,37 +66,45 @@ typedef struct jsonvar_t {
 */
 #define JSDN(V, N, T, C, S) {N, &##V, T, S, C}
 
+///Generate entry for a composite object
+#define JSD_OBJECT(N) {N, 0, JT_OBJECT, 0, 1}
 
-class ui_context {
+///Generate entry for end of composite object
+#define JSD_ENDOBJ {"", 0, JT_ENDOBJ, 0, 1}
+
+///Generate entry for POST function call
+#define JSDN_POSTFUNC(F, N) {N, F, JT_POSTFUN, 0, 1}
+
+class JSONBridge {
 public:
-  ui_context (const char *path);
-  ~ui_context ();
+  JSONBridge (const char *path);
+  ~JSONBridge ();
 
   void attach_to (httpd& server);
   void lock ();
   void unlock ();
   const char *path ();
 
-  virtual int jsonify_all (const char *query) = 0;
-  virtual void post_parse (const char *query) = 0;
+  virtual void post_parse (http_connection& client);
 
 protected:
-  bool jsonify (void *var);
+  bool jsonify (const JSONVAR*& entry);
   void bprintf (const char *fmt, ...);
   void not_found (const char *varname);
+  bool strquote (const char *str);
   const JSONVAR *find (const char *name, int *idx);
   http_connection *client;
 
 private:
-  void json_begin (http_connection* client);
-  void json_end ();
-  bool parse_urlencoded (http_connection* client);
+  bool json_begin (http_connection& client);
+  void json_end (http_connection& client);
+  bool parse_urlencoded (http_connection& client);
 
   const char *path_;
   char *buffer;
   char *bufptr;
   criticalsection in_use;
-  static int callback (const char *uri, http_connection& client, ui_context *ctx);
+  static int callback (const char *uri, http_connection& client, JSONBridge *ctx);
 };
 
 
@@ -100,15 +112,15 @@ private:
 
 /// Enter the critical section associated with this context
 inline
-void ui_context::lock (){ in_use.enter (); }
+void JSONBridge::lock (){ in_use.enter (); }
 
 /// Leave the critical section associated with this context
 inline
-void ui_context::unlock (){ in_use.leave (); }
+void JSONBridge::unlock (){ in_use.leave (); }
 
 /// Return the context path 
 inline
-const char* ui_context::path () { return path_; }
+const char* JSONBridge::path () { return path_; }
 
 #ifdef MLIBSPACE
 }

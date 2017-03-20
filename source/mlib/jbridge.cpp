@@ -1,13 +1,13 @@
 /*!
-  \file   ui.cpp
+  \file   jbridge.cpp
   (c) Mircea Neacsu 2017
 
-  Implementation of ui_context class
+  Implementation of JSONBridge class
 */
 #include <memory.h>
 #include <string.h>
 
-#include <mlib/ui.h>
+#include <mlib/jbridge.h>
 #include <mlib/trace.h>
 #include <mlib/critsect.h>
 
@@ -25,47 +25,91 @@ namespace MLIBSPACE {
 // Sizes of data elements (same order as JT_.. values)
 const int jsz[] = { sizeof (short int), sizeof (unsigned short int), 
 sizeof (int), sizeof (unsigned int), sizeof (long), sizeof (unsigned long), 
-sizeof (float), sizeof (double), sizeof (char*), sizeof(char) };
+sizeof (float), sizeof (double), sizeof (char*), sizeof(char), sizeof(bool) };
 
 
 static int url_decode (const char *in, char *out);
 static int hexdigit (char *bin, char c);
 static int hexbyte (char *bin, const char *str);
+/*!
+  \class JSONBridge
+  \brief JSON objects support
+  \ingroup sockets
 
-ui_context::ui_context (const char *path) :
+  JSONBridge class provides an easy access mechanism to program variables for
+  HTTP server. A JSONBridge object is attached to a HTTP server using the
+  attach_to() function. Behind the scene, this function registers a handler function
+  for the path associated with the JSONBridge. 
+  
+  Assume the HTTP server hs answers requests sent to http://localhost:8080 and 
+  the JSONBridge object was created
+  as:
+  \code
+    JSONBridge jb("var");
+  \endcode
+
+  Then:
+  \code
+    jb.attach_to(hs);
+  \endcode
+  will register a handler for requests to http://localhost:8080/var
+
+  If this handler is invoked with a GET request for http://localhost:8080/var?data
+  it will search in the JSON dictionary a variable called 'data' and return it's
+  content as a JSON object.
+*/
+
+///Creates a JSONBridge object for the given path
+JSONBridge::JSONBridge (const char *path) :
 path_ (path)
 {
   buffer = new char[MAX_JSONRESPONSE];
 }
 
-ui_context::~ui_context ()
+JSONBridge::~JSONBridge ()
 {
   delete buffer;
 }
 
-void ui_context::attach_to (httpd& server)
+/// Attach JSONBridge object to a HTTP server
+void JSONBridge::attach_to (httpd& server)
 {
-  server.add_handler (path_, (uri_handler)ui_context::callback, this);
+  server.add_handler (path_, (uri_handler)JSONBridge::callback, this);
 }
 
-void ui_context::json_begin (http_connection* cl)
+/// Initializes the response buffer 
+bool JSONBridge::json_begin (http_connection& cl)
 {
-  TRACE ("ui_context::json_begin");
+  TRACE ("JSONBridge::json_begin");
   in_use.enter ();
+  client = &cl;
+  int idx;
+  const JSONVAR *entry = find (cl.get_query (), &idx);
+  if (!entry)
+    return false;
   bufptr = buffer;
   *bufptr++ = '{';
-  client = cl;
+  if (entry->type == JT_OBJECT)
+  {
+    entry++;
+    while (entry->type != JT_ENDOBJ)
+      jsonify (entry);
+  }
+  else if (!jsonify (entry))
+    return false;
+  json_end (cl);
+  return true;
 }
 
 /// Send out the JSON formatted buffer
-void ui_context::json_end ()
+void JSONBridge::json_end (http_connection& client)
 {
   if (',' == *(bufptr - 1))
     bufptr--; //kill the trailing comma 
 
   strcpy (bufptr, "}\r\n");
   bufptr += 3;
-  client->out ()
+  client.out ()
     << "HTTP/1.1 200 OK\r\n"
        "Cache-Control: no-cache, no-store\r\n"
        "Content-Type: text/plain\r\n"
@@ -79,21 +123,8 @@ void ui_context::json_end ()
 }
 
 /// Serializes a variable to JSON format
-bool ui_context::jsonify (void *var)
+bool JSONBridge::jsonify (const JSONVAR*& entry)
 {
-  const JSONVAR *entry;
-  int i;
-  char *addr = (char *)var;
-
-  for (entry = json_dict; entry->name && entry->addr != addr; entry++)
-    ;
-
-  if (!entry->name)
-  {
-    TRACE ("Missing dictionary entry!!");
-    return false;   //oops! entry not found
-  }
-
   *bufptr++ = '"';
   strcpy (bufptr, entry->name);
   bufptr += strlen (bufptr);
@@ -103,16 +134,18 @@ bool ui_context::jsonify (void *var)
   if (entry->cnt > 1)
     *bufptr++ = '[';
 
-  i = 0;
+  int i = 0;
+  char *addr = (char*)entry->addr;
+
   while (i<entry->cnt)
   {
     switch (entry->type)
     {
     case JT_PSTR:
-      sprintf (bufptr, "\"%s\"", *(char**)addr);
+      strquote (*(char**)addr);
       break;
     case JT_STR:
-      sprintf (bufptr, "\"%s\"", addr);
+      strquote (addr);
       break;
     case JT_SHORT:
       sprintf (bufptr, "%hd", *(short int*)addr);
@@ -137,6 +170,21 @@ bool ui_context::jsonify (void *var)
     case JT_DBL:
       sprintf (bufptr, "%.10lg", *(double*)addr);
       break;
+    case JT_BOOL:
+      strcpy (bufptr, *(bool*)addr ? "true" : "false");
+      break;
+    case JT_OBJECT:
+      *bufptr++ = '{';
+      entry++;
+      while (entry->type != JT_ENDOBJ)
+        jsonify (entry);
+
+      *(bufptr-1) = '}'; //replace ending comma with closing brace
+      *bufptr = 0;
+      break;
+
+    default:
+      TRACE ("Unexpected entry type %d", entry->type);
     }
     bufptr += strlen (bufptr);
     i++;
@@ -151,18 +199,20 @@ bool ui_context::jsonify (void *var)
     *bufptr++ = ']';
 
   *bufptr++ = ',';
+  *bufptr = 0; //null terminated just to play safe
+  entry++; //advance to next dictionary entry
   return true;
 }
 
 /// Allow derived classes to generate response inside JSON buffer
-void ui_context::bprintf (const char *fmt, ...)
+void JSONBridge::bprintf (const char *fmt, ...)
 {
   va_list args;
   va_start (args, fmt);
   bufptr += vsprintf (bufptr, fmt, args);
 }
 
-void ui_context::not_found (const char *varname)
+void JSONBridge::not_found (const char *varname)
 {
   char tmp[1024];
   sprintf (tmp, "HTTP/1.1 415 Unknown variable %s\r\n", varname);
@@ -174,33 +224,67 @@ void ui_context::not_found (const char *varname)
     << endl;
 }
 
+bool JSONBridge::strquote (const char *str)
+{
+  //trivial null case
+  if (!str)
+  {
+    strcpy (bufptr, "null");
+    bufptr += 4;
+    return true;
+  }
+
+  *bufptr++ = '"';
+  while (*str && bufptr - buffer < MAX_JSONRESPONSE)
+  {
+    const char repl[] = "\"\\/bfnrt";
+    const char quote[] = "\"\\/\b\f\n\r\t";
+    const char *ptr;
+    if (ptr = strchr (quote, *str))
+    {
+      int i = ptr - quote;
+      *bufptr++ = '\\';
+      *bufptr++ = repl[i];
+      str++;
+    }
+    else
+      *bufptr++ = *str++;
+  }
+  if (*str)
+    return false; //buffer full
+  *bufptr++ = '"';
+  *bufptr = 0;
+  return true;
+}
 /*!
   Search a variable in JSON dictionary. The variable name can be a construct
   '<name>_<index>' for an indexed variable.
 */
-const JSONVAR* ui_context::find (const char *name, int *idx)
+const JSONVAR* JSONBridge::find (const char *name, int *pidx)
 {
   const JSONVAR *entry;
   char varname[256];
   char *pi = strchr (varname, '_'), *tail;
-
+  int idx; //if pidx == 0
   strncpy (varname, name, sizeof(varname)-1);
   varname[sizeof (varname) - 1] = 0;
-  *idx = 0;
+  if (!pidx)
+    pidx = &idx;
+  *pidx = 0;
   if (pi)
   {
-    *idx = (int)strtol (pi + 1, &tail, 10);
-    if (*tail == 0 && *idx >= 0) //if name is indeed <var>_<number> and index is positive...
+    *pidx = (int)strtol (pi + 1, &tail, 10);
+    if (*tail == 0 && *pidx >= 0) //if name is indeed <var>_<number> and index is positive...
       *pi = 0;                   //...search dictionary for <var>
     else
-      *idx = 0;
+      *pidx = 0;
   }
 
   for (entry = json_dict; entry->name; entry++)
   {
     if (!strcmp (varname, entry->name))
     {
-      if (*idx < entry->cnt)
+      if (*pidx < entry->cnt)
         return entry;
       return NULL;
     }
@@ -212,16 +296,16 @@ const JSONVAR* ui_context::find (const char *name, int *idx)
   Parse the URL-encoded body of a POST request assigning new values to all
   variables.
 */
-bool ui_context::parse_urlencoded (http_connection* cl)
+bool JSONBridge::parse_urlencoded (http_connection& cl)
 {
   char val[1024];
   int idx;
   void *pv;
 
   mlib::lock l (in_use);
-  client = cl;
+  client = &cl;
   str_pairs vars;
-  cl->parse_formbody (vars);
+  cl.parse_formbody (vars);
   for (auto var = vars.begin (); var != vars.end (); var++)
   {
     if (!var->second.length ())
@@ -242,7 +326,7 @@ bool ui_context::parse_urlencoded (http_connection* cl)
     {
     case JT_PSTR:
       pv = *(char**)pv; //one more level of indirection
-      //flow through to JT_STR case. Don't break them appart!
+      //flow through to JT_STR case. Don't break them apart!
     case JT_STR:
       strncpy ((char *)pv, val, k->sz);
       if (k->sz)
@@ -271,14 +355,24 @@ bool ui_context::parse_urlencoded (http_connection* cl)
     case JT_DBL:
       *(double *)pv = atof (val);
       break;
+    case JT_BOOL:
+      *(bool *)pv = (atoi (val) != 0);
+    default:
+      TRACE ("Unexpected entry type: %d", k->type);
     }
   }
-  post_parse (cl->get_query());
   return true;
 }
 
+/*!
+  Redirect client to root
+*/
+void JSONBridge::post_parse (http_connection& client)
+{
+  client.redirect ("/");
+}
 
-int ui_context::callback (const char *uri, http_connection& client, ui_context *ctx)
+int JSONBridge::callback (const char *uri, http_connection& client, JSONBridge *ctx)
 {
   const char *req = client.get_method ();
   const char *query = client.get_query ();
@@ -286,16 +380,25 @@ int ui_context::callback (const char *uri, http_connection& client, ui_context *
   if (!_strcmpi (req, "GET"))
   {
     int ret;
-    ctx->json_begin (&client);
-    if (200 == (ret = ctx->jsonify_all (query)))
-      ctx->json_end ();
+    if (200 == (ret = ctx->json_begin (client)))
+      ctx->json_end (client);
     else if (ret == 404)
       client.respond (404);
   }
   else if (!_strcmpi (req, "POST"))
   {
     if (!_strcmpi (client.get_ihdr ("Content-Type"), "application/x-www-form-urlencoded"))
-      ctx->parse_urlencoded (&client);
+      ctx->parse_urlencoded (client);
+    const JSONVAR* entry;
+    int idx;
+    if (strlen (client.get_query ()) 
+     && (entry = ctx->find (client.get_query (), &idx))
+     && entry->type == JT_POSTFUN)
+    {
+      uri_handler(entry->addr)(uri, client, 0);
+    }
+    ctx->post_parse (client);
+
   }
   return 1;
 }

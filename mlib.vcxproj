@@ -163,6 +163,7 @@
     <ClInclude Include="include\mlib\firewall.h" />
     <ClInclude Include="include\mlib\httpd.h" />
     <ClInclude Include="include\mlib\inaddr.h" />
+    <ClInclude Include="include\mlib\jbridge.h" />
     <ClInclude Include="include\mlib\log.h" />
     <ClInclude Include="include\mlib\md5.h" />
     <ClInclude Include="include\mlib\mutex.h" />
@@ -177,7 +178,6 @@
     <ClInclude Include="include\mlib\tcpserv.h" />
     <ClInclude Include="include\mlib\thread.h" />
     <ClInclude Include="include\mlib\trace.h" />
-    <ClInclude Include="include\mlib\ui.h" />
     <ClInclude Include="include\mlib\utf8.h" />
     <ClInclude Include="include\mlib\wsockstream.h" />
   </ItemGroup>
@@ -193,6 +193,7 @@
     <ClCompile Include="source\mlib\firewall.cpp" />
     <ClCompile Include="source\mlib\httpd.cpp" />
     <ClCompile Include="source\mlib\inaddr.cpp" />
+    <ClCompile Include="source\mlib\jbridge.cpp" />
     <ClCompile Include="source\mlib\log.cpp" />
     <ClCompile Include="source\mlib\md5.c" />
     <ClCompile Include="source\mlib\mutex.cpp" />
@@ -205,7 +206,6 @@
     <ClCompile Include="source\mlib\syncbase.cpp" />
     <ClCompile Include="source\mlib\tcpserv.cpp" />
     <ClCompile Include="source\mlib\thread.cpp" />
-    <ClCompile Include="source\mlib\ui.cpp" />
     <ClCompile Include="source\mlib\utf8.cpp" />
     <ClCompile Include="source\mlib\wsockstream.cpp" />
     <ClCompile Include="source\mlib\wtimer.cpp" />

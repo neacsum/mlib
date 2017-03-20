@@ -105,7 +105,7 @@
     <ClInclude Include="include\mlib\dogbone.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\mlib\ui.h">
+    <ClInclude Include="include\mlib\jbridge.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -188,7 +188,7 @@
     <ClCompile Include="source\mlib\dogbone.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\mlib\ui.cpp">
+    <ClCompile Include="source\mlib\jbridge.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
