@@ -46,8 +46,8 @@ static int getkeystring (FILE* fp, const char* Section, const char* Key, char* B
 static char* skipleading (char* str);
 static char* skiptrailing (char* str, char* base);
 static char *striptrailing(char *str);
-inline static FILE *ini_openread (const char* fname) {return _wfopen (widen(fname).c_str(), L"rb, ccs=UTF-8");};
-inline static FILE *ini_openwrite (const char* fname) {return _wfopen (widen(fname).c_str(), L"wb, ccs=UTF-8");};
+inline static FILE *ini_openread (const char* fname) {return _wfopen (utf8::widen(fname).c_str(), L"rb, ccs=UTF-8");};
+inline static FILE *ini_openwrite (const char* fname) {return _wfopen (utf8::widen(fname).c_str(), L"wb, ccs=UTF-8");};
 static void ini_tempname (char* dest, const char* source, int maxlength);
 static void writesection (char* LocalBuffer, const char* Section, FILE *fp);
 static void writekey (char* buffer, const char* key, const char* value, FILE *fp);
@@ -80,7 +80,7 @@ Profile::Profile ()
 {
   wchar_t tmp[_MAX_PATH];
   GetTempFileName (L".", L"INI", 0, tmp);
-  strcpy (filename, narrow(tmp).c_str());
+  strcpy (filename, utf8::narrow(tmp).c_str());
   temp_file = true;
 }
 
@@ -99,7 +99,7 @@ Profile::Profile (const Profile& p)
 Profile::~Profile()
 {
   if (temp_file)
-    _wremove (widen (filename).c_str());
+    utf8::remove (filename);
 }
 
 /*!
@@ -111,7 +111,7 @@ Profile::~Profile()
 void Profile::File (const char *fname)
 {
   if (temp_file)
-    _wremove (widen (filename).c_str());
+    utf8::remove (filename);
 
   if (fname)
   {
@@ -122,7 +122,7 @@ void Profile::File (const char *fname)
   {
     wchar_t tmp[_MAX_PATH];
     GetTempFileName (L".", L"INI", 0, tmp);
-    strcpy (filename, narrow (tmp).c_str());
+    strcpy (filename, utf8::narrow (tmp).c_str());
     temp_file = true;
   }
 }
@@ -133,7 +133,7 @@ void Profile::File (const char *fname)
 Profile& Profile::operator = (const Profile& p)
 {
   // Copy the source file to the destination file.
-  CopyFile (widen (p.filename).c_str(), widen (filename).c_str(), FALSE);
+  CopyFile (utf8::widen (p.filename).c_str(), utf8::widen (filename).c_str(), FALSE);
   return *this;
 }
 
@@ -350,7 +350,7 @@ HFONT Profile::GetFont (const char *key, const char *section, HFONT defval) cons
   else
     lfont.lfPitchAndFamily = DEFAULT_PITCH | FF_DONTCARE;
   if (szptr && *szptr)
-    wcscpy (lfont.lfFaceName, widen(++szptr).c_str() );
+    wcscpy (lfont.lfFaceName, utf8::widen(++szptr).c_str() );
   else
     wcscpy( lfont.lfFaceName, L"Courier" );
   return CreateFontIndirect (&lfont);
@@ -509,7 +509,7 @@ bool Profile::CopySection (const Profile& from_file, const char *from_sect, cons
     return true;
 
   //if file doesn't exist create it now
-  if (_waccess (widen (filename).c_str (), 0))
+  if (utf8::access (filename, 0))
   {
     FILE *fp = ini_openwrite (filename);
     if (fp == NULL)
@@ -1201,19 +1201,17 @@ static bool close_rename(FILE* rfp, FILE* wfp, const char* filename)
   fclose(rfp);
   fclose(wfp);
   ini_tempname(tmpname, filename, sizeof(tmpname));
-  wstring wfn = widen (filename);
-  wstring wtmp = widen (tmpname);
 
   //retry a few times to allow for stupid anti-virus
   i = 0;
-  while (i++ < RETRIES && _wremove(wfn.c_str()))
+  while (i++ < RETRIES && utf8::remove(filename))
     Sleep(0);
 
   if (i >= RETRIES)
     return false;
 
   i = 0;
-  while (i++ < RETRIES && _wrename(wtmp.c_str(), wfn.c_str()))
+  while (i++ < RETRIES && utf8::rename(tmpname, filename))
     Sleep(0);
   return (i < RETRIES);
 }

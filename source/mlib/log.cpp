@@ -160,7 +160,7 @@ static const char *processname (char *name)
       strcpy (pname, "unknown");
     else
     {
-      strncpy (pname, narrow(wpn).c_str(), sizeof(pname)-1);
+      strncpy (pname, utf8::narrow(wpn).c_str(), sizeof(pname)-1);
       pname[sizeof(pname)-1] = 0;
     }
     if (p = strchr (pname, '.'))
@@ -402,7 +402,7 @@ void syslog( int facility_priority, char* fmt, ...)
 
   strcat (datagram, "\n");
   if (proclog->option & LOGOPT_OUTDEBUG)
-    OutputDebugString (widen(datagram).c_str());
+    OutputDebugString (utf8::widen(datagram).c_str());
 
   if (proclog->file)
   {
@@ -441,7 +441,7 @@ void syslog_debug (char* fmt, ...)
 
   strcat (datagram, "\n");
   if (proclog->option & LOGOPT_OUTDEBUG)
-    OutputDebugString (widen(datagram).c_str());
+    OutputDebugString (utf8::widen(datagram).c_str());
 
   if (proclog->file)
   {

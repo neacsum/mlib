@@ -32,7 +32,7 @@ namespace MLIBSPACE {
 semaphore::semaphore (int limit, const char *name) :
   syncbase (name)
 {
-  HANDLE h = CreateSemaphore (NULL, 0, limit, name?widen(name).c_str():0);
+  HANDLE h = CreateSemaphore (NULL, 0, limit, name?utf8::widen(name).c_str():0);
 
   assert (h);
   set_handle (h);

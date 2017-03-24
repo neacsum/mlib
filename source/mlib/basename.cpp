@@ -23,26 +23,27 @@ using namespace std;
   The function can be used with UTF-8 encoded filenames.
 */
 
-char *basename (const char* filename)
+const char *basename (const char* filename)
 {
-  wchar_t ext[_MAX_EXT], fname[_MAX_FNAME];
-  static char bname[_MAX_FNAME + _MAX_EXT];
-
+  static string bname;
+  
   //NULL or empty path gets treated as "."
   if (!filename || !*filename)
   {
-    strcpy (bname, ".");
-    return bname;
+    bname = ".";
+    return bname.c_str();
   }
 
-  _wsplitpath (widen(filename).c_str(), NULL, NULL, fname, ext);
-  strcpy (bname, narrow(fname).c_str());
-  strcat (bname, narrow(ext).c_str());
-  
-  if (!strlen(bname))
-    strcpy (bname, ".");
+  string drive, dir, fname, ext;
 
-  return bname;
+  utf8::splitpath (filename, drive, dir, fname, ext);
+
+  bname = fname + ext;
+  
+  if (bname.empty())
+    bname = ".";
+
+  return bname.c_str();
 }
 
 /*!
@@ -60,27 +61,26 @@ char *basename (const char* filename)
   The function is not reentrant.
   The function can be used with UTF-8 encoded filenames.
 */
-char *dirname (const char *filename)
+const char *dirname (const char *filename)
 {
-  static char dname[_MAX_PATH + _MAX_DRIVE];
-  wchar_t drive[_MAX_DRIVE], path[_MAX_PATH];
+  static string dname;
 
+  string drive, dir, fname, ext;
   //NULL or empty path gets treated as "."
   if (!filename || !*filename)
   {
-    strcpy (dname, ".");
-    return dname;
+    dname = ".";
+    return dname.c_str();
   }
 
-  _wsplitpath (widen(filename).c_str(), drive, path, NULL, NULL);
-  strcpy (dname, narrow(drive).c_str());
-  strcat (dname, narrow(path).c_str());
-  if (!strlen(dname))
-    strcpy (dname, ".");
-  char *last = dname +strlen(dname)-1;
+  utf8::splitpath (filename, drive, dir, fname, ext);
+  dname = drive + dir;
+  if (dname.empty())
+    dname = ".";
   
   //remove terminating path separator
-  if (*last == '\\' || *last == '/')
-    *last = 0;
-  return dname;
+  if (dname.back() == '\\' || dname.back() == '/')
+    dname.pop_back();
+
+  return dname.c_str();
 }

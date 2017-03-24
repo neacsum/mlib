@@ -29,7 +29,7 @@ namespace MLIBSPACE {
 mutex::mutex (const char *name) :
   syncbase (name)
 {
-  HANDLE h=CreateMutex (NULL, FALSE, name?widen(name).c_str():NULL);
+  HANDLE h=CreateMutex (NULL, FALSE, name?utf8::widen(name).c_str():NULL);
   assert (h);
   set_handle (h);
 }

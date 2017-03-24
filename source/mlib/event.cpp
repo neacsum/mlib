@@ -34,7 +34,7 @@ event::event (mode md, bool signaled, const char *name) :
   syncbase (name),
   m (md)
 {
-  HANDLE h = CreateEvent (NULL, m==manual, signaled, name?widen(name).c_str():0);
+  HANDLE h = CreateEvent (NULL, m==manual, signaled, name?utf8::widen(name).c_str():0);
 
   assert (h);
   set_handle (h);

@@ -68,7 +68,7 @@ bool shmem_base::open (const char * nam, size_t sz_)
   name_ = new char[strlen (nam) + 1];
   strcpy (name_, nam);
 
-  std::wstring wname = widen(name_);
+  std::wstring wname = utf8::widen(name_);
   std::wstring tmp;
   try {
     tmp = wname + L".MEM";

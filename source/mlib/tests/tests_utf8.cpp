@@ -3,6 +3,7 @@
 #include <utpp/utpp.h>
 
 using namespace std;
+using namespace utf8;
 
 TEST (widen_string)
 {
@@ -52,4 +53,28 @@ TEST (greek_letters)
   wchar_t *greek = L"ελληνικό αλφάβητο";
   string s = narrow (greek);
   CHECK (widen (s) == greek);
+}
+
+TEST (utf8_dir)
+{
+  /* Make a folder using Greek alphabet, change current directory into it,
+  obtain the current working directory and verify that it matches the name
+  of the newly created folder */
+
+  wchar_t *greek = L"ελληνικό";
+  string dirname = narrow (greek);
+  CHECK (!mkdir (dirname));   //mkdir should return 0 for success
+
+  //enter newly created directory
+  CHECK (!chdir (dirname));   //chdir should return 0 for success
+
+  //Path returned by getcwd should end in our Greek string
+  string cwd = getcwd ();
+  size_t idx = cwd.rfind ("\\");      //last backslash
+  string last = cwd.substr (idx+1);
+  CHECK_EQUAL (dirname, last);
+
+  //Move out of directory and remove it
+  chdir ("..");
+  CHECK (!rmdir (dirname));
 }

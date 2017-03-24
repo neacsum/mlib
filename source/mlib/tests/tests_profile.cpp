@@ -179,7 +179,7 @@ TEST (Greek_filename)
   char *greek_text = "\xCE\xB1\xCE\xBB\xCF\x86\xCE\xAC\xCE\xB2\xCE\xB7\xCF\x84\xCE\xBF";
   char strval[80];
 
-  _wunlink (widen(filename).c_str());
+  utf8::remove (filename);
   Sleep (200);
   Profile greek (filename);
   greek.PutInt ("Integer", 1, "Keys");
@@ -188,7 +188,7 @@ TEST (Greek_filename)
   greek.GetString (strval, sizeof(strval), "GreekAlphabet", "Keys");
   CHECK_EQUAL (strval, greek_text);
   greek.PutString (greek_text, "This is how you spell alphabet in Greek", "Keys");
-  _wunlink (widen(filename).c_str());
+  utf8::remove (filename);
 }
 
 TEST (Quoted_strings)
