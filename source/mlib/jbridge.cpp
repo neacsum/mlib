@@ -167,6 +167,7 @@ bool JSONBridge::jsonify (const JSONVAR*& entry)
       break;
     case JT_FLT:
       sprintf (bufptr, "%.10g", *(float*)addr);
+      break;
     case JT_DBL:
       sprintf (bufptr, "%.10lg", *(double*)addr);
       break;
@@ -264,10 +265,11 @@ const JSONVAR* JSONBridge::find (const char *name, int *pidx)
 {
   const JSONVAR *entry;
   char varname[256];
-  char *pi = strchr (varname, '_'), *tail;
-  int idx; //if pidx == 0
+  char *pi, *tail;
+  int idx;
   strncpy (varname, name, sizeof(varname)-1);
   varname[sizeof (varname) - 1] = 0;
+  pi = strchr (varname, '_');
   if (!pidx)
     pidx = &idx;
   *pidx = 0;
@@ -286,6 +288,7 @@ const JSONVAR* JSONBridge::find (const char *name, int *pidx)
     {
       if (*pidx < entry->cnt)
         return entry;
+      TRACE ("Out of bounds %s[%d]", varname, *pidx);
       return NULL;
     }
   }
@@ -314,7 +317,10 @@ bool JSONBridge::parse_urlencoded (http_connection& cl)
     strcpy (val, var->second.c_str ());
     const JSONVAR *k = find (var->first.c_str (), &idx);
     if (!k)
-      continue;     //variable not found
+    {
+      TRACE ("Posted key %s not found in dictionary", var->first.c_str ());
+      continue;
+    }
     url_decode (val, val);
     if (k->type == JT_STR)
       pv = (char*)(k->addr) + k->sz*idx;
@@ -336,27 +342,29 @@ bool JSONBridge::parse_urlencoded (http_connection& cl)
       *(int*)pv = (int)strtol (val, NULL, 0);
       break;
     case JT_UINT:
-      *(unsigned int*)pv = (unsigned int)atol (val);
+      *(unsigned int*)pv = (unsigned int)strtoul (val, NULL, 0);
       break;
     case JT_SHORT:
       *(short*)pv = (short)strtol (val, NULL, 0);
       break;
     case JT_USHORT:
-      *(unsigned short*)pv = (unsigned short)atol (val);
+      *(unsigned short*)pv = (unsigned short)strtoul (val, NULL, 0);
       break;
     case JT_LONG:
       *(long *)pv = strtol (val, NULL, 0);
       break;
     case JT_ULONG:
-      *(unsigned long *)pv = atol (val);
+      *(unsigned long *)pv = strtoul (val, NULL, 0);
       break;
     case JT_FLT:
       *(float *)pv = (float)atof (val);
+      break;
     case JT_DBL:
       *(double *)pv = atof (val);
       break;
     case JT_BOOL:
       *(bool *)pv = (atoi (val) != 0);
+      break;
     default:
       TRACE ("Unexpected entry type: %d", k->type);
     }

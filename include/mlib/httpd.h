@@ -201,7 +201,7 @@ const char* http_connection::get_all_ihdr () { return headers; };
 
 /// Return URI query string (everything after '?')
 inline
-const char* http_connection::get_query () { return query; };
+const char* http_connection::get_query () { return query?query : ""; };
 
 /// Return request body
 inline

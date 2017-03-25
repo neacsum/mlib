@@ -48,9 +48,9 @@ typedef struct jsonvar_t {
   Generates an entry in JSON dictionary for a variable that has the same
   external name (name used in the JSON response) as the variable name.
   \param V  Name of the variable
-  \param T  Type of variable (one of js_type values)
+  \param T  Type of variable (one of JT_... values)
   \param C  Number of elements (for arrays)
-  \param S  Element size (only for JT_STR type)
+  \param S  Element size (only for JT_STR and JT_PSTR types)
 */
 #define JSD(V, T, C, S) {#V, &##V, T, S, C}
 
@@ -60,10 +60,10 @@ typedef struct jsonvar_t {
   external name (name used in the JSON response) than the variable name.
   \param V  Name of the variable
   \param N  External (JSON) name of the variable
-  \param T  Type of variable (one of jst_type values)
+  \param T  Type of variable (one of JT_... values)
   \param C  Number of elements (for arrays)
-  \param S  Element size (only for JT_STR type)
-*/
+  \param S  Element size (only for JT_STR and JT_PSTR types)
+  */
 #define JSDN(V, N, T, C, S) {N, &##V, T, S, C}
 
 ///Generate entry for a composite object
