@@ -1,0 +1,234 @@
+﻿<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Sample User Interface</title>
+<script type="text/javascript" src="jquery.js"></script>
+<link rel="stylesheet" type="text/css" media="all" href="main.css" />
+
+<script type="text/javascript">
+var sample_default =
+'{ \
+ "hvar": 111,\n\
+ "huvar": 222,\n\
+ "ivar": 333,\n\
+ "iuvar": 444,\n\
+ "lvar": 555,\n\
+ "luvar": 666,\n\
+ "fvar": 555.55,\n\
+ "dvar": 666.66,\n\
+ "pstr": "AAAAAA",\n\
+ "str": "BBBBBB",\n\
+ "bvar": true\n,\
+ "iarr": [11, 22, 33, 44],\n\
+ "sarr": [\"AB\", \"CD\", \"EF\", \"GH\"],\n\
+ "psarr": [\"IJ\", \"KL\", \"MN\", \"OP\"]\n\
+}';
+
+function do_parse (json)
+{
+  var i;
+  var data = JSON.parse(json)
+  $("#hvar").val(data.hvar);
+  $("#huvar").val("0x"+data.huvar.toString(16));
+  $("#ivar").val(data.ivar);
+  $("#iuvar").val("0x"+data.iuvar.toString(16));
+  $("#lvar").val(data.lvar);
+  $("#luvar").val("0x"+data.luvar.toString(16));
+  $("#fvar").val(data.fvar);
+  $("#dvar").val(data.dvar);
+  $("#pstr").val(data.pstr);
+  $("#str").val(data.str);
+  $("#bvar").prop('checked', data.bvar);
+  for (i=0; i<4; i++)
+  {
+    $("#iarr_" + i).val(data.iarr[i]);
+    $("#sarr_" + i).val(data.sarr[i]);
+    $("#psarr_" + i).html(data.psarr[i]);
+  }
+}
+
+$(document).ready ( function ()
+{
+  $.get("/var?sample", function (r)
+  {
+    do_parse(r)
+  })
+  .fail(function ()
+  {
+    do_parse(sample_default)
+  });
+
+
+});
+
+</script>
+<style>
+  .psarr table,
+  .psarr td 
+    {border: 1px solid black; border-collapse: collapse;}
+</style>
+</head>
+
+<body>
+
+  <div class="container_12">
+    <div class="grid_12">
+      <h1>Sample User Interface</h1>
+      <h4>Different data types</h4>
+    </div>
+    <div class="clear"></div>
+    <div class="grid_4">
+      The interface supports all basic numeric and string types. When a form is
+      submitted, all fields are sent as 
+      <a href="https://en.wikipedia.org/wiki/Percent-encoding">URL encoded</a>
+      values. the interface decodes them and assigns new values to corresponding
+      variables. received values for integer type fields can be decimal, hex or octal.<br/>
+
+      Keep in mind that check-boxes and radio buttons that are not checked are not
+      submitted. The "standard" trick in this case is to use another hidden
+      input field with the same name and a value corresponding to the unchecked.
+      state. Because submitted fields are parsed sequentially, the hidden field
+      must be placed <b>BEFORE</b> the check-box or radio button field.
+    </div>
+    <div class="grid_8">
+      <form method="post" action="/var">
+      <table>
+        <tr>
+          <td>Short integer hvar:</td>
+          <td><input id="hvar" name="hvar" /></td>
+        </tr>
+        <tr>
+          <td>Short unsigned huvar (hex):</td>
+          <td><input id="huvar" name="huvar" /></td>
+        </tr>
+        <tr>
+          <td>Integer ivar:</td>
+          <td><input id="ivar" name="ivar"/></td>
+        </tr>
+        <tr>
+          <td>Unsigned integer iuvar (hex):</td>
+          <td><input id="iuvar" name="iuvar" /></td>
+        </tr>
+        <tr>
+          <td>Long lvar:</td>
+          <td><input id="lvar" name="lvar" /></td>
+        </tr>
+        <tr>
+          <td>Unsigned long luvar (hex):</td>
+          <td><input id="luvar" name="luvar" /></td>
+        </tr>
+        <tr>
+          <td>Float fvar:</td>
+          <td><input id="fvar" name="fvar" /></td>
+        </tr>
+        <tr>
+          <td>Double dvar:</td>
+          <td><input id="dvar" name="dvar" /></td>
+        </tr>
+        <tr>
+          <td>Pointer to string pstr:</td>
+          <td><input id="pstr" name="pstr" /></td>
+        </tr>
+        <tr>
+          <td>String str:</td>
+          <td><input id="str" name="str" /></td>
+        </tr>
+        <tr>
+          <td>Boolean bvar:</td>
+          <td>
+            <input type="hidden" name="bvar" value="0" />
+            <input type="checkbox" id="bvar" name="bvar" value="1"/>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2" style="text-align:center"><input type="submit" value="SUBMIT" /></td>
+        </tr>
+      </table>
+      </form>
+    </div>
+    <div class="clear"></div>
+    <div class="grid_12"><hr /><h4>Arrays</h4></div>
+    <div class="clear"></div>
+    <div class="grid_4">
+      Transferring arrays from program to the user interface page is simple. The
+      interface knows how to format arrays for all basic data types.<br/>
+      When posting data back from HTML page to the program we have to establish
+      a convention because the browser's posting mechanism has no concept of array.<br/>
+      So, by convention, array elements are named <em>&lt;array&gt;_&lt;index&gt;</em>.
+      Note that index value is checked against the limit set in the data dictionary
+      entry for the array.
+    </div>
+    <div class="grid_8">
+      Integer array iarr:<p />
+      <form method="post" action="/var">
+        <table>
+          <tr>
+            <td><input id="iarr_0" name="iarr_0" size="4" /></td>
+            <td><input id="iarr_1" name="iarr_1" size="4" /></td>
+            <td><input id="iarr_2" name="iarr_2" size="4" /></td>
+            <td><input id="iarr_3" name="iarr_3" size="4" /></td>
+            <td><input id="iarr_4" name="iarr_4" size="4" value="Out of bounds" /></td>
+          </tr>
+          <tr>
+            <td colspan="4" style="text-align:center"><input type="submit" value="SUBMIT" /></td>
+          </tr>
+        </table>
+      </form>
+      <p />
+      String array sarr:</p>
+      <form method="post" action="/var">
+        <table>
+          <tr>
+            <td>sarr[0]:</td>
+            <td><input id="sarr_0" name="sarr_0" /></td>
+          </tr>
+          <tr>
+            <td>sarr[1]:</td>
+            <td><input id="sarr_1" name="sarr_1" /></td>
+          </tr>
+          <tr>
+            <td>sarr[2]:</td>
+            <td><input id="sarr_2" name="sarr_2" /></td>
+          </tr>
+          <tr>
+            <td>sarr[3]:</td>
+            <td><input id="sarr_3" name="sarr_3" /></td>
+          </tr>
+          <tr>
+            <td colspan="2" style="text-align:center"><input type="submit" value="SUBMIT" /></td>
+          </tr>
+        </table>
+      </form>
+    </div>
+    <div class="clear"></div>
+    <div class="grid_4">
+      The interface can be used not only for variables that need to be entered by
+      user, but also for stuff that has only to be displayed. Of particular use
+      in this case are arrays of pointers to strings.
+    </div>
+    <div class="grid_8 psarr">
+      Pointer to string array psarr:<p/>
+      <table>
+        <tr>
+          <td>psarr[0]:</td>
+          <td id="psarr_0"></td>
+        </tr>
+        <tr>
+          <td>psarr[1]:</td>
+          <td id="psarr_1"></td>
+        </tr>
+        <tr>
+          <td>psarr[2]:</td>
+          <td id="psarr_2"></td>
+        </tr>
+        <tr>
+          <td>psarr[3]:</td>
+          <td id="psarr_3"></td>
+        </tr>
+      </table>
+    </div>
+    <div class="clear"></div>
+  </div>
+</body>
+</html>

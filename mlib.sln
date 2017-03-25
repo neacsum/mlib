@@ -43,6 +43,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ui-sample", "samples\ui-sample\ui-sample.vcxproj", "{B12E80A7-75C8-4EE7-86C2-62252DC28C12}"
+	ProjectSection(ProjectDependencies) = postProject
+		{F9E11AA9-FAB8-40D8-96D9-F92C5725762B} = {F9E11AA9-FAB8-40D8-96D9-F92C5725762B}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
