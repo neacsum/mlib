@@ -3,16 +3,19 @@
 
 namespace UnitTest {
 
-TestResults*& CurrentTest::Results()
+struct_CurrentTest CurrentTest;
+
+#if 0
+TestResults*& CurrentTest::Results ()
 {
-	static TestResults* testResults = NULL;
-	return testResults;
+  static TestResults* testResults = NULL;
+  return testResults;
 }
 
-const TestDetails*& CurrentTest::Details()
+const TestDetails*& CurrentTest::Details ()
 {
-	static const TestDetails* testDetails = NULL;
-	return testDetails;
+  static const TestDetails* testDetails = NULL;
+  return testDetails;
 }
-
+#endif
 }

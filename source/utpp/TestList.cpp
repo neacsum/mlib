@@ -5,35 +5,35 @@
 
 namespace UnitTest {
 
-TestList::TestList() 
-    : m_head(0)
-    , m_tail(0)
+TestList::TestList ()
+  : head (0)
+  , tail (0)
 {
 }
 
-void TestList::Add(Test* test)
+void TestList::Add (Test* test)
 {
-    if (m_tail == 0)
-    {
-        assert(m_head == 0);
-        m_head = test;
-        m_tail = test;
-    }
-    else
-    {
-        m_tail->next = test;
-        m_tail = test;
-    }
+  if (tail == 0)
+  {
+    assert (head == 0);
+    head = test;
+    tail = test;
+  }
+  else
+  {
+    tail->next = test;
+    tail = test;
+  }
 }
 
-Test* TestList::GetHead() const
+Test* TestList::GetHead () const
 {
-    return m_head;
+  return head;
 }
 
-ListAdder::ListAdder(TestList& list, Test* test)
+ListAdder::ListAdder (TestList& list, Test* test)
 {
-    list.Add(test);
+  list.Add (test);
 }
 
 }

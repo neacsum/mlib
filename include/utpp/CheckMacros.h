@@ -35,10 +35,10 @@
     { \
         try { \
             if (!UnitTest::Check(value)) \
-                UnitTest::CurrentTest::Results()->OnTestFailure(UnitTest::TestDetails(*UnitTest::CurrentTest::Details(), __LINE__), #value); \
+                UnitTest::CurrentTest.Results->OnTestFailure(UnitTest::TestDetails(*UnitTest::CurrentTest.Details, __LINE__), #value); \
         } \
         catch (...) { \
-            UnitTest::CurrentTest::Results()->OnTestFailure(UnitTest::TestDetails(*UnitTest::CurrentTest::Details(), __LINE__), \
+            UnitTest::CurrentTest.Results->OnTestFailure(UnitTest::TestDetails(*UnitTest::CurrentTest.Details, __LINE__), \
                     "Unhandled exception in CHECK(" #value ")"); \
         } \
     } while (0)
@@ -47,10 +47,10 @@
     do \
     { \
         try { \
-            UnitTest::CheckEqual(*UnitTest::CurrentTest::Results(), expected, actual, UnitTest::TestDetails(*UnitTest::CurrentTest::Details(), __LINE__)); \
+            UnitTest::CheckEqual(*UnitTest::CurrentTest.Results, expected, actual, UnitTest::TestDetails(*UnitTest::CurrentTest.Details, __LINE__)); \
         } \
         catch (...) { \
-            UnitTest::CurrentTest::Results()->OnTestFailure(UnitTest::TestDetails(*UnitTest::CurrentTest::Details(), __LINE__), \
+            UnitTest::CurrentTest.Results->OnTestFailure(UnitTest::TestDetails(*UnitTest::CurrentTest.Details, __LINE__), \
                     "Unhandled exception in CHECK_EQUAL(" #expected ", " #actual ")"); \
         } \
     } while (0)
@@ -59,10 +59,10 @@
     do \
     { \
         try { \
-            UnitTest::CheckClose(*UnitTest::CurrentTest::Results(), expected, actual, tolerance, UnitTest::TestDetails(*UnitTest::CurrentTest::Details(), __LINE__)); \
+            UnitTest::CheckClose(*UnitTest::CurrentTest.Results, expected, actual, tolerance, UnitTest::TestDetails(*UnitTest::CurrentTest.Details, __LINE__)); \
         } \
         catch (...) { \
-            UnitTest::CurrentTest::Results()->OnTestFailure(UnitTest::TestDetails(*UnitTest::CurrentTest::Details(), __LINE__), \
+            UnitTest::CurrentTest.Results->OnTestFailure(UnitTest::TestDetails(*UnitTest::CurrentTest.Details, __LINE__), \
                     "Unhandled exception in CHECK_CLOSE(" #expected ", " #actual ")"); \
         } \
     } while (0)
@@ -71,10 +71,10 @@
     do \
     { \
         try { \
-            UnitTest::CheckArrayEqual(*UnitTest::CurrentTest::Results(), expected, actual, count, UnitTest::TestDetails(*UnitTest::CurrentTest::Details(), __LINE__)); \
+            UnitTest::CheckArrayEqual(*UnitTest::CurrentTest.Results, expected, actual, count, UnitTest::TestDetails(*UnitTest::CurrentTest.Details, __LINE__)); \
         } \
         catch (...) { \
-            UnitTest::CurrentTest::Results()->OnTestFailure(UnitTest::TestDetails(*UnitTest::CurrentTest::Details(), __LINE__), \
+            UnitTest::CurrentTest.Results->OnTestFailure(UnitTest::TestDetails(*UnitTest::CurrentTest.Details, __LINE__), \
                     "Unhandled exception in CHECK_ARRAY_EQUAL(" #expected ", " #actual ")"); \
         } \
     } while (0)
@@ -83,10 +83,10 @@
     do \
     { \
         try { \
-            UnitTest::CheckArrayClose(*UnitTest::CurrentTest::Results(), expected, actual, count, tolerance, UnitTest::TestDetails(*UnitTest::CurrentTest::Details(), __LINE__)); \
+            UnitTest::CheckArrayClose(*UnitTest::CurrentTest.Results, expected, actual, count, tolerance, UnitTest::TestDetails(*UnitTest::CurrentTest.Details, __LINE__)); \
         } \
         catch (...) { \
-            UnitTest::CurrentTest::Results()->OnTestFailure(UnitTest::TestDetails(*UnitTest::CurrentTest::Details(), __LINE__), \
+            UnitTest::CurrentTest.Results->OnTestFailure(UnitTest::TestDetails(*UnitTest::CurrentTest.Details, __LINE__), \
                     "Unhandled exception in CHECK_ARRAY_CLOSE(" #expected ", " #actual ")"); \
         } \
     } while (0)
@@ -95,10 +95,10 @@
     do \
     { \
         try { \
-            UnitTest::CheckArray2DClose(*UnitTest::CurrentTest::Results(), expected, actual, rows, columns, tolerance, UnitTest::TestDetails(*UnitTest::CurrentTest::Details(), __LINE__)); \
+            UnitTest::CheckArray2DClose(*UnitTest::CurrentTest.Results, expected, actual, rows, columns, tolerance, UnitTest::TestDetails(*UnitTest::CurrentTest.Details, __LINE__)); \
         } \
         catch (...) { \
-            UnitTest::CurrentTest::Results()->OnTestFailure(UnitTest::TestDetails(*UnitTest::CurrentTest::Details(), __LINE__), \
+            UnitTest::CurrentTest.Results->OnTestFailure(UnitTest::TestDetails(*UnitTest::CurrentTest.Details, __LINE__), \
                     "Unhandled exception in CHECK_ARRAY_CLOSE(" #expected ", " #actual ")"); \
         } \
     } while (0)
@@ -112,7 +112,7 @@
         catch (ExpectedExceptionType const&) { caught_ = true; } \
         catch (...) {} \
         if (!caught_) \
-            UnitTest::CurrentTest::Results()->OnTestFailure(UnitTest::TestDetails(*UnitTest::CurrentTest::Details(), __LINE__), "Expected exception: \"" #ExpectedExceptionType "\" not thrown"); \
+            UnitTest::CurrentTest.Results->OnTestFailure(UnitTest::TestDetails(*UnitTest::CurrentTest.Details, __LINE__), "Expected exception: \"" #ExpectedExceptionType "\" not thrown"); \
     } while(0)
 
 #define CHECK_THROW_EQUAL(expression, ExpectedExceptionType, expected) \
@@ -121,10 +121,10 @@
         bool caught_ = false; \
         try { expression; } \
         catch (ExpectedExceptionType const& actual) { caught_ = true;\
-                  UnitTest::CheckEqual(*UnitTest::CurrentTest::Results(), expected, actual, UnitTest::TestDetails(*UnitTest::CurrentTest::Details(), __LINE__)); } \
+                  UnitTest::CheckEqual(*UnitTest::CurrentTest.Results, expected, actual, UnitTest::TestDetails(*UnitTest::CurrentTest.Details, __LINE__)); } \
         catch (...) {} \
         if (!caught_) \
-            UnitTest::CurrentTest::Results()->OnTestFailure(UnitTest::TestDetails(*UnitTest::CurrentTest::Details(), __LINE__), "Expected exception: \"" #ExpectedExceptionType "\" not thrown"); \
+            UnitTest::CurrentTest.Results->OnTestFailure(UnitTest::TestDetails(*UnitTest::CurrentTest.Details, __LINE__), "Expected exception: \"" #ExpectedExceptionType "\" not thrown"); \
     } while(0)
 
 #define CHECK_ASSERT(expression) \

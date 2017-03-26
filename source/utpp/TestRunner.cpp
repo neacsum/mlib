@@ -10,67 +10,85 @@
 
 namespace UnitTest {
 
-int RunAllTests()
+TestReporterStdout stdout_reporter;
+
+int RunAllTests (TestReporter& reporter)
 {
-	TestReporterStdout reporter;
-	TestRunner runner(reporter);
-	return runner.RunTestsIf(Test::GetTestList(), NULL, True(), 0);
+  TestRunner runner (reporter);
+  return runner.RunTests (Test::GetTestList (), NULL, 0);
 }
 
 
-TestRunner::TestRunner(TestReporter& reporter)
-	: m_reporter(&reporter)
-	, m_result(new TestResults(&reporter))
-	, m_timer(new Timer)
+TestRunner::TestRunner (TestReporter& reporter_)
+  : reporter (&reporter_)
+  , result (new TestResults (&reporter_))
+  , timer (new Timer)
 {
-	m_timer->Start();
+  timer->Start ();
 }
 
-TestRunner::~TestRunner()
+TestRunner::~TestRunner ()
 {
-	delete m_result;
-	delete m_timer;
+  delete result;
+  delete timer;
 }
 
-int TestRunner::Finish() const
+int TestRunner::RunTests (TestList const& list, char const* suiteName, int maxTestTimeInMs) const
 {
-    float const secondsElapsed = m_timer->GetTimeInMs() / 1000.0f;
-    m_reporter->ReportSummary(m_result->GetTotalTestCount(), 
-							  m_result->GetFailedTestCount(), 
-							  m_result->GetFailureCount(), 
-							  secondsElapsed);
-    
-	return m_result->GetFailureCount();
+  Test* curTest = list.GetHead ();
+
+  while (curTest != 0)
+  {
+    if (IsTestInSuite (curTest, suiteName))
+    {
+      RunTest (curTest, maxTestTimeInMs);
+    }
+
+    curTest = curTest->next;
+  }
+
+  return Finish ();
 }
 
-bool TestRunner::IsTestInSuite(const Test* const curTest, char const* suiteName) const
+int TestRunner::Finish () const
 {
-	using namespace std;
-	return (suiteName == NULL) || !strcmp(curTest->m_details.suiteName, suiteName);
+  float const secondsElapsed = timer->GetTimeInMs () / 1000.0f;
+  reporter->ReportSummary (result->GetTotalTestCount (),
+                             result->GetFailedTestCount (),
+                             result->GetFailureCount (),
+                             secondsElapsed);
+
+  return result->GetFailureCount ();
 }
 
-void TestRunner::RunTest(TestResults* const result, Test* const curTest, int const maxTestTimeInMs) const
+bool TestRunner::IsTestInSuite (const Test* const curTest, char const* suiteName) const
 {
-	CurrentTest::Results() = result;
+  using namespace std;
+  return (suiteName == NULL) || !strcmp (curTest->m_details.suiteName, suiteName);
+}
 
-	Timer testTimer;
-	testTimer.Start();
+void TestRunner::RunTest (Test* const curTest, int const maxTestTimeInMs) const
+{
+  CurrentTest.Results = result;
 
-	result->OnTestStart(curTest->m_details);
+  Timer testTimer;
+  testTimer.Start ();
 
-	curTest->Run();
+  result->OnTestStart (curTest->m_details);
 
-	int const testTimeInMs = testTimer.GetTimeInMs();
-	if (maxTestTimeInMs > 0 && testTimeInMs > maxTestTimeInMs && !curTest->m_timeConstraintExempt)
-	{
-	    MemoryOutStream stream;
-	    stream << "Global time constraint failed. Expected under " << maxTestTimeInMs <<
-	            "ms but took " << testTimeInMs << "ms.";
+  curTest->Run ();
 
-	    result->OnTestFailure(curTest->m_details, stream.GetText());
-	}
+  int const testTimeInMs = testTimer.GetTimeInMs ();
+  if (maxTestTimeInMs > 0 && testTimeInMs > maxTestTimeInMs && !curTest->m_timeConstraintExempt)
+  {
+    MemoryOutStream stream;
+    stream << "Global time constraint failed. Expected under " << maxTestTimeInMs <<
+      "ms but took " << testTimeInMs << "ms.";
 
-	result->OnTestFinish(curTest->m_details, testTimeInMs/1000.0f);
+    result->OnTestFailure (curTest->m_details, stream.GetText ());
+  }
+
+  result->OnTestFinish (curTest->m_details, testTimeInMs / 1000.0f);
 }
 
 }

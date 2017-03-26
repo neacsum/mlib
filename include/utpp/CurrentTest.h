@@ -1,14 +1,15 @@
 #pragma once
+#include "TestDetails.h"
+#include "TestResults.h"
 
 namespace UnitTest {
 
-class TestResults;
-class TestDetails;
 
-namespace CurrentTest
+struct struct_CurrentTest
 {
-	TestResults*& Results();
-	const TestDetails*& Details();
-}
+  TestResults* Results;
+  TestDetails* Details;
+};
 
+extern struct_CurrentTest CurrentTest;
 }

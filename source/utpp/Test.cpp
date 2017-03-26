@@ -9,29 +9,29 @@
 
 namespace UnitTest {
 
-TestList& Test::GetTestList()
+TestList& Test::GetTestList ()
 {
-    static TestList s_list;
-    return s_list;
+  static TestList s_list;
+  return s_list;
 }
 
-Test::Test(char const* testName, char const* suiteName, char const* filename, int lineNumber)
-    : m_details(testName, suiteName, filename, lineNumber)
-    , next(0)
-    , m_timeConstraintExempt(false)
-{
-}
-
-Test::~Test()
+Test::Test (char const* testName, char const* suiteName, char const* filename, int lineNumber)
+  : m_details (testName, suiteName, filename, lineNumber)
+  , next (0)
+  , m_timeConstraintExempt (false)
 {
 }
 
-void Test::Run()
+Test::~Test ()
 {
-	ExecuteTest(*this, m_details);
 }
 
-void Test::RunImpl() const
+void Test::Run ()
+{
+  ExecuteTest (*this, m_details);
+}
+
+void Test::RunImpl ()
 {
 }
 

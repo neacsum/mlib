@@ -3,37 +3,34 @@
 
 #include "ScopedCurrentTest.h"
 
-namespace 
+using namespace UnitTest;
+
+TEST (CanSetandGetDetails)
 {
+  bool ok = false;
+  {
+    ScopedCurrentTest scopedTest;
 
-TEST(CanSetandGetDetails)
-{
-	bool ok = false;
-	{
-		ScopedCurrentTest scopedTest;
+    TestDetails* details = reinterpret_cast<TestDetails*>(12345);
+    CurrentTest.Details = details;
 
-		const UnitTest::TestDetails* details = reinterpret_cast< const UnitTest::TestDetails* >(12345);
-		UnitTest::CurrentTest::Details() = details;
+    ok = (CurrentTest.Details == details);
+  }
 
-		ok = (UnitTest::CurrentTest::Details() == details);
-	}
-
-	CHECK(ok);
+  CHECK (ok);
 }
 
-TEST(CanSetAndGetResults)
+TEST (CanSetAndGetResults)
 {
-	bool ok = false;
-	{
-		ScopedCurrentTest scopedTest;
+  bool ok = false;
+  {
+    ScopedCurrentTest scopedTest;
 
-		UnitTest::TestResults results;
-		UnitTest::CurrentTest::Results() = &results;
+    TestResults results;
+    CurrentTest.Results = &results;
 
-		ok = (UnitTest::CurrentTest::Results() == &results);
-	}
+    ok = (CurrentTest.Results == &results);
+  }
 
-	CHECK(ok);
-}
-
+  CHECK (ok);
 }

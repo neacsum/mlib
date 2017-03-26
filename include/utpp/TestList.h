@@ -13,8 +13,8 @@ public:
     Test* GetHead() const;
 
 private:
-    Test* m_head;
-    Test* m_tail;
+    Test* head;
+    Test* tail;
 };
 
 

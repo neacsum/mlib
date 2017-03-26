@@ -7,10 +7,6 @@
   #pragma warning(disable:4702) // unreachable code
   #pragma warning(disable:4722) // destructor never returns, potential memory leak
 
-	#if (_MSC_VER == 1200)  // VC6
-		#pragma warning(disable:4786)
-		#pragma warning(disable:4290)
-	#endif
 #endif
 
 

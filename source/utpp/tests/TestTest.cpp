@@ -6,125 +6,122 @@
 
 using namespace UnitTest;
 
-namespace {
-
-TEST(PassingTestHasNoFailures)
+TEST (PassingTestHasNoFailures)
 {
-    class PassingTest : public Test
+  class PassingTest : public Test
+  {
+  public:
+    PassingTest () : Test ("passing") {}
+    virtual void RunImpl () const
     {
-    public:
-        PassingTest() : Test("passing") {}
-        virtual void RunImpl() const
-        {
-            CHECK(true);
-        }
-    };
+      CHECK (true);
+    }
+  };
 
-    TestResults results;
-	{
-		ScopedCurrentTest scopedResults(results);
-		PassingTest().Run();
-	}
+  TestResults results;
+  {
+    ScopedCurrentTest scopedResults (results);
+    PassingTest ().Run ();
+  }
 
-    CHECK_EQUAL(0, results.GetFailureCount());
+  CHECK_EQUAL (0, results.GetFailureCount ());
 }
 
 
-TEST(FailingTestHasFailures)
+TEST (FailingTestHasFailures)
 {
-    class FailingTest : public Test
+  class FailingTest : public Test
+  {
+  public:
+    FailingTest () : Test ("failing") {}
+    void RunImpl ()
     {
-    public:
-        FailingTest() : Test("failing") {}
-        virtual void RunImpl() const
-        {
-            CHECK(false);
-        }
-    };
+      CHECK (false);
+    }
+  };
 
-    TestResults results;
-	{
-		ScopedCurrentTest scopedResults(results);
-		FailingTest().Run();
-	}
+  TestResults results;
+  {
+    ScopedCurrentTest scopedResults (results);
+    FailingTest ().Run ();
+  }
 
-    CHECK_EQUAL(1, results.GetFailureCount());
+  CHECK_EQUAL (1, results.GetFailureCount ());
 }
 
 
-TEST(ThrowingTestsAreReportedAsFailures)
+TEST (ThrowingTestsAreReportedAsFailures)
 {
-    class CrashingTest : public Test
+  class CrashingTest : public Test
+  {
+  public:
+    CrashingTest () : Test ("throwing") {}
+    void RunImpl ()
     {
-    public:
-        CrashingTest() : Test("throwing") {}
-        virtual void RunImpl() const
-        {
-            throw "Blah";
-        }
-    };
- 
-    TestResults results;
-	{
-		ScopedCurrentTest scopedResult(results);
-		CrashingTest().Run();
-	}
+      throw "Blah";
+    }
+  };
 
-	CHECK_EQUAL(1, results.GetFailureCount());
+  TestResults results;
+  {
+    ScopedCurrentTest scopedResult (results);
+    CrashingTest ().Run ();
+  }
+
+  CHECK_EQUAL (1, results.GetFailureCount ());
 }
 
 
 #if _MSC_VER < 1800
 TEST(CrashingTestsAreReportedAsFailures)
 {
-    class CrashingTest : public Test
+  class CrashingTest : public Test
+  {
+  public:
+    CrashingTest() : Test("crashing") {}
+    virtual void RunImpl() const
     {
-    public:
-        CrashingTest() : Test("crashing") {}
-        virtual void RunImpl() const
-        {
-            reinterpret_cast< void (*)() >(0)();
-        }
-    };
+      reinterpret_cast< void (*)() >(0)();
+    }
+  };
 
-    TestResults results;
-	{
-		ScopedCurrentTest scopedResult(results);
-		CrashingTest().Run();
-	}
+  TestResults results;
+  {
+    ScopedCurrentTest scopedResult(results);
+    CrashingTest().Run();
+  }
 
-	CHECK_EQUAL(1, results.GetFailureCount());
+  CHECK_EQUAL(1, results.GetFailureCount());
 }
 #endif
 
-TEST(TestWithUnspecifiedSuiteGetsDefaultSuite)
+TEST (TestWithUnspecifiedSuiteGetsDefaultSuite)
 {
-    Test test("test");
-    CHECK(test.m_details.suiteName != NULL);
-    CHECK_EQUAL("DefaultSuite", test.m_details.suiteName);
+  Test test ("test");
+  CHECK (test.m_details.suiteName != NULL);
+  CHECK_EQUAL ("DefaultSuite", test.m_details.suiteName);
 }
 
-TEST(TestReflectsSpecifiedSuiteName)
+TEST (TestReflectsSpecifiedSuiteName)
 {
-    Test test("test", "testSuite");
-    CHECK(test.m_details.suiteName != NULL);
-    CHECK_EQUAL("testSuite", test.m_details.suiteName);
+  Test test ("test", "testSuite");
+  CHECK (test.m_details.suiteName != NULL);
+  CHECK_EQUAL ("testSuite", test.m_details.suiteName);
 }
 
-void Fail()
+void Fail ()
 {
-	CHECK(false);
+  CHECK (false);
 }
 
-TEST(OutOfCoreCHECKMacrosCanFailTests)
+TEST (OutOfCoreCHECKMacrosCanFailTests)
 {
-	TestResults results;
-	{
-		ScopedCurrentTest scopedResult(results);
-		Fail();
-	}
+  TestResults results;
+  {
+    ScopedCurrentTest scopedResult (results);
+    Fail ();
+  }
 
-	CHECK_EQUAL(1, results.GetFailureCount());
+  CHECK_EQUAL (1, results.GetFailureCount ());
 }
 
-}

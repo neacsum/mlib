@@ -71,6 +71,7 @@
     <LinkIncremental>true</LinkIncremental>
     <IntDir>o\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
     <OutDir>tests\$(Platform)\$(Configuration)\</OutDir>
+    <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>

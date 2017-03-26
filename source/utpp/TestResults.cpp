@@ -5,56 +5,44 @@
 
 namespace UnitTest {
 
-TestResults::TestResults(TestReporter* testReporter)
-    : m_testReporter(testReporter)
-    , m_totalTestCount(0)
-    , m_failedTestCount(0)
-    , m_failureCount(0)
-    , m_currentTestFailed(false)
+TestResults::TestResults (TestReporter* testReporter)
+  : testReporter (testReporter)
+  , totalTestCount (0)
+  , failedTestCount (0)
+  , failureCount (0)
+  , currentTestFailed (false)
 {
 }
 
-void TestResults::OnTestStart(TestDetails const& test)
+void TestResults::OnTestStart (TestDetails const& test)
 {
-    ++m_totalTestCount;
-    m_currentTestFailed = false;
-    if (m_testReporter)
-        m_testReporter->ReportTestStart(test);
+  ++totalTestCount;
+  currentTestFailed = false;
+  if (testReporter)
+    testReporter->ReportTestStart (test);
 }
 
-void TestResults::OnTestFailure(TestDetails const& test, char const* failure)
+void TestResults::OnTestFailure (TestDetails const& test, char const* failure)
 {
-    ++m_failureCount;
-    if (!m_currentTestFailed)
-    {
-        ++m_failedTestCount;
-        m_currentTestFailed = true;
-    }
+  ++failureCount;
+  if (!currentTestFailed)
+  {
+    ++failedTestCount;
+    currentTestFailed = true;
+  }
 
-    if (m_testReporter)
-        m_testReporter->ReportFailure(test, failure);
+  if (testReporter)
+    testReporter->ReportFailure (test, failure);
 }
 
-void TestResults::OnTestFinish(TestDetails const& test, float secondsElapsed)
+void TestResults::OnTestFinish (TestDetails const& test, float secondsElapsed)
 {
-    if (m_testReporter)
-        m_testReporter->ReportTestFinish(test, secondsElapsed);
+  if (testReporter)
+    testReporter->ReportTestFinish (test, secondsElapsed);
 }
 
-int TestResults::GetTotalTestCount() const
-{
-    return m_totalTestCount;
-}
 
-int TestResults::GetFailedTestCount() const
-{
-    return m_failedTestCount;
-}
 
-int TestResults::GetFailureCount() const
-{
-    return m_failureCount;
-}
 
 
 }

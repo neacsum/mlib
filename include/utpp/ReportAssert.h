@@ -2,6 +2,6 @@
 
 namespace UnitTest {
 
-void ReportAssert(char const* description, char const* filename, int lineNumber);
+void ReportAssert (char const* description, char const* filename, int lineNumber);
     
 }

@@ -3,32 +3,30 @@
 
 namespace UnitTest {
 
-AssertException::AssertException(char const* description, char const* filename, int lineNumber)
-    : m_lineNumber(lineNumber)
+AssertException::AssertException (char const* description_, char const* filename_, int lineNumber_)
+  : lineNumber (lineNumber_)
 {
-	using namespace std;
-
-    strcpy(m_description, description);
-    strcpy(m_filename, filename);
+  strcpy (description, description_);
+  strcpy (filename, filename_);
 }
 
-AssertException::~AssertException() throw()
+AssertException::~AssertException ()
 {
 }
 
-char const* AssertException::what() const throw()
+char const* AssertException::what () const
 {
-    return m_description;
+  return description;
 }
 
-char const* AssertException::Filename() const
+char const* AssertException::Filename () const
 {
-    return m_filename;
+  return filename;
 }
 
-int AssertException::LineNumber() const
+int AssertException::LineNumber () const
 {
-    return m_lineNumber;
+  return lineNumber;
 }
 
 }
