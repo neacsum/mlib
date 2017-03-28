@@ -10,6 +10,7 @@ TestDetails::TestDetails (char const* testName_, char const* suiteName_, char co
 {
 }
 
+/*
 TestDetails::TestDetails (const TestDetails& details, int lineNumber_)
   : suiteName (details.suiteName)
   , testName (details.testName)
@@ -17,6 +18,6 @@ TestDetails::TestDetails (const TestDetails& details, int lineNumber_)
   , lineNumber (lineNumber_)
 {
 }
-
+*/
 
 }

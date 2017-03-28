@@ -4,15 +4,18 @@
 
 namespace UnitTest {
 
+/*!
+  Exception thrown by ReportAssert function.
+*/
 class AssertException : public std::exception
 {
 public:
-  AssertException (char const* description, char const* filename, int lineNumber);
+  AssertException (const char* description, const char* filename, int lineNumber);
   virtual ~AssertException ();
 
-  virtual char const* what () const;
+  const char* what () const;
 
-  char const* Filename () const;
+  const char* Filename () const;
   int LineNumber () const;
 
 private:

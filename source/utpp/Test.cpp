@@ -3,9 +3,8 @@
 #include <utpp/TestList.h>
 #include <utpp/TestResults.h>
 #include <utpp/AssertException.h>
-#include <utpp/MemoryOutStream.h>
-#include <utpp/ExecuteTest.h>
-
+#include <utpp/CurrentTest.h>
+#include <sstream>
 
 namespace UnitTest {
 
@@ -28,11 +27,35 @@ Test::~Test ()
 
 void Test::Run ()
 {
-  ExecuteTest (*this, m_details);
+//  ExecuteTest (*this, m_details);
+  CurrentTest.Details = &m_details;
+
+  try
+  {
+    RunImpl ();
+  }
+  catch (const AssertException& e)
+  {
+    m_details.filename = e.Filename ();
+    m_details.lineNumber = e.LineNumber ();
+    CurrentTest.Results->OnTestFailure (m_details, e.what ());
+  }
+  catch (const std::exception& e)
+  {
+    std::stringstream stream;
+    stream << "Unhandled exception: " << e.what ();
+    CurrentTest.Results->OnTestFailure (m_details, stream.str ());
+  }
+  catch (...)
+  {
+    CurrentTest.Results->OnTestFailure (m_details, "Unhandled exception: Crash!");
+  }
+
 }
 
+/*
 void Test::RunImpl ()
 {
 }
-
+*/
 }

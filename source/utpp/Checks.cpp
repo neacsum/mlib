@@ -1,5 +1,4 @@
 #include <utpp/Checks.h>
-#include <cstring>
 
 namespace UnitTest {
 
@@ -10,10 +9,10 @@ static void CheckStringsEqual (TestResults& results, char const* expected, char 
 
   if (strcmp (expected, actual))
   {
-    UnitTest::MemoryOutStream stream;
+    std::stringstream stream;
     stream << "Expected " << expected << " but was " << actual;
 
-    results.OnTestFailure (details, stream.GetText ());
+    results.OnTestFailure (details, stream.str ());
   }
 }
 

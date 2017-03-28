@@ -36,7 +36,7 @@ TEST_FIXTURE_EX (ThrowingThingie, DummyTestName, list2)
 TEST (ExceptionsInFixtureAreReportedAsHappeningInTheFixture)
 {
   RecordingReporter reporter;
-  TestResults result (&reporter);
+  TestResults result (reporter);
   {
     ScopedCurrentTest scopedResults (result);
     list2.GetHead ()->Run ();
@@ -113,7 +113,7 @@ TEST (FixturesWithThrowingCtorsAreFailures)
 {
   CHECK (throwingFixtureTestList1.GetHead () != NULL);
   RecordingReporter reporter;
-  TestResults result (&reporter);
+  TestResults result (reporter);
   {
     ScopedCurrentTest scopedResult (result);
     throwingFixtureTestList1.GetHead ()->Run ();
@@ -139,7 +139,7 @@ TEST (FixturesWithThrowingDtorsAreFailures)
   CHECK (throwingFixtureTestList2.GetHead () != NULL);
 
   RecordingReporter reporter;
-  TestResults result (&reporter);
+  TestResults result (reporter);
   {
     ScopedCurrentTest scopedResult (result);
     throwingFixtureTestList2.GetHead ()->Run ();
@@ -168,7 +168,7 @@ TEST_FIXTURE_EX (FixtureCtorAsserts, CorrectlyReportsAssertFailureInCtor, ctorAs
 TEST (CorrectlyReportsFixturesWithCtorsThatAssert)
 {
   RecordingReporter reporter;
-  TestResults result (&reporter);
+  TestResults result (reporter);
   {
     ScopedCurrentTest scopedResults (result);
     ctorAssertFixtureTestList.GetHead ()->Run ();

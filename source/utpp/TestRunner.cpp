@@ -3,14 +3,10 @@
 #include <utpp/TestReporter.h>
 #include <utpp/TestReporterStdout.h>
 #include <utpp/TimeHelpers.h>
-#include <utpp/MemoryOutStream.h>
 
-#include <cstring>
-
+#include <sstream>
 
 namespace UnitTest {
-
-TestReporterStdout stdout_reporter;
 
 int RunAllTests (TestReporter& reporter)
 {
@@ -20,20 +16,13 @@ int RunAllTests (TestReporter& reporter)
 
 
 TestRunner::TestRunner (TestReporter& reporter_)
-  : reporter (&reporter_)
-  , result (new TestResults (&reporter_))
-  , timer (new Timer)
+  : reporter (reporter_)
+  , result (reporter)
 {
-  timer->Start ();
+  timer.Start ();
 }
 
-TestRunner::~TestRunner ()
-{
-  delete result;
-  delete timer;
-}
-
-int TestRunner::RunTests (TestList const& list, char const* suiteName, int maxTestTimeInMs) const
+int TestRunner::RunTests (TestList const& list, char const* suiteName, int maxTestTimeInMs)
 {
   Test* curTest = list.GetHead ();
 
@@ -52,43 +41,43 @@ int TestRunner::RunTests (TestList const& list, char const* suiteName, int maxTe
 
 int TestRunner::Finish () const
 {
-  float const secondsElapsed = timer->GetTimeInMs () / 1000.0f;
-  reporter->ReportSummary (result->GetTotalTestCount (),
-                             result->GetFailedTestCount (),
-                             result->GetFailureCount (),
+  float const secondsElapsed = timer.GetTimeInMs () / 1000.0f;
+  reporter.ReportSummary (result.GetTotalTestCount (),
+                             result.GetFailedTestCount (),
+                             result.GetFailureCount (),
                              secondsElapsed);
 
-  return result->GetFailureCount ();
+  return result.GetFailureCount ();
 }
 
-bool TestRunner::IsTestInSuite (const Test* const curTest, char const* suiteName) const
+bool TestRunner::IsTestInSuite (const Test* const curTest, const char* suiteName) const
 {
   using namespace std;
-  return (suiteName == NULL) || !strcmp (curTest->m_details.suiteName, suiteName);
+  return (suiteName == NULL) || curTest->m_details.suiteName != suiteName;
 }
 
-void TestRunner::RunTest (Test* const curTest, int const maxTestTimeInMs) const
+void TestRunner::RunTest (Test* const curTest, int const maxTestTimeInMs)
 {
-  CurrentTest.Results = result;
-
+  CurrentTest.Results = &result;
+  CurrentTest.Details = &curTest->m_details;
   Timer testTimer;
   testTimer.Start ();
 
-  result->OnTestStart (curTest->m_details);
+  result.OnTestStart (curTest->m_details);
 
   curTest->Run ();
 
   int const testTimeInMs = testTimer.GetTimeInMs ();
   if (maxTestTimeInMs > 0 && testTimeInMs > maxTestTimeInMs && !curTest->m_timeConstraintExempt)
   {
-    MemoryOutStream stream;
+    std::stringstream stream;
     stream << "Global time constraint failed. Expected under " << maxTestTimeInMs <<
       "ms but took " << testTimeInMs << "ms.";
 
-    result->OnTestFailure (curTest->m_details, stream.GetText ());
+    result.OnTestFailure (curTest->m_details, stream.str ());
   }
 
-  result->OnTestFinish (curTest->m_details, testTimeInMs / 1000.0f);
+  result.OnTestFinish (curTest->m_details, testTimeInMs / 1000.0f);
 }
 
 }

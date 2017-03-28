@@ -5,17 +5,18 @@
 using namespace UnitTest;
 
 TestDetails const details ("testname", "suitename", "filename", 123);
+extern TestReporter null_reporter;
 
 
 TEST (StartsWithNoTestsRun)
 {
-  TestResults results;
+  TestResults results (null_reporter);
   CHECK_EQUAL (0, results.GetTotalTestCount ());
 }
 
 TEST (RecordsNumbersOfTests)
 {
-  TestResults results;
+  TestResults results (null_reporter);
   results.OnTestStart (details);
   results.OnTestStart (details);
   results.OnTestStart (details);
@@ -24,13 +25,13 @@ TEST (RecordsNumbersOfTests)
 
 TEST (StartsWithNoTestsFailing)
 {
-  TestResults results;
+  TestResults results (null_reporter);
   CHECK_EQUAL (0, results.GetFailureCount ());
 }
 
 TEST (RecordsNumberOfFailures)
 {
-  TestResults results;
+  TestResults results (null_reporter);
   results.OnTestFailure (details, "");
   results.OnTestFailure (details, "");
   CHECK_EQUAL (2, results.GetFailureCount ());
@@ -38,7 +39,7 @@ TEST (RecordsNumberOfFailures)
 
 TEST (RecordsNumberOfFailedTests)
 {
-  TestResults results;
+  TestResults results (null_reporter);
 
   results.OnTestStart (details);
   results.OnTestFailure (details, "");
@@ -56,7 +57,7 @@ TEST (RecordsNumberOfFailedTests)
 TEST (NotifiesReporterOfTestStartWithCorrectInfo)
 {
   RecordingReporter reporter;
-  TestResults results (&reporter);
+  TestResults results (reporter);
   results.OnTestStart (details);
 
   CHECK_EQUAL (1, reporter.testRunCount);
@@ -67,7 +68,7 @@ TEST (NotifiesReporterOfTestStartWithCorrectInfo)
 TEST (NotifiesReporterOfTestFailureWithCorrectInfo)
 {
   RecordingReporter reporter;
-  TestResults results (&reporter);
+  TestResults results (reporter);
 
   results.OnTestFailure (details, "failurestring");
   CHECK_EQUAL (1, reporter.testFailedCount);
@@ -81,7 +82,7 @@ TEST (NotifiesReporterOfTestFailureWithCorrectInfo)
 TEST (NotifiesReporterOfCheckFailureWithCorrectInfo)
 {
   RecordingReporter reporter;
-  TestResults results (&reporter);
+  TestResults results (reporter);
 
   results.OnTestFailure (details, "failurestring");
   CHECK_EQUAL (1, reporter.testFailedCount);
@@ -96,7 +97,7 @@ TEST (NotifiesReporterOfCheckFailureWithCorrectInfo)
 TEST (NotifiesReporterOfTestEnd)
 {
   RecordingReporter reporter;
-  TestResults results (&reporter);
+  TestResults results (reporter);
 
   results.OnTestFinish (details, 0.1234f);
   CHECK_EQUAL (1, reporter.testFinishedCount);

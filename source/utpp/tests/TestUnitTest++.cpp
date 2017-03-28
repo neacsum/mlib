@@ -8,6 +8,7 @@
 // These are sample tests that show the different features of the framework
 
 using namespace UnitTest;
+extern TestReporter null_reporter;
 
 TEST (ValidCheckSucceeds)
 {
@@ -84,7 +85,7 @@ TEST (CheckThrowMacroFailsOnMissingException)
     }
   };
 
-  UnitTest::TestResults results;
+  UnitTest::TestResults results (null_reporter);
   {
     ScopedCurrentTest scopedResults (results);
 
@@ -107,7 +108,7 @@ TEST (CheckThrowMacroFailsOnWrongException)
     }
   };
 
-  UnitTest::TestResults results;
+  UnitTest::TestResults results (null_reporter);
   {
     ScopedCurrentTest scopedResults (results);
 

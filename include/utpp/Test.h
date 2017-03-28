@@ -12,7 +12,7 @@ class TestList;
 class Test
 {
 public:
-  Test (char const* testName, char const* suiteName = DEFAULT_SUITE, char const* filename = "", int lineNumber = 0);
+  Test (const char* testName, const char* suiteName = DEFAULT_SUITE, const char* filename = "", int lineNumber = 0);
   virtual ~Test ();
   void Run ();
 
@@ -22,7 +22,7 @@ public:
 
   static TestList& GetTestList ();
 
-  virtual void RunImpl ();
+  virtual void RunImpl () = 0;
 
 private:
   Test (Test const&);

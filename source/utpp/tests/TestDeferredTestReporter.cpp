@@ -5,14 +5,6 @@
 
 using namespace UnitTest;
 
-#ifdef UNITTEST_USE_CUSTOM_STREAMS
-MemoryOutStream& operator <<(MemoryOutStream& lhs, const std::string& rhs)
-{
-  lhs << rhs.c_str();
-  return lhs;
-}
-#endif
-
 struct MockDeferredTestReporter : public DeferredTestReporter
 {
   virtual void ReportSummary (int, int, int, float)

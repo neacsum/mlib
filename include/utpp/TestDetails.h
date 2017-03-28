@@ -1,21 +1,18 @@
 #pragma once
+#include <string>
 
 namespace UnitTest {
 
 class TestDetails
 {
 public:
-  TestDetails (char const* testName, char const* suiteName, char const* filename, int lineNumber);
-  TestDetails (const TestDetails& details, int lineNumber);
+  TestDetails (const char* testName, const char* suiteName, const char* filename, int lineNumber);
+//  TestDetails (const TestDetails& details, int lineNumber);
 
-  char const* const suiteName;
-  char const* const testName;
-  char const* const filename;
-  int const lineNumber;
-
-private:
-  TestDetails (TestDetails const&);
-  TestDetails& operator=(TestDetails const&);
+  std::string suiteName;
+  std::string testName;
+  std::string filename;
+  int lineNumber;
 };
 
 }

@@ -5,6 +5,12 @@ namespace UnitTest {
 
 struct_CurrentTest CurrentTest;
 
+void struct_CurrentTest::OnTestFailure (int where, const std::string& what)
+{
+  Details->lineNumber = where;
+  Results->OnTestFailure (*Details, what);
+}
+
 #if 0
 TestResults*& CurrentTest::Results ()
 {

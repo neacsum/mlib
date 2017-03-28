@@ -5,8 +5,8 @@
 
 namespace UnitTest {
 
-TestResults::TestResults (TestReporter* testReporter)
-  : testReporter (testReporter)
+TestResults::TestResults (TestReporter& testReporter_)
+  : testReporter (testReporter_)
   , totalTestCount (0)
   , failedTestCount (0)
   , failureCount (0)
@@ -18,11 +18,10 @@ void TestResults::OnTestStart (TestDetails const& test)
 {
   ++totalTestCount;
   currentTestFailed = false;
-  if (testReporter)
-    testReporter->ReportTestStart (test);
+  testReporter.ReportTestStart (test);
 }
 
-void TestResults::OnTestFailure (TestDetails const& test, char const* failure)
+void TestResults::OnTestFailure (TestDetails const& test, const std::string& failure)
 {
   ++failureCount;
   if (!currentTestFailed)
@@ -31,14 +30,12 @@ void TestResults::OnTestFailure (TestDetails const& test, char const* failure)
     currentTestFailed = true;
   }
 
-  if (testReporter)
-    testReporter->ReportFailure (test, failure);
+  testReporter.ReportFailure (test, failure);
 }
 
 void TestResults::OnTestFinish (TestDetails const& test, float secondsElapsed)
 {
-  if (testReporter)
-    testReporter->ReportTestFinish (test, secondsElapsed);
+  testReporter.ReportTestFinish (test, secondsElapsed);
 }
 
 

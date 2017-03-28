@@ -3,16 +3,15 @@
 
 namespace UnitTest {
 
+__int64 Timer::frequency = 0;
+
 Timer::Timer ()
   : startTime (0)
-  , m_threadHandle (::GetCurrentThread ())
 {
-  DWORD_PTR systemMask;
-  ::GetProcessAffinityMask (GetCurrentProcess (), &processAffinityMask, &systemMask);
-
-  ::SetThreadAffinityMask (m_threadHandle, 1);
-  ::QueryPerformanceFrequency (reinterpret_cast<LARGE_INTEGER*>(&frequency));
-  ::SetThreadAffinityMask (m_threadHandle, processAffinityMask);
+  if (!frequency)
+  {
+    ::QueryPerformanceFrequency (reinterpret_cast<LARGE_INTEGER*>(&frequency));
+  }
 }
 
 void Timer::Start ()
@@ -22,17 +21,15 @@ void Timer::Start ()
 
 int Timer::GetTimeInMs () const
 {
-  __int64 const elapsedTime = GetTime () - startTime;
-  double const seconds = double (elapsedTime) / double (frequency);
+  __int64 elapsedTime = GetTime () - startTime;
+  double seconds = double (elapsedTime) / double (frequency);
   return int (seconds * 1000.0f);
 }
 
 __int64 Timer::GetTime () const
 {
   LARGE_INTEGER curTime;
-  ::SetThreadAffinityMask (m_threadHandle, 1);
   ::QueryPerformanceCounter (&curTime);
-  ::SetThreadAffinityMask (m_threadHandle, processAffinityMask);
   return curTime.QuadPart;
 }
 

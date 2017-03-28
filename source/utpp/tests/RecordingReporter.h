@@ -33,34 +33,34 @@ public:
     lastFinishedTest[0] = '\0';
   }
 
-  virtual void ReportTestStart (UnitTest::TestDetails const& test)
+  virtual void ReportTestStart (const UnitTest::TestDetails& test)
   {
     using namespace std;
 
     ++testRunCount;
-    strcpy (lastStartedSuite, test.suiteName);
-    strcpy (lastStartedTest, test.testName);
+    strcpy (lastStartedSuite, test.suiteName.c_str ());
+    strcpy (lastStartedTest, test.testName.c_str ());
   }
 
-  virtual void ReportFailure (UnitTest::TestDetails const& test, char const* failure)
+  virtual void ReportFailure (const UnitTest::TestDetails& test, const std::string& failure)
   {
     using namespace std;
 
     ++testFailedCount;
-    strcpy (lastFailedFile, test.filename);
+    strcpy (lastFailedFile, test.filename.c_str ());
     lastFailedLine = test.lineNumber;
-    strcpy (lastFailedSuite, test.suiteName);
-    strcpy (lastFailedTest, test.testName);
-    strcpy (lastFailedMessage, failure);
+    strcpy (lastFailedSuite, test.suiteName.c_str ());
+    strcpy (lastFailedTest, test.testName.c_str ());
+    strcpy (lastFailedMessage, failure.c_str());
   }
 
-  virtual void ReportTestFinish (UnitTest::TestDetails const& test, float testDuration)
+  virtual void ReportTestFinish (const UnitTest::TestDetails& test, float testDuration)
   {
     using namespace std;
 
     ++testFinishedCount;
-    strcpy (lastFinishedSuite, test.suiteName);
-    strcpy (lastFinishedTest, test.testName);
+    strcpy (lastFinishedSuite, test.suiteName.c_str ());
+    strcpy (lastFinishedTest, test.testName.c_str ());
     lastFinishedTestTime = testDuration;
   }
 
@@ -92,6 +92,14 @@ public:
   int summaryFailedTestCount;
   int summaryFailureCount;
   float summarySecondsElapsed;
+};
+
+
+struct EmptyTest : public UnitTest::Test
+{
+  EmptyTest (const char* testName, const char* suiteName = DEFAULT_SUITE)
+    : Test (testName, suiteName) {};
+  void RunImpl () {};
 };
 
 

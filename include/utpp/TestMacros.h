@@ -1,9 +1,8 @@
 #pragma once
 #include "Config.h"
-#include "ExecuteTest.h"
 #include "AssertException.h"
 #include "TestDetails.h"
-#include "MemoryOutStream.h"
+#include <sstream>
 
 #ifdef TEST
   #error UnitTest++ redefines TEST
@@ -66,27 +65,30 @@
     try {                                                                     \
       Fixture##Name##Helper fixtureHelper;                                    \
       ctorOk = true;                                                          \
-      UnitTest::ExecuteTest(fixtureHelper, m_details);                        \
+      fixtureHelper.RunImpl ();                                                  \
     }                                                                         \
     catch (const UnitTest::AssertException& e)                                \
     {                                                                         \
-      UnitTest::CurrentTest.Results->OnTestFailure(UnitTest::TestDetails(m_details.testName, m_details.suiteName, e.Filename(), e.LineNumber()), e.what()); \
+      m_details.filename = e.Filename ();                                     \
+      m_details.lineNumber = e.LineNumber ();                                 \
+      UnitTest::CurrentTest.Results->OnTestFailure(m_details, e.what());      \
     }                                                                         \
     catch (const std::exception& e)                                           \
     {                                                                         \
-      UnitTest::MemoryOutStream stream;                                       \
+      std::stringstream stream;                                                  \
       stream << "Unhandled exception: " << e.what();                          \
-      UnitTest::CurrentTest.Results->OnTestFailure(m_details, stream.GetText()); \
+      UnitTest::CurrentTest.Results->OnTestFailure(m_details, stream.str());  \
     }                                                                         \
     catch (...) {                                                             \
+      m_details.lineNumber = __LINE__;                                        \
       if (ctorOk)                                                             \
       {                                                                       \
-        UnitTest::CurrentTest.Results->OnTestFailure(UnitTest::TestDetails(m_details, __LINE__), \
-        "Unhandled exception while destroying fixture " #Fixture);            \
+        UnitTest::CurrentTest.Results->OnTestFailure(m_details,               \
+          "Unhandled exception while destroying fixture " #Fixture);          \
       }                                                                       \
       else                                                                    \
       {                                                                       \
-        UnitTest::CurrentTest.Results->OnTestFailure(UnitTest::TestDetails(m_details, __LINE__), \
+        UnitTest::CurrentTest.Results->OnTestFailure(m_details,               \
           "Unhandled exception while constructing fixture " #Fixture);        \
       }                                                                       \
     }                                                                         \

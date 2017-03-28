@@ -1,19 +1,26 @@
 #include <utpp/TestReporterStdout.h>
-#include <cstdio>
+#include <iostream>
 
 #include <utpp/TestDetails.h>
 #include <utpp/Test.h>
+using namespace std;
 
 namespace UnitTest {
 
-void TestReporterStdout::ReportFailure (TestDetails const& details, char const* failure)
+static TestReporterStdout the_default_reporter;
+TestReporter& default_reporter = the_default_reporter;
+
+void TestReporterStdout::ReportFailure (TestDetails const& details, const string& failure)
 {
   if (details.suiteName == DEFAULT_SUITE)
-    printf ("Failure in test %s (file %s,line %d)\n  %s\n",
-    details.testName, details.filename, details.lineNumber, failure);
+    cout << "Failure in test " << details.testName
+    << "(file " << details.filename << ", line " << details.lineNumber << ")\n"
+    << failure << endl;
   else
-    printf ("Failure in suite %s test %s (file %s, line %d)\n  %s\n",
-    details.suiteName, details.testName, details.filename, details.lineNumber, failure);
+    cout << "Failure in suite " << details.suiteName
+    << " test " << details.testName
+    << "(file " << details.filename << ", line " << details.lineNumber << ")\n"
+    << failure << endl;
 }
 
 void TestReporterStdout::ReportSummary (int const totalTestCount, int const failedTestCount,

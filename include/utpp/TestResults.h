@@ -1,25 +1,27 @@
 #pragma once
 
+#include "TestReporter.h"
+#include <string>
+
 namespace UnitTest {
 
-class TestReporter;
 class TestDetails;
 
 class TestResults
 {
 public:
-  TestResults (TestReporter* reporter = 0);
+  TestResults (TestReporter& reporter = default_reporter);
 
-  void OnTestStart (TestDetails const& test);
-  void OnTestFailure (TestDetails const& test, char const* failure);
-  void OnTestFinish (TestDetails const& test, float secondsElapsed);
+  void OnTestStart (const TestDetails& test);
+  void OnTestFailure (const TestDetails& test, const std::string& failure);
+  void OnTestFinish (const TestDetails& test, float secondsElapsed);
 
   int GetTotalTestCount () const;
   int GetFailedTestCount () const;
   int GetFailureCount () const;
 
 private:
-  TestReporter* testReporter;
+  TestReporter& testReporter;
   int totalTestCount;
   int failedTestCount;
   int failureCount;

@@ -179,7 +179,6 @@
     <ClCompile Include="source\utpp\tests\TestChecks.cpp" />
     <ClCompile Include="source\utpp\tests\TestCurrentTest.cpp" />
     <ClCompile Include="source\utpp\tests\TestDeferredTestReporter.cpp" />
-    <ClCompile Include="source\utpp\tests\TestMemoryOutStream.cpp" />
     <ClCompile Include="source\utpp\tests\TestTest.cpp" />
     <ClCompile Include="source\utpp\tests\TestTestList.cpp" />
     <ClCompile Include="source\utpp\tests\TestTestMacros.cpp" />

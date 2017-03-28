@@ -4,6 +4,7 @@
 #include "ScopedCurrentTest.h"
 
 using namespace UnitTest;
+extern TestReporter null_reporter;
 
 TEST (CanSetandGetDetails)
 {
@@ -26,7 +27,7 @@ TEST (CanSetAndGetResults)
   {
     ScopedCurrentTest scopedTest;
 
-    TestResults results;
+    TestResults results (null_reporter);
     CurrentTest.Results = &results;
 
     ok = (CurrentTest.Results == &results);

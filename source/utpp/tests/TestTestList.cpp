@@ -1,4 +1,5 @@
 #include <utpp/utpp.h>
+#include "RecordingReporter.h"
 
 using namespace UnitTest;
 
@@ -11,7 +12,7 @@ TEST (TestListIsEmptyByDefault)
 
 TEST (AddingTestSetsHeadToTest)
 {
-  Test test ("test");
+  EmptyTest test ("test");
   TestList list;
   list.Add (&test);
 
@@ -21,8 +22,8 @@ TEST (AddingTestSetsHeadToTest)
 
 TEST (AddingSecondTestAddsItToEndOfList)
 {
-  Test test1 ("test1");
-  Test test2 ("test2");
+  EmptyTest test1 ("test1");
+  EmptyTest test2 ("test2");
 
   TestList list;
   list.Add (&test1);
@@ -37,7 +38,7 @@ TEST (ListAdderAddsTestToList)
 {
   TestList list;
 
-  Test test ("");
+  EmptyTest test ("");
   ListAdder adder (list, &test);
 
   CHECK (list.GetHead () == &test);

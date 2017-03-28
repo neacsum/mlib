@@ -3,10 +3,11 @@
 
 using namespace UnitTest;
 
+extern TestReporter null_reporter;
 
 TEST (CheckEqualWithUnsignedLong)
 {
-  TestResults results;
+  TestResults results (null_reporter);
   unsigned long something = 2;
   CHECK_EQUAL (something, something);
 }
@@ -15,7 +16,7 @@ TEST (CheckEqualsWithStringsFailsOnDifferentStrings)
 {
   char txt1[] = "Hello";
   char txt2[] = "Hallo";
-  TestResults results;
+  TestResults results (null_reporter);
   CheckEqual (results, txt1, txt2, TestDetails ("", "", "", 0));
   CHECK_EQUAL (1, results.GetFailureCount ());
 }
@@ -27,7 +28,7 @@ TEST (CheckEqualsWithStringsWorksOnContentsNonConstNonConst)
 {
   char const* const p1 = txt1;
   char const* const p2 = txt2;
-  TestResults results;
+  TestResults results (null_reporter);
   CheckEqual (results, p1, p2, TestDetails ("", "", "", 0));
   CHECK_EQUAL (0, results.GetFailureCount ());
 }
@@ -36,7 +37,7 @@ TEST (CheckEqualsWithStringsWorksOnContentsConstConst)
 {
   char* const p1 = txt1;
   char* const p2 = txt2;
-  TestResults results;
+  TestResults results (null_reporter);
   CheckEqual (results, p1, p2, TestDetails ("", "", "", 0));
   CHECK_EQUAL (0, results.GetFailureCount ());
 }
@@ -45,7 +46,7 @@ TEST (CheckEqualsWithStringsWorksOnContentsNonConstConst)
 {
   char* const p1 = txt1;
   char const* const p2 = txt2;
-  TestResults results;
+  TestResults results (null_reporter);
   CheckEqual (results, p1, p2, TestDetails ("", "", "", 0));
   CHECK_EQUAL (0, results.GetFailureCount ());
 }
@@ -54,7 +55,7 @@ TEST (CheckEqualsWithStringsWorksOnContentsConstNonConst)
 {
   char const* const p1 = txt1;
   char* const p2 = txt2;
-  TestResults results;
+  TestResults results (null_reporter);
   CheckEqual (results, p1, p2, TestDetails ("", "", "", 0));
   CHECK_EQUAL (0, results.GetFailureCount ());
 }
@@ -62,7 +63,7 @@ TEST (CheckEqualsWithStringsWorksOnContentsConstNonConst)
 TEST (CheckEqualsWithStringsWorksOnContentsWithALiteral)
 {
   char const* const p1 = txt1;
-  TestResults results;
+  TestResults results (null_reporter);
   CheckEqual (results, "Hello", p1, TestDetails ("", "", "", 0));
   CHECK_EQUAL (0, results.GetFailureCount ());
 }
@@ -70,7 +71,7 @@ TEST (CheckEqualsWithStringsWorksOnContentsWithALiteral)
 TEST (CheckEqualFailureIncludesCheckExpectedAndActual)
 {
   RecordingReporter reporter;
-  TestResults results (&reporter);
+  TestResults results (reporter);
   const int something = 2;
   CheckEqual (results, 1, something, TestDetails ("", "", "", 0));
 
@@ -82,7 +83,7 @@ TEST (CheckEqualFailureIncludesCheckExpectedAndActual)
 TEST (CheckEqualFailureIncludesDetails)
 {
   RecordingReporter reporter;
-  TestResults results (&reporter);
+  TestResults results (reporter);
   TestDetails const details ("mytest", "mysuite", "file.h", 101);
 
   CheckEqual (results, 1, 2, details);
@@ -95,21 +96,21 @@ TEST (CheckEqualFailureIncludesDetails)
 
 TEST (CheckCloseTrue)
 {
-  TestResults results;
+  TestResults results (null_reporter);
   CheckClose (results, 3.001f, 3.0f, 0.1f, TestDetails ("", "", "", 0));
   CHECK_EQUAL (0, results.GetFailureCount ());
 }
 
 TEST (CheckCloseFalse)
 {
-  TestResults results;
+  TestResults results (null_reporter);
   CheckClose (results, 3.12f, 3.0f, 0.1f, TestDetails ("", "", "", 0));
   CHECK_EQUAL (1, results.GetFailureCount ());
 }
 
 TEST (CheckCloseWithZeroEpsilonWorksForSameNumber)
 {
-  TestResults results;
+  TestResults results (null_reporter);
   CheckClose (results, 0.1f, 0.1f, 0, TestDetails ("", "", "", 0));
   CHECK_EQUAL (0, results.GetFailureCount ());
 }
@@ -122,7 +123,7 @@ TEST (CheckCloseWithNaNFails)
     float nan;
   };
   bitpattern = 0xFFFFFFFF;
-  TestResults results;
+  TestResults results (null_reporter);
   CheckClose (results, 3.0f, nan, 0.1f, TestDetails ("", "", "", 0));
   CHECK_EQUAL (1, results.GetFailureCount ());
 }
@@ -135,7 +136,7 @@ TEST (CheckCloseWithNaNAgainstItselfFails)
     float nan;
   };
   bitpattern = 0xFFFFFFFF;
-  TestResults results;
+  TestResults results (null_reporter);
   CheckClose (results, nan, nan, 0.1f, TestDetails ("", "", "", 0));
   CHECK_EQUAL (1, results.GetFailureCount ());
 }
@@ -143,7 +144,7 @@ TEST (CheckCloseWithNaNAgainstItselfFails)
 TEST (CheckCloseFailureIncludesCheckExpectedAndActual)
 {
   RecordingReporter reporter;
-  TestResults results (&reporter);
+  TestResults results (reporter);
   const float expected = 0.9f;
   const float actual = 1.1f;
   CheckClose (results, expected, actual, 0.01f, TestDetails ("", "", "", 0));
@@ -156,7 +157,7 @@ TEST (CheckCloseFailureIncludesCheckExpectedAndActual)
 TEST (CheckCloseFailureIncludesTolerance)
 {
   RecordingReporter reporter;
-  TestResults results (&reporter);
+  TestResults results (reporter);
   CheckClose (results, 2, 3, 0.01f, TestDetails ("", "", "", 0));
 
   using namespace std;
@@ -166,7 +167,7 @@ TEST (CheckCloseFailureIncludesTolerance)
 TEST (CheckCloseFailureIncludesDetails)
 {
   RecordingReporter reporter;
-  TestResults results (&reporter);
+  TestResults results (reporter);
   TestDetails const details ("mytest", "mysuite", "header.h", 10);
 
   CheckClose (results, 2, 3, 0.01f, details);
@@ -180,7 +181,7 @@ TEST (CheckCloseFailureIncludesDetails)
 
 TEST (CheckArrayEqualTrue)
 {
-  TestResults results;
+  TestResults results (null_reporter);
 
   int const array[3] = { 1, 2, 3 };
   CheckArrayEqual (results, array, array, 3, TestDetails ("", "", "", 0));
@@ -189,7 +190,7 @@ TEST (CheckArrayEqualTrue)
 
 TEST (CheckArrayEqualFalse)
 {
-  TestResults results;
+  TestResults results (null_reporter);
 
   int const array1[3] = { 1, 2, 3 };
   int const array2[3] = { 1, 2, 2 };
@@ -199,7 +200,7 @@ TEST (CheckArrayEqualFalse)
 
 TEST (CheckArrayCloseTrue)
 {
-  TestResults results;
+  TestResults results (null_reporter);
 
   float const array1[3] = { 1.0f, 1.5f, 2.0f };
   float const array2[3] = { 1.01f, 1.51f, 2.01f };
@@ -209,7 +210,7 @@ TEST (CheckArrayCloseTrue)
 
 TEST (CheckArrayCloseFalse)
 {
-  TestResults results;
+  TestResults results (null_reporter);
 
   float const array1[3] = { 1.0f, 1.5f, 2.0f };
   float const array2[3] = { 1.01f, 1.51f, 2.01f };
@@ -220,7 +221,7 @@ TEST (CheckArrayCloseFalse)
 TEST (CheckArrayCloseFailureIncludesDetails)
 {
   RecordingReporter reporter;
-  TestResults results (&reporter);
+  TestResults results (reporter);
   TestDetails const details ("arrayCloseTest", "arrayCloseSuite", "file", 1337);
 
   float const array1[3] = { 1.0f, 1.5f, 2.0f };
@@ -236,7 +237,7 @@ TEST (CheckArrayCloseFailureIncludesDetails)
 
 TEST (CheckArray2DCloseTrue)
 {
-  TestResults results;
+  TestResults results (null_reporter);
 
   float const array1[3][3] = { { 1.0f, 1.5f, 2.0f },
   { 2.0f, 2.5f, 3.0f },
@@ -250,7 +251,7 @@ TEST (CheckArray2DCloseTrue)
 
 TEST (CheckArray2DCloseFalse)
 {
-  TestResults results;
+  TestResults results (null_reporter);
 
   float const array1[3][3] = { { 1.0f, 1.5f, 2.0f },
   { 2.0f, 2.5f, 3.0f },
@@ -270,7 +271,7 @@ TEST (CheckCloseWithDoublesSucceeds)
 TEST (CheckArray2DCloseFailureIncludesDetails)
 {
   RecordingReporter reporter;
-  TestResults results (&reporter);
+  TestResults results (reporter);
   TestDetails const details ("array2DCloseTest", "array2DCloseSuite", "file", 1234);
 
   float const array1[3][3] = { { 1.0f, 1.5f, 2.0f },

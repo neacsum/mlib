@@ -152,12 +152,10 @@
     <ClCompile Include="source\utpp\CurrentTest.cpp" />
     <ClCompile Include="source\utpp\DeferredTestReporter.cpp" />
     <ClCompile Include="source\utpp\DeferredTestResult.cpp" />
-    <ClCompile Include="source\utpp\MemoryOutStream.cpp" />
     <ClCompile Include="source\utpp\ReportAssert.cpp" />
     <ClCompile Include="source\utpp\Test.cpp" />
     <ClCompile Include="source\utpp\TestDetails.cpp" />
     <ClCompile Include="source\utpp\TestList.cpp" />
-    <ClCompile Include="source\utpp\TestReporter.cpp" />
     <ClCompile Include="source\utpp\TestReporterStdout.cpp" />
     <ClCompile Include="source\utpp\TestResults.cpp" />
     <ClCompile Include="source\utpp\TestRunner.cpp" />
@@ -173,8 +171,6 @@
     <ClInclude Include="include\utpp\CurrentTest.h" />
     <ClInclude Include="include\utpp\DeferredTestReporter.h" />
     <ClInclude Include="include\utpp\DeferredTestResult.h" />
-    <ClInclude Include="include\utpp\ExecuteTest.h" />
-    <ClInclude Include="include\utpp\MemoryOutStream.h" />
     <ClInclude Include="include\utpp\ReportAssert.h" />
     <ClInclude Include="include\utpp\Test.h" />
     <ClInclude Include="include\utpp\TestDetails.h" />
@@ -189,6 +185,9 @@
     <ClInclude Include="include\utpp\timehelpers.h" />
     <ClInclude Include="include\utpp\utpp.h" />
     <ClInclude Include="include\utpp\XmlTestReporter.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="source\utpp\README.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

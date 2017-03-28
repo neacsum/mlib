@@ -30,9 +30,6 @@
     <ClCompile Include="source\utpp\DeferredTestResult.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\utpp\MemoryOutStream.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="source\utpp\ReportAssert.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -43,9 +40,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\utpp\TestList.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="source\utpp\TestReporter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\utpp\TestReporterStdout.cpp">
@@ -87,12 +81,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\utpp\DeferredTestResult.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\utpp\ExecuteTest.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\utpp\MemoryOutStream.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\utpp\ReportAssert.h">
@@ -137,5 +125,8 @@
     <ClInclude Include="include\utpp\XmlTestReporter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="source\utpp\README.md" />
   </ItemGroup>
 </Project>

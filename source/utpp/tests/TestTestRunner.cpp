@@ -15,17 +15,18 @@ struct MockTest : public Test
   {
   }
 
-  virtual void RunImpl (TestResults& testResults_) const
+  void RunImpl ()
   {
     for (int i = 0; i < count; ++i)
     {
       if (asserted)
         ReportAssert ("desc", "file", 0);
       else if (!success)
-        testResults_.OnTestFailure (m_details, "message");
+        CurrentTest.OnTestFailure (__LINE__, "message");
     }
   }
 
+  void Run () {};
   bool const success;
   bool const asserted;
   int const count;
@@ -68,7 +69,7 @@ class SlowTest : public Test
 {
 public:
   SlowTest () : Test ("slow", "somesuite", "filename", 123) {}
-  virtual void RunImpl (TestResults&) const
+  void RunImpl ()
   {
     TimeHelpers::SleepMs (20);
   }
@@ -180,7 +181,7 @@ TEST_FIXTURE (TestRunnerFixture, SlowTestHasCorrectFailureInformation)
   using namespace std;
 
   CHECK_EQUAL (test.m_details.testName, reporter.lastFailedTest);
-  CHECK (strstr (test.m_details.filename, reporter.lastFailedFile));
+  CHECK (test.m_details.filename.find (reporter.lastFailedFile));
   CHECK_EQUAL (test.m_details.lineNumber, reporter.lastFailedLine);
 
   CHECK (strstr (reporter.lastFailedMessage, "Global time constraint failed"));
@@ -192,8 +193,8 @@ TEST_FIXTURE (TestRunnerFixture, SlowTestWithTimeExemptionPasses)
   class SlowExemptedTest : public Test
   {
   public:
-    SlowExemptedTest () : Test ("slowexempted", "", 0) {}
-    virtual void RunImpl (TestResults&) const
+    SlowExemptedTest () : Test ("slowexempted") {}
+    void RunImpl () 
     {
       UNITTEST_TIME_CONSTRAINT_EXEMPT ();
       TimeHelpers::SleepMs (20);
@@ -219,9 +220,9 @@ struct TestSuiteFixture
     list.Add (&test2);
   }
 
-  Test test1;
-  Test test2;
-  Test test3;
+  EmptyTest test1;
+  EmptyTest test2;
+  EmptyTest test3;
   RecordingReporter reporter;
   TestList list;
   TestRunner runner;

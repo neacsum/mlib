@@ -8,16 +8,15 @@
 namespace UnitTest
 {
 
-/*
+/*!
   A DeferredTestReporter is TestReporter that keeps a list of test results.
-  It is an abstract base because it is still missing a ReportSummary function.
 */
 class DeferredTestReporter : public TestReporter
 {
 public:
-  virtual void ReportTestStart (TestDetails const& details);
-  virtual void ReportFailure (TestDetails const& details, char const* failure);
-  virtual void ReportTestFinish (TestDetails const& details, float secondsElapsed);
+  virtual void ReportTestStart (const TestDetails& details);
+  virtual void ReportFailure (const TestDetails& details, const std::string& failure);
+  virtual void ReportTestFinish (const TestDetails& details, float secondsElapsed);
 
   typedef std::vector< DeferredTestResult > DeferredTestResultList;
   DeferredTestResultList& GetResults ();

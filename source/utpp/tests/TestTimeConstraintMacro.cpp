@@ -14,7 +14,7 @@ TEST (TimeConstraintMacroUsesCorrectInfo)
   int testLine = 0;
   RecordingReporter reporter;
   {
-    UnitTest::TestResults testResults (&reporter);
+    UnitTest::TestResults testResults (reporter);
     ScopedCurrentTest scopedResults (testResults);
 
     UNITTEST_TIME_CONSTRAINT (10); testLine = __LINE__;

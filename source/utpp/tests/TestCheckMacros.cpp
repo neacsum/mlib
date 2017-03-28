@@ -6,12 +6,14 @@
 using namespace std;
 using namespace UnitTest;
 
+TestReporter null_reporter;
+
 TEST (CheckSucceedsOnTrue)
 {
   bool failure = true;
   {
     RecordingReporter reporter;
-    TestResults testResults (&reporter);
+    TestResults testResults (reporter);
 
     ScopedCurrentTest scopedResults (testResults);
     CHECK (true);
@@ -27,7 +29,7 @@ TEST (CheckFailsOnFalse)
   bool failure = false;
   {
     RecordingReporter reporter;
-    TestResults testResults (&reporter);
+    TestResults testResults (reporter);
     ScopedCurrentTest scopedResults (testResults);
     CHECK (false);
     failure = (testResults.GetFailureCount () > 0);
@@ -40,7 +42,7 @@ TEST (FailureReportsCorrectTestName)
 {
   RecordingReporter reporter;
   {
-    TestResults testResults (&reporter);
+    TestResults testResults (reporter);
     ScopedCurrentTest scopedResults (testResults);
     CHECK (false);
   }
@@ -52,7 +54,7 @@ TEST (CheckFailureIncludesCheckContents)
 {
   RecordingReporter reporter;
   {
-    TestResults testResults (&reporter);
+    TestResults testResults (reporter);
     ScopedCurrentTest scopedResults (testResults);
     const bool yaddayadda = false;
     CHECK (yaddayadda);
@@ -71,7 +73,7 @@ TEST (CheckFailsOnException)
   bool failure = false;
   {
     RecordingReporter reporter;
-    TestResults testResults (&reporter);
+    TestResults testResults (reporter);
     ScopedCurrentTest scopedResults (testResults);
     CHECK (ThrowingFunction () == 1);
     failure = (testResults.GetFailureCount () > 0);
@@ -84,7 +86,7 @@ TEST (CheckFailureBecauseOfExceptionIncludesCheckContents)
 {
   RecordingReporter reporter;
   {
-    TestResults testResults (&reporter);
+    TestResults testResults (reporter);
     ScopedCurrentTest scopedResults (testResults);
     CHECK (ThrowingFunction () == 1);
   }
@@ -97,7 +99,7 @@ TEST (CheckEqualSucceedsOnEqual)
   bool failure = true;
   {
     RecordingReporter reporter;
-    TestResults testResults (&reporter);
+    TestResults testResults (reporter);
     ScopedCurrentTest scopedResults (testResults);
     CHECK_EQUAL (1, 1);
     failure = (testResults.GetFailureCount () > 0);
@@ -111,7 +113,7 @@ TEST (CheckEqualFailsOnNotEqual)
   bool failure = false;
   {
     RecordingReporter reporter;
-    TestResults testResults (&reporter);
+    TestResults testResults (reporter);
     ScopedCurrentTest scopedResults (testResults);
     CHECK_EQUAL (1, 2);
     failure = (testResults.GetFailureCount () > 0);
@@ -125,7 +127,7 @@ TEST (CheckEqualFailsOnException)
   bool failure = false;
   {
     RecordingReporter reporter;
-    TestResults testResults (&reporter);
+    TestResults testResults (reporter);
     ScopedCurrentTest scopedResults (testResults);
     CHECK_EQUAL (ThrowingFunction (), 1);
     failure = (testResults.GetFailureCount () > 0);
@@ -139,7 +141,7 @@ TEST (CheckEqualFailureContainsCorrectDetails)
   int line = 0;
   RecordingReporter reporter;
   {
-    TestResults testResults (&reporter);
+    TestResults testResults (reporter);
     TestDetails testDetails ("testName", "suiteName", "filename", -1);
     ScopedCurrentTest scopedResults (testResults, &testDetails);
 
@@ -157,7 +159,7 @@ TEST (CheckEqualFailureBecauseOfExceptionContainsCorrectDetails)
   int line = 0;
   RecordingReporter reporter;
   {
-    TestResults testResults (&reporter);
+    TestResults testResults (reporter);
     TestDetails testDetails ("testName", "suiteName", "filename", -1);
     ScopedCurrentTest scopedResults (testResults, &testDetails);
 
@@ -174,7 +176,7 @@ TEST (CheckEqualFailureBecauseOfExceptionIncludesCheckContents)
 {
   RecordingReporter reporter;
   {
-    TestResults testResults (&reporter);
+    TestResults testResults (reporter);
     ScopedCurrentTest scopedResults (testResults);
     CHECK_EQUAL (ThrowingFunction (), 123);
   }
@@ -194,7 +196,7 @@ TEST (CheckEqualDoesNotHaveSideEffectsWhenPassing)
 {
   g_sideEffect = 0;
   {
-    TestResults testResults;
+    TestResults testResults (null_reporter);
     ScopedCurrentTest scopedResults (testResults);
     CHECK_EQUAL (1, FunctionWithSideEffects ());
   }
@@ -205,7 +207,7 @@ TEST (CheckEqualDoesNotHaveSideEffectsWhenFailing)
 {
   g_sideEffect = 0;
   {
-    TestResults testResults;
+    TestResults testResults (null_reporter);
     ScopedCurrentTest scopedResults (testResults);
     CHECK_EQUAL (2, FunctionWithSideEffects ());
   }
@@ -218,7 +220,7 @@ TEST (CheckCloseSucceedsOnEqual)
   bool failure = true;
   {
     RecordingReporter reporter;
-    TestResults testResults (&reporter);
+    TestResults testResults (reporter);
     ScopedCurrentTest scopedResults (testResults);
     CHECK_CLOSE (1.0f, 1.001f, 0.01f);
     failure = (testResults.GetFailureCount () > 0);
@@ -232,7 +234,7 @@ TEST (CheckCloseFailsOnNotEqual)
   bool failure = false;
   {
     RecordingReporter reporter;
-    TestResults testResults (&reporter);
+    TestResults testResults (reporter);
     ScopedCurrentTest scopedResults (testResults);
     CHECK_CLOSE (1.0f, 1.1f, 0.01f);
     failure = (testResults.GetFailureCount () > 0);
@@ -246,7 +248,7 @@ TEST (CheckCloseFailsOnException)
   bool failure = false;
   {
     RecordingReporter reporter;
-    TestResults testResults (&reporter);
+    TestResults testResults (reporter);
     ScopedCurrentTest scopedResults (testResults);
     CHECK_CLOSE ((float)ThrowingFunction (), 1.0001f, 0.1f);
     failure = (testResults.GetFailureCount () > 0);
@@ -260,7 +262,7 @@ TEST (CheckCloseFailureContainsCorrectDetails)
   int line = 0;
   RecordingReporter reporter;
   {
-    TestResults testResults (&reporter);
+    TestResults testResults (reporter);
     TestDetails testDetails ("test", "suite", "filename", -1);
     ScopedCurrentTest scopedResults (testResults, &testDetails);
 
@@ -278,7 +280,7 @@ TEST (CheckCloseFailureBecauseOfExceptionContainsCorrectDetails)
   int line = 0;
   RecordingReporter reporter;
   {
-    TestResults testResults (&reporter);
+    TestResults testResults (reporter);
     TestDetails testDetails ("closeTest", "closeSuite", "filename", -1);
     ScopedCurrentTest scopedResults (testResults, &testDetails);
     CHECK_CLOSE ((float)ThrowingFunction (), 1.0001f, 0.1f);    line = __LINE__;
@@ -294,7 +296,7 @@ TEST (CheckCloseFailureBecauseOfExceptionIncludesCheckContents)
 {
   RecordingReporter reporter;
   {
-    TestResults testResults (&reporter);
+    TestResults testResults (reporter);
     ScopedCurrentTest scopedResults (testResults);
     CHECK_CLOSE ((float)ThrowingFunction (), 1.0001f, 0.1f);
   }
@@ -307,7 +309,7 @@ TEST (CheckCloseDoesNotHaveSideEffectsWhenPassing)
 {
   g_sideEffect = 0;
   {
-    TestResults testResults;
+    TestResults testResults (null_reporter);
     ScopedCurrentTest scopedResults (testResults);
     CHECK_CLOSE (1, FunctionWithSideEffects (), 0.1f);
   }
@@ -318,7 +320,7 @@ TEST (CheckCloseDoesNotHaveSideEffectsWhenFailing)
 {
   g_sideEffect = 0;
   {
-    TestResults testResults;
+    TestResults testResults (null_reporter);
     ScopedCurrentTest scopedResults (testResults);
     CHECK_CLOSE (2, FunctionWithSideEffects (), 0.1f);
   }
@@ -341,7 +343,7 @@ TEST (CheckArrayCloseSucceedsOnEqual)
   bool failure = true;
   {
     RecordingReporter reporter;
-    TestResults testResults (&reporter);
+    TestResults testResults (reporter);
     ScopedCurrentTest scopedResults (testResults);
     const float data[4] = { 0, 1, 2, 3 };
     CHECK_ARRAY_CLOSE (data, data, 4, 0.01f);
@@ -356,7 +358,7 @@ TEST (CheckArrayCloseFailsOnNotEqual)
   bool failure = false;
   {
     RecordingReporter reporter;
-    TestResults testResults (&reporter);
+    TestResults testResults (reporter);
     ScopedCurrentTest scopedResults (testResults);
 
     int const data1[4] = { 0, 1, 2, 3 };
@@ -373,7 +375,7 @@ TEST (CheckArrayCloseFailureIncludesCheckExpectedAndActual)
 {
   RecordingReporter reporter;
   {
-    TestResults testResults (&reporter);
+    TestResults testResults (reporter);
     ScopedCurrentTest scopedResults (testResults);
 
     int const data1[4] = { 0, 1, 2, 3 };
@@ -390,7 +392,7 @@ TEST (CheckArrayCloseFailureContainsCorrectDetails)
   int line = 0;
   RecordingReporter reporter;
   {
-    TestResults testResults (&reporter);
+    TestResults testResults (reporter);
     TestDetails testDetails ("arrayCloseTest", "arrayCloseSuite", "filename", -1);
     ScopedCurrentTest scopedResults (testResults, &testDetails);
 
@@ -410,7 +412,7 @@ TEST (CheckArrayCloseFailureBecauseOfExceptionContainsCorrectDetails)
   int line = 0;
   RecordingReporter reporter;
   {
-    TestResults testResults (&reporter);
+    TestResults testResults (reporter);
     TestDetails testDetails ("arrayCloseTest", "arrayCloseSuite", "filename", -1);
     ScopedCurrentTest scopedResults (testResults, &testDetails);
 
@@ -428,7 +430,7 @@ TEST (CheckArrayCloseFailureIncludesTolerance)
 {
   RecordingReporter reporter;
   {
-    TestResults testResults (&reporter);
+    TestResults testResults (reporter);
     ScopedCurrentTest scopedResults (testResults);
 
     float const data1[4] = { 0, 1, 2, 3 };
@@ -445,7 +447,7 @@ TEST (CheckArrayCloseFailsOnException)
   bool failure = false;
   {
     RecordingReporter reporter;
-    TestResults testResults (&reporter);
+    TestResults testResults (reporter);
     ScopedCurrentTest scopedResults (testResults);
 
     const float data[4] = { 0, 1, 2, 3 };
@@ -462,7 +464,7 @@ TEST (CheckArrayCloseFailureOnExceptionIncludesCheckContents)
 {
   RecordingReporter reporter;
   {
-    TestResults testResults (&reporter);
+    TestResults testResults (reporter);
     ScopedCurrentTest scopedResults (testResults);
 
     const float data[4] = { 0, 1, 2, 3 };
@@ -480,7 +482,7 @@ TEST (CheckArrayEqualSuceedsOnEqual)
   bool failure = true;
   {
     RecordingReporter reporter;
-    TestResults testResults (&reporter);
+    TestResults testResults (reporter);
     ScopedCurrentTest scopedResults (testResults);
 
     const float data[4] = { 0, 1, 2, 3 };
@@ -497,7 +499,7 @@ TEST (CheckArrayEqualFailsOnNotEqual)
   bool failure = false;
   {
     RecordingReporter reporter;
-    TestResults testResults (&reporter);
+    TestResults testResults (reporter);
     ScopedCurrentTest scopedResults (testResults);
 
     int const data1[4] = { 0, 1, 2, 3 };
@@ -514,7 +516,7 @@ TEST (CheckArrayEqualFailureIncludesCheckExpectedAndActual)
 {
   RecordingReporter reporter;
   {
-    TestResults testResults (&reporter);
+    TestResults testResults (reporter);
     ScopedCurrentTest scopedResults (testResults);
 
     int const data1[4] = { 0, 1, 2, 3 };
@@ -531,7 +533,7 @@ TEST (CheckArrayEqualFailureContainsCorrectInfo)
   int line = 0;
   RecordingReporter reporter;
   {
-    TestResults testResults (&reporter);
+    TestResults testResults (reporter);
     ScopedCurrentTest scopedResults (testResults);
 
     int const data1[4] = { 0, 1, 2, 3 };
@@ -549,7 +551,7 @@ TEST (CheckArrayEqualFailsOnException)
   bool failure = false;
   {
     RecordingReporter reporter;
-    TestResults testResults (&reporter);
+    TestResults testResults (reporter);
     ScopedCurrentTest scopedResults (testResults);
 
     const float data[4] = { 0, 1, 2, 3 };
@@ -566,7 +568,7 @@ TEST (CheckArrayEqualFailureOnExceptionIncludesCheckContents)
 {
   RecordingReporter reporter;
   {
-    TestResults testResults (&reporter);
+    TestResults testResults (reporter);
     ScopedCurrentTest scopedResults (testResults);
 
     const float data[4] = { 0, 1, 2, 3 };
@@ -589,7 +591,7 @@ TEST (CheckArrayCloseDoesNotHaveSideEffectsWhenPassing)
 {
   g_sideEffect = 0;
   {
-    TestResults testResults;
+    TestResults testResults (null_reporter);
     ScopedCurrentTest scopedResults (testResults);
 
     const float data[] = { 0, 1, 2, 3 };
@@ -602,7 +604,7 @@ TEST (CheckArrayCloseDoesNotHaveSideEffectsWhenFailing)
 {
   g_sideEffect = 0;
   {
-    TestResults testResults;
+    TestResults testResults (null_reporter);
     ScopedCurrentTest scopedResults (testResults);
 
     const float data[] = { 0, 1, 3, 3 };
@@ -627,7 +629,7 @@ TEST (CheckArray2DCloseSucceedsOnEqual)
   bool failure = true;
   {
     RecordingReporter reporter;
-    TestResults testResults (&reporter);
+    TestResults testResults (reporter);
     ScopedCurrentTest scopedResults (testResults);
 
     const float data[2][2] = { { 0, 1 }, { 2, 3 } };
@@ -644,7 +646,7 @@ TEST (CheckArray2DCloseFailsOnNotEqual)
   bool failure = false;
   {
     RecordingReporter reporter;
-    TestResults testResults (&reporter);
+    TestResults testResults (reporter);
     ScopedCurrentTest scopedResults (testResults);
 
     int const data1[2][2] = { { 0, 1 }, { 2, 3 } };
@@ -661,7 +663,7 @@ TEST (CheckArray2DCloseFailureIncludesCheckExpectedAndActual)
 {
   RecordingReporter reporter;
   {
-    TestResults testResults (&reporter);
+    TestResults testResults (reporter);
     ScopedCurrentTest scopedResults (testResults);
 
     int const data1[2][2] = { { 0, 1 }, { 2, 3 } };
@@ -679,7 +681,7 @@ TEST (CheckArray2DCloseFailureContainsCorrectDetails)
   int line = 0;
   RecordingReporter reporter;
   {
-    TestResults testResults (&reporter);
+    TestResults testResults (reporter);
     TestDetails testDetails ("array2DCloseTest", "array2DCloseSuite", "filename", -1);
     ScopedCurrentTest scopedResults (testResults, &testDetails);
 
@@ -699,7 +701,7 @@ TEST (CheckArray2DCloseFailureBecauseOfExceptionContainsCorrectDetails)
   int line = 0;
   RecordingReporter reporter;
   {
-    TestResults testResults (&reporter);
+    TestResults testResults (reporter);
     TestDetails testDetails ("array2DCloseTest", "array2DCloseSuite", "filename", -1);
     ScopedCurrentTest scopedResults (testResults, &testDetails);
 
@@ -717,7 +719,7 @@ TEST (CheckArray2DCloseFailureIncludesTolerance)
 {
   RecordingReporter reporter;
   {
-    TestResults testResults (&reporter);
+    TestResults testResults (reporter);
     ScopedCurrentTest scopedResults (testResults);
 
     float const data1[2][2] = { { 0, 1 }, { 2, 3 } };
@@ -733,7 +735,7 @@ TEST (CheckArray2DCloseFailsOnException)
   bool failure = false;
   {
     RecordingReporter reporter;
-    TestResults testResults (&reporter);
+    TestResults testResults (reporter);
     ScopedCurrentTest scopedResults (testResults);
 
     const float data[2][2] = { { 0, 1 }, { 2, 3 } };
@@ -750,7 +752,7 @@ TEST (CheckArray2DCloseFailureOnExceptionIncludesCheckContents)
 {
   RecordingReporter reporter;
   {
-    TestResults testResults (&reporter);
+    TestResults testResults (reporter);
     ScopedCurrentTest scopedResults (testResults);
 
     const float data[2][2] = { { 0, 1 }, { 2, 3 } };
@@ -775,7 +777,7 @@ TEST (CheckArray2DCloseDoesNotHaveSideEffectsWhenPassing)
 {
   g_sideEffect = 0;
   {
-    TestResults testResults;
+    TestResults testResults (null_reporter);
     ScopedCurrentTest scopedResults (testResults);
 
     const float data[2][2] = { { 0, 1 }, { 2, 3 } };
@@ -788,7 +790,7 @@ TEST (CheckArray2DCloseDoesNotHaveSideEffectsWhenFailing)
 {
   g_sideEffect = 0;
   {
-    TestResults testResults;
+    TestResults testResults (null_reporter);
     ScopedCurrentTest scopedResults (testResults);
 
     const float data[2][2] = { { 0, 1 }, { 3, 3 } };

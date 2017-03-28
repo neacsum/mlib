@@ -4,12 +4,12 @@
 
 using namespace UnitTest;
 
-void DeferredTestReporter::ReportTestStart (TestDetails const& details)
+void DeferredTestReporter::ReportTestStart (const TestDetails& details)
 {
   results.push_back (DeferredTestResult (details.suiteName, details.testName));
 }
 
-void DeferredTestReporter::ReportFailure (TestDetails const& details, char const* failure)
+void DeferredTestReporter::ReportFailure (const TestDetails& details, const std::string& failure)
 {
   DeferredTestResult& r = results.back ();
   r.failed = true;

@@ -4,10 +4,11 @@
 #include "ScopedCurrentTest.h"
 
 using namespace UnitTest;
+extern TestReporter null_reporter;
 
 TEST (TimeConstraintSucceedsWithFastTest)
 {
-  TestResults result;
+  TestResults result (null_reporter);
   {
     ScopedCurrentTest scopedResult (result);
     TimeConstraint t (200, TestDetails ("", "", "", 0));
@@ -18,7 +19,7 @@ TEST (TimeConstraintSucceedsWithFastTest)
 
 TEST (TimeConstraintFailsWithSlowTest)
 {
-  TestResults result;
+  TestResults result (null_reporter);
   {
     ScopedCurrentTest scopedResult (result);
     TimeConstraint t (10, TestDetails ("", "", "", 0));
@@ -30,7 +31,7 @@ TEST (TimeConstraintFailsWithSlowTest)
 TEST (TimeConstraintFailureIncludesCorrectData)
 {
   RecordingReporter reporter;
-  TestResults result (&reporter);
+  TestResults result (reporter);
   {
     ScopedCurrentTest scopedResult (result);
 
@@ -49,7 +50,7 @@ TEST (TimeConstraintFailureIncludesCorrectData)
 TEST (TimeConstraintFailureIncludesTimeoutInformation)
 {
   RecordingReporter reporter;
-  TestResults result (&reporter);
+  TestResults result (reporter);
   {
     ScopedCurrentTest scopedResult (result);
     TimeConstraint t (10, TestDetails ("", "", "", 0));

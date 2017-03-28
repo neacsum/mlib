@@ -20,17 +20,8 @@ public:
 
 private:
   __int64 GetTime () const;
-
-  void* m_threadHandle;
-
-#if defined(_WIN64)
-  unsigned __int64 processAffinityMask;
-#else
-  unsigned long processAffinityMask;
-#endif
-
   __int64 startTime;
-  __int64 frequency;
+  static __int64 frequency;
 };
 
 

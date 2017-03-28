@@ -3,8 +3,10 @@
 #include <utpp/TimeHelpers.h>
 
 #include "ScopedCurrentTest.h"
+#include "RecordingReporter.h"
 
 using namespace UnitTest;
+extern TestReporter null_reporter;
 
 TEST (PassingTestHasNoFailures)
 {
@@ -12,13 +14,13 @@ TEST (PassingTestHasNoFailures)
   {
   public:
     PassingTest () : Test ("passing") {}
-    virtual void RunImpl () const
+    void RunImpl ()
     {
       CHECK (true);
     }
   };
 
-  TestResults results;
+  TestResults results (null_reporter);
   {
     ScopedCurrentTest scopedResults (results);
     PassingTest ().Run ();
@@ -40,7 +42,7 @@ TEST (FailingTestHasFailures)
     }
   };
 
-  TestResults results;
+  TestResults results (null_reporter);
   {
     ScopedCurrentTest scopedResults (results);
     FailingTest ().Run ();
@@ -62,7 +64,7 @@ TEST (ThrowingTestsAreReportedAsFailures)
     }
   };
 
-  TestResults results;
+  TestResults results (null_reporter);
   {
     ScopedCurrentTest scopedResult (results);
     CrashingTest ().Run ();
@@ -97,15 +99,13 @@ TEST(CrashingTestsAreReportedAsFailures)
 
 TEST (TestWithUnspecifiedSuiteGetsDefaultSuite)
 {
-  Test test ("test");
-  CHECK (test.m_details.suiteName != NULL);
+  EmptyTest test ("test");
   CHECK_EQUAL ("DefaultSuite", test.m_details.suiteName);
 }
 
 TEST (TestReflectsSpecifiedSuiteName)
 {
-  Test test ("test", "testSuite");
-  CHECK (test.m_details.suiteName != NULL);
+  EmptyTest test ("test", "testSuite");
   CHECK_EQUAL ("testSuite", test.m_details.suiteName);
 }
 
@@ -116,7 +116,7 @@ void Fail ()
 
 TEST (OutOfCoreCHECKMacrosCanFailTests)
 {
-  TestResults results;
+  TestResults results (null_reporter);
   {
     ScopedCurrentTest scopedResult (results);
     Fail ();
