@@ -52,6 +52,7 @@ public:
   const char* get_ihdr (const char *hdr);
   const char* get_ohdr (const char *hdr);
   const char* get_query ();
+  const char* get_fragment ();
   const char* get_body ();
   int         get_content_length ();
 
@@ -86,6 +87,8 @@ private:
   char request[HTTPD_MAX_HEADER];
   char *uri;            //!< location
   char *query;          //!< query string
+  char *fragment;       //!< fragment identifier
+  char *http_version;   //!< HTTP version string
   char *headers;        //!< all headers
   char *body;           //!< request body
   int  content_len;     //!< content length or -1 if not known
@@ -199,9 +202,13 @@ const char* http_connection::get_method () { return request; };
 inline
 const char* http_connection::get_all_ihdr () { return headers; };
 
-/// Return URI query string (everything after '?')
+/// Return URI query string (everything after '?' and before '#')
 inline
 const char* http_connection::get_query () { return query?query : ""; };
+
+/// Return URI fragment identifier (everything after '#')
+inline
+const char* http_connection::get_fragment () { return fragment ? fragment : ""; };
 
 /// Return request body
 inline

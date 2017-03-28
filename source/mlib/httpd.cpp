@@ -107,6 +107,8 @@ ws (socket),
 req_len (0),
 body (0),
 query (0),
+fragment (0),
+http_version (0),
 response_sent (false),
 content_len (-1)
 {
@@ -669,6 +671,7 @@ int http_connection::serve_file(const char *full_path)
 
 bool http_connection::parse_url()
 {
+  //Request-Line   = Method SP Request-URI SP HTTP-Version CRLF
   char *ptr = request;
 
   //method
@@ -678,36 +681,51 @@ bool http_connection::parse_url()
     return false;
   *ptr++ = 0;
 
+  //SP
   while (*ptr == ' ')
     ptr++;
-  uri = ptr;
 
-  //uri
+  //Request-URI
+  uri = ptr;
   while (*ptr != ' ' && *ptr != '\n' && *ptr)
     ptr++;
   if (*ptr != ' ')
     return false;
   *ptr++ = 0;
 
-  
+  //SP
+  while (*ptr == ' ')
+    ptr++;
+
+  //HTTP-Version
+  http_version = ptr;
   while (*ptr != '\n' && *ptr)
     ptr++;
   if (*ptr != '\n')
     return false;
-  headers = ptr+1;
-  
-  //parse eventual query string
-  ptr = uri;
-  while (*ptr && *ptr != '?')
-    ptr++;
-  if (*ptr == '?')
-  {
-    *ptr = 0;
-    query = ptr+1;
-  }  
-  else
-    query = 0;
+  *ptr++ = 0;
 
+  //headers start on next line
+  headers = ptr;
+
+  //parse URI
+  ptr = uri;
+  while (*ptr)
+  {
+    if (*ptr == '?' && !query)
+    {
+      *ptr++ = 0;
+      query = ptr;
+    }
+    else if (*ptr == '#' && !fragment)
+    {
+      *ptr++ = 0;
+      fragment = ptr;
+    }
+    else
+      ptr++;
+  }
+  
   return true;
 }
 
