@@ -71,7 +71,7 @@
     <LinkIncremental>true</LinkIncremental>
     <IntDir>o\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
     <OutDir>tests\$(Platform)\$(Configuration)\</OutDir>
-    <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
+    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -174,25 +174,43 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="source\utpp\tests\Main.cpp" />
-    <ClCompile Include="source\utpp\tests\TestAssertHandler.cpp" />
-    <ClCompile Include="source\utpp\tests\TestCheckMacros.cpp" />
-    <ClCompile Include="source\utpp\tests\TestChecks.cpp" />
-    <ClCompile Include="source\utpp\tests\TestCurrentTest.cpp" />
-    <ClCompile Include="source\utpp\tests\TestDeferredTestReporter.cpp" />
-    <ClCompile Include="source\utpp\tests\TestTest.cpp" />
-    <ClCompile Include="source\utpp\tests\TestTestList.cpp" />
-    <ClCompile Include="source\utpp\tests\TestTestMacros.cpp" />
-    <ClCompile Include="source\utpp\tests\TestTestResults.cpp" />
-    <ClCompile Include="source\utpp\tests\TestTestRunner.cpp" />
-    <ClCompile Include="source\utpp\tests\TestTestSuite.cpp" />
-    <ClCompile Include="source\utpp\tests\TestTimeConstraint.cpp" />
-    <ClCompile Include="source\utpp\tests\TestTimeConstraintMacro.cpp" />
-    <ClCompile Include="source\utpp\tests\TestUnitTest++.cpp" />
-    <ClCompile Include="source\utpp\tests\TestXmlTestReporter.cpp" />
+    <ClCompile Include="source\utpp\tests\AssertHandler.cpp" />
+    <ClCompile Include="source\utpp\tests\CheckMacros.cpp" />
+    <ClCompile Include="source\utpp\tests\Checks.cpp" />
+    <ClCompile Include="source\utpp\tests\DeferredTestReporter.cpp" />
+    <ClCompile Include="source\utpp\tests\Test.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="source\utpp\tests\TestList.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="source\utpp\tests\TestMacros.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="source\utpp\tests\TestResults.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="source\utpp\tests\TestRunner.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="source\utpp\tests\TestSuite.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="source\utpp\tests\TimeConstraint.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="source\utpp\tests\TimeConstraintMacro.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="source\utpp\tests\UnitTest++.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="source\utpp\tests\XmlTestReporter.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="source\utpp\tests\RecordingReporter.h" />
-    <ClInclude Include="source\utpp\tests\ScopedCurrentTest.h" />
+    <ClInclude Include="source\utpp\tests\recording_reporter.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

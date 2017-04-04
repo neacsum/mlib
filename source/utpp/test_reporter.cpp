@@ -1,3 +1,9 @@
+/*!
+  \file test_reporter.cpp - Implementation of TestReporter class
+
+  (c) Mircea Neacsu 2017
+  See README file for full copyright information.
+*/
 #include <utpp/test_reporter.h>
 #include <utpp/test.h>
 
@@ -23,7 +29,6 @@ void TestReporter::ReportSuiteStart (const TestSuite&)
   suites_count++;
   suite_test_count = suite_failed_count = suite_failures_count = 0;
 }
-
 
 void TestReporter::ReportTestStart (const Test&)
 {

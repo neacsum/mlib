@@ -1,4 +1,10 @@
 #pragma once
+/*!
+  \file checks.h - Definition of Check template functions
+
+  (c) Mircea Neacsu 2017
+  See README file for full copyright information.
+*/
 
 #include <sstream>
 
@@ -11,7 +17,9 @@ bool Check(Value const value)
   return !!value; // doing double negative to avoid silly VS warnings
 }
 
-
+/*!
+  Check if two values are equal. If not, generate a failure message.
+*/
 template< typename Expected, typename Actual >
 bool CheckEqual (const Expected& expected, const Actual& actual, std::string& msg)
 {
@@ -25,17 +33,30 @@ bool CheckEqual (const Expected& expected, const Actual& actual, std::string& ms
   return true;
 }
 
-bool CheckEqual (const char* expected, const char* actual, std::string& msg);
+///Specialization of CheckEqual template for strings
+template < >
+bool CheckEqual (const std::string& expected, const std::string& actual, std::string& msg);
+
+/// \name Specializations of CheckEqual template for char pointers and strings
+/// \{
+bool CheckEqual (const char* expected, const std::string& actual, std::string& msg);
+bool CheckEqual (const char* expected, char const* actual, std::string& msg);
 bool CheckEqual (char* expected, char* actual, std::string& msg);
 bool CheckEqual (char* expected, const char* actual, std::string& msg);
-bool CheckEqual (const char* expected, char* actual, std::string& msg);
+bool CheckEqual (char const* expected, char* actual, std::string& msg);
+/// \}
 
+/// Return true if two values are closer than specified tolerance.
 template< typename Expected, typename Actual, typename Tolerance >
 bool AreClose (const Expected& expected, const Actual& actual, const Tolerance& tolerance)
 {
   return (actual >= (expected - tolerance)) && (actual <= (expected + tolerance));
 }
 
+/*!
+  Check if two values are closer than specified tolerance. If not, generate a
+  failure message.
+*/
 template< typename Expected, typename Actual, typename Tolerance >
 bool CheckClose (const Expected& expected, const Actual& actual, const Tolerance& tolerance,
                  std::string& msg)
@@ -53,16 +74,24 @@ bool CheckClose (const Expected& expected, const Actual& actual, const Tolerance
   return true;
 }
 
+/// Return true if two arrays are equal
+template< typename Expected, typename Actual >
+bool Equal1D (const Expected& expected, const Actual& actual, int count)
+{
+  for (int i = 0; && i < count; ++i)
+    if (expected[i] != actual[i])
+      return false;
+  return true;
+}
 
+/*!
+  Check if two arrays are equal. If not, generate a failure message.
+*/
 template< typename Expected, typename Actual >
 bool CheckArrayEqual (const Expected& expected, const Actual& actual,
                       int count, std::string& msg)
 {
-  bool equal = true;
-  for (int i = 0; equal && i < count; ++i)
-    equal = (expected[i] == actual[i]);
-
-  if (!equal)
+  if (!Equal1D (expected, actual, count))
   {
     std::stringstream stream;
     stream << "Expected [ ";
@@ -80,8 +109,9 @@ bool CheckArrayEqual (const Expected& expected, const Actual& actual,
   return true;
 }
 
+/// Return true if values in two arrays are closer than specified tolerance.
 template< typename Expected, typename Actual, typename Tolerance >
-bool ArrayAreClose (const Expected& expected, const Actual& actual, int count, const Tolerance& tolerance)
+bool Close1D (const Expected& expected, const Actual& actual, int count, const Tolerance& tolerance)
 {
   bool equal = true;
   for (int i = 0; equal && i < count; ++i)
@@ -89,11 +119,16 @@ bool ArrayAreClose (const Expected& expected, const Actual& actual, int count, c
   return equal;
 }
 
+
+/*!
+  Check if values in two arrays are closer than specified tolerance. If not,
+  generate a failure message.
+*/
 template< typename Expected, typename Actual, typename Tolerance >
 bool CheckArrayClose (const Expected& expected, const Actual& actual,
                       int count, const Tolerance& tolerance, std::string& msg)
 {
-  if (!ArrayAreClose (expected, actual, count, tolerance))
+  if (!Close1D (expected, actual, count, tolerance))
   {
     std::stringstream stream;
     stream << "Expected [ ";
@@ -110,15 +145,71 @@ bool CheckArrayClose (const Expected& expected, const Actual& actual,
   return true;
 }
 
+/// Return true if two 2D arrays are equal
+template< typename Expected, typename Actual, typename Tolerance >
+bool Equal2D (const Expected& expected, const Actual& actual, int rows, int columns)
+{
+  for (int i = 0; i < rows; i++)
+    if (!Equal1D (expected[i], actual[i], columns))
+      return false;
+  return true;
+}
+
+/*!
+  Check if two 2D arrays are equal. If not, generate a failure message.
+*/
+template< typename Expected, typename Actual, typename Tolerance >
+bool CheckArray2DEqual (const Expected& expected, const Actual& actual,
+                        int rows, int columns, const Tolerance& tolerance, std::string& msg)
+{
+  if (!Equal2D (expected, actual, rows, columns))
+  {
+    std::stringstream stream;
+    stream << "Expected [ ";
+    for (int expectedRow = 0; expectedRow < rows; ++expectedRow)
+    {
+      stream << "[ ";
+      for (int expectedColumn = 0; expectedColumn < columns; ++expectedColumn)
+        stream << expected[expectedRow][expectedColumn] << " ";
+      stream << "] ";
+    }
+
+    stream << "] +/- " << tolerance << " but was [ ";
+    for (int actualRow = 0; actualRow < rows; ++actualRow)
+    {
+      stream << "[ ";
+      for (int actualColumn = 0; actualColumn < columns; ++actualColumn)
+        stream << actual[actualRow][actualColumn] << " ";
+      stream << "] ";
+    }
+    stream << "]";
+    msg = stream.str ();
+    return false;
+  }
+  return true;
+}
+
+/// Return true if values in two 2D arrays are closer than specified tolerance.
+template< typename Expected, typename Actual, typename Tolerance >
+bool Close2D (const Expected& expected, const Actual& actual, int rows, int columns)
+{
+  for (int i = 0; i < rows; i++)
+    if (!Close1D (expected[i], actual[i], columns))
+      return false;
+  return true;
+}
+
+/*!
+  Check if values in two 2D arrays are closer than specified tolerance. If not,
+  generate a failure message.
+*/
 template< typename Expected, typename Actual, typename Tolerance >
 bool CheckArray2DClose (const Expected& expected, const Actual& actual,
                         int rows, int columns, const Tolerance& tolerance, std::string& msg)
 {
   bool equal = true;
-  for (int i = 0; equal && i < rows; i++)
-    equal = ArrayAreClose (expected[i], actual[i], columns, tolerance);
 
-  if (!equal)
+  if (!Close2D (expected, actual, rows, columns))
   {
     std::stringstream stream;
     stream << "Expected [ ";

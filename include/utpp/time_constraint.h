@@ -1,4 +1,10 @@
 #pragma once
+/*!
+  \file timer_constraint.h - Definition of TimeConstraint class
+
+  (c) Mircea Neacsu 2017
+  See README file for full copyright information.
+*/
 
 #include <string>
 #include "time_helpers.h"
@@ -7,6 +13,7 @@ namespace UnitTest {
 
 class TestResults;
 
+/// @brief Defines maximum run time of a test
 class TimeConstraint
 {
 public:
@@ -23,7 +30,7 @@ private:
   int line_number;
 };
 
-/// Defines a local time constraint
+/// Defines a local (per scope) time constraint
 #define UNITTEST_TIME_CONSTRAINT(ms) \
   UnitTest::TimeConstraint unitTest__timeConstraint__(ms, __FILE__, __LINE__)
 

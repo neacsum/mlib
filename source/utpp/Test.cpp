@@ -1,3 +1,9 @@
+/*!
+  \file test.cpp - Implementation of Test class
+
+  (c) Mircea Neacsu 2017
+  See README file for full copyright information.
+*/
 #include <utpp/test.h>
 #include <utpp/test_suite.h>
 #include <utpp/test_reporter.h>
@@ -7,6 +13,7 @@
 
 namespace UnitTest {
 
+/// Constructor
 Test::Test (const char* testName)
   : name (testName)
   , suite (0)
@@ -19,6 +26,7 @@ Test::~Test ()
 {
 }
 
+/// Start a timer and call RunImpl to execute test code
 void Test::run ()
 {
   Timer test_timer;
@@ -31,10 +39,21 @@ void Test::run ()
     time = test_timer.GetTimeInMs ();
 }
 
-void Test::ReportFailure (const std::string& filename, int line, const std::string& message)
+
+void Test::failure ()
 {
   failures++;
-  CurrentReporter->ReportFailure (Failure(filename, line, message));
 }
+
+
+void ReportFailure (const std::string& filename, int line, const std::string& message)
+{
+  assert (CurrentReporter);
+
+  if (CurrentTest)
+    CurrentTest->failure ();
+  CurrentReporter->ReportFailure (Failure (filename, line, message));
+}
+
 
 }

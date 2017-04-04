@@ -1,4 +1,10 @@
 #pragma once
+/*!
+  \file utpp.h - Master include file
+
+  (c) Mircea Neacsu 2017
+  See README file for full copyright information.
+*/
 
 #include "test.h"
 #include "test_suite.h"

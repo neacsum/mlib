@@ -1,4 +1,10 @@
 #pragma once
+/*!
+  \file assert_exception.h - Definition of AssetException class
+
+  (c) Mircea Neacsu 2017
+  See README file for full copyright information.
+*/
 #include <exception>
 
 
@@ -11,17 +17,16 @@ class AssertException : public std::exception
 {
 public:
   AssertException (const char* description, const char* filename, int lineNumber);
-  virtual ~AssertException ();
 
   const char* what () const;
 
-  const char* Filename () const;
-  int LineNumber () const;
+  const char* filename () const;
+  int line_number () const;
 
 private:
   char description[512];
-  char filename[256];
-  int lineNumber;
+  char file[256];
+  int line;
 };
 
 void ReportAssert (char const* description, char const* filename, int lineNumber);

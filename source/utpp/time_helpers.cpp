@@ -1,3 +1,10 @@
+/*!
+  \file time_helpers.cpp - Implementation of Timer class
+
+  (c) Mircea Neacsu 2017
+  See README file for full copyright information.
+*/
+
 #include <utpp/time_helpers.h>
 #include <windows.h>
 
@@ -33,9 +40,8 @@ __int64 Timer::GetTime () const
   return curTime.QuadPart;
 }
 
-
-
-void TimeHelpers::SleepMs (int const ms)
+/// Pause current thread for the specified time
+void SleepMs (int const ms)
 {
   ::Sleep (ms);
 }

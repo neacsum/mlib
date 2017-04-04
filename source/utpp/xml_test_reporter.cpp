@@ -1,3 +1,10 @@
+/*!
+  \file xml_test_reporter.cpp - Implementation of XmlTestReporter class
+
+  (c) Mircea Neacsu 2017
+  See README file for full copyright information.
+*/
+
 #include <utpp/xml_test_reporter.h>
 #include <utpp/test_suite.h>
 
@@ -37,11 +44,13 @@ static string BuildFailureMessage (string const& file, int line, string const& m
 
 namespace UnitTest {
 
+/// Constructor
 XmlTestReporter::XmlTestReporter (ostream& ostream)
   : os (ostream)
 {
 }
 
+/// Generate XML report
 int XmlTestReporter::ReportSummary ()
 {
   AddXmlElement (NULL);

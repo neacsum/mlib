@@ -1,7 +1,6 @@
 #include <utpp/utpp.h>
-#include <utpp/TestReporterStdout.h>
 
-#include <utpp/XmlTestReporter.h>
+#include <utpp/xml_test_reporter.h>
 #include <iostream>
 #include <fstream>
 

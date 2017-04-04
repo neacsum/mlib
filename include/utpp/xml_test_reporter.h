@@ -1,4 +1,10 @@
 #pragma once
+/*!
+  \file xml_test_reporter.h - Definition of XmlTestReporter class
+
+  (c) Mircea Neacsu 2017
+  See README file for full copyright information.
+*/
 
 #include "deferred_test_reporter.h"
 
@@ -7,7 +13,7 @@
 namespace UnitTest
 {
 
-/// XmlTestReporte is a DeferredTestReporter that prints results in an XML file.
+/// A DeferredTestReporter that sends results to an XML file.
 class XmlTestReporter : public DeferredTestReporter
 {
 public:

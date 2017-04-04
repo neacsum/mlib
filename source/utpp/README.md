@@ -1,86 +1,10 @@
 This test library is based on UnitTest++. See below for README notes of UnitTest++.
 
-# Architecture #
-## Overview ##
-In its simplest form, a test is defined using the `TEST` macro similarly with a
-standard function call:
-``````
-TEST (MyFirstTest)
-{
-  // test code goes here
-}
-``````
-A number of things happen behind the scenes when TEST macro is invoked:
-1. It defines a class called _TestMyFirstTest_ derived from
-`Test` class. The new class has a method called `RunImpl` and the block of code
-following the TEST macro becomes the body of the _RunImpl_ method.
+Author:
+Mircea Neacsu (mircea@neacsu.net)
 
-2. It creates an instance of this object (called _testMyFirstTestInstance_).
 
-3. It creates a `ListAdder` object (with the name _adderMyFirstTest_).
-
-4. The `ListAdder` constructor inserts the newly created object in a linked list
-whose head is returned by `Test::GetTestList()` static method.
-
-The main program contains a call to `RunAllTests ()` that triggers the following 
-sequence of events:
-1. _RunAllTests_ function creates a `TestRunner` object using a `TestReporter`
-as a means for sending out test results and calls its _RunTests()_ method.
-
-2. `TestRunner::RunTests()` iterates through the linked list mentioned before and,
-for each object in the list calls the `TestRunner::Run` method passing it the
-current Test-derived object .
-
-3. Essentially, the _TestRunner::Run_ function, calls the _Test::Run_ function but
-it also does a bit of housekeeping before and after to take care of things like
-time measurement and results reporting.
-
-4. _Test::Run_ wraps the RunImpl() function in a try...catch block and finally
-calls this function. This is actually the test code that was placed after the
-TEST macro.
-
-## Checking Test Results ##
-There are a a number of macro-definitions for testing abnormal conditions while
-running a test here is a list of them:
-
-`CHECK(value)`  Verify that value is true (or not 0) 
-`CHECK_EQUAL (expected, actual)` Compare two values for equality
-`CHECK_CLOSE (expected, actual, tolerance)` Check that two values are closer than
- specified tolerance
-`CHECK_ARRAY_EQUAL (expected, actual, count)` Compare two arrays for equality
-`CHECK_ARRAY_CLOSE (expected, actual, count, tolerance)` Check that two arrays
- are closer than specified tolerance
-`CHECK_ARRAY2D_CLOSE (expected, actual, rows, columns, tolerance)` Check that
- two matrices are within the specified tolerance
-`CHECK_THROW (expression, ExceptionType)` Verifies that expression throws a given exception
-`CHECK_ASSERT (expression)` Verifies that expression throws an AssertException. 
-AssertException objects are thrown by _ReportAssert_ function.
-
-## Using Test Suites ##
-Tests can be grouped together in _suites_ like in the following example:
-``````
-SUITE (BigSuite)
-{
-  TEST (MyFirstTest)
-  {
-    // test code goes here
-  }
-  TEST (MySecondTest)
-  {
-    //another test case
-  }
-  // ....
-}
-``````
-The SUITE macro defines in effect a namespace (called _SuiteBigSuite_) and makes
-all tests, objects inside the namespace.
-
-## Objects ##
-There are two main global object pointers: `CurrentTest` and `CurrentReporter`.
-They need to be global to be able to call check macros from anywhere. When the
-test runner object is initialized (int the RunAllTests function) it also initializes
-the CurrentReporter pointer.
-
+See architecture.md for details
 
 # UnitTest++ README #
 Version: v1.4

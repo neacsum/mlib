@@ -18,57 +18,51 @@
     <ClCompile Include="source\utpp\tests\Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\utpp\tests\TestAssertHandler.cpp">
+    <ClCompile Include="source\utpp\tests\AssertHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\utpp\tests\TestCheckMacros.cpp">
+    <ClCompile Include="source\utpp\tests\CheckMacros.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\utpp\tests\TestChecks.cpp">
+    <ClCompile Include="source\utpp\tests\Checks.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\utpp\tests\TestCurrentTest.cpp">
+    <ClCompile Include="source\utpp\tests\DeferredTestReporter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\utpp\tests\TestDeferredTestReporter.cpp">
+    <ClCompile Include="source\utpp\tests\Test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\utpp\tests\TestTest.cpp">
+    <ClCompile Include="source\utpp\tests\TestList.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\utpp\tests\TestTestList.cpp">
+    <ClCompile Include="source\utpp\tests\TestMacros.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\utpp\tests\TestTestMacros.cpp">
+    <ClCompile Include="source\utpp\tests\TestResults.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\utpp\tests\TestTestResults.cpp">
+    <ClCompile Include="source\utpp\tests\TestRunner.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\utpp\tests\TestTestRunner.cpp">
+    <ClCompile Include="source\utpp\tests\TestSuite.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\utpp\tests\TestTestSuite.cpp">
+    <ClCompile Include="source\utpp\tests\TimeConstraint.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\utpp\tests\TestTimeConstraint.cpp">
+    <ClCompile Include="source\utpp\tests\TimeConstraintMacro.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\utpp\tests\TestTimeConstraintMacro.cpp">
+    <ClCompile Include="source\utpp\tests\UnitTest++.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\utpp\tests\TestUnitTest++.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="source\utpp\tests\TestXmlTestReporter.cpp">
+    <ClCompile Include="source\utpp\tests\XmlTestReporter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="source\utpp\tests\RecordingReporter.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="source\utpp\tests\ScopedCurrentTest.h">
+    <ClInclude Include="source\utpp\tests\recording_reporter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

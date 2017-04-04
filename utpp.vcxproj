@@ -148,8 +148,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="source\utpp\assert_exception.cpp" />
-    <ClCompile Include="source\utpp\checks.cpp" />
+    <ClCompile Include="source\utpp\Checks.cpp" />
     <ClCompile Include="source\utpp\deferred_test_reporter.cpp" />
+    <ClCompile Include="source\utpp\suites_list.cpp" />
     <ClCompile Include="source\utpp\test.cpp" />
     <ClCompile Include="source\utpp\test_suite.cpp" />
     <ClCompile Include="source\utpp\test_reporter.cpp" />
@@ -164,6 +165,7 @@
     <ClInclude Include="include\utpp\checks.h" />
     <ClInclude Include="include\utpp\deferred_test_reporter.h" />
     <ClInclude Include="include\utpp\failure.h" />
+    <ClInclude Include="include\utpp\suites_list.h" />
     <ClInclude Include="include\utpp\test.h" />
     <ClInclude Include="include\utpp\test_macros.h" />
     <ClInclude Include="include\utpp\test_reporter.h" />
