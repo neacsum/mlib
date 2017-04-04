@@ -35,7 +35,7 @@
     try {                                                                     \
       if (!UnitTest::Check(value))                                            \
       {                                                                       \
-        ReportFailure (__FILE__, __LINE__, #value);                           \
+        ReportFailure (__FILE__, __LINE__, "Check failed: " #value);          \
       }                                                                       \
     }                                                                         \
     catch (...) {                                                             \

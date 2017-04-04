@@ -8,7 +8,7 @@ namespace UnitTest {
 class TestReporterStdout : public TestReporter
 {
 private:
-  virtual void ReportFailure (Failure& failure);
+  virtual void ReportFailure (const Failure& failure);
   virtual int ReportSummary ();
 };
 

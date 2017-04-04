@@ -148,7 +148,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="source\utpp\assert_exception.cpp" />
-    <ClCompile Include="source\utpp\checks.cpp" />
+    <ClCompile Include="source\utpp\Checks.cpp" />
     <ClCompile Include="source\utpp\deferred_test_reporter.cpp" />
     <ClCompile Include="source\utpp\test.cpp" />
     <ClCompile Include="source\utpp\test_suite.cpp" />

@@ -11,7 +11,6 @@ bool Check(Value const value)
   return !!value; // doing double negative to avoid silly VS warnings
 }
 
-
 template< typename Expected, typename Actual >
 bool CheckEqual (const Expected& expected, const Actual& actual, std::string& msg)
 {
@@ -25,10 +24,15 @@ bool CheckEqual (const Expected& expected, const Actual& actual, std::string& ms
   return true;
 }
 
-bool CheckEqual (const char* expected, const char* actual, std::string& msg);
+template < >
+bool CheckEqual (const std::string& expected, const std::string& actual, std::string& msg);
+
+bool CheckEqual (const char* expected, const std::string& actual, std::string& msg);
+bool CheckEqual (const char* expected, char const* actual, std::string& msg);
 bool CheckEqual (char* expected, char* actual, std::string& msg);
 bool CheckEqual (char* expected, const char* actual, std::string& msg);
-bool CheckEqual (const char* expected, char* actual, std::string& msg);
+bool CheckEqual (char const* expected, char* actual, std::string& msg);
+
 
 template< typename Expected, typename Actual, typename Tolerance >
 bool AreClose (const Expected& expected, const Actual& actual, const Tolerance& tolerance)
