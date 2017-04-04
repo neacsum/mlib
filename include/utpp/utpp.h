@@ -1,16 +1,11 @@
 #pragma once
-//lint -esym(1509,*Fixture)
 
-#include "Config.h"
-#include "Test.h"
-#include "TestList.h"
-#include "TestSuite.h"
-#include "TestResults.h"
+#include "test.h"
+#include "test_suite.h"
+#include "test_reporter.h"
+#include "test_macros.h"
 
-#include "TestMacros.h"
-
-#include "CheckMacros.h"
-#include "TestRunner.h"
-#include "TimeConstraint.h"
+#include "check_macros.h"
+#include "time_constraint.h"
 
 #pragma comment (lib, "utpp.lib")

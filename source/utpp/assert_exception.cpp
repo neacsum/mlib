@@ -1,4 +1,4 @@
-#include <utpp/AssertException.h>
+#include <utpp/assert_exception.h>
 #include <cstring>
 
 namespace UnitTest {
@@ -27,6 +27,11 @@ char const* AssertException::Filename () const
 int AssertException::LineNumber () const
 {
   return lineNumber;
+}
+
+void ReportAssert (char const* description, char const* filename, int lineNumber)
+{
+  throw AssertException (description, filename, lineNumber);
 }
 
 }

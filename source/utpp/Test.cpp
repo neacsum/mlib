@@ -1,23 +1,17 @@
-#include <utpp/Config.h>
-#include <utpp/Test.h>
-#include <utpp/TestList.h>
-#include <utpp/TestResults.h>
-#include <utpp/AssertException.h>
-#include <utpp/CurrentTest.h>
+#include <utpp/test.h>
+#include <utpp/test_suite.h>
+#include <utpp/test_reporter.h>
+#include <utpp/failure.h>
+
 #include <sstream>
 
 namespace UnitTest {
 
-TestList& Test::GetTestList ()
-{
-  static TestList s_list;
-  return s_list;
-}
-
-Test::Test (char const* testName, char const* suiteName, char const* filename, int lineNumber)
-  : m_details (testName, suiteName, filename, lineNumber)
-  , next (0)
-  , m_timeConstraintExempt (false)
+Test::Test (const char* testName)
+  : name (testName)
+  , suite (0)
+  , failures (0)
+  , time (0)
 {
 }
 
@@ -25,37 +19,22 @@ Test::~Test ()
 {
 }
 
-void Test::Run ()
+void Test::run ()
 {
-//  ExecuteTest (*this, m_details);
-  CurrentTest.Details = &m_details;
+  Timer test_timer;
+  if (time >= 0)
+    test_timer.Start ();
 
-  try
-  {
-    RunImpl ();
-  }
-  catch (const AssertException& e)
-  {
-    m_details.filename = e.Filename ();
-    m_details.lineNumber = e.LineNumber ();
-    CurrentTest.Results->OnTestFailure (m_details, e.what ());
-  }
-  catch (const std::exception& e)
-  {
-    std::stringstream stream;
-    stream << "Unhandled exception: " << e.what ();
-    CurrentTest.Results->OnTestFailure (m_details, stream.str ());
-  }
-  catch (...)
-  {
-    CurrentTest.Results->OnTestFailure (m_details, "Unhandled exception: Crash!");
-  }
+  RunImpl ();
 
+  if (time >= 0)
+    time = test_timer.GetTimeInMs ();
 }
 
-/*
-void Test::RunImpl ()
+void Test::ReportFailure (const std::string& filename, int line, const std::string& message)
 {
+  failures++;
+  CurrentReporter->ReportFailure (Failure(filename, line, message));
 }
-*/
+
 }

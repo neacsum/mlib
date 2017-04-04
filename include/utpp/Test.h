@@ -1,33 +1,76 @@
 #pragma once
-
-#include "TestDetails.h"
-
-#define DEFAULT_SUITE "DefaultSuite"
+#include <string>
+#include <cassert>
+#include "test_suite.h"
 
 namespace UnitTest {
-
-class TestResults;
-class TestList;
 
 class Test
 {
 public:
-  Test (const char* testName, const char* suiteName = DEFAULT_SUITE, const char* filename = "", int lineNumber = 0);
+  Test (const char* testName);
   virtual ~Test ();
-  void Run ();
+  void assign_suite (TestSuite* suite);
+  void no_time_constraint ();
 
-  TestDetails m_details;
-  Test* next;
-  mutable bool m_timeConstraintExempt;
+  const std::string& suite_name () const;
+  int failure_count () const;
+  int test_time_ms () const;
+  const std::string& test_name () const;
 
-  static TestList& GetTestList ();
-
+  void ReportFailure (const std::string& filename, int line, const std::string& message);
+  void run ();
   virtual void RunImpl () = 0;
+
+protected:
+  std::string name;
+  TestSuite *suite;
+  int failures;
+  int time;
 
 private:
   Test (Test const&);
   Test& operator =(Test const&);
+  friend class TestSuite;
 };
 
+inline
+void Test::assign_suite (TestSuite *suite_)
+{
+  suite = suite_;
+}
 
+inline
+const std::string& Test::suite_name () const
+{
+  assert (suite);
+  return suite->name;
+}
+
+inline 
+int Test::failure_count () const
+{
+  return failures;
+}
+
+inline
+int Test::test_time_ms () const
+{
+  return time;
+}
+
+inline
+const std::string& Test::test_name () const
+{
+  return name;
+}
+
+inline
+void Test::no_time_constraint ()
+{
+  time = -1;
+}
+
+//Currently executing test
+extern Test* CurrentTest;
 }

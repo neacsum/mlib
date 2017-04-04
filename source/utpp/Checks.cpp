@@ -1,44 +1,41 @@
-#include <utpp/Checks.h>
+#include <utpp/checks.h>
+
+using namespace std;
 
 namespace UnitTest {
 
-static void CheckStringsEqual (TestResults& results, char const* expected, char const* actual,
-                        TestDetails const& details)
+static bool CheckStringsEqual (const char* expected, const char* actual, string& msg)
 {
-  using namespace std;
 
   if (strcmp (expected, actual))
   {
     std::stringstream stream;
     stream << "Expected " << expected << " but was " << actual;
-
-    results.OnTestFailure (details, stream.str ());
+    msg = stream.str ();
+    return false;
   }
+  return true;
 }
 
 
-void CheckEqual (TestResults& results, char const* expected, char const* actual,
-                 TestDetails const& details)
+bool CheckEqual (const char* expected, char const* actual, string& msg)
 {
-  CheckStringsEqual (results, expected, actual, details);
+  return CheckStringsEqual (expected, actual, msg);
 }
 
-void CheckEqual (TestResults& results, char* expected, char* actual,
-                 TestDetails const& details)
+bool CheckEqual (char* expected, char* actual, string& msg)
 {
-  CheckStringsEqual (results, expected, actual, details);
+  return CheckStringsEqual (expected, actual, msg);
 }
 
-void CheckEqual (TestResults& results, char* expected, char const* actual,
-                 TestDetails const& details)
+bool CheckEqual (char* expected, const char* actual, string& msg)
 {
-  CheckStringsEqual (results, expected, actual, details);
+  return CheckStringsEqual (expected, actual, msg);
 }
 
-void CheckEqual (TestResults& results, char const* expected, char* actual,
-                 TestDetails const& details)
+bool CheckEqual (char const* expected, char* actual, string& msg)
 {
-  CheckStringsEqual (results, expected, actual, details);
+  return CheckStringsEqual (expected, actual, msg);
 }
 
 

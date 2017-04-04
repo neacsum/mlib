@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Config.h"
-#include "TestResults.h"
 #include <sstream>
 
 namespace UnitTest {
@@ -10,29 +8,27 @@ namespace UnitTest {
 template< typename Value >
 bool Check(Value const value)
 {
-    return !!value; // doing double negative to avoid silly VS warnings
+  return !!value; // doing double negative to avoid silly VS warnings
 }
 
 
 template< typename Expected, typename Actual >
-void CheckEqual (TestResults& results, const Expected& expected, const Actual& actual, const TestDetails& details)
+bool CheckEqual (const Expected& expected, const Actual& actual, std::string& msg)
 {
   if (!(expected == actual))
   {
     std::stringstream stream;
     stream << "Expected " << expected << " but was " << actual;
-
-    results.OnTestFailure (details, stream.str());
+    msg = stream.str ();
+    return false;
   }
+  return true;
 }
 
-void CheckEqual(TestResults& results, const char* expected, const char* actual, const TestDetails& details);
-
-void CheckEqual(TestResults& results, char* expected, char* actual, const TestDetails& details);
-
-void CheckEqual(TestResults& results, char* expected, const char* actual, const TestDetails& details);
-
-void CheckEqual(TestResults& results, const char* expected, char* actual, const TestDetails& details);
+bool CheckEqual (const char* expected, const char* actual, std::string& msg);
+bool CheckEqual (char* expected, char* actual, std::string& msg);
+bool CheckEqual (char* expected, const char* actual, std::string& msg);
+bool CheckEqual (const char* expected, char* actual, std::string& msg);
 
 template< typename Expected, typename Actual, typename Tolerance >
 bool AreClose (const Expected& expected, const Actual& actual, const Tolerance& tolerance)
@@ -41,8 +37,8 @@ bool AreClose (const Expected& expected, const Actual& actual, const Tolerance& 
 }
 
 template< typename Expected, typename Actual, typename Tolerance >
-void CheckClose (TestResults& results, const Expected& expected, const Actual& actual, const Tolerance& tolerance,
-                 const TestDetails& details)
+bool CheckClose (const Expected& expected, const Actual& actual, const Tolerance& tolerance,
+                 std::string& msg)
 {
   if (!AreClose (expected, actual, tolerance))
   {
@@ -51,37 +47,37 @@ void CheckClose (TestResults& results, const Expected& expected, const Actual& a
     stream.precision (prec);
     stream.setf (std::ios::fixed);
     stream << "Expected " << expected << " +/- " << tolerance << " but was " << actual;
-    results.OnTestFailure (details, stream.str ());
+    msg = stream.str ();
+    return false;
   }
+  return true;
 }
 
 
 template< typename Expected, typename Actual >
-void CheckArrayEqual (TestResults& results, const Expected& expected, const Actual& actual,
-                      int count, const TestDetails& details)
+bool CheckArrayEqual (const Expected& expected, const Actual& actual,
+                      int count, std::string& msg)
 {
   bool equal = true;
-  for (int i = 0; i < count; ++i)
-    equal &= (expected[i] == actual[i]);
+  for (int i = 0; equal && i < count; ++i)
+    equal = (expected[i] == actual[i]);
 
   if (!equal)
   {
     std::stringstream stream;
-
     stream << "Expected [ ";
-
     for (int expectedIndex = 0; expectedIndex < count; ++expectedIndex)
       stream << expected[expectedIndex] << " ";
 
     stream << "] but was [ ";
-
     for (int actualIndex = 0; actualIndex < count; ++actualIndex)
       stream << actual[actualIndex] << " ";
 
     stream << "]";
-
-    results.OnTestFailure (details, stream.str());
+    msg = stream.str ();
+    return false;
   }
+  return true;
 }
 
 template< typename Expected, typename Actual, typename Tolerance >
@@ -94,42 +90,38 @@ bool ArrayAreClose (const Expected& expected, const Actual& actual, int count, c
 }
 
 template< typename Expected, typename Actual, typename Tolerance >
-void CheckArrayClose (TestResults& results, const Expected& expected, const Actual& actual,
-                      int count, const Tolerance& tolerance, const TestDetails& details)
+bool CheckArrayClose (const Expected& expected, const Actual& actual,
+                      int count, const Tolerance& tolerance, std::string& msg)
 {
-  bool equal = ArrayAreClose (expected, actual, count, tolerance);
-
-  if (!equal)
+  if (!ArrayAreClose (expected, actual, count, tolerance))
   {
     std::stringstream stream;
-
     stream << "Expected [ ";
     for (int expectedIndex = 0; expectedIndex < count; ++expectedIndex)
       stream << expected[expectedIndex] << " ";
-    stream << "] +/- " << tolerance << " but was [ ";
 
+    stream << "] +/- " << tolerance << " but was [ ";
     for (int actualIndex = 0; actualIndex < count; ++actualIndex)
       stream << actual[actualIndex] << " ";
     stream << "]";
-
-    results.OnTestFailure (details, stream.str());
+    msg = stream.str ();
+    return false;
   }
+  return true;
 }
 
 template< typename Expected, typename Actual, typename Tolerance >
-void CheckArray2DClose (TestResults& results, const Expected& expected, const Actual& actual,
-                        int rows, int columns, const Tolerance& tolerance, const TestDetails& details)
+bool CheckArray2DClose (const Expected& expected, const Actual& actual,
+                        int rows, int columns, const Tolerance& tolerance, std::string& msg)
 {
   bool equal = true;
-  for (int i = 0; equal && i < rows; ++i)
+  for (int i = 0; equal && i < rows; i++)
     equal = ArrayAreClose (expected[i], actual[i], columns, tolerance);
 
   if (!equal)
   {
     std::stringstream stream;
-
     stream << "Expected [ ";
-
     for (int expectedRow = 0; expectedRow < rows; ++expectedRow)
     {
       stream << "[ ";
@@ -139,7 +131,6 @@ void CheckArray2DClose (TestResults& results, const Expected& expected, const Ac
     }
 
     stream << "] +/- " << tolerance << " but was [ ";
-
     for (int actualRow = 0; actualRow < rows; ++actualRow)
     {
       stream << "[ ";
@@ -147,11 +138,11 @@ void CheckArray2DClose (TestResults& results, const Expected& expected, const Ac
         stream << actual[actualRow][actualColumn] << " ";
       stream << "] ";
     }
-
     stream << "]";
-
-    results.OnTestFailure (details, stream.str());
+    msg = stream.str ();
+    return false;
   }
+  return true;
 }
 
 }

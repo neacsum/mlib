@@ -147,44 +147,32 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="source\utpp\AssertException.cpp" />
-    <ClCompile Include="source\utpp\Checks.cpp" />
-    <ClCompile Include="source\utpp\CurrentTest.cpp" />
-    <ClCompile Include="source\utpp\DeferredTestReporter.cpp" />
-    <ClCompile Include="source\utpp\DeferredTestResult.cpp" />
-    <ClCompile Include="source\utpp\ReportAssert.cpp" />
-    <ClCompile Include="source\utpp\Test.cpp" />
-    <ClCompile Include="source\utpp\TestDetails.cpp" />
-    <ClCompile Include="source\utpp\TestList.cpp" />
-    <ClCompile Include="source\utpp\TestReporterStdout.cpp" />
-    <ClCompile Include="source\utpp\TestResults.cpp" />
-    <ClCompile Include="source\utpp\TestRunner.cpp" />
-    <ClCompile Include="source\utpp\TimeConstraint.cpp" />
-    <ClCompile Include="source\utpp\TimeHelpers.cpp" />
-    <ClCompile Include="source\utpp\XmlTestReporter.cpp" />
+    <ClCompile Include="source\utpp\assert_exception.cpp" />
+    <ClCompile Include="source\utpp\checks.cpp" />
+    <ClCompile Include="source\utpp\deferred_test_reporter.cpp" />
+    <ClCompile Include="source\utpp\test.cpp" />
+    <ClCompile Include="source\utpp\test_suite.cpp" />
+    <ClCompile Include="source\utpp\test_reporter.cpp" />
+    <ClCompile Include="source\utpp\test_reporter_stdout.cpp" />
+    <ClCompile Include="source\utpp\time_constraint.cpp" />
+    <ClCompile Include="source\utpp\time_helpers.cpp" />
+    <ClCompile Include="source\utpp\xml_test_reporter.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\utpp\AssertException.h" />
-    <ClInclude Include="include\utpp\CheckMacros.h" />
-    <ClInclude Include="include\utpp\Checks.h" />
-    <ClInclude Include="include\utpp\Config.h" />
-    <ClInclude Include="include\utpp\CurrentTest.h" />
-    <ClInclude Include="include\utpp\DeferredTestReporter.h" />
-    <ClInclude Include="include\utpp\DeferredTestResult.h" />
-    <ClInclude Include="include\utpp\ReportAssert.h" />
-    <ClInclude Include="include\utpp\Test.h" />
-    <ClInclude Include="include\utpp\TestDetails.h" />
-    <ClInclude Include="include\utpp\TestList.h" />
-    <ClInclude Include="include\utpp\TestMacros.h" />
-    <ClInclude Include="include\utpp\TestReporter.h" />
-    <ClInclude Include="include\utpp\TestReporterStdout.h" />
-    <ClInclude Include="include\utpp\TestResults.h" />
-    <ClInclude Include="include\utpp\TestRunner.h" />
-    <ClInclude Include="include\utpp\TestSuite.h" />
-    <ClInclude Include="include\utpp\TimeConstraint.h" />
-    <ClInclude Include="include\utpp\timehelpers.h" />
+    <ClInclude Include="include\utpp\assert_exception.h" />
+    <ClInclude Include="include\utpp\check_macros.h" />
+    <ClInclude Include="include\utpp\checks.h" />
+    <ClInclude Include="include\utpp\deferred_test_reporter.h" />
+    <ClInclude Include="include\utpp\failure.h" />
+    <ClInclude Include="include\utpp\test.h" />
+    <ClInclude Include="include\utpp\test_macros.h" />
+    <ClInclude Include="include\utpp\test_reporter.h" />
+    <ClInclude Include="include\utpp\test_reporter_stdout.h" />
+    <ClInclude Include="include\utpp\test_suite.h" />
+    <ClInclude Include="include\utpp\time_constraint.h" />
+    <ClInclude Include="include\utpp\time_helpers.h" />
     <ClInclude Include="include\utpp\utpp.h" />
-    <ClInclude Include="include\utpp\XmlTestReporter.h" />
+    <ClInclude Include="include\utpp\xml_test_reporter.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="source\utpp\README.md" />

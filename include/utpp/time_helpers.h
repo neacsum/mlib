@@ -1,8 +1,5 @@
 #pragma once
 
-#include "config.h"
-
-
 #ifdef UNITTEST_MINGW
   #ifndef __int64
     #define __int64 long long
