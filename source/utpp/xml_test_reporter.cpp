@@ -45,7 +45,7 @@ static string BuildFailureMessage (string const& file, int line, string const& m
 namespace UnitTest {
 
 /// Constructor
-XmlTestReporter::XmlTestReporter (ostream& ostream)
+XmlTestReporter::XmlTestReporter (std::ostream& ostream)
   : os (ostream)
 {
 }

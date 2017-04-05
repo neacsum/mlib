@@ -1,4 +1,10 @@
 #pragma once
+/*!
+  \file suites_list.h - Definition of SuitesList class
+
+  (c) Mircea Neacsu 2017
+  See README file for full copyright information.
+*/
 #include <deque>
 #include "test_suite.h"
 

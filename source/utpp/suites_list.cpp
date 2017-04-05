@@ -1,3 +1,9 @@
+/*!
+  \file suites_list.cpp - Implementation of SuitesList class
+
+  (c) Mircea Neacsu 2017
+  See README file for full copyright information.
+*/
 #include <utpp/suites_list.h>
 
 namespace UnitTest {

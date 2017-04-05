@@ -148,7 +148,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="source\utpp\assert_exception.cpp" />
-    <ClCompile Include="source\utpp\Checks.cpp" />
+    <ClCompile Include="source\utpp\checks.cpp" />
     <ClCompile Include="source\utpp\deferred_test_reporter.cpp" />
     <ClCompile Include="source\utpp\suites_list.cpp" />
     <ClCompile Include="source\utpp\test.cpp" />
@@ -177,6 +177,7 @@
     <ClInclude Include="include\utpp\xml_test_reporter.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="source\utpp\achitecture.md" />
     <None Include="source\utpp\README.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

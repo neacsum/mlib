@@ -3,7 +3,7 @@
   \file test_suite.h - Definition of TestSuite class
 
   (c) Mircea Neacsu 2017
-  See README file for full copyright information.
+  See README.md file for full copyright information.
 */
 #include <string>
 #include <deque>
@@ -23,11 +23,13 @@ typedef UnitTest::Test* (*Testmaker)();
 class TestSuite
 {
 public:
+
+  ///Information kept for each test
   struct maker_info {
-    std::string name;
-    std::string file;
-    int line;
-    Testmaker func;
+    std::string name;   ///< test name
+    std::string file;   ///< filename where test was declared
+    int line;           ///< line number where test was declared
+    Testmaker func;     ///< test maker function
   };
 
   TestSuite (const char *name);
@@ -36,7 +38,7 @@ public:
   std::string name;
 
 private:
-  std::deque <maker_info> test_list;
+  std::deque <maker_info> test_list;  ///< tests included in this suite
   int max_runtime;
 
   bool SetupCurrentTest (maker_info& inf);

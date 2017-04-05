@@ -1,6 +1,6 @@
 #pragma once
 /*!
-  \file timer_constraint.h - Definition of TimeConstraint class
+  \file time_constraint.h - Definition of TimeConstraint class
 
   (c) Mircea Neacsu 2017
   See README file for full copyright information.

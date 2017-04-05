@@ -42,7 +42,7 @@
     <ClCompile Include="source\utpp\test_suite.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\utpp\Checks.cpp">
+    <ClCompile Include="source\utpp\checks.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\utpp\suites_list.cpp">
@@ -98,5 +98,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="source\utpp\README.md" />
+    <None Include="source\utpp\achitecture.md" />
   </ItemGroup>
 </Project>
