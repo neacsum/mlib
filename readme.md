@@ -1,9 +1,9 @@
-# MLIB - Multi-purpose Library
+# MLIB - Multi-purpose Library #
 
 This is a collection of bits and pieces crafted over the years. It is released
 with the hope that other people might find it useful or interesting.
 
-## License
+## License ##
 
 The MIT License (MIT)
  
@@ -28,20 +28,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 
-##Contents:
+## Contents ##
 Projects:
-  - mlib - Main Library
-  - utpp - UnitTest++
-  - geo  - Geodesy and Map Projections
-  - geom - Geometry Objects and algorithms
-  - nmea - NMEA-0183 
+- mlib - Main Library
+- utpp - Test liobrary derived from UnitTest++
+- geo  - Geodesy and Map Projections
+- geom - Geometry Objects and algorithms
+- nmea - NMEA-0183 
   
 UnitTests:
-  - mlib_test
-  - utpp_test   - Tests for UnitTest++
-  - geo_tests   - Tests for Geodesy and Map Projections
-  - geom_tests  - Tests for Geometry Objects
+- mlib_test
+- utpp_test   - Tests for utpp
+- geo_tests   - Tests for Geodesy and Map Projections
+- geom_tests  - Tests for Geometry Objects
 
-##Installation
+## Installation ##
 All projects have been tested under Visual Studio 2013. The libraries can be 
 built in 32 or 64 bit version, with or without debug information.
