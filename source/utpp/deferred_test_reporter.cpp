@@ -13,7 +13,7 @@ using namespace UnitTest;
 void DeferredTestReporter::ReportTestStart (const Test& test)
 {
   TestReporter::ReportTestStart (test);
-  results.push_back (TestResult (test.suite_name (), test.test_name()));
+  results.push_back (TestResult (CurrentSuite, test.test_name()));
 }
 
 /// Add a new failure to current test

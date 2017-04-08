@@ -11,16 +11,14 @@
 
 namespace UnitTest {
 
-/// @brief %Test case
+/// @brief A test case representation
 class Test
 {
 public:
   Test (const char* testName);
   virtual ~Test ();
-  void assign_suite (TestSuite* suite);
   void no_time_constraint ();
 
-  const std::string& suite_name () const;
   int failure_count () const;
   int test_time_ms () const;
   const std::string& test_name () const;
@@ -31,7 +29,6 @@ public:
 
 protected:
   std::string name;
-  TestSuite *suite;
   int failures;
   int time;
 
@@ -41,20 +38,6 @@ private:
   friend class TestSuite;
 };
 
-/// Assign the test to a TestSuite
-inline
-void Test::assign_suite (TestSuite *suite_)
-{
-  suite = suite_;
-}
-
-/// Return the name of the currently assigned suite 
-inline
-const std::string& Test::suite_name () const
-{
-  static const std::string nil ("");
-  return suite?suite->name : nil;
-}
 
 /// Return the number of failures in this test
 inline 

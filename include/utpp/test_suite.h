@@ -57,14 +57,14 @@ public:
               Testmaker func);
 };
 
-/// Run all tests from all test suites
-int RunAllTests (TestReporter& rpt = GetDefaultReporter (), int max_time_ms = 0);
+extern std::string CurrentSuite;
 
-/// Run all tests from one suite
-int RunSuite (const char *suite_name, TestReporter& rpt = GetDefaultReporter (), int max_time_ms = 0);
 }
 
-/// Return current suite name
+/*!
+  Return current suite name for default suite. All other suites have the same
+  function defined inside their namespaces.
+*/
 inline const char* GetSuiteName ()
 {
   return DEFAULT_SUITE;

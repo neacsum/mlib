@@ -16,7 +16,6 @@ namespace UnitTest {
 /// Constructor
 Test::Test (const char* testName)
   : name (testName)
-  , suite (0)
   , failures (0)
   , time (0)
 {

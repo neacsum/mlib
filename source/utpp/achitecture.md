@@ -3,14 +3,8 @@
 
 ## Motivation ##
 UnitTest++ is an excellent lightweight test framework but it has a number of
-drawbacks. The main problem is that all tests are statically instantiated and
-they are not destroyed. This can be a big problem for test fixtures if they need
-to reuse a resource. For instance a fixture containing a TCP server (to test a TCP
-client) will remain listening the first time it is created. In this new architecture,
-fixtures are setup at the beginning of the test and teared down at the end of the
-test.
+irritants:
 
-In addition there were some smaller irritants:
 * baroque internal structure with tests, test suites, test lists, test results, test details,
 test reporters, etc.
 * stylistical issues with 'const madness' like this:
@@ -25,12 +19,17 @@ The library allows you to define test cases (called _tests_) and group those cas
 in _test suites_. Test suites are executed and the results are displayed using
 a _test repoter_.
 
-Included are two test reporters: one that generates output to stdout (the default one)
-and another that generates results in an XML file with a structure similar to the
-files created by NUnit.
+Included are three test reporters: 
+* `TestReporterStdout` generates output to stdout.
+* `XMLTestReporter` generates results in an XML file with a structure similar
+to the files created by NUnit.
+* `TestReporterDbgout` writes messages to debug output (using OutputDebugString)
+
+The function GetDefaultTestReporter returns an instance of the `TestReporterStdout`
+object as the default test reporter.
 
 Throughout the execution of a test, one can verify the results and compare them with
-expected results using _CHECK macros_.
+expected results using _CHECK macros_ (see below).
 
 ## Overview ##
 In its simplest form, a test is defined using the `TEST` macro similarly with a
@@ -140,6 +139,10 @@ SUITE (BigSuite)
 The SUITE macro defines in effect a namespace (called _SuiteBigSuite_) and makes
 all tests, objects inside the namespace.
 
+It also defines a function GetSuiteName() inside this namespace that returns the
+name of the current suite. This function is called by the TEST macros to obtain
+the suite name.
+
 ## Fixtures ##
 In many (most) cases one needs a certain environment for executing the test and
 the same environment might be reused in multiple tests. This environment is
@@ -181,4 +184,6 @@ There are two global object pointers: `CurrentTest` and `CurrentReporter`.
 They need to be global to be able to call check macros from anywhere.
 The TestSuite::RunTests function also initializes the CurrentReporter pointer.
 
+There is also a global string object CurrentSuite that contains the name of the
+currently running suite.
 

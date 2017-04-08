@@ -32,8 +32,8 @@ void TestReporterStdout::ReportFailure (const Failure& failure)
   cout << "Failure in ";
   if (CurrentTest)
   {
-    if (CurrentTest->suite_name () != DEFAULT_SUITE)
-      cout << " suite " << CurrentTest->suite_name ();
+    if (CurrentSuite != DEFAULT_SUITE)
+      cout << " suite " << CurrentSuite;
     cout << " test " << CurrentTest->test_name ();
   }
   cout << endl << failure.filename << "(" << failure.line_number << "):"

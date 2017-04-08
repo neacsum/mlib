@@ -22,6 +22,9 @@ namespace UnitTest {
 //The global CurrentTest object
 Test* CurrentTest;
 
+//The global CurrentSuite name
+string CurrentSuite = DEFAULT_SUITE;
+
 /*!
   \class UnitTest::TestSuite
   A suite maintains a container with information about all tests included in
@@ -33,6 +36,7 @@ TestSuite::TestSuite (const char *name_)
   : name (name_)
 {
   CurrentTest = nullptr;
+  CurrentSuite = name;
 }
 
 /// Add a new test information to test_list
@@ -87,7 +91,6 @@ bool TestSuite::SetupCurrentTest (maker_info& inf)
   bool ok = false;
   try {
     CurrentTest = (*inf.func)();
-    CurrentTest->assign_suite (this);
     ok = true;
   }
   catch (const std::exception& e)

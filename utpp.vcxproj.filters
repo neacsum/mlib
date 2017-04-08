@@ -48,6 +48,9 @@
     <ClCompile Include="source\utpp\suites_list.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="source\utpp\test_reporter_dbgout.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\utpp\test.h">
@@ -93,6 +96,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\utpp\suites_list.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\utpp\test_reporter_dbgout.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

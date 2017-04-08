@@ -152,6 +152,7 @@
     <ClCompile Include="source\utpp\deferred_test_reporter.cpp" />
     <ClCompile Include="source\utpp\suites_list.cpp" />
     <ClCompile Include="source\utpp\test.cpp" />
+    <ClCompile Include="source\utpp\test_reporter_dbgout.cpp" />
     <ClCompile Include="source\utpp\test_suite.cpp" />
     <ClCompile Include="source\utpp\test_reporter.cpp" />
     <ClCompile Include="source\utpp\test_reporter_stdout.cpp" />
@@ -169,6 +170,7 @@
     <ClInclude Include="include\utpp\test.h" />
     <ClInclude Include="include\utpp\test_macros.h" />
     <ClInclude Include="include\utpp\test_reporter.h" />
+    <ClInclude Include="include\utpp\test_reporter_dbgout.h" />
     <ClInclude Include="include\utpp\test_reporter_stdout.h" />
     <ClInclude Include="include\utpp\test_suite.h" />
     <ClInclude Include="include\utpp\time_constraint.h" />
