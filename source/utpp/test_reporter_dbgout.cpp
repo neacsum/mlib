@@ -33,10 +33,12 @@ void TestReporterDbgout::ReportFailure (const Failure& failure)
       ss << " suite " << CurrentSuite;
     ss << " test " << CurrentTest->test_name ();
   }
+  ss << endl;
   OutputDebugString (utf8::widen(ss.str()).c_str());
-  ss.str ().clear ();
+  ss.clear ();
+  ss.str ("");
   ss << failure.filename << "(" << failure.line_number << "):"
-    << failure.message;
+    << failure.message << endl;
   OutputDebugString (utf8::widen (ss.str ()).c_str ());
   TestReporter::ReportFailure (failure);
 }
@@ -45,7 +47,7 @@ void TestReporterDbgout::ReportFailure (const Failure& failure)
   Prints a test run summary including number of tests, number of failures,
   running time, etc.
 */
-int TestReporterDbgout::ReportSummary ()
+int TestReporterDbgout::Summary ()
 {
   stringstream ss;
   if (total_failed_count > 0)
@@ -53,19 +55,20 @@ int TestReporterDbgout::ReportSummary ()
     ss << "FAILURE: " << total_failed_count << " out of "
       << total_test_count << " tests failed (" << total_failures_count
       << " failures).";
-    OutputDebugString (utf8::widen (ss.str ()).c_str ());
   }
   else
   {
     ss << "Success: " << total_test_count << " tests passed.";
-    OutputDebugString (utf8::widen (ss.str ()).c_str ());
   }
-  ss.str ().clear ();
+  ss << endl;
+  OutputDebugString (utf8::widen (ss.str ()).c_str ());
+  ss.clear ();
+  ss.str ("");
   ss.setf (ios::fixed);
   ss << "Run time: " << setprecision (2) << total_time_msec / 1000.;
   OutputDebugString (utf8::widen (ss.str ()).c_str ());
 
-  return TestReporter::ReportSummary ();
+  return TestReporter::Summary ();
 }
 
 }

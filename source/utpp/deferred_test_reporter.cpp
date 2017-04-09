@@ -10,9 +10,9 @@
 using namespace UnitTest;
 
 /// Add a new test to the results container
-void DeferredTestReporter::ReportTestStart (const Test& test)
+void DeferredTestReporter::TestStart (const Test& test)
 {
-  TestReporter::ReportTestStart (test);
+  TestReporter::TestStart (test);
   results.push_back (TestResult (CurrentSuite, test.test_name()));
 }
 
@@ -24,9 +24,9 @@ void DeferredTestReporter::ReportFailure (const Failure& failure)
 }
 
 /// Store test runtime when the test finishes
-void DeferredTestReporter::ReportTestFinish (const Test& test)
+void DeferredTestReporter::TestFinish (const Test& test)
 {
-  TestReporter::ReportTestFinish (test);
+  TestReporter::TestFinish (test);
   results.back ().test_time_ms = test.test_time_ms();
 }
 

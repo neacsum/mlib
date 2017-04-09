@@ -35,8 +35,6 @@ string CurrentSuite = DEFAULT_SUITE;
 TestSuite::TestSuite (const char *name_)
   : name (name_)
 {
-  CurrentTest = nullptr;
-  CurrentSuite = name;
 }
 
 /// Add a new test information to test_list
@@ -50,17 +48,22 @@ void TestSuite::Add (maker_info& inf)
 
   \param rep Reporter object to be used
   \param maxtime maximum run time for each test
+  \return number of failed tests
 
   Iterate through all test information objects doing the following:
 */
 int TestSuite::RunTests (TestReporter& rep, int maxtime)
 {
-  /// Establish reporter as CurrentReporter
+  /// Establish reporter as CurrentReporter and suite as CurrentSuite
+  CurrentSuite = name;
   CurrentReporter = &rep;
+
+  ///Inform reporter that suite has started
+  CurrentReporter->SuiteStart (*this);
+
   auto listp = test_list.begin ();
   max_runtime = maxtime;
-
-  while (listp != test_list.end())
+  while (listp != test_list.end ())
   {
     /// Setup the test context
     if (SetupCurrentTest (*listp))
@@ -72,8 +75,8 @@ int TestSuite::RunTests (TestReporter& rep, int maxtime)
     listp++;
   }
 
-  ///At the end invoke reporter summary
-  return CurrentReporter->ReportSummary ();
+  ///At the end invoke reporter SuiteFinish function
+  return CurrentReporter->SuiteFinish (*this);
 }
 
 /*!
@@ -111,7 +114,7 @@ bool TestSuite::SetupCurrentTest (maker_info& inf)
 void TestSuite::RunCurrentTest (maker_info& inf)
 {
   assert (CurrentTest);
-  CurrentReporter->ReportTestStart (*CurrentTest);
+  CurrentReporter->TestStart (*CurrentTest);
 
 
   try {
@@ -141,7 +144,7 @@ void TestSuite::RunCurrentTest (maker_info& inf)
 
     ReportFailure (inf.file, inf.line, stream.str ());
   }
-  CurrentReporter->ReportTestFinish (*CurrentTest);
+  CurrentReporter->TestFinish (*CurrentTest);
 }
 
 /// Delete current test instance

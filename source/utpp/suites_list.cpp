@@ -50,11 +50,9 @@ int SuitesList::Run (const char *suite_name, TestReporter& reporter, int max_tim
 
 int SuitesList::RunAll (TestReporter& reporter, int max_time_ms)
 {
-  int ret = -1;
   for (auto p = suites.cbegin (); p != suites.cend (); p++)
-    ret += (*p)->RunTests (reporter, max_time_ms);
-
-  return ret;
+    (*p)->RunTests (reporter, max_time_ms);
+  return reporter.Summary ();
 }
 
 SuitesList& SuitesList::GetSuitesList ()

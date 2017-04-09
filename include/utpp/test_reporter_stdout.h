@@ -15,7 +15,7 @@ class TestReporterStdout : public TestReporter
 {
 private:
   virtual void ReportFailure (const Failure& failure);
-  virtual int ReportSummary ();
+  virtual int Summary ();
 };
 
 }

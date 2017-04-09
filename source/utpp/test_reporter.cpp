@@ -24,13 +24,13 @@ TestReporter::TestReporter ()
 {
 }
 
-void TestReporter::ReportSuiteStart (const TestSuite&)
+void TestReporter::SuiteStart (const TestSuite&)
 {
   suites_count++;
   suite_test_count = suite_failed_count = suite_failures_count = 0;
 }
 
-void TestReporter::ReportTestStart (const Test&)
+void TestReporter::TestStart (const Test&)
 {
   suite_test_count++;
   total_test_count++;
@@ -40,7 +40,7 @@ void TestReporter::ReportFailure (const Failure &f)
 {
 }
 
-void TestReporter::ReportTestFinish (const Test& t)
+void TestReporter::TestFinish (const Test& t)
 {
   int f = t.failure_count ();
   if (f)
@@ -55,8 +55,9 @@ void TestReporter::ReportTestFinish (const Test& t)
   total_time_msec += ms;
 }
 
-void TestReporter::ReportSuiteFinish (const TestSuite&)
+int TestReporter::SuiteFinish (const TestSuite&)
 {
+  return suite_failures_count;
 }
 
 }

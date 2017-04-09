@@ -45,7 +45,7 @@ void TestReporterStdout::ReportFailure (const Failure& failure)
   Prints a test run summary including number of tests, number of failures,
   running time, etc.
 */
-int TestReporterStdout::ReportSummary ()
+int TestReporterStdout::Summary ()
 {
   if (total_failed_count > 0)
   {
@@ -59,7 +59,7 @@ int TestReporterStdout::ReportSummary ()
   }
   cout.setf (ios::fixed);
   cout << "Run time: " << setprecision (2) << total_time_msec / 1000. << endl;
-  return TestReporter::ReportSummary ();
+  return TestReporter::Summary ();
 }
 
 }

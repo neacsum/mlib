@@ -19,9 +19,9 @@ class DeferredTestReporter : public TestReporter
 {
 public:
   DeferredTestReporter () {};
-  virtual void ReportTestStart (const Test& test);
+  virtual void TestStart (const Test& test);
   virtual void ReportFailure (const Failure& failure);
-  virtual void ReportTestFinish (const Test& test);
+  virtual void TestFinish (const Test& test);
 
 protected:
   ///@brief %Test results including all failure messages

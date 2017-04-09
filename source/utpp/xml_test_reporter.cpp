@@ -15,6 +15,9 @@
 
 using namespace std;
 
+//XML char encoding
+const string encoding;
+
 static void ReplaceChar (string& str, char c, string const& replacement)
 {
   for (size_t pos = str.find (c); pos != string::npos; pos = str.find (c, pos + 1))
@@ -51,15 +54,31 @@ XmlTestReporter::XmlTestReporter (std::ostream& ostream)
 }
 
 /// Generate XML report
-int XmlTestReporter::ReportSummary ()
+int XmlTestReporter::Summary ()
 {
-  AddXmlElement (NULL);
+  string suite;
 
-  BeginResults ();
+  os << "<?xml version=\"1.0\"";
+  if (!encoding.empty())
+    os << " encoding=\"" << encoding << "\"";
+  os << "?>" << endl;
+
+  os << "<unittest-results"
+    << " tests=\"" << total_test_count << "\""
+    << " failedtests=\"" << total_failed_count << "\""
+    << " failures=\"" << total_failures_count << "\""
+    << " time_sec=\"" << fixed << setprecision (3) << total_time_msec / 1000. << "\""
+    << ">" << endl;
+
   for (auto i = results.begin (); i != results.end (); ++i)
   {
     if (i->suite_name != suite)
-      BeginSuite (i->suite_name);
+    {
+      if (!suite.empty ())
+        os << " </suite>" << endl;
+      suite = i->suite_name;
+      os << " <suite name=\"" << suite << "\">" << endl;
+    }
 
     BeginTest (*i);
 
@@ -69,42 +88,9 @@ int XmlTestReporter::ReportSummary ()
     EndTest (*i);
   }
 
-  EndResults ();
-  return DeferredTestReporter::ReportSummary ();
-}
-
-void XmlTestReporter::AddXmlElement (char const* encoding)
-{
-  os << "<?xml version=\"1.0\"";
-
-  if (encoding != NULL)
-    os << " encoding=\"" << encoding << "\"";
-
-  os << "?>" <<endl;
-}
-
-void XmlTestReporter::BeginResults ()
-{
-  os << "<unittest-results"
-     << " tests=\"" << total_test_count << "\""
-     << " failedtests=\"" << total_failed_count << "\""
-     << " failures=\"" << total_failures_count << "\""
-     << " time_sec=\"" << fixed << setprecision(3) << total_time_msec/1000. << "\""
-     << ">" << endl;
-}
-
-void XmlTestReporter::BeginSuite (const string& new_suite)
-{
-  if (!suite.empty ())
-    os << " </suite>" << endl;
-  suite = new_suite;
-  os << " <suite name=\"" << suite << "\">" << endl;
-}
-
-void XmlTestReporter::EndResults ()
-{
   os << " </suite>" << endl;
   os << "</unittest-results>" << endl;
+  return DeferredTestReporter::Summary ();
 }
 
 void XmlTestReporter::BeginTest (const DeferredTestReporter::TestResult& result)
