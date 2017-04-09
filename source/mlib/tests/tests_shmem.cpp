@@ -3,6 +3,7 @@
 #include <utpp/utpp.h>
 #include <string>
 #include <mlib/thread.h>
+#include <mlib/trace.h>
 
 #ifdef MLIBSPACE
 using namespace MLIBSPACE;
@@ -15,8 +16,20 @@ struct S{
   int ival;
 };
 
-S rd, wr = { "String", 12.3, 1 };
 event shrd, shwr;
+
+struct shmem_fixture {
+  shmem_fixture () 
+  { 
+    strcpy (wr.str, "String"); 
+    wr.fval = 12.3;
+    wr.ival = 1;
+    shrd.reset ();
+    shwr.reset ();
+  };
+  S rd, wr;
+};
+
 
 //add some delay while reading and writing
 class SlowMem : public shmem_base
@@ -32,12 +45,15 @@ bool SlowMem::read (void *data)
 {
   if (rdlock ())
   {
+    TRACE ("SlowMem::read - got rdlock");
     shrd.signal ();
     Sleep (50);
     get (data);
+    TRACE ("SlowMem::read - will rdunlock");
     rdunlock ();
     return true;
   }
+  TRACE ("SlowMem::read - failed");
   return false;
 }
 
@@ -45,12 +61,15 @@ bool SlowMem::write (const void *data)
 {
   if (wrlock ())
   {
+    TRACE ("SlowMem::write - got wrlock");
     shwr.signal ();
     Sleep (50);
     put (data);
+    TRACE ("SlowMem::write - will wrunlock");
     wrunlock ();
     return true;
   }
+  TRACE ("SlowMem::write - failed");
   return false;
 }
 
@@ -65,7 +84,7 @@ TEST (Create_shmem)
   CHECK_EQUAL ("Shared", n);
 }
 
-TEST (ReadWrite_shmem)
+TEST_FIXTURE (shmem_fixture, ReadWrite_shmem)
 {
   memset (&rd, 0, sizeof (S));
 
@@ -76,9 +95,9 @@ TEST (ReadWrite_shmem)
 }
 
 
-TEST (TwoTheard_shmem)
+TEST_FIXTURE (shmem_fixture, TwoTheard_shmem)
 {
-  thread t1 ([](void *)->int
+  thread t1 ([=](void *)->int
   {
     shmem<S> smem ("Shared");       //create shared memory
     CHECK (smem.is_opened ());
@@ -91,7 +110,7 @@ TEST (TwoTheard_shmem)
   }
   );
 
-  thread t2 ([](void *)->int
+  thread t2 ([=](void *)->int
   {
     Sleep (50);
     shmem<S> smem ("Shared");       //open shared memory
@@ -114,12 +133,12 @@ TEST (TwoTheard_shmem)
 }
 
 
-TEST (SlowWriter_shmem)
+TEST_FIXTURE (shmem_fixture, SlowWriter_shmem)
 {
   shmem<S, SlowMem> smem ("Shared");       //create shared memory
 
   //reader thread
-  thread t1 ([](void *)->int
+  thread t1 ([=](void *)->int
   {
     memset (&rd, 0, sizeof (S));
 
@@ -131,17 +150,15 @@ TEST (SlowWriter_shmem)
       return 0;                   //that should not happen; shared memory should be busy
 
     return 1;                     //all good
-  }
-  );
+  });
 
   //writer thread
-  thread t2 ([](void *)->int
+  thread t2 ([=](void *)->int
   {
     shmem<S, SlowMem> smem ("Shared");  //open shared memory
     smem << wr;                         //write data. Signaling to reader thread is done in SlowMem::write
     return 0;
-  }
-  );
+  });
 
   //start both threads
   t1.start ();
@@ -153,26 +170,25 @@ TEST (SlowWriter_shmem)
   CHECK (t1.exitcode ());        //verify thread 1 could not acquire read lock
 }
 
-TEST (SlowReader_shmem)
+TEST_FIXTURE (shmem_fixture, SlowReader_shmem)
 {
   shmem<S, SlowMem> smem ("Shared");      //create shared memory
 
   //reader thread
-  thread t1 ([](void *)->int
+  thread t1 ([=](void *)->int
   {
     memset (&rd, 0, sizeof (S));
 
     shmem<S, SlowMem> smem ("Shared");    //open shared memory
 
     shwr.wait ();                 //wait for other thread to populate it
-    smem >> rd;                   //read data. This trigger a 50 ms delay and signals shrd event flag
+    smem >> rd;                   //read data. This triggers a 50 ms delay and signals shrd event flag
     smem >> rd;                   //one more read, mostly for fun
     return 0;
-  }
-  );
+  });
 
   //writer thread
-  thread t2 ([](void *)->int
+  thread t2 ([=](void *)->int
   {
     shmem<S, SlowMem> smem ("Shared");      //open shared memory
     smem.wtmo (5);                          //5ms write timeout
@@ -182,14 +198,13 @@ TEST (SlowReader_shmem)
     if (smem.write (&wr))           //try to write again
       return 0;                     //should not happen. Reader is holding rdlock
     return 1;     //all good
-  }
-  );
+  });
 
   //start both threads
   t1.start ();
   t2.start ();
 
-  Sleep (200);                    //let them finish
+  Sleep (500);                    //let them finish
   CHECK (!t1.is_running ());      //verify they have finished
   CHECK (!t2.is_running ());
   CHECK (t2.exitcode ());         //verify thread 2 could not acquire write lock

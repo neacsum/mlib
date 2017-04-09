@@ -177,7 +177,9 @@
     <ClCompile Include="source\utpp\tests\AssertHandler.cpp" />
     <ClCompile Include="source\utpp\tests\CheckMacros.cpp" />
     <ClCompile Include="source\utpp\tests\Checks.cpp" />
-    <ClCompile Include="source\utpp\tests\DeferredTestReporter.cpp" />
+    <ClCompile Include="source\utpp\tests\DeferredTestReporter.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="source\utpp\tests\Test.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
