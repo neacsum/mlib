@@ -709,6 +709,8 @@ bool http_connection::parse_url()
   headers = ptr;
 
   //parse URI
+  if (*uri == '/')
+    uri++;
   ptr = uri;
   while (*ptr)
   {
@@ -941,7 +943,7 @@ void http_connection::respond_next (bool last)
 httpd::httpd (unsigned short port, unsigned int maxconn) :
 tcpserver (maxconn),
 port_num (port),
-root ("."),
+root ("./"),
 defuri (HTTPD_DEFAULT_URI),
 servname (HTTPD_SERVER_NAME)
 {
@@ -1113,6 +1115,8 @@ void httpd::delete_mime_type (const char *ext)
 */
 void httpd::add_realm (const char *realm, const char *uri)
 {
+  if (*uri == '/')
+    uri++;
   realms[realm] = uri;
 }
 
@@ -1175,7 +1179,9 @@ bool httpd::remove_user(const char *realm, const char *username)
 
 bool httpd::is_protected (const char *uri, string& realm)
 {
-  int len = 0;
+  if (*uri == '/')
+    uri++;
+  int len = -1;
   auto it = realms.begin ();
   while (it != realms.end ())
   {
@@ -1187,7 +1193,7 @@ bool httpd::is_protected (const char *uri, string& realm)
     }
     it++;
   }
-  return (len > 0);
+  return (len >= 0);
 }
 
 /*!
@@ -1322,6 +1328,16 @@ string httpd::get_var(const char *name)
     return string("none");
 }
 
+/*!
+  Set server root path
+*/
+void httpd::docroot (const char* path)
+{
+  root = path;
+  //make sure it's (back)slash terminated
+  if (root.back () != '\\' && root.back () != '/')
+    root.push_back ('/');
+}
 /*!
   Guess MIME type of a file and if SSI replacement should be enabled based on
   file extension.

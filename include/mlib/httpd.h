@@ -123,7 +123,7 @@ public:
   void        add_var (const char *name, const char *fmt, void *addr, double multiplier=0.);
   std::string get_var (const char *name);
 
-  void        docroot (const char *path) {root = path;};
+  void        docroot (const char *path);
   const char* docroot () {return root.c_str();};
 
   void        default_uri (const char *name) {defuri = name;};
