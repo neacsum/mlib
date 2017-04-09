@@ -36,11 +36,8 @@ int sock_initializer_counter=0;
 ///The initialization object
 static sock_initializer init;
 
-/// Default error handler
-sock_facility error_handler;
-
 /// Pointer to error handler
-errfacility *sockerrors=&error_handler;
+errfacility *sockerrors;
 
 
 #define WSALASTERROR (errc( WSAGetLastError(), ERROR_PRI_ERROR, sockerrors))
@@ -1086,6 +1083,7 @@ sock_initializer::sock_initializer ()
     WSADATA wsadata; 
     int err = WSAStartup (MAKEWORD(2,0), &wsadata);
     TRACE ("sock_initializer - WSAStartup result = %d", err);
+    sockerrors = new sock_facility ();
   }
 }
 
@@ -1096,6 +1094,7 @@ sock_initializer::~sock_initializer()
   {
     int err = WSACleanup ();
     TRACE ("sock_initializer - WSACleanup result=%d", err);
+    delete sockerrors;
   }
   TRACE ("sock_initializer::~sock_initializer cnt=%d", sock_initializer_counter);
 }
