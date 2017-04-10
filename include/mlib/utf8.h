@@ -20,32 +20,34 @@ std::wstring widen (const char* s);
 std::string narrow (const std::wstring& s);
 std::wstring widen (const std::string& s);
 
-char **get_argv (int *argc);
+std::vector<std::string> get_argv ();
+char** get_argv (int *argc);
 void free_argv (int argc, char **argv);
 
-int mkdir (const char* dirname);
-int mkdir (const std::string& dirname);
+bool mkdir (const char* dirname);
+bool mkdir (const std::string& dirname);
 
-int rmdir (const char* dirname);
-int rmdir (const std::string& dirname);
+bool rmdir (const char* dirname);
+bool rmdir (const std::string& dirname);
 
-int chdir (const char* dirname);
-int chdir (const std::string& dirname);
+bool chdir (const char* dirname);
+bool chdir (const std::string& dirname);
+
+bool chmod (const char* filename, int mode);
+bool chmod (const std::string& filename, int mode);
 
 std::string getcwd ();
 
-int access (const char* path, int mode);
-int access (const std::string& path, int mode);
+bool access (const char* filename, int mode);
+bool access (const std::string& filename, int mode);
 
-int remove (const char* path);
-int remove (const std::string& path);
+bool remove (const char* filename);
+bool remove (const std::string& filename);
 
-int rename (const char* oldname, const char* newname);
-int rename (const std::string& oldname, const std::string& newname);
+bool rename (const char* oldname, const char* newname);
+bool rename (const std::string& oldname, const std::string& newname);
 
 void splitpath (const char* path, char* drive, char* dir, char* fname, char* ext);
 void splitpath (const char* path, std::string& drive, std::string& dir, std::string& fname, std::string& ext);
-
-std::vector<std::string> get_utf8argv ();
 
 }

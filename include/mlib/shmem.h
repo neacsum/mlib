@@ -12,7 +12,7 @@
 namespace MLIBSPACE {
 #endif
 
-
+///Base class for shared memory objects
 class shmem_base
 {
 public:
@@ -76,14 +76,14 @@ private:
   size_t sz;
   struct syncblk *syn;
   void *mem;
-//  friend class lockr_base;
 };
 
+///Shared memory area with support for single-writer multiple-readers
 template<class S, class B=shmem_base> class shmem : public B
 {
 public:
   shmem ();
-  shmem (const char *name, size_t sz = sizeof(S));
+  shmem (const char *name);
   bool open (const char *name, size_t sz = sizeof(S));
   void operator >>(S& data);
   void operator <<(const S& data);
@@ -95,18 +95,23 @@ protected:
   template<class S, class B> friend class lockw;
 };
 
+/// Default constructor
 template<class S, class B>
 shmem<S, B>::shmem () : B () {};
 
+/// Creates and opens a shared memory area with the given name
 template<class S, class B>
-shmem<S, B>::shmem (const char *name, size_t sz) : B (name, sz) {};
+shmem<S, B>::shmem (const char *name) : B (name, sizeof (S)) {};
 
+/// Opens a shared memory area
 template<class S, class B>
-bool shmem<S, B>::open(const char *name, size_t sz) {return B::open (name, sz);};
+bool shmem<S, B>::open(const char *name) {return B::open (name, sizeof(S));};
 
+/// Read the content of shared memory area
 template<class S, class B>
 void shmem<S, B>::operator >>(S& data) {read (&data);};
 
+/// Update (write) the content of a shared memory area
 template<class S, class B>
 void shmem<S, B>::operator <<(const S& data) {write (&data);};
 

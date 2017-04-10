@@ -10,9 +10,9 @@
 
 namespace UnitTest {
 
-
+/// Check if value is true (or not 0)
 template< typename Value >
-bool Check(Value const value)
+bool Check (Value const value)
 {
   return !!value; // doing double negative to avoid silly VS warnings
 }

@@ -32,8 +32,8 @@ using namespace std;
 using namespace MLIBSPACE;
 #endif
 
-//Table of known mime types
-struct smime
+///Table of known mime types
+static struct smime
 {
   const char *suffix;
   const char *type;

@@ -10,14 +10,19 @@
 #include <map>
 #include <deque>
 
+/// Maximum size of HTTP header
 #define HTTPD_MAX_HEADER      8192
+
+/// Default listening port for HTTP server
 #define HTTPD_DEFAULT_PORT    80
-///Error codes
+
+/// \name Error codes
+///\{
 #define HTTPD_OK              0      ///< Success
 #define HTTPD_ERR_WRITE       -1      ///< Socket write failure
 #define HTTPD_ERR_FOPEN       -2      ///< File open failure
 #define HTTPD_ERR_FREAD       -3      ///< File read failure
-
+///\}
 
 #ifdef MLIBSPACE
 namespace MLIBSPACE {

@@ -1,6 +1,6 @@
 #pragma once
 /*!
-  \file jbrideg.h - Definition of JSONBridge class
+  \file jbridge.h - Definition of JSONBridge class
   
   (c) Mircea Neacsu 2017. All rights reserved.
 */
@@ -28,13 +28,13 @@ enum js_type {
   JT_POSTFUN,   ///< POST function call
 };
 
-//JSON data dictionary entry
+/// JSON data dictionary entry
 typedef struct jsonvar_t {
-  char *name;           //external name of variable
-  void *addr;           //memory address
-  js_type type;         //data type (one of JT_... values)
-  unsigned short sz;    //element size (used only for strings)
-  unsigned short cnt;   //number of elements
+  char *name;           ///< external name of variable
+  void *addr;           ///< memory address
+  js_type type;         ///< data type (one of JT_... values)
+  unsigned short sz;    ///< element size (used only for strings)
+  unsigned short cnt;   ///< number of elements
 } JSONVAR;
 
 

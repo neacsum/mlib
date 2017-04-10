@@ -9,22 +9,21 @@
   the strategy advocated by [UTF-8 Everywhere](http://utf8everywhere.org/)
 */
 #include <windows.h>
-
+#include <sys/stat.h>
 #include <mlib/utf8.h>
 #include <vector>
 
 using namespace std;
 namespace utf8 {
 
-///@{
 /*!
   Conversion from wide character to UTF-8
   \ingroup utf8
 
   \param  s input string
   \return UTF-8 character string
-  */
-string narrow (const wchar_t* s)
+*/
+std::string narrow (const wchar_t* s)
 {
   int wsz = (int)wcslen (s);
   int nsz = WideCharToMultiByte (CP_UTF8, 0, s, wsz, 0, 0, 0, 0);
@@ -34,7 +33,14 @@ string narrow (const wchar_t* s)
   return out;
 }
 
-string narrow (const wstring& s)
+/*!
+  Conversion from wide character to UTF-8
+  \ingroup utf8
+
+  \param  s input string
+  \return UTF-8 character string
+*/
+std::string narrow (const std::wstring& s)
 {
   int wsz = (int)s.size ();
   int nsz = WideCharToMultiByte (CP_UTF8, 0, &s[0], wsz, 0, 0, 0, 0);
@@ -43,9 +49,8 @@ string narrow (const wstring& s)
     WideCharToMultiByte (CP_UTF8, 0, &s[0], wsz, &out[0], nsz, 0, 0);
   return out;
 }
-///@}
 
-///@{
+///\{
 /*!
   Conversion from UTF-8 to wide character
   \ingroup utf8
@@ -53,7 +58,7 @@ string narrow (const wstring& s)
   \param  s input string
   \return wide character string
   */
-wstring widen (const char* s)
+std::wstring widen (const char* s)
 {
   int nsz = (int)strlen (s);
   int wsz = MultiByteToWideChar (CP_UTF8, 0, s, nsz, 0, 0);
@@ -64,7 +69,7 @@ wstring widen (const char* s)
 }
 
 
-wstring widen (const string& s)
+std::wstring widen (const std::string& s)
 {
   int nsz = (int)s.size ();
   int wsz = MultiByteToWideChar (CP_UTF8, 0, &s[0], nsz, 0, 0);
@@ -73,7 +78,7 @@ wstring widen (const string& s)
     MultiByteToWideChar (CP_UTF8, 0, &s[0], nsz, &out[0], wsz);
   return out;
 }
-///@}
+///\}
 
 /*!
   Converts wide byte command arguments to an array of pointers
@@ -87,7 +92,7 @@ wstring widen (const string& s)
   The space allocated for strings and array of pointers should be freed
   by calling free_utf8argv()
   */
-char **get_utf8argv (int *argc)
+char** get_argv (int *argc)
 {
   wchar_t **wargv = CommandLineToArgvW (GetCommandLineW (), argc);
   char** uargv = (char **)malloc (*argc*sizeof (char*));
@@ -121,7 +126,7 @@ void free_argv (int argc, char **argv)
 
   \return vector of UTF-8 strings
   */
-vector<string> get_argv ()
+std::vector<std::string> get_argv ()
 {
   int argc;
   vector<string> uargv;
@@ -132,37 +137,90 @@ vector<string> get_argv ()
   LocalFree (wargv);
   return uargv;
 }
+///\{
+/*!
+  Creates a new directory
+  \ingroup utf8
 
-int mkdir (const char* dirname)
+  \param dirname UTF-8 path for new directory
+  \return true if successful, false otherwise
+*/
+bool mkdir (const char* dirname)
 {
-  return _wmkdir (widen (dirname).c_str ());
+  return (_wmkdir (widen (dirname).c_str ()) == 0);
 }
 
-int mkdir (const string& dirname)
+bool mkdir (const std::string& dirname)
 {
-  return _wmkdir (widen (dirname).c_str ());
+  return (_wmkdir (widen (dirname).c_str ()) == 0);
+}
+///\}
+
+
+///\{
+/*!
+  Deletes a directory
+  \ingroup utf8
+
+  \param dirname UTF-8 path of directory to be removed
+  \return true if successful, false otherwise
+  */
+bool rmdir (const char* dirname)
+{
+  return (_wrmdir (widen (dirname).c_str ()) == 0);
 }
 
-int rmdir (const char* dirname)
+bool rmdir (const std::string& dirname)
 {
-  return _wrmdir (widen (dirname).c_str ());
+  return (_wrmdir (widen (dirname).c_str ()) == 0);
+}
+///\}
+
+
+///\{
+/*!
+  Changes the current working directory
+  \ingroup utf8
+
+  \param dirname UTF-8 path of new working directory
+  \return true if successful, false otherwise
+*/
+bool chdir (const char* dirname)
+{
+  return (_wchdir (widen (dirname).c_str ()) == 0);
 }
 
-int rmdir (const string& dirname)
+bool chdir (const std::string& dirname)
 {
-  return _wrmdir (widen (dirname).c_str ());
+  return (_wchdir (widen (dirname).c_str ()) == 0);
+}
+///\}
+
+///\{
+/*!
+  Changes the file access permissions
+  \ingroup utf8
+
+  \param filename UTF-8 name of file
+  \param mode access permissions. Or'ed combination of:
+              - _S_IWRITE write permission
+              - _S_IREAD  read permission
+
+  \return true if successful, false otherwise
+*/
+
+bool chmod (const char* filename, int mode)
+{
+  return (_wchmod (widen (filename).c_str (), mode) == 0);
 }
 
-int chdir (const char* dirname)
+bool chmod (const std::string& filename, int mode)
 {
-  return _wchdir (widen (dirname).c_str ());
+  return (_wchmod (widen (filename).c_str (), mode) == 0);
 }
+///\}
 
-int chdir (const string& dirname)
-{
-  return _wchdir (widen (dirname).c_str ());
-}
-
+///Gets the current working directory as an UTF-8 encoded string
 std::string getcwd ()
 {
   wchar_t tmp[_MAX_PATH];
@@ -172,42 +230,89 @@ std::string getcwd ()
     return string ();
 }
 
-int access (const char *path, int mode)
+
+///\{
+/*!
+  Determines if a file has the requested access permissions
+  \ingroup utf8
+
+  \param filename UTF-8 file path of new working directory
+  \param mode required access:
+              - 0 existence only
+              - 2 write permission
+              - 4 read permission
+              - 6 read/write permission
+
+  \return true if successful, false otherwise
+*/
+bool access (const char* filename, int mode)
 {
-  return _waccess (widen (path).c_str (), mode);
+  return (_waccess (widen (filename).c_str (), mode) == 0);
 }
 
-int access (const std::string& path, int mode)
+bool access (const std::string& filename, int mode)
 {
-  return _waccess (widen (path).c_str (), mode);
+  return (_waccess (widen (filename).c_str (), mode) == 0);
+}
+///\}
+
+
+///\{
+/*!
+  Delete a file
+  \ingroup utf8
+
+  \param filename UTF-8 name of file to be deleted
+  \return true if successful, false otherwise
+*/
+bool remove (const char* filename)
+{
+  return (_wremove (widen (filename).c_str ()) == 0);
 }
 
-int remove (const char* dirname)
+bool remove (const std::string& filename)
 {
-  return _wremove (widen (dirname).c_str ());
+  return (_wremove (widen (filename).c_str ()) == 0);
 }
+///\}
 
-int remove (const string& dirname)
-{
-  return _wremove (widen (dirname).c_str ());
-}
+///\{
+/*!
+  Rename a file or directory
+  \ingroup utf8
 
-int rename (const char* oldname, const char* newname)
+  \param oldname current UTF-8 encoded name of file or directory
+  \param newname new UTF-8 name
+  \return true if successful, false otherwise
+*/
+bool rename (const char* oldname, const char* newname)
 {
   wstring oldn = widen (oldname);
   wstring newn = widen (newname);
 
-  return _wrename (oldn.c_str (), newn.c_str ());
+  return (_wrename (oldn.c_str (), newn.c_str ()) == 0);
 }
 
-int rename (const string& oldname, const string& newname)
+bool rename (const std::string& oldname, const std::string& newname)
 {
   wstring oldn = widen (oldname);
   wstring newn = widen (newname);
 
-  return _wrename (oldn.c_str (), newn.c_str ());
+  return (_wrename (oldn.c_str (), newn.c_str ()) == 0);
 }
+///\}
 
+///\{
+/*!
+  Breaks a path name into components
+  \ingroup utf8
+
+  \param path   UTF-8 encoded full path
+  \param drive  drive letter followed by colon (or NULL)
+  \param dir    directory path (or NULL)
+  \param fname  base filename (or NULL)
+  \param ext    file extension including the leading period (.) (or NULL)
+*/
 void splitpath (const char* path, char* drive, char* dir, char* fname, char* ext)
 {
   wstring wpath = widen (path);
@@ -231,7 +336,7 @@ void splitpath (const char* path, char* drive, char* dir, char* fname, char* ext
     strcpy (ext, narrow (wext).c_str ());
 }
 
-void splitpath (const char* path, string& drive, string& dir, string& fname, string& ext)
+void splitpath (const char* path, std::string& drive, std::string& dir, std::string& fname, std::string& ext)
 {
   wstring wpath = widen (path);
   wchar_t wdrive[_MAX_DRIVE];
@@ -245,5 +350,6 @@ void splitpath (const char* path, string& drive, string& dir, string& fname, str
   fname = narrow (wfname);
   ext = narrow (wext);
 }
+///\}
 
 } //end namespace

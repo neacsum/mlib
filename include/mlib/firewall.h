@@ -7,6 +7,7 @@
 namespace MLIBSPACE {
 #endif
 
+/// Light wrapper for Windows firewall
 class firewall
 {
 public:

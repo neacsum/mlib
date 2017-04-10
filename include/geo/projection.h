@@ -17,6 +17,7 @@ namespace MLIBSPACE {
 class Projection
 {
 public:
+  ///Projection parameters
   class Params
   {
   public:
@@ -88,10 +89,12 @@ public:
 };
 
 ///Error codes
+///\{
 #define GEOERR_PARAM    1       ///< Invalid projection parameters
 #define GEOERR_SINGL    2       ///< Singularity
 #define GEOERR_DOMAIN   3       ///< Domain error
 #define GEOERR_NCONV    4       ///< Non-convergence
+///\}
 
 
 /*==================== INLINE FUNCTIONS ===========================*/

@@ -102,21 +102,21 @@ running a test here is a list of them:
 
 `CHECK(value)`  Verify that value is true (or not 0) 
 
-`CHECK_EQUAL (expected, actual)` Compare two values for equality
+`CHECK_EQUAL(expected, actual)` Compare two values for equality
 
-`CHECK_CLOSE (expected, actual, tolerance)` Check that two values are closer than
+`CHECK_CLOSE(expected, actual, tolerance)` Check that two values are closer than
  specified tolerance
  
-`CHECK_ARRAY_EQUAL (expected, actual, count)` Compare two arrays for equality
+`CHECK_ARRAY_EQUAL(expected, actual, count)` Compare two arrays for equality
 
-`CHECK_ARRAY_CLOSE (expected, actual, count, tolerance)` Check that two arrays
+`CHECK_ARRAY_CLOSE(expected, actual, count, tolerance)` Check that two arrays
  are closer than specified tolerance
  
-`CHECK_ARRAY2D_CLOSE (expected, actual, rows, columns, tolerance)` Check that
+`CHECK_ARRAY2D_CLOSE(expected, actual, rows, columns, tolerance)` Check that
  two matrices are within the specified tolerance
  
-`CHECK_THROW (expression, ExceptionType)` Verifies that expression throws a given exception
-`CHECK_ASSERT (expression)` Verifies that expression throws an AssertException. 
+`CHECK_THROW(expression, ExceptionType)` Verifies that expression throws a given exception
+`CHECK_ASSERT(expression)` Verifies that expression throws an AssertException. 
 
 AssertException objects are thrown by _ReportAssert_ function.
 

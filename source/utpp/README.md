@@ -1,10 +1,12 @@
-UTPP - A New Generation of UnitTest++                               {#mainpage}
+UTPP - A New Generation of UnitTest++                            {#utpp_readme}
 =====================================
 
 This test library is based on UnitTest++. See below for README notes of UnitTest++.
 
 Author:
 Mircea Neacsu (mircea@neacsu.net)
+
+See [architecture file] (@ref architecture) for details
 
 ## License ##
 
@@ -31,9 +33,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 
-See [architecture file] (@ref architecture) for details
-
-# UnitTest++ README #
+## UnitTest++ README ##
 Version: v1.4
 Last update: 2008-10-30
 

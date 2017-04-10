@@ -17,8 +17,13 @@
 #define USFOOT    0.3048006096          ///< US Survey foot to meters conversion factor
 #define MAS       (M_PI/(180*3600000.)) ///< milli-arcsecond
 
+/// Convert decimal degrees to radians
 #define DEG(dd) ((dd)*D2R)
+
+///Convert degrees, minutes to radians
 #define DM(dd,mm) (((dd)+(mm)/60.)*D2R)
+
+///Convert degrees, minutes seconds to radians
 #define DMS(dd,mm,ss) (((dd)+(mm)/60.+(ss)/3600.)*D2R)
 
 /// Conversion to decimal degrees from DDMM.mmm
