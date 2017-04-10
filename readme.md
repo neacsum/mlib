@@ -1,4 +1,4 @@
-# MLIB - Multi-purpose Library #                                    {#mainpage}
+# MLIB - Multi-purpose Library #                                   {#mainpage}
 
 This is a collection of bits and pieces crafted over the years. It is released
 with the hope that other people might find it useful or interesting.
@@ -30,17 +30,17 @@ SOFTWARE.
 
 ## Contents ##
 Projects:
-- mlib                      - Main Library
-- [utpp] (@ref utpp_readme) - Test library derived from UnitTest++
-- [geo] (@ref geo)          - Geodesy and Map Projections
-- geom                      - Geometry Objects and algorithms
-- nmea                      - NMEA-0183 
+  * mlib                      - Main Library
+  * [utpp] (\ref utpp_readme) - Test library derived from UnitTest++
+  * [geo] (\ref geo)          - Geodesy and Map Projections
+  * geom                      - Geometry Objects and algorithms
+  * nmea                      - NMEA-0183 
   
 UnitTests:
-- mlib_test
-- utpp_test   - Tests for utpp
-- geo_tests   - Tests for Geodesy and Map Projections
-- geom_tests  - Tests for Geometry Objects
+  * mlib_test
+  * utpp_test   - Tests for utpp
+  * geo_tests   - Tests for Geodesy and Map Projections
+  * geom_tests  - Tests for Geometry Objects
 
 ## Installation ##
 All projects have been tested under Visual Studio 2013. The libraries can be 
