@@ -30,16 +30,25 @@ SOFTWARE.
 
 ## Contents ##
 Projects:
-  * mlib                      - Main Library
-  * [utpp] (\ref utpp_readme) - Test library derived from UnitTest++
-  * [geo] (\ref geo)          - Geodesy and Map Projections
-  * geom                      - Geometry Objects and algorithms
-  * nmea                      - NMEA-0183 
+
+ - mlib                      - Main Library
+
+ - [utpp] (\ref utpp_readme) - Test library derived from UnitTest++
+
+ * [geo] (\ref geo)          - Geodesy and Map Projections
+
+ * geom                      - Geometry Objects and algorithms
+
+ * nmea                      - NMEA-0183 
   
 UnitTests:
+
   * mlib_test
+
   * utpp_test   - Tests for utpp
+
   * geo_tests   - Tests for Geodesy and Map Projections
+
   * geom_tests  - Tests for Geometry Objects
 
 ## Installation ##
