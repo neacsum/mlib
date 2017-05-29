@@ -13,6 +13,7 @@
 #include <mlib/utf8.h>
 
 using namespace std;
+#pragma comment (lib, "mlib.lib")
 
 
 namespace UnitTest {
