@@ -105,7 +105,7 @@ shmem<S, B>::shmem (const char *name) : B (name, sizeof (S)) {};
 
 /// Opens a shared memory area
 template<class S, class B>
-bool shmem<S, B>::open(const char *name) {return B::open (name, sizeof(S));};
+bool shmem<S, B>::open (const char *name, size_t sz=sizeof(S)) { return B::open (name, sz); };
 
 /// Read the content of shared memory area
 template<class S, class B>
