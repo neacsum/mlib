@@ -17,11 +17,11 @@ namespace MLIBSPACE {
 #endif
 
 /*!
-  \class timer
-  \brief Waitable %timer.
+  \class wtimer
+  \brief Waitable timer.
   \ingroup syncro
 
-  A waitable %timer object is set to signaled when the specified due time
+  A waitable timer object is set to signaled when the specified due time
   arrives. There are two types of waitable timers that can be created: 
   manual and automatic (called synchronization timers in Windows documentation).
   Automatic timers are reset to their non-signaled state when a %thread 
@@ -29,11 +29,11 @@ namespace MLIBSPACE {
 
   Manual timers remain signaled until restarted.
   
-  A %timer of either type can also be a periodic %timer.
+  A timer of either type can also be a periodic timer.
 
   When signaled, waitable timers can call the #at_timer function as an APC 
   (Asynchronous Procedure Call) to be executed in the context of the %thread
-  that created the %timer. To use this feature you need to derive another class
+  that created the timer. To use this feature you need to derive another class
   that reimplements the #at_timer function.
 */
 
@@ -42,7 +42,7 @@ namespace MLIBSPACE {
   \param  name    object's name
   \param  use_apc \b true if object's at_timer function should be called
 */
-timer::timer(mode m, const char *name, bool use_apc) :
+wtimer::wtimer(mode m, const char *name, bool use_apc) :
   syncbase( name ),
   apc_ (use_apc)
 {
@@ -53,11 +53,11 @@ timer::timer(mode m, const char *name, bool use_apc) :
 }
 
 /*!
-  Set the start time of the %timer and it's period.
+  Set the start time of the timer and it's period.
   \param  interval time in milliseconds from now when object should be signaled
   \param  period  timer's period (0 if it's a one-shot)
 */
-void timer::start( DWORD interval, DWORD period )
+void wtimer::start( DWORD interval, DWORD period )
 {
   LARGE_INTEGER time;
   interval = -abs((int)interval);    //make sure it's a negative value;
@@ -71,16 +71,16 @@ void timer::start( DWORD interval, DWORD period )
   \param  utctime UTC time when object should become signaled
   \param  period  timer's period (0 if it's a one-shot)
 */
-void timer::at (FILETIME& utctime, DWORD period)
+void wtimer::at (FILETIME& utctime, DWORD period)
 {
   SetWaitableTimer( handle(), (LARGE_INTEGER *)&utctime, period, 
     apc_?(PTIMERAPCROUTINE)timerProc:0, this, FALSE );
 }
 
 /*!
-  Stop the %timer.
+  Stop the timer.
 */
-void timer::stop ()
+void wtimer::stop ()
 {
   CancelWaitableTimer (handle());
 }
@@ -88,7 +88,7 @@ void timer::stop ()
 /*!
   glue function that calls the at_timer function.
 */
-void CALLBACK timer::timerProc( timer *obj, DWORD loval, DWORD hival )
+void CALLBACK wtimer::timerProc( wtimer *obj, DWORD loval, DWORD hival )
 {
   obj->at_timer( loval, hival );
 }

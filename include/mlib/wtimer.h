@@ -1,8 +1,8 @@
 #pragma once
 /*!
-  \file wtimer.h definition of timer class
+  \file wtimer.h definition of waitable timer class
 
-	(c) Mircea Neacsu 1999
+  (c) Mircea Neacsu 1999
 */
 
 #include "syncbase.h"
@@ -11,13 +11,13 @@
 namespace MLIBSPACE {
 #endif
 
-class timer : public syncbase
+class wtimer : public syncbase
 {
 public:
   ///Timer mode
   enum mode { manual, automatic };
 
-  timer (mode m=automatic, const char *name=NULL, bool use_apc=false);
+  wtimer (mode m=automatic, const char *name=NULL, bool use_apc=false);
   void start (DWORD interval_ms, DWORD period_ms=0);
   void at (FILETIME& utctime, DWORD period_ms=0);
   void stop ();
@@ -30,7 +30,7 @@ protected:
 
 private:
   bool apc_;
-  static void CALLBACK timerProc (timer *obj, DWORD loval, DWORD hival);
+  static void CALLBACK timerProc (wtimer *obj, DWORD loval, DWORD hival);
 };
 
 #ifdef MLIBSPACE
