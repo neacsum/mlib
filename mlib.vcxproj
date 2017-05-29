@@ -174,12 +174,14 @@
     <ClInclude Include="include\mlib\sqlite3.h" />
     <ClInclude Include="include\mlib\sqlite3ext.h" />
     <ClInclude Include="include\mlib\sqlitepp.h" />
+    <ClInclude Include="include\mlib\stopwatch.h" />
     <ClInclude Include="include\mlib\syncbase.h" />
     <ClInclude Include="include\mlib\tcpserv.h" />
     <ClInclude Include="include\mlib\thread.h" />
     <ClInclude Include="include\mlib\trace.h" />
     <ClInclude Include="include\mlib\utf8.h" />
     <ClInclude Include="include\mlib\wsockstream.h" />
+    <ClInclude Include="include\mlib\wtimer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\mlib\base64.cpp" />
@@ -203,6 +205,7 @@
     <ClCompile Include="source\mlib\shmem.cpp" />
     <ClCompile Include="source\mlib\sqlite3.c" />
     <ClCompile Include="source\mlib\sqlitepp.cpp" />
+    <ClCompile Include="source\mlib\stopwatch.cpp" />
     <ClCompile Include="source\mlib\syncbase.cpp" />
     <ClCompile Include="source\mlib\tcpserv.cpp" />
     <ClCompile Include="source\mlib\thread.cpp" />

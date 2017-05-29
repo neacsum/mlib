@@ -108,6 +108,12 @@
     <ClInclude Include="include\mlib\jbridge.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\mlib\wtimer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\mlib\stopwatch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\mlib\dprintf.c">
@@ -189,6 +195,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\mlib\jbridge.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\mlib\stopwatch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
