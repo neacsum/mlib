@@ -63,10 +63,10 @@ TEST (utf8_dir)
 
   wchar_t *greek = L"ελληνικό";
   string dirname = narrow (greek);
-  CHECK (!mkdir (dirname));   //mkdir should return 0 for success
+  CHECK (mkdir (dirname));   //mkdir returns true  for success
 
   //enter newly created directory
-  CHECK (!chdir (dirname));   //chdir should return 0 for success
+  CHECK (chdir (dirname));   //chdir returns true for success
 
   //Path returned by getcwd should end in our Greek string
   string cwd = getcwd ();
@@ -76,5 +76,5 @@ TEST (utf8_dir)
 
   //Move out of directory and remove it
   chdir ("..");
-  CHECK (!rmdir (dirname));
+  CHECK (rmdir (dirname));    //rmdir returrs true for success
 }

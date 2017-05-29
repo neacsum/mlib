@@ -509,7 +509,7 @@ bool Profile::CopySection (const Profile& from_file, const char *from_sect, cons
     return true;
 
   //if file doesn't exist create it now
-  if (utf8::access (filename, 0))
+  if (!utf8::access (filename, 0))
   {
     FILE *fp = ini_openwrite (filename);
     if (fp == NULL)
@@ -1211,7 +1211,7 @@ static bool close_rename(FILE* rfp, FILE* wfp, const char* filename)
     return false;
 
   i = 0;
-  while (i++ < RETRIES && utf8::rename(tmpname, filename))
+  while (i++ < RETRIES && !utf8::rename(tmpname, filename))
     Sleep(0);
   return (i < RETRIES);
 }
