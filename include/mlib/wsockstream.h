@@ -176,7 +176,7 @@ public:
       strm (new sockbuf (type, domain, proto)) {};
 
   /// Create a SOCK_STREAM connected to a remote peer
-  generic_sockstream (const char* rhost, unsigned short rport, int type=SOCK_STREAM);
+  generic_sockstream (const inaddr& remote, int type=SOCK_STREAM);
 
   ~generic_sockstream ();
 
@@ -187,14 +187,11 @@ public:
 };
 
 template <class strm>
-generic_sockstream<strm>::generic_sockstream (const char* rhost, unsigned short rport, int type) :
- strm(new sockbuf())
+generic_sockstream<strm>::generic_sockstream (const inaddr& remote, int type) :
+strm (new sockbuf ())
 {
-  if (rhost)
-  {
-    rdbuf()->open (type);
-    rdbuf()->connect (inaddr(rhost, rport));
-  }
+  rdbuf ()->open (type);
+  rdbuf ()->connect (remote);
 }
 
 template <class strm>

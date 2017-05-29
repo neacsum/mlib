@@ -69,7 +69,7 @@ HttpServerFixture::HttpServerFixture () :
   srv.docroot (".");
   srv.start ();
   cfunc = [&] (void*) -> int {
-    sockstream ws("127.0.0.1", 8080);
+    sockstream ws(inaddr ("127.0.0.1", 8080));
     ws << "GET " << uri << " HTTP/1.1" << endl;
     TRACE ("GET %s", uri.c_str ());
     ws << request.c_str () << endl << flush;
