@@ -55,6 +55,14 @@ TEST (greek_letters)
   CHECK (widen (s) == greek);
 }
 
+TEST (string_len)
+{
+  wchar_t *greek = L"ελληνικό αλφάβητο";
+  string s = narrow (greek);
+  size_t l = length (s);
+  CHECK_EQUAL (wcslen (greek), l);
+}
+
 TEST (utf8_dir)
 {
   /* Make a folder using Greek alphabet, change current directory into it,

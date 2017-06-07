@@ -81,6 +81,26 @@ std::wstring widen (const std::string& s)
 ///\}
 
 /*!
+  Counts number of characters in an UTF8 encoded string
+  
+  \ingroup utf8
+  \param s UTF8-encoded string
+
+  \note Algorithm from http://canonical.org/~kragen/strlen-utf8.html
+*/
+size_t length (const std::string& s)
+{
+  size_t nc = 0;
+  auto p = s.begin ();
+  while (p != s.end ())
+  {
+    if ((*p++ & 0xC0) != 0x80)
+      nc++;
+  }
+  return nc;
+}
+
+/*!
   Converts wide byte command arguments to an array of pointers
   to UTF-8 strings.
 

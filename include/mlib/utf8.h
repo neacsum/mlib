@@ -20,6 +20,8 @@ std::wstring widen (const char* s);
 std::string narrow (const std::wstring& s);
 std::wstring widen (const std::string& s);
 
+size_t length (const std::string& s);
+
 std::vector<std::string> get_argv ();
 char** get_argv (int *argc);
 void free_argv (int argc, char **argv);
