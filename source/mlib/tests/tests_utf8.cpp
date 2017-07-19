@@ -63,6 +63,15 @@ TEST (string_len)
   CHECK_EQUAL (wcslen (greek), l);
 }
 
+TEST (emoji)
+{
+  wchar_t *wsmiley = L"😄";
+  int wlen = wcslen (wsmiley);
+  CHECK_EQUAL (2, wlen);
+  string smiley = narrow (wsmiley);
+  CHECK_EQUAL ("\xF0\x9f\x98\x84", smiley);
+}
+
 TEST (utf8_dir)
 {
   /* Make a folder using Greek alphabet, change current directory into it,
