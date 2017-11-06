@@ -33,10 +33,6 @@ Projects:
 
  - mlib                      - Main Library
 
- - [utpp] (\ref utpp_readme) - Test library derived from UnitTest++
-
- * [geo] (\ref geo)          - Geodesy and Map Projections
-
  * geom                      - Geometry Objects and algorithms
 
  * nmea                      - NMEA-0183 
@@ -45,12 +41,10 @@ UnitTests:
 
   * mlib_test
 
-  * utpp_test   - Tests for utpp
-
   * geo_tests   - Tests for Geodesy and Map Projections
 
   * geom_tests  - Tests for Geometry Objects
 
 ## Installation ##
-All projects have been tested under Visual Studio 2013. The libraries can be 
+All projects have been tested under Visual Studio 2017. The libraries can be 
 built in 32 or 64 bit version, with or without debug information.

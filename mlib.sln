@@ -1,21 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.16
+VisualStudioVersion = 15.0.27004.2006
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mlib", "mlib.vcxproj", "{F9E11AA9-FAB8-40D8-96D9-F92C5725762B}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "utpp", "utpp.vcxproj", "{C6BEA1F0-D8D4-493B-902C-EF57FDA8F477}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "utpp_test", "utpp_test.vcxproj", "{767056F0-0D38-4CDB-B8A6-9A994A3E0A1C}"
-	ProjectSection(ProjectDependencies) = postProject
-		{C6BEA1F0-D8D4-493B-902C-EF57FDA8F477} = {C6BEA1F0-D8D4-493B-902C-EF57FDA8F477}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mlib_test", "mlib_test.vcxproj", "{F32484D8-7598-4833-BE1A-27A35CF8E5DE}"
 	ProjectSection(ProjectDependencies) = postProject
 		{F9E11AA9-FAB8-40D8-96D9-F92C5725762B} = {F9E11AA9-FAB8-40D8-96D9-F92C5725762B}
-		{C6BEA1F0-D8D4-493B-902C-EF57FDA8F477} = {C6BEA1F0-D8D4-493B-902C-EF57FDA8F477}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "geo", "geo.vcxproj", "{288C8E72-1034-42D4-8A33-B3BADAAC280B}"
@@ -24,7 +16,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "geo_test", "geo_test.vcxpro
 	ProjectSection(ProjectDependencies) = postProject
 		{288C8E72-1034-42D4-8A33-B3BADAAC280B} = {288C8E72-1034-42D4-8A33-B3BADAAC280B}
 		{F9E11AA9-FAB8-40D8-96D9-F92C5725762B} = {F9E11AA9-FAB8-40D8-96D9-F92C5725762B}
-		{C6BEA1F0-D8D4-493B-902C-EF57FDA8F477} = {C6BEA1F0-D8D4-493B-902C-EF57FDA8F477}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "geom", "geom.vcxproj", "{3FF5F1BE-1178-4373-8FB0-E9FC6380221F}"
@@ -32,7 +23,6 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "geom_test", "geom_test.vcxproj", "{3A8FB307-CF89-46CF-BA34-8C52C271C4CF}"
 	ProjectSection(ProjectDependencies) = postProject
 		{3FF5F1BE-1178-4373-8FB0-E9FC6380221F} = {3FF5F1BE-1178-4373-8FB0-E9FC6380221F}
-		{C6BEA1F0-D8D4-493B-902C-EF57FDA8F477} = {C6BEA1F0-D8D4-493B-902C-EF57FDA8F477}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nmea", "nmea.vcxproj", "{09B3C8EE-0112-4B6F-85CC-5C4584EE23D6}"
@@ -63,22 +53,6 @@ Global
 		{F9E11AA9-FAB8-40D8-96D9-F92C5725762B}.Release|Win32.Build.0 = Release|Win32
 		{F9E11AA9-FAB8-40D8-96D9-F92C5725762B}.Release|x64.ActiveCfg = Release|x64
 		{F9E11AA9-FAB8-40D8-96D9-F92C5725762B}.Release|x64.Build.0 = Release|x64
-		{C6BEA1F0-D8D4-493B-902C-EF57FDA8F477}.Debug|Win32.ActiveCfg = Debug|Win32
-		{C6BEA1F0-D8D4-493B-902C-EF57FDA8F477}.Debug|Win32.Build.0 = Debug|Win32
-		{C6BEA1F0-D8D4-493B-902C-EF57FDA8F477}.Debug|x64.ActiveCfg = Debug|x64
-		{C6BEA1F0-D8D4-493B-902C-EF57FDA8F477}.Debug|x64.Build.0 = Debug|x64
-		{C6BEA1F0-D8D4-493B-902C-EF57FDA8F477}.Release|Win32.ActiveCfg = Release|Win32
-		{C6BEA1F0-D8D4-493B-902C-EF57FDA8F477}.Release|Win32.Build.0 = Release|Win32
-		{C6BEA1F0-D8D4-493B-902C-EF57FDA8F477}.Release|x64.ActiveCfg = Release|x64
-		{C6BEA1F0-D8D4-493B-902C-EF57FDA8F477}.Release|x64.Build.0 = Release|x64
-		{767056F0-0D38-4CDB-B8A6-9A994A3E0A1C}.Debug|Win32.ActiveCfg = Debug|Win32
-		{767056F0-0D38-4CDB-B8A6-9A994A3E0A1C}.Debug|Win32.Build.0 = Debug|Win32
-		{767056F0-0D38-4CDB-B8A6-9A994A3E0A1C}.Debug|x64.ActiveCfg = Debug|x64
-		{767056F0-0D38-4CDB-B8A6-9A994A3E0A1C}.Debug|x64.Build.0 = Debug|x64
-		{767056F0-0D38-4CDB-B8A6-9A994A3E0A1C}.Release|Win32.ActiveCfg = Release|Win32
-		{767056F0-0D38-4CDB-B8A6-9A994A3E0A1C}.Release|Win32.Build.0 = Release|Win32
-		{767056F0-0D38-4CDB-B8A6-9A994A3E0A1C}.Release|x64.ActiveCfg = Release|x64
-		{767056F0-0D38-4CDB-B8A6-9A994A3E0A1C}.Release|x64.Build.0 = Release|x64
 		{F32484D8-7598-4833-BE1A-27A35CF8E5DE}.Debug|Win32.ActiveCfg = Debug|Win32
 		{F32484D8-7598-4833-BE1A-27A35CF8E5DE}.Debug|Win32.Build.0 = Debug|Win32
 		{F32484D8-7598-4833-BE1A-27A35CF8E5DE}.Debug|x64.ActiveCfg = Debug|x64
@@ -134,5 +108,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D39A9FF6-3402-4FC0-8F60-32F9F75F7A95}
 	EndGlobalSection
 EndGlobal
