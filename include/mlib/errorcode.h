@@ -87,7 +87,7 @@ public:
   erc ();
   erc (int value , short int priority=ERROR_PRI_ERROR, errfac* f = 0);
   erc (const erc& other);
-  ~erc ();
+  ~erc () noexcept(false);
 
   erc&           operator= (const erc& other);
 

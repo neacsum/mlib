@@ -64,6 +64,6 @@ int invbone (float *dims, float stick, float *dog, float bucket)
   c_cad = (ad_*ad_ + ac*ac - cd_*cd_) / (2 * ad_*ac);
   if (fabs (c_cad) >= 1)
     return -1;
-  *dog = M_PI - (acos (c_bac) + acos (c_cad) - stick);
+  *dog = (float)(M_PI - (acos (c_bac) + acos (c_cad) - stick));
   return 0;
 }

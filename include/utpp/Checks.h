@@ -39,7 +39,7 @@ bool CheckEqual (const std::string& expected, const std::string& actual, std::st
 
 /// \name Specializations of CheckEqual template for char pointers and strings
 /// \{
-bool CheckEqual (const char* expected, const std::string& actual, std::string& msg);
+bool CheckEqual (const std::string& expected, const std::string& actual, std::string& msg);
 bool CheckEqual (const char* expected, char const* actual, std::string& msg);
 bool CheckEqual (char* expected, char* actual, std::string& msg);
 bool CheckEqual (char* expected, const char* actual, std::string& msg);

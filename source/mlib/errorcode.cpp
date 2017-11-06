@@ -153,11 +153,7 @@ void errfac::raise (const erc& e)
 
 void errfac::message(const erc& e, char *msg, size_t sz) const
 {
-#if defined(__BORLANDC__) && (__BORLANDC__ < 0x560)  //no snprintf for old BC5.02
-  sprintf (msg, "Log -- %s %d\n", name_, e.value);
-#else
   _snprintf (msg, sz, "Log -- %s %d\n", name_, e.value);
-#endif
 }
 
 /// Logging action. Default is to use dprintf
@@ -234,7 +230,7 @@ erc::erc (const erc& other) :
   Dtor. If we are active, call our facility to see if we get logged
   or thrown.
 */
-erc::~erc ()
+erc::~erc () noexcept(false)
 {
   if (value && active && priority_ > ERROR_PRI_SUCCESS)
     facility_->raise (*this);

@@ -9,5 +9,7 @@
 
 #define MLIBSPACE mlib
 
+#ifndef NODEFAULTLIB
 #pragma comment (lib, "mlib.lib")
+#endif
 

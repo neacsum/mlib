@@ -11,3 +11,4 @@ Release/
 *.bak
 doc/
 *.ipch
+.vs/

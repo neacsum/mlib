@@ -43,8 +43,7 @@
 #define DEFAULT_SERVERNAME    "localhost"
 #define DEFAULT_FACILITY      LOG_USER
 
-static wchar_t *local_hostname;
-static bool wsa_initialized;
+static char local_hostname[_MAX_PATH];
 
 //values loaded from INI file
 static int defopt = DEFAULT_FLAGS;
@@ -82,38 +81,28 @@ static void init ()
 {
   WSADATA wsd;
   DWORD namesz = 0;
-  
+  wchar_t whost[_MAX_PATH];
   if (proclog)
     return;     //been here before
 
   atexit (dnit);
+  whost[0] = 0;
+  namesz = _countof(whost);
 
   if( WSAStartup( MAKEWORD( 2, 2 ), &wsd ) )
   {
     //failed to initialize WINSOCK - will have to live with netbios and files
-    local_hostname = (wchar_t *)malloc ((MAX_COMPUTERNAME_LENGTH + 1)*sizeof(wchar_t));
-    local_hostname[0] = 0;
-    namesz = MAX_COMPUTERNAME_LENGTH + 1;
-    GetComputerName (local_hostname, &namesz);
+    GetComputerName (whost, &namesz);
   }
   else
   {
-    /* 
-    W2K returns 0 for namesz so we fix it to a sufficiently large value
-    GetComputerNameEx (ComputerNameDnsFullyQualified, NULL, &namesz);
-    */
-    namesz = 255;
-    local_hostname = (wchar_t *)malloc (namesz+1);
-    local_hostname[0] = 0;
-    if (!GetComputerNameEx (ComputerNameDnsFullyQualified, local_hostname, &namesz))
-      GetComputerName (local_hostname, &namesz);
+    if (!GetComputerNameEx (ComputerNameDnsFullyQualified, whost, &namesz))
+      GetComputerName (whost, &namesz);
       
     if (!server_hostname)
       server_hostname = strdup (DEFAULT_SERVERNAME);
-
-    wsa_initialized = true;
   }
-
+  strcpy(local_hostname, utf8::narrow(whost).c_str());
   proclog = (LOG*)malloc (sizeof(LOG));
   //init LOG structure
   memset (proclog, 0, sizeof (LOG));
@@ -127,16 +116,7 @@ static void dnit ()
 {
   closelog ();
 
-  if (wsa_initialized)
-  {
-    WSACleanup ();
-    wsa_initialized = false;
-  }
-  if (local_hostname)
-  {
-    free (local_hostname);
-    local_hostname = 0;
-  }
+  WSACleanup ();
   if (server_hostname)
   {
     free (server_hostname);
@@ -272,7 +252,7 @@ void openlog( char* ident, int option, int facility )
     proclog->file = fopen (logfname, "ac");
   }
 
-  if (wsa_initialized && !(proclog->option & LOGOPT_NOUDP))
+  if (!(proclog->option & LOGOPT_NOUDP))
   {
     logger_addr (proclog);
     proclog->sock = socket( AF_INET, SOCK_DGRAM, 0 );
@@ -372,81 +352,81 @@ void closelog ()
           "Unable to make network connection to %s.", host );
 \endverbatim
  */
-void syslog( int facility_priority, char* fmt, ...)
+void syslog (int facility_priority, char* fmt, ...)
 {
   SYSTEMTIME stm;
   va_list ap;
   int len;
-  char datagram [LOG_DGRAM_SIZE+3];
+  char datagram[LOG_DGRAM_SIZE + 3];
   if (!proclog)
     openlog (NULL, 0, 0);
 
-  int prm = LOG_MASK( facility_priority & LOG_PRIMASK );
-  if( !(prm & proclog->mask) )
+  int prm = LOG_MASK (facility_priority & LOG_PRIMASK);
+  if (!(prm & proclog->mask))
     return;
 
-  if( !(facility_priority & LOG_FACMASK) )
+  if (!(facility_priority & LOG_FACMASK))
     facility_priority |= proclog->facility;
-  
+
   va_start (ap, fmt);
-  GetLocalTime( &stm );
-  len = sprintf( datagram, "<%d>%s %2d %02d:%02d:%02d %s %s%s: ",
-    facility_priority,
-    month[ stm.wMonth - 1 ], stm.wDay, stm.wHour, stm.wMinute, stm.wSecond,
-    local_hostname, 
-    proclog->ident?proclog->ident : processname(0), proclog->str_pid );
-  vsnprintf( datagram + len, LOG_DGRAM_SIZE - len, fmt, ap );
+  GetLocalTime (&stm);
+  len = sprintf (datagram, "<%d>%s %2d %02d:%02d:%02d %s %s%s: ",
+                 facility_priority,
+                 month[stm.wMonth - 1], stm.wDay, stm.wHour, stm.wMinute, stm.wSecond,
+                 local_hostname,
+                 proclog->ident ? proclog->ident : processname (0), proclog->str_pid);
+  vsnprintf (datagram + len, LOG_DGRAM_SIZE - len, fmt, ap);
 
   if (proclog->sock != INVALID_SOCKET)
-    sendto( proclog->sock, datagram, (int)strlen(datagram), 0, (SOCKADDR*) &proclog->sa_logger, sizeof(SOCKADDR_IN) );
+    sendto (proclog->sock, datagram, (int)strlen (datagram), 0, (SOCKADDR*)&proclog->sa_logger, sizeof (SOCKADDR_IN));
 
   strcat (datagram, "\n");
   if (proclog->option & LOGOPT_OUTDEBUG)
-    OutputDebugString (utf8::widen(datagram).c_str());
+    OutputDebugString (utf8::widen (datagram).c_str ());
 
   if (proclog->file)
   {
-    fwrite (datagram, sizeof(char), strlen(datagram), proclog->file);
+    fwrite (datagram, sizeof (char), strlen (datagram), proclog->file);
     fflush (proclog->file);
   }
 
 }
 
-void syslog_debug (char* fmt, ...)
+void syslog_debug(char* fmt, ...)
 {
   SYSTEMTIME stm;
   va_list ap;
   int len;
-  char datagram [LOG_DGRAM_SIZE+3];
+  char datagram[LOG_DGRAM_SIZE + 3];
   if (!proclog)
-    openlog (NULL, 0, 0);
+    openlog(NULL, 0, 0);
 
-  int prm = LOG_MASK( LOG_DEBUG );
-  if( !(prm & proclog->mask) )
+  int prm = LOG_MASK(LOG_DEBUG);
+  if (!(prm & proclog->mask))
     return;
 
   int facility_priority = proclog->facility | LOG_DEBUG;
-  
-  va_start (ap, fmt);
-  GetLocalTime( &stm );
-  len = sprintf( datagram, "<%d>%s %2d %02d:%02d:%02d %s %s%s: ",
-    facility_priority,
-    month[ stm.wMonth - 1 ], stm.wDay, stm.wHour, stm.wMinute, stm.wSecond,
-    local_hostname, 
-    proclog->ident?proclog->ident : processname(0), proclog->str_pid );
-  vsnprintf( datagram + len, LOG_DGRAM_SIZE - len, fmt, ap );
+
+  va_start(ap, fmt);
+  GetLocalTime(&stm);
+  len = sprintf(datagram, "<%d>%s %2d %02d:%02d:%02d %s %s%s: ",
+                facility_priority,
+                month[stm.wMonth - 1], stm.wDay, stm.wHour, stm.wMinute, stm.wSecond,
+                local_hostname,
+                proclog->ident ? proclog->ident : processname(0), proclog->str_pid);
+  vsnprintf(datagram + len, LOG_DGRAM_SIZE - len, fmt, ap);
 
   if (proclog->sock != INVALID_SOCKET)
-    sendto( proclog->sock, datagram, (int)strlen(datagram), 0, (SOCKADDR*) &proclog->sa_logger, sizeof(SOCKADDR_IN) );
+    sendto(proclog->sock, datagram, (int)strlen(datagram), 0, (SOCKADDR*)&proclog->sa_logger, sizeof(SOCKADDR_IN));
 
-  strcat (datagram, "\n");
+  strcat(datagram, "\n");
   if (proclog->option & LOGOPT_OUTDEBUG)
-    OutputDebugString (utf8::widen(datagram).c_str());
+    OutputDebugString(utf8::widen(datagram).c_str());
 
   if (proclog->file)
   {
-    fwrite (datagram, sizeof(char), strlen(datagram), proclog->file);
-    fflush (proclog->file);
+    fwrite(datagram, sizeof(char), strlen(datagram), proclog->file);
+    fflush(proclog->file);
   }
 }
 
