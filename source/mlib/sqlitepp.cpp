@@ -568,7 +568,7 @@ SYSTEMTIME Query::column_time (int nc)
   const char *pstr = (const char *)sqlite3_column_text (stmt, nc);
   if (pstr)
   {
-    sscanf (pstr, "%d-%d-%d %d:%d:%f", 
+    sscanf (pstr, "%hd-%hd-%hd %hd:%hd:%f", 
       &st.wYear, &st.wMonth, &st.wDay, &st.wHour, &st.wMinute, &sec);
     st.wSecond = (int)sec;
     st.wMilliseconds = (int)((sec - st.wSecond)*1000.);

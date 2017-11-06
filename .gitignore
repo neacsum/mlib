@@ -10,3 +10,4 @@ Release/
 *.obj
 *.bak
 doc/
+*.ipch
