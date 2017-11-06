@@ -63,7 +63,7 @@ TEST (string_len)
   CHECK_EQUAL (wcslen (greek), l);
 }
 
-TEST (emoji)
+TEST (wemoji)
 {
   wchar_t *wsmiley = L"😄";
   int wlen = wcslen (wsmiley);
@@ -71,6 +71,36 @@ TEST (emoji)
   string smiley = narrow (wsmiley);
   CHECK_EQUAL ("\xF0\x9f\x98\x84", smiley);
 }
+
+TEST (rune)
+{
+  string smiley{ u8"😀" };
+  int rune_smiley = rune (smiley.begin ());
+  CHECK_EQUAL (0x1f600, rune_smiley);
+}
+
+TEST (next)
+{
+  string emojis{ u8"😃😎😛" };
+  int i = 0;
+  auto ptr = emojis.begin ();
+  while (ptr != emojis.end ())
+  {
+    i++;
+    CHECK (next (emojis, ptr));
+  }
+
+  CHECK_EQUAL (3, i);
+}
+
+TEST (runes)
+{
+  string emojis{ u8"😃😎😛" };
+  u32string emojis32 = runes (emojis);
+  CHECK_EQUAL (3, emojis32.size ());
+  CHECK_EQUAL (0x1f603, emojis32[0]);
+}
+
 
 TEST (utf8_dir)
 {

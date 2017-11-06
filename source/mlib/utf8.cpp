@@ -12,6 +12,7 @@
 #include <sys/stat.h>
 #include <mlib/utf8.h>
 #include <vector>
+#include <assert.h>
 
 using namespace std;
 namespace utf8 {
@@ -25,6 +26,8 @@ namespace utf8 {
 */
 std::string narrow (const wchar_t* s)
 {
+  if (!s)
+    return string ();
   int wsz = (int)wcslen (s);
   int nsz = WideCharToMultiByte (CP_UTF8, 0, s, wsz, 0, 0, 0, 0);
   string out (nsz, 0);
@@ -60,6 +63,8 @@ std::string narrow (const std::wstring& s)
   */
 std::wstring widen (const char* s)
 {
+  if (!s)
+    return wstring ();
   int nsz = (int)strlen (s);
   int wsz = MultiByteToWideChar (CP_UTF8, 0, s, nsz, 0, 0);
   wstring out (wsz, 0);
@@ -81,6 +86,62 @@ std::wstring widen (const std::string& s)
 ///\}
 
 /*!
+  Conversion from UTF-8 to UTF-32
+  \ingroup utf8
+  
+  \param s UTF-8 encoded string
+  \return UTF-32 encoded string
+*/
+std::u32string runes (const std::string& s)
+{
+  u32string str;
+  for (auto p = s.begin (); p != s.end (); next (s, p))
+    str.push_back (rune (p));
+  return str;
+}
+
+
+/*!
+  Conversion from UTF32 to UTF8
+  \param s UTF-32 encoded string
+  \return UTF-8 encoded string
+
+  Each character in the input string should be a valid UTF-32 code point
+  ( <0x10FFFF)
+*/
+std::string narrow (const std::u32string& s)
+{
+  string str;
+  for (auto p = s.begin (); p != s.end (); p++)
+  { 
+    assert (*p < 0x10ffff);
+
+    if (*p < 0x7f)
+      str.push_back ((char)*p);
+    else if (*p < 0x7ff)
+    {
+      str.push_back ((char)(0xC0 | *p >> 6));
+      str.push_back (0x80 | *p & 0x3f);
+    }
+    else if (*p < 0xFFFF)
+    {
+      str.push_back ((char)(0xE0 | *p >> 12));
+      str.push_back (0x80 | *p >> 6 & 0x3f);
+      str.push_back (0x80 | *p & 0x3f);
+    }
+    else
+    {
+      str.push_back ((char)(0xF0 | *p >> 18));
+      str.push_back (0x80 | *p >> 12 & 0x3f);
+      str.push_back (0x80 | *p >> 6 & 0x3f);
+      str.push_back (0x80 | *p & 0x3f);
+    }
+  }
+  return str;
+}
+
+
+/*!
   Counts number of characters in an UTF8 encoded string
   
   \ingroup utf8
@@ -100,6 +161,95 @@ size_t length (const std::string& s)
   return nc;
 }
 
+/// Return current Unicode code point.
+char32_t rune (std::string::const_iterator p)
+{
+  int rune = 0;
+  if ((*p & 0x80) == 0)
+  {
+    rune = *p;
+  }
+  else if ((*p & 0xE0) == 0xc0)
+  {
+    rune = (*p++ & 0x1f) << 6;
+    assert ((*p & 0xC0) == 0x80);
+    rune += *p & 0x3f;
+  }
+  else if ((*p & 0xf0) == 0xE0)
+  {
+    rune = (*p++ & 0x0f) << 12;
+    assert ((*p & 0xC0) == 0x80);
+    rune += (*p++ & 0x3f) << 6;
+    assert ((*p & 0xC0) == 0x80);
+    rune += (*p & 0x3f);
+  }
+  else
+  {
+    rune = (*p++ & 0x07) << 18;
+    assert ((*p & 0xC0) == 0x80);
+    rune += (*p++ & 0x3f) << 12;
+    assert ((*p & 0xC0) == 0x80);
+    rune += (*p++ & 0x3f) << 6;
+    assert ((*p & 0xC0) == 0x80);
+    rune += (*p & 0x3f);
+  }
+  return rune;
+}
+
+/// Verifies if string is a valid utf8 string
+bool valid (const char *s)
+{
+  int rem = 0;
+  while (*s)
+  {
+    if (rem)
+    {
+      if ((*s & 0xC0) != 0x80)
+        return false;
+      else
+        rem--;
+    }
+    else if (*s & 0x80)
+    {
+      if ((*s & 0xC0) == 0x80)
+        return false;
+
+      rem = ((*s & 0xE0) == 0xC0) ? 1 :
+        ((*s & 0xF0) == 0xE0) ? 2 : 3;
+    }
+    s++;
+  }
+  return !rem;
+}
+
+/// Advance iterator to next rune
+bool next (const std::string& s, std::string::const_iterator& p)
+{
+  int rem = 0;
+  if (p == s.end ())
+    return true;    //don't advance past end
+
+  do
+  {
+    if ((*p & 0xC0) == 0x80)
+    {
+      if (rem)
+        rem--;
+      else
+        return false;   //missing continuation byte
+    }
+    else if ((*p & 0xE0) == 0xC0)
+      rem = 1;
+    else if ((*p & 0xF0) == 0xE0)
+      rem = 2;
+    else if ((*p & 0xF8) == 0xF0)
+      rem = 3;
+    p++;
+  } while (rem && p != s.end ());
+
+  return !rem; // rem == 0 if sequence is complete
+}
+
 /*!
   Converts wide byte command arguments to an array of pointers
   to UTF-8 strings.
@@ -111,15 +261,15 @@ size_t length (const std::string& s)
 
   The space allocated for strings and array of pointers should be freed
   by calling free_utf8argv()
-  */
+*/
 char** get_argv (int *argc)
 {
   wchar_t **wargv = CommandLineToArgvW (GetCommandLineW (), argc);
-  char** uargv = (char **)malloc (*argc*sizeof (char*));
+  char** uargv = new char*[*argc];
   for (int i = 0; i < *argc; i++)
   {
     int nc = WideCharToMultiByte (CP_UTF8, 0, wargv[i], -1, 0, 0, 0, 0);
-    uargv[i] = (char *)malloc (nc + 1);
+    uargv[i] = new char[nc + 1];
     WideCharToMultiByte (CP_UTF8, 0, wargv[i], -1, uargv[i], nc, 0, 0);
   }
   LocalFree (wargv);
@@ -132,12 +282,12 @@ char** get_argv (int *argc)
 
   \param  argc  number of arguments
   \param  argv  array of pointers to arguments
-  */
+*/
 void free_argv (int argc, char **argv)
 {
   for (int i = 0; i < argc; i++)
-    free (argv[i]);
-  free (argv);
+    delete argv[i];
+  delete argv;
 }
 
 /*!
@@ -145,7 +295,7 @@ void free_argv (int argc, char **argv)
   \ingroup utf8
 
   \return vector of UTF-8 strings
-  */
+*/
 std::vector<std::string> get_argv ()
 {
   int argc;
