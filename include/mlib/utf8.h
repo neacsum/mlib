@@ -8,6 +8,7 @@
 
 #include <string>
 #include <vector>
+#include <fstream>
 
 namespace utf8 {
 
@@ -55,6 +56,76 @@ bool rename (const std::string& oldname, const std::string& newname);
 
 void splitpath (const char* path, char* drive, char* dir, char* fname, char* ext);
 void splitpath (const char* path, std::string& drive, std::string& dir, std::string& fname, std::string& ext);
+
+class ifstream : public std::ifstream
+{
+public:
+  ifstream () : std::ifstream () {};
+  ifstream (const char* filename, std::ios_base::openmode mode = ios_base::in)
+    : std::ifstream (utf8::widen (filename), mode) {};
+  ifstream (const std::string& filename, std::ios_base::openmode mode = ios_base::in)
+    : std::ifstream (utf8::widen (filename), mode) {};
+  ifstream (ifstream&& other) : std::ifstream ((std::ifstream&&)other) {};
+  ifstream (const ifstream& rhs) = delete;
+
+  void open (const char* filename, ios_base::openmode mode = ios_base::in,
+    int prot = (int)ios_base::_Openprot)
+  {
+    std::ifstream::open (utf8::widen (filename), mode, prot);
+  }
+  void open (const std::string& filename, ios_base::openmode mode = ios_base::in,
+    int prot = (int)ios_base::_Openprot)
+  {
+    std::ifstream::open (utf8::widen (filename), mode, prot);
+  }
+};
+
+class ofstream : public std::ofstream
+{
+public:
+  ofstream () : std::ofstream () {};
+  ofstream (const char* filename, std::ios_base::openmode mode = ios_base::out)
+    : std::ofstream (utf8::widen (filename), mode) {};
+  ofstream (const std::string& filename, std::ios_base::openmode mode = ios_base::out)
+    : std::ofstream (utf8::widen (filename), mode) {};
+  ofstream (ofstream&& other) : std::ofstream ((std::ofstream&&)other) {};
+  ofstream (const ofstream& rhs) = delete;
+
+  void open (const char* filename, ios_base::openmode mode = ios_base::out,
+    int prot = (int)ios_base::_Openprot)
+  {
+    std::ofstream::open (utf8::widen (filename), mode, prot);
+  }
+  void open (const std::string& filename, ios_base::openmode mode = ios_base::out,
+    int prot = (int)ios_base::_Openprot)
+  {
+    std::ofstream::open (utf8::widen (filename), mode, prot);
+  }
+};
+
+class fstream : public std::fstream
+{
+public:
+  fstream () : std::fstream () {};
+  fstream (const char* filename, std::ios_base::openmode mode = ios_base::in | ios_base::out)
+    : std::fstream (utf8::widen (filename), mode) {};
+  fstream (const std::string& filename, std::ios_base::openmode mode = ios_base::in | ios_base::out)
+    : std::fstream (utf8::widen (filename), mode) {};
+  fstream (fstream&& other) : std::fstream ((std::fstream&&)other) {};
+  fstream (const fstream& rhs) = delete;
+
+  void open (const char* filename, ios_base::openmode mode = ios_base::in | ios_base::out,
+    int prot = (int)ios_base::_Openprot)
+  {
+    std::fstream::open (utf8::widen (filename), mode, prot);
+  }
+  void open (const std::string& filename, ios_base::openmode mode = ios_base::in | ios_base::out,
+    int prot = (int)ios_base::_Openprot)
+  {
+    std::fstream::open (utf8::widen (filename), mode, prot);
+  }
+};
+
 
 inline
 bool valid (const std::string& s)

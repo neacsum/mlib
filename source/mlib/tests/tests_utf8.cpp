@@ -66,7 +66,7 @@ TEST (string_len)
 TEST (wemoji)
 {
   wchar_t *wsmiley = L"😄";
-  int wlen = wcslen (wsmiley);
+  size_t wlen = wcslen (wsmiley);
   CHECK_EQUAL (2, wlen);
   string smiley = narrow (wsmiley);
   CHECK_EQUAL ("\xF0\x9f\x98\x84", smiley);
@@ -108,8 +108,7 @@ TEST (utf8_dir)
   obtain the current working directory and verify that it matches the name
   of the newly created folder */
 
-  wchar_t *greek = L"ελληνικό";
-  string dirname = narrow (greek);
+  string dirname = u8"ελληνικό";
   CHECK (mkdir (dirname));   //mkdir returns true  for success
 
   //enter newly created directory
@@ -124,4 +123,58 @@ TEST (utf8_dir)
   //Move out of directory and remove it
   chdir ("..");
   CHECK (rmdir (dirname));    //rmdir returrs true for success
+}
+
+TEST (utf8_out_stream)
+{
+  /* Write some text in a file with a UTF8 encoded filename. Verifies using
+  standard Windows file reading that content was written. */
+
+  string filename = u8"ελληνικό";
+  string filetext{ u8"😃😎😛" };
+
+  utf8::ofstream u8strm(filename);
+
+  u8strm << filetext << endl;
+  u8strm.close ();
+
+  HANDLE f = CreateFile (utf8::widen (filename).c_str (), GENERIC_READ, 0,
+    NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+  CHECK (f);
+
+  char read_back[80];
+  memset (read_back, 0, sizeof (read_back));
+
+  size_t len = filetext.size();
+  DWORD nr;
+  ReadFile (f, read_back, (DWORD)len, &nr, NULL);
+  CloseHandle (f);
+  CHECK (remove (filename));
+  CHECK_EQUAL (len, nr);
+  CHECK_EQUAL (filetext, read_back);
+}
+
+TEST (utf8_in_stream)
+{
+  /* write some stuff in file using utf8::ofstream object and read it
+  back using utf8::ifstream. Verify read back matches original.*/
+
+  string filetext{ u8"ελληνικό" };
+  string filename{ u8"😃😎😛" };
+
+  utf8::ofstream u8out (filename);
+
+  u8out << filetext << endl;
+  u8out.close ();
+
+  utf8::ifstream u8in (filename);
+
+  char read_back[80];
+  memset (read_back, 0, sizeof (read_back));
+  u8in.getline (read_back, sizeof (read_back));
+
+  CHECK_EQUAL (filetext, read_back);
+
+  u8in.close ();
+  CHECK (remove (filename));
 }
