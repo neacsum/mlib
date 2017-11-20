@@ -9,7 +9,7 @@ TEST (NotConnectedDbObject)
 {
   Database db;
   sqlite3* hdb = db;
-  CHECK_EQUAL (0, (int)hdb);
+  CHECK_EQUAL ((sqlite3*)nullptr, hdb);
   db.open ("");
   hdb = db;
   CHECK(hdb != 0);
@@ -118,13 +118,13 @@ TEST_FIXTURE (TestDatabase, NonExisitngColumnName)
 {
   q = "SELECT * FROM tab";
   q.step ();
-  CHECK_THROW_EQUAL (q.column_int ("no_such_column"), erc, SQLITE_RANGE);
+  CHECK_THROW_EQUAL (erc, SQLITE_RANGE, q.column_int ("no_such_column"));
 }
 
 TEST_FIXTURE (TestDatabase, NonExistingParameter)
 {
   q = "SELECT (:par)";
-  CHECK_THROW_EQUAL (q.bind (":no_such_par", 123), erc, SQLITE_RANGE);
+  CHECK_THROW_EQUAL (erc, SQLITE_RANGE, q.bind (":no_such_par", 123));
 }
 
 TEST_FIXTURE (TestDatabase, InsertBlob)

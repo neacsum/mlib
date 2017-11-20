@@ -27,23 +27,9 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-
 ## Contents ##
-Projects:
-
  - mlib                      - Main Library
-
- * geom                      - Geometry Objects and algorithms
-
- * nmea                      - NMEA-0183 
-  
-UnitTests:
-
-  * mlib_test
-
-  * geo_tests   - Tests for Geodesy and Map Projections
-
-  * geom_tests  - Tests for Geometry Objects
+ - mlib_test
 
 ## Installation ##
 All projects have been tested under Visual Studio 2017. The libraries can be 
