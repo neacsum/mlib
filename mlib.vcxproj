@@ -171,6 +171,7 @@
     <ClInclude Include="include\mlib\options.h" />
     <ClInclude Include="include\mlib\profile.h" />
     <ClInclude Include="include\mlib\semaphore.h" />
+    <ClInclude Include="include\mlib\serenum.h" />
     <ClInclude Include="include\mlib\shmem.h" />
     <ClInclude Include="include\mlib\sqlite3.h" />
     <ClInclude Include="include\mlib\sqlite3ext.h" />
@@ -203,6 +204,9 @@
     <ClCompile Include="source\mlib\options.cpp" />
     <ClCompile Include="source\mlib\profile.cpp" />
     <ClCompile Include="source\mlib\semaphore.cpp" />
+    <ClCompile Include="source\mlib\serenum1.cpp" />
+    <ClCompile Include="source\mlib\serenum2.cpp" />
+    <ClCompile Include="source\mlib\serenum3.cpp" />
     <ClCompile Include="source\mlib\shmem.cpp" />
     <ClCompile Include="source\mlib\sqlite3.c" />
     <ClCompile Include="source\mlib\sqlitepp.cpp" />

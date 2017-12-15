@@ -51,5 +51,8 @@
     <ClCompile Include="source\mlib\tests\tests_shmem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="source\mlib\tests\tests_serenum.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

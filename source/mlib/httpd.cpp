@@ -295,7 +295,7 @@ void http_connection::serve401 (const char *realm)
 
   add_ohdr ("WWW-Authenticate", challenge);
 
-  sprintf(len, "%d", strlen(std401));
+  sprintf(len, "%d", (int)strlen(std401));
   add_ohdr ("Content-Length", len);
   add_ohdr ("Content-Type", "text/html");
   respond (401);
@@ -363,7 +363,7 @@ void http_connection::serve404 (const char* text)
   if (!text)
     text = std404;
 
-  sprintf(len, "%d", strlen(text));
+  sprintf(len, "%d", (int)strlen(text));
   add_ohdr ("Content-Length", len);
   add_ohdr ("Content-Type", "text/html");
   respond (404);

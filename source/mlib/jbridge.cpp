@@ -243,7 +243,7 @@ bool JSONBridge::strquote (const char *str)
     const char *ptr;
     if (ptr = strchr (quote, *str))
     {
-      int i = ptr - quote;
+      size_t i = ptr - quote;
       *bufptr++ = '\\';
       *bufptr++ = repl[i];
       str++;

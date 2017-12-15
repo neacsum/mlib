@@ -9,6 +9,6 @@ Debug/
 Release/
 *.obj
 *.bak
-doc/
+docs/
 *.ipch
 .vs/
