@@ -1,7 +1,23 @@
+/*!
+  \file serenum2.cpp - Implementation of SerEnum_UsingRegistry() function.
+  (c) Mircea Neacsu 2017. All rights reserved.
+
+  These functions are heavily inspired from [CEnumerateSerial] (http://www.naughter.com/enumser.html)
+  code.
+*/
 #include <mlib/serenum.h>
 
 using namespace std;
 
+#ifdef MLIBSPACE
+namespace MLIBSPACE {
+#endif
+
+/*!
+  \addtogroup serenum
+  Enumerates all values under HKEY_LOCAL_MACHINE\HARDWARE\DEVICEMAP\SERIALCOMM
+  to retrieve available COM ports.
+*/
 bool SerEnum_UsingRegistry (vector<int>& ports)
 {
   HKEY comm_key;
@@ -46,3 +62,7 @@ bool SerEnum_UsingRegistry (vector<int>& ports)
   }
   return true;
 }
+
+#ifdef MLIBSPACE
+};
+#endif

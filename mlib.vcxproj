@@ -148,9 +148,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <Text Include="ReadMe.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="include\mlib\base64.h" />
     <ClInclude Include="include\mlib\basename.h" />
     <ClInclude Include="include\mlib\convert.h" />

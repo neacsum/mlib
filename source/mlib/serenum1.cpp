@@ -1,15 +1,32 @@
+/*!
+  \file serenum1.cpp - Implementation of SerEnum_UsingCreateFile() function.
+  (c) Mircea Neacsu 2017. All rights reserved.
+
+  These functions are heavily inspired from [CEnumerateSerial] (http://www.naughter.com/enumser.html)
+  code.
+*/
 #include <mlib/serenum.h>
 
+#ifdef MLIBSPACE
+namespace MLIBSPACE {
+#endif
+
+
+/*!
+  \addtogroup serenum
+  Iterate from 1 to 255 finding those ports for which the CreateFile function
+  doesn't fail.
+*/
 bool SerEnum_UsingCreateFile (std::vector<int>& ports)
 {
   ports.clear ();
 
-  //Up to 255 COM ports are supported so we iterate through all of them seeing
-  //if we can open them or if we fail to open them, get an access denied or general error error.
-  //Both of these cases indicate that there is a COM port at that number. 
+  /* Up to 255 COM ports are supported so we iterate through all of them seeing
+  if we can open them or if we fail to open them, get an access denied or general error.
+  Both of these cases indicate that there is a COM port at that number. */
   for (int i = 1; i<256; i++)
   {
-    //Form the Raw device name
+    //Form the raw device name
     wchar_t port_str[32];
     swprintf (port_str, _countof(port_str), L"\\\\.\\COM%d", i);
     bool ok = false;
@@ -34,3 +51,6 @@ bool SerEnum_UsingCreateFile (std::vector<int>& ports)
   return true;
 }
 
+#ifdef MLIBSPACE
+};
+#endif
