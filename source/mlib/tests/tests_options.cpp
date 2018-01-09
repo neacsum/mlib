@@ -2,6 +2,9 @@
 #include <mlib/options.h>
 #include <iostream>
 
+SUITE (Options)
+{
+
 char *optlist[]  = {"a? optional_arg",
                     "b: required_arg",
                     "c+ one_or_more_args",
@@ -11,7 +14,7 @@ char *optlist[]  = {"a? optional_arg",
                     ":onlylong required",
                     0};
 
-TEST (Options_CostructorWithOptlist)
+TEST (CostructorWithOptlist)
 {
   Options o1;
   Options o2 (optlist);
@@ -24,7 +27,7 @@ TEST (Options_CostructorWithOptlist)
   CHECK (usage1 == usage2);
 }
 
-TEST (Options_CopyConstructor)
+TEST (CopyConstructor)
 {
   Options o1 (optlist);
   Options o2 (o1);
@@ -37,7 +40,7 @@ TEST (Options_CopyConstructor)
 }
 
 
-TEST (Options_Usage)
+TEST (Usage)
 {
   char *cmd[] ={"program"};
   Options o (optlist);
@@ -46,7 +49,7 @@ TEST (Options_Usage)
   cout << o.usage () << endl;
 }
 
-TEST (Options_UnknownOpt)
+TEST (UnknownOpt)
 {
   char *cmd[] ={"programname", "-x"};
 
@@ -54,7 +57,7 @@ TEST (Options_UnknownOpt)
   CHECK_EQUAL (1, o.parse (2, cmd));
 }
 
-TEST (Options_GetMissingOpt)
+TEST (GetMissingOpt)
 {
   string argval;
   char *cmd[] ={"programname", "-a"};
@@ -65,7 +68,7 @@ TEST (Options_GetMissingOpt)
   CHECK (argval.empty ());
 }
 
-TEST (Options_OptionalArgNoArg)
+TEST (OptionalArgNoArg)
 {
   string argval;
   char *cmd[] ={"programname", "-a"};
@@ -76,7 +79,7 @@ TEST (Options_OptionalArgNoArg)
   CHECK (argval.empty ());
 }
 
-TEST (Options_OptionalArg)
+TEST (OptionalArg)
 {
   string argval;
   char *cmd[] ={"programname", "-a", "abcd"};
@@ -88,7 +91,7 @@ TEST (Options_OptionalArg)
   CHECK_EQUAL ("abcd", argval);
 }
 
-TEST (Options_RequiredArgValue)
+TEST (RequiredArgValue)
 {
   string argval;
   char *cmd[] ={"programname", "-b", "abcd"};
@@ -100,7 +103,7 @@ TEST (Options_RequiredArgValue)
   CHECK_EQUAL ("abcd", argval);
 }
 
-TEST (Options_RequiredArgMissing)
+TEST (RequiredArgMissing)
 {
   char *cmd[] ={"programname", "-b"};
 
@@ -108,7 +111,7 @@ TEST (Options_RequiredArgMissing)
   CHECK_EQUAL (2, o.parse (2, cmd));
 }
 
-TEST (Options_OneOrMoreWithOne)
+TEST (OneOrMoreWithOne)
 {
   string argval;
   char *cmd[] ={"programname", "-c", "abcd"};
@@ -120,7 +123,7 @@ TEST (Options_OneOrMoreWithOne)
   CHECK_EQUAL ("abcd", argval);
 }
 
-TEST (Options_OneOrMoreWithMore)
+TEST (OneOrMoreWithMore)
 {
   string argval;
   char *cmd[] ={"programname", "-c", "abcd", "efgh", "ijkl"};
@@ -132,7 +135,7 @@ TEST (Options_OneOrMoreWithMore)
   CHECK_EQUAL ("abcd|efgh|ijkl", argval);
 }
 
-TEST (Options_OneOrMoreWithNone)
+TEST (OneOrMoreWithNone)
 {
   string argval;
   char *cmd[] ={"programname", "-c"};
@@ -141,7 +144,7 @@ TEST (Options_OneOrMoreWithNone)
   CHECK_EQUAL (2, o.parse (2, cmd));
 }
 
-TEST (Options_ZeroOrMoreWithOne)
+TEST (ZeroOrMoreWithOne)
 {
   string argval;
   char *cmd[] ={"programname", "-d", "abcd"};
@@ -153,7 +156,7 @@ TEST (Options_ZeroOrMoreWithOne)
   CHECK_EQUAL ("abcd", argval);
 }
 
-TEST (Options_ZeroOrMoreWithMore)
+TEST (ZeroOrMoreWithMore)
 {
   string argval;
   char *cmd[] ={"programname", "-d", "abcd", "efgh", "ijkl"};
@@ -165,7 +168,7 @@ TEST (Options_ZeroOrMoreWithMore)
   CHECK_EQUAL ("abcd|efgh|ijkl", argval);
 }
 
-TEST (Options_ZeroOrMoreWithNone)
+TEST (ZeroOrMoreWithNone)
 {
   string argval;
   char *cmd[] ={"programname", "-d"};
@@ -176,7 +179,7 @@ TEST (Options_ZeroOrMoreWithNone)
   CHECK (argval.empty ());
 }
 
-TEST (Options_NoArg)
+TEST (NoArg)
 {
   string argval;
   char *cmd[] ={"programname", "-e"};
@@ -187,7 +190,7 @@ TEST (Options_NoArg)
   CHECK (argval.empty ());
 }
 
-TEST (Options_LongOptShortForm)
+TEST (LongOptShortForm)
 {
   string argval;
   char *cmd[] ={"programname", "-f", "abcd"};
@@ -199,7 +202,7 @@ TEST (Options_LongOptShortForm)
   CHECK_EQUAL ("abcd", argval);
 }
 
-TEST (Options_LongOptShortFormAsString)
+TEST (LongOptShortFormAsString)
 {
   string argval;
   char *cmd[] ={"programname", "-f", "abcd"};
@@ -212,7 +215,7 @@ TEST (Options_LongOptShortFormAsString)
 }
 
 
-TEST (Options_LongOptLongForm)
+TEST (LongOptLongForm)
 {
   string argval;
   char *cmd[] ={"programname", "--longorshort", "abcd"};
@@ -224,7 +227,7 @@ TEST (Options_LongOptLongForm)
   CHECK_EQUAL ("abcd", argval);
 }
 
-TEST (Options_LongOptGetByLongName)
+TEST (LongOptGetByLongName)
 {
   string argval;
   char *cmd[] ={"programname", "--longorshort", "abcd"};
@@ -236,7 +239,7 @@ TEST (Options_LongOptGetByLongName)
   CHECK_EQUAL ("abcd", argval);
 }
 
-TEST (Options_LongOptNoShortForm)
+TEST (LongOptNoShortForm)
 {
   string argval;
   char *cmd[] ={"programname", "--onlylong", "abcd"};
@@ -248,7 +251,7 @@ TEST (Options_LongOptNoShortForm)
   CHECK_EQUAL ("abcd", argval);
 }
 
-TEST (Options_NonOptionParam)
+TEST (NonOptionParam)
 {
   int nextarg;
   string argval;
@@ -260,7 +263,7 @@ TEST (Options_NonOptionParam)
   CHECK_EQUAL ("nonopt", cmd[nextarg]);
 }
 
-TEST (Options_EndOfParams)
+TEST (EndOfParams)
 {
   int nextarg;
   string argval;
@@ -272,7 +275,7 @@ TEST (Options_EndOfParams)
   CHECK_EQUAL (3, nextarg);
 }
 
-TEST (Options_NextOnEmpytParser)
+TEST (NextOnEmpytParser)
 {
   Options o;
   string argval;
@@ -281,7 +284,7 @@ TEST (Options_NextOnEmpytParser)
   CHECK_EQUAL (-1, o.next (opt, argval));
 }
 
-TEST (Options_Next)
+TEST (Next)
 {
   int nextarg;
   string argval, argopt;
@@ -295,7 +298,7 @@ TEST (Options_Next)
   CHECK_EQUAL ("abcd", argval);
 }
 
-TEST (Options_NextGetsLongForm)
+TEST (NextGetsLongForm)
 {
   int nextarg;
   string argval, argopt;
@@ -309,7 +312,7 @@ TEST (Options_NextGetsLongForm)
   CHECK_EQUAL ("abcd", argval);
 }
 
-TEST (Options_NextAdvances)
+TEST (NextAdvances)
 {
   int nextarg;
   string argval, argopt;
@@ -325,6 +328,7 @@ TEST (Options_NextAdvances)
   CHECK_EQUAL (0, o.next (argopt, argval));
   CHECK_EQUAL ("b", argopt);
   CHECK_EQUAL ("efgh", argval);
+}
 }
 
 

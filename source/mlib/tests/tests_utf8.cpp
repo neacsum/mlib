@@ -5,6 +5,8 @@
 using namespace std;
 using namespace utf8;
 
+SUITE (Utf8)
+{
 TEST (widen_string)
 {
   string s1 ("ABCD");
@@ -102,7 +104,7 @@ TEST (runes)
 }
 
 
-TEST (utf8_dir)
+TEST (dir)
 {
   /* Make a folder using Greek alphabet, change current directory into it,
   obtain the current working directory and verify that it matches the name
@@ -125,7 +127,7 @@ TEST (utf8_dir)
   CHECK (rmdir (dirname));    //rmdir returrs true for success
 }
 
-TEST (utf8_out_stream)
+TEST (out_stream)
 {
   /* Write some text in a file with a UTF8 encoded filename. Verifies using
   standard Windows file reading that content was written. */
@@ -154,7 +156,7 @@ TEST (utf8_out_stream)
   CHECK_EQUAL (filetext, read_back);
 }
 
-TEST (utf8_in_stream)
+TEST (in_stream)
 {
   /* write some stuff in file using utf8::ofstream object and read it
   back using utf8::ifstream. Verify read back matches original.*/
@@ -177,4 +179,5 @@ TEST (utf8_in_stream)
 
   u8in.close ();
   CHECK (remove (filename));
+}
 }
