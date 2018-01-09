@@ -167,6 +167,7 @@
     <ClInclude Include="include\mlib\mutex.h" />
     <ClInclude Include="include\mlib\options.h" />
     <ClInclude Include="include\mlib\profile.h" />
+    <ClInclude Include="include\mlib\ringbuf.h" />
     <ClInclude Include="include\mlib\semaphore.h" />
     <ClInclude Include="include\mlib\serenum.h" />
     <ClInclude Include="include\mlib\shmem.h" />

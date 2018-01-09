@@ -186,6 +186,7 @@
     <ClCompile Include="source\mlib\tests\tests_main.cpp" />
     <ClCompile Include="source\mlib\tests\tests_options.cpp" />
     <ClCompile Include="source\mlib\tests\tests_profile.cpp" />
+    <ClCompile Include="source\mlib\tests\tests_ringbuffer.cpp" />
     <ClCompile Include="source\mlib\tests\tests_serenum.cpp" />
     <ClCompile Include="source\mlib\tests\tests_shmem.cpp" />
     <ClCompile Include="source\mlib\tests\tests_sock.cpp" />

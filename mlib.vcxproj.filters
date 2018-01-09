@@ -114,6 +114,9 @@
     <ClInclude Include="include\mlib\serenum.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\mlib\ringbuf.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\mlib\dprintf.c">
