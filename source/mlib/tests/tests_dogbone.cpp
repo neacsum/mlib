@@ -1,6 +1,8 @@
 #include <mlib/dogbone.h>
 #include <utpp/utpp.h>
-#include <mlib/mathval.h>
+
+#define _USE_MATH_DEFINES
+#include <math.h>
 
 float dims[4] = { 0.73f, 0.89f, 0.96f, 1.2f };
 

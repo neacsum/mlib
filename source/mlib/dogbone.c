@@ -1,6 +1,6 @@
 #include <mlib/dogbone.h>
+#define _USE_MATH_DEFINES
 #include <math.h>
-#include <mlib/mathval.h>
 
 #define ab_ dims[0]
 #define bc_ dims[1]
