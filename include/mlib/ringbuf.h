@@ -6,6 +6,7 @@
 #pragma once
 
 #include <memory>
+#include <vector>
 
 /// Circular buffer
 template <class T>
@@ -143,6 +144,16 @@ public:
       }
     }
     return *this;
+  }
+
+  /// Vector conversion operator
+  operator std::vector<T> () const
+  {
+    std::vector<T> v(sz);
+    for (size_t i = 0; i < sz; i++)
+      v[i] = buf[(front_idx + i) % cap];
+
+    return v;
   }
 
   ///Inserts new element in buffer

@@ -242,5 +242,29 @@ SUITE (RingBuffer)
       CHECK_EQUAL (*it, *it1++);
     } while (it != it++);
   }
+
+  TEST_FIXTURE (make_intbuf, vector_operator)
+  {
+    std::vector<int> v;
+
+    //half-full ring buffer
+    fill (BUFSZ / 2);
+
+    v = intbuf;
+
+    CHECK_EQUAL (v.size (), intbuf.size ());
+    for (int i = 0; i < BUFSZ / 2; i++)
+      CHECK_EQUAL (i, v[i]);
+
+    //overfill ring buffer
+    for (int i = 0; i < BUFSZ; i++)
+      intbuf.push_back (i*10);
+
+    v = intbuf;
+
+    CHECK_EQUAL (v.size (), intbuf.size ());
+    for (int i = 0; i < BUFSZ; i++)
+      CHECK_EQUAL (i*10, v[i]);
+  }
 }
 
