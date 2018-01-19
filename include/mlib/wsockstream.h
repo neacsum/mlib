@@ -23,7 +23,7 @@ namespace MLIBSPACE {
 
 
 ///Error facility used by all sock derived classes.
-extern errfacility *sockerrors;
+extern errfac *sockerrors;
 
 //sockbuf flags
 #define _S_ALLOCBUF		0x0002				///< locally allocated buffer
@@ -56,9 +56,9 @@ public:
   ///Retrieve Windows socket handle
   SOCKET            handle () const {return sl->handle;};
   
-  virtual errc      open (int type, int domain=AF_INET, int proto=0);
+  virtual erc       open (int type, int domain=AF_INET, int proto=0);
   void              close ();
-  virtual errc      shutdown (shuthow sh);
+  virtual erc       shutdown (shuthow sh);
 
   ///Check if socket is opened
   virtual bool      is_open () const  { return sl->handle != INVALID_SOCKET; }
@@ -75,10 +75,10 @@ public:
   bool              is_exceptionpending (int wp_sec, int wp_usec=0) const;
   unsigned int      nread ();
 
-  errc              bind (const sockaddr&);
-  errc              bind ();
-  errc              connect (const sockaddr& peer, int wp_sec = INFINITE);
-  errc              listen (int num=SOMAXCONN);
+  erc               bind (const sockaddr&);
+  erc               bind ();
+  erc               connect (const sockaddr& peer, int wp_sec = INFINITE);
+  erc               listen (int num=SOMAXCONN);
   sockaddr          name () const;
   sockaddr          peer () const;
 
@@ -107,7 +107,7 @@ public:
   int               recvbufsz () const;
   void              recvbufsz (size_t sz);
   void              blocking (bool on_off);
-  errc              setevent (HANDLE evt, long mask);
+  erc               setevent (HANDLE evt, long mask);
   long              enumevents ();
   void              linger (bool on_off, unsigned short seconds);
   bool              linger (unsigned short *seconds = 0);
@@ -219,12 +219,12 @@ static struct sock_initializer
 } sock_nifty_counter;
 
 ///Router for socket errors
-class sock_facility : public errfacility
+class sock_facility : public errfac
 {
 public:
   sock_facility ();
-  void log (const errc& e);
-  const char *msg (const errc& e);
+  void log (const erc& e);
+  const char *msg (const erc& e);
 };
 
 #ifdef MLIBSPACE

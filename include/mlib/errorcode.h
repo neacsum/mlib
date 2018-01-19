@@ -7,7 +7,12 @@
 
 */
 
-#include <mlib/defs.h>
+#include "defs.h"
+
+#ifdef MLIBSPACE
+namespace MLIBSPACE {
+#endif
+
 
 /*! 
   \anchor ERROR_PRI
@@ -137,17 +142,12 @@ int errfac::operator != (const errfac& other) const
   return !operator == (other);
 }
 
-
-namespace MLIBSPACE {
-/// Alias name for erc objects
-/// \ingroup 
-typedef erc errc;           
-
-/// Alias name for errfac
-typedef errfac errfacility; 
-};
-
 /// The SUCCESS indicator
 #define ERR_SUCCESS (erc (0, ERROR_PRI_SUCCESS))
+
+
+#ifdef MLIBSPACE
+}
+#endif
 
 

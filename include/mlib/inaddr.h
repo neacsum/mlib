@@ -56,9 +56,9 @@ public:
   unsigned host () const                  { return ntohl(sa.sin_addr.s_addr); };
 
   /// set host address
-  errc host (unsigned int h)           { sa.sin_addr.s_addr = htonl(h); return ERR_SUCCESS;};
+  erc host (unsigned int h)           { sa.sin_addr.s_addr = htonl(h); return ERR_SUCCESS;};
 
-  errc host (const char *hostname);
+  erc host (const char *hostname);
   void hostname (char *name, size_t sz);
   const char* hostname ();
 

@@ -4,7 +4,14 @@
 */
 #include <string>
 #include <deque>
+
+#include "defs.h"
+
 using namespace std;
+
+#ifdef MLIBSPACE
+namespace MLIBSPACE {
+#endif
 
 class Options
 {
@@ -39,3 +46,7 @@ private:
   string app;
   string usage_;
 };
+
+#ifdef MLIBSPACE
+}
+#endif

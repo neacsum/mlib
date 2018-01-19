@@ -2,6 +2,10 @@
 #include <mlib/options.h>
 #include <iostream>
 
+#ifdef MLIBSPACE
+using namespace MLIBSPACE;
+#endif
+
 SUITE (Options)
 {
 

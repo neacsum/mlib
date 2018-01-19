@@ -8,6 +8,13 @@
 #include <memory>
 #include <vector>
 
+#include "defs.h"
+
+#ifdef MLIBSPACE
+namespace MLIBSPACE {
+#endif
+
+
 /// Circular buffer
 template <class T>
 class ring_buffer 
@@ -230,3 +237,7 @@ private:
   std::unique_ptr<T[]> buf;
   size_t front_idx, back_idx, cap, sz;
 };
+
+#ifdef MLIBSPACE
+}
+#endif

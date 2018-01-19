@@ -5,16 +5,17 @@
 //#include <comutil.h>
 //#include <comip.h>
 
-BSTR ConvertStringToBSTR(const char* in);
 
 #ifdef MLIBSPACE
 namespace MLIBSPACE {
 #endif
 
+BSTR ConvertStringToBSTR(const char* in);
+
 errfac fw_errors("Firewall error");
 errfac *fw_errptr = &fw_errors;
 
-#define FWERROR(A) errc((A),ERROR_PRI_ERROR, fw_errptr)
+#define FWERROR(A) erc((A),ERROR_PRI_ERROR, fw_errptr)
 
 
 firewall::firewall(void) :
@@ -220,7 +221,7 @@ bool firewall::has_app(const char *appname)
 }
 
 
-errc firewall::add_port(int portnum, bool tcp, const char *name)
+erc firewall::add_port(int portnum, bool tcp, const char *name)
 {
   HRESULT hr;
   NET_FW_IP_PROTOCOL protocol = tcp?NET_FW_IP_PROTOCOL_TCP : NET_FW_IP_PROTOCOL_UDP;
@@ -267,7 +268,7 @@ errc firewall::add_port(int portnum, bool tcp, const char *name)
   return ERROR_SUCCESS;
 }
 
-errc firewall::add_app(const char *appname, const char *filename)
+erc firewall::add_app(const char *appname, const char *filename)
 {
   HRESULT hr;
   INetFwAuthorizedApplication* app = NULL;
@@ -316,7 +317,7 @@ errc firewall::add_app(const char *appname, const char *filename)
   return ERROR_SUCCESS;
 }
 
-errc firewall::set_port (int portnum, bool tcp, bool enable)
+erc firewall::set_port (int portnum, bool tcp, bool enable)
 {
   HRESULT hr = S_OK;
   NET_FW_IP_PROTOCOL protocol = tcp?NET_FW_IP_PROTOCOL_TCP : NET_FW_IP_PROTOCOL_UDP;
@@ -361,10 +362,6 @@ errc firewall::set_port (int portnum, bool tcp, bool enable)
   return ERROR_SUCCESS;
 }
 
-#ifndef NO_COI_NAMESPACE
-};
-#endif
-
 BSTR ConvertStringToBSTR(const char* in)
 {
   int cnt;
@@ -390,3 +387,6 @@ BSTR ConvertStringToBSTR(const char* in)
   return out;
 }
 
+#ifdef MLIBSPACE
+}
+#endif

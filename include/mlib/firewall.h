@@ -18,9 +18,9 @@ public:
   bool is_port_enabled (int portnum, bool tcp);
   bool has_port (int portnum, bool tcp);
   bool has_app (const char *appname);
-  errc add_app (const char *appname, const char *filename);
-  errc add_port (int portnum, bool tcp, const char *name);
-  errc set_port (int portnum, bool tcp, bool enable);
+  erc add_app (const char *appname, const char *filename);
+  erc add_port (int portnum, bool tcp, const char *name);
+  erc set_port (int portnum, bool tcp, bool enable);
 
 private:
   INetFwMgr* fwmgr;

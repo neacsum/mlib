@@ -14,7 +14,7 @@ namespace MLIBSPACE {
 #endif
 
 
-#define WSALASTERROR (errc( WSAGetLastError(), ERROR_PRI_ERROR, sockerrors))
+#define WSALASTERROR (erc( WSAGetLastError(), ERROR_PRI_ERROR, sockerrors))
 
 sock_initializer init;
 
@@ -63,7 +63,7 @@ inaddr::inaddr (const char *hostname, unsigned short port)
 /*!
   Set host address after resolving name
 */
-errc inaddr::host (const char *hostname)
+erc inaddr::host (const char *hostname)
 {
   if ((sa.sin_addr.s_addr=inet_addr (hostname)) == INADDR_NONE &&
        strcmp(hostname, "255.255.255.255"))

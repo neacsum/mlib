@@ -13,6 +13,10 @@
 
 */
 
+#ifdef MLIBSPACE
+namespace MLIBSPACE {
+#endif
+  
 /*!
   Initialize parser
 */
@@ -389,3 +393,7 @@ const string& Options::usage(char sep)
   }
   return usage_;
 }
+
+#ifdef MLIBSPACE
+}
+#endif

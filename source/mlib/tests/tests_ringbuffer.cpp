@@ -2,6 +2,11 @@
 #include <mlib/ringbuf.h>
 #include <vector>
 
+#ifdef MLIBSPACE
+using namespace MLIBSPACE;
+#endif
+
+
 SUITE (RingBuffer)
 {
   const int BUFSZ = 10;
