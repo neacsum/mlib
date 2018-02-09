@@ -17,6 +17,30 @@
 #define USFOOT    0.3048006096          ///< US Survey foot to meters conversion factor
 #define MAS       (M_PI/(180*3600000.)) ///< milli-arcsecond
 
+/// New syntax for degrees to radians conversion
+constexpr double operator "" _deg (long double deg)
+{
+  return deg * D2R;
+}
+
+/// New syntax for milli-arcseconds to radians conversion
+constexpr double operator "" _mas (long double mas)
+{
+  return mas * MAS;
+}
+
+/// New syntax for US Survey foot to meters conversion
+constexpr double operator "" _ftus (long double ftus)
+{
+  return ftus * USFOOT;
+}
+
+/// New syntax for Nautical Miles to meters conversion
+constexpr double operator "" _nmi (long double nmi)
+{
+  return nmi * NM2M;
+}
+
 /// Convert decimal degrees to radians
 #define DEG(dd) ((dd)*D2R)
 
