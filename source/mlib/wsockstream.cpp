@@ -37,10 +37,10 @@ int sock_initializer_counter=0;
 static sock_initializer init;
 
 /// Pointer to error handler
-errfacility *sockerrors;
+errfac *sockerrors;
 
 
-#define WSALASTERROR (errc( WSAGetLastError(), ERROR_PRI_ERROR, sockerrors))
+#define WSALASTERROR (erc( WSAGetLastError(), ERROR_PRI_ERROR, sockerrors))
 
 /*!
   \class sock
@@ -146,7 +146,7 @@ sock::~sock ()
   
   If the socket was previously opened it calls first closesocket.
 */
-errc sock::open (int type, int domain, int proto)
+erc sock::open (int type, int domain, int proto)
 {
   TRACE ("sock::open (type=%d, domain=%d, proto=%d)", type, domain, proto);
   if (sl->handle != INVALID_SOCKET)
@@ -205,7 +205,7 @@ sockaddr sock::peer () const
 /*!
   Associates a local address with the socket.
 */
-errc sock::bind (const sockaddr& sa)
+erc sock::bind (const sockaddr& sa)
 {
   TRACE ("sock::bind (%x) to %x:%d", 
     sl->handle, ntohl(((sockaddr_in&)sa).sin_addr.S_un.S_addr), 
@@ -222,7 +222,7 @@ errc sock::bind (const sockaddr& sa)
   name() after calling bind to learn the address and the port that has been
   assigned to it.
 */
-errc sock::bind()
+erc sock::bind()
 {
   sockaddr sa;
   memset (&sa, 0, sizeof(sa));
@@ -240,7 +240,7 @@ errc sock::bind()
   the function waits the specified interval for the connection to be established.
   If it is not established the function returns WSAETIMEDOUT.
 */
-errc sock::connect (const sockaddr& sa, int wp_sec)
+erc sock::connect (const sockaddr& sa, int wp_sec)
 {
   if (wp_sec != INFINITE)
   {
@@ -263,7 +263,7 @@ errc sock::connect (const sockaddr& sa, int wp_sec)
   Places the socket in a state in which it is listening for
   incoming connections.
 */
-errc sock::listen (int num)
+erc sock::listen (int num)
 {
   if (::listen (sl->handle, num) == SOCKET_ERROR)
     return WSALASTERROR;
@@ -564,7 +564,7 @@ unsigned int sock::nread ()
 
   \param  sh   describes what types of operation will no longer be allowed
 */
-errc sock::shutdown (shuthow sh)
+erc sock::shutdown (shuthow sh)
 {
   if (::shutdown(sl->handle, sh) == SOCKET_ERROR)
     return WSALASTERROR;
@@ -782,7 +782,7 @@ void sock::blocking (bool on_off)
   It is not possible to specify different event objects for different
   network events. 
 */
-errc sock::setevent (HANDLE evt, long mask)
+erc sock::setevent (HANDLE evt, long mask)
 {
   if (WSAEventSelect (sl->handle, (WSAEVENT)evt, mask) == SOCKET_ERROR)
     return WSALASTERROR;
@@ -1106,7 +1106,7 @@ sock_initializer::~sock_initializer()
   Converts from error number to error name. 
 */
 /// Constructor
-sock_facility::sock_facility () : errfacility ("SOCKSTREAM ERROR") 
+sock_facility::sock_facility () : errfac ("SOCKSTREAM ERROR") 
 {
   TRACE ("sock_facility::sock_facility");
 }
@@ -1117,7 +1117,7 @@ sock_facility::sock_facility () : errfacility ("SOCKSTREAM ERROR")
 /*!
   Return the error message text.
 */
-const char* sock_facility::msg (const errc& e)
+const char* sock_facility::msg (const erc& e)
 {
   static struct errtab {
     int code;
@@ -1210,7 +1210,7 @@ const char* sock_facility::msg (const errc& e)
 /*!
   Output either the message text or message number if no text.
 */
-void sock_facility::log (const errc& e)
+void sock_facility::log (const erc& e)
 {
   const char *str = msg (e);
   if (str)

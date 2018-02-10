@@ -2,7 +2,6 @@
 #include <mlib/serenum.h>
 
 using namespace std;
-using namespace mlib;
 
 TEST (SerEnum_Test)
 {

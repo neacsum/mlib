@@ -12,6 +12,11 @@
 
 #include <mlib/dprintf.h>
 
+#ifdef MLIBSPACE
+namespace MLIBSPACE {
+#endif
+
+
 /*!
   \defgroup errors Error Error Handling
   \brief Unified error handling.
@@ -287,4 +292,7 @@ erc& erc::deactivate ()
   return *this;
 }
 
+#ifdef MLIBSPACE
+}
+#endif
 

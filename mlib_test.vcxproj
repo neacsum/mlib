@@ -69,23 +69,23 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IntDir>o\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
-    <OutDir>tests\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>o\$(PlatformTarget)\$(Configuration)\$(ProjectName)\</IntDir>
+    <OutDir>tests\$(PlatformTarget)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IntDir>o\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
-    <OutDir>tests\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>o\$(PlatformTarget)\$(Configuration)\$(ProjectName)\</IntDir>
+    <OutDir>tests\$(PlatformTarget)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IntDir>o\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
-    <OutDir>tests\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>o\$(PlatformTarget)\$(Configuration)\$(ProjectName)\</IntDir>
+    <OutDir>tests\$(PlatformTarget)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IntDir>o\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
-    <OutDir>tests\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>o\$(PlatformTarget)\$(Configuration)\$(ProjectName)\</IntDir>
+    <OutDir>tests\$(PlatformTarget)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -100,7 +100,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>lib\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>lib\$(PlatformTarget)\$(Configuration)</AdditionalLibraryDirectories>
       <AdditionalDependencies>mlib.lib;utpp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
@@ -121,7 +121,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>lib\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>lib\$(PlatformTarget)\$(Configuration)</AdditionalLibraryDirectories>
       <AdditionalDependencies>mlib.lib;utpp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
@@ -146,7 +146,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>lib\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>lib\$(PlatformTarget)\$(Configuration)</AdditionalLibraryDirectories>
       <AdditionalDependencies>mlib.lib;utpp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
@@ -170,7 +170,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>lib\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>lib\$(PlatformTarget)\$(Configuration)</AdditionalLibraryDirectories>
       <AdditionalDependencies>mlib.lib;utpp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
@@ -186,6 +186,7 @@
     <ClCompile Include="source\mlib\tests\tests_main.cpp" />
     <ClCompile Include="source\mlib\tests\tests_options.cpp" />
     <ClCompile Include="source\mlib\tests\tests_profile.cpp" />
+    <ClCompile Include="source\mlib\tests\tests_ringbuffer.cpp" />
     <ClCompile Include="source\mlib\tests\tests_serenum.cpp" />
     <ClCompile Include="source\mlib\tests\tests_shmem.cpp" />
     <ClCompile Include="source\mlib\tests\tests_sock.cpp" />

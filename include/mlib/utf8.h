@@ -10,6 +10,8 @@
 #include <vector>
 #include <fstream>
 
+#ifndef UTF8_H
+
 namespace utf8 {
 
 std::string narrow (const wchar_t* s);
@@ -134,3 +136,5 @@ bool valid (const std::string& s)
 }
 
 }
+
+#endif
