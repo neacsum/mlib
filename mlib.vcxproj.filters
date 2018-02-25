@@ -123,6 +123,21 @@
     <ClInclude Include="include\mlib\ringbuf.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\mlib\chull.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\mlib\border.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\mlib\point.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\nmeac.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\mlib\nmea.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\base64.cpp">
