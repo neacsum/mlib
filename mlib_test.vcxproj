@@ -102,6 +102,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>lib\$(PlatformTarget)\$(Configuration)</AdditionalLibraryDirectories>
       <AdditionalDependencies>mlib.lib;utpp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ShowProgress>LinkVerbose</ShowProgress>
     </Link>
     <PostBuildEvent>
       <Command>
