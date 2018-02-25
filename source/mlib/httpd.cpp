@@ -11,6 +11,7 @@
 #include <mlib/trace.h>
 #include <mlib/httpd.h>
 #include <mlib/base64.h>
+#include <mlib/utf8.h>
 
 using namespace std;
 
@@ -435,7 +436,7 @@ bool http_connection::parse_formbody (str_pairs& params)
 /*!
   Send the content of a file, processing any SSI directives.
 
-  \param  full_path fully qualified file name
+  \param  full_path fully qualified file name (UTF8 encoded)
 
   \return 0 if successful or one of the following values:
   \retval -1 socket write failure
@@ -444,9 +445,9 @@ bool http_connection::parse_formbody (str_pairs& params)
   As we don't know the size of the response, the file is sent without a
   "Content-Length" header.
 */
-int http_connection::serve_shtml (const char* full_path)
+int http_connection::serve_shtml (const std::string& full_path)
 {
-  FILE *fn = fopen (full_path, "r");
+  FILE *fn = _wfopen (utf8::widen(full_path).c_str(), L"r");
   if (fn == NULL)
     return -2;
 
@@ -615,7 +616,7 @@ int http_connection::serve_buffer(BYTE *src_buff, size_t sz)
 /*!
   Send the content of a file.
 
-  \param  full_path fully qualified path name
+  \param  full_path fully qualified path name (UTF8 encoded)
 
   \return 0 if successful or one of the following codes:
   \retval HTTPD_ERR_WRITE  - socket write failure
@@ -624,13 +625,13 @@ int http_connection::serve_buffer(BYTE *src_buff, size_t sz)
 
   The file is preceded by the "Content-Length" header.
 */
-int http_connection::serve_file(const char *full_path)
+int http_connection::serve_file (const std::string& full_path)
 {
   int ret = HTTPD_OK;
-  FILE *fin = fopen (full_path, "rbS");
+  FILE *fin = _wfopen (utf8::widen(full_path).c_str(), L"rbS");
   if (!fin)
   {
-    TRACE ("File %s - open error", full_path);
+    TRACE ("File %s - open error", full_path.c_str());
     return HTTPD_ERR_FOPEN;
   }
   //find file size
@@ -638,7 +639,7 @@ int http_connection::serve_file(const char *full_path)
   fseek (fin, 0, SEEK_END);
   len = ftell (fin);
   fseek (fin, 0, SEEK_SET);
-  TRACE ("http_connection::serve_file - File %s size %d", full_path, len);
+  TRACE ("http_connection::serve_file - File %s size %d", full_path.c_str(), len);
   char flen[30];
   sprintf (flen, "%d", len);
   add_ohdr ("Content-Length", flen);
@@ -653,13 +654,13 @@ int http_connection::serve_file(const char *full_path)
     start = GetTickCount();
     if (!cnt && ferror (fin))
     {
-      TRACE ("File %s - file read error %d", ferror(fin));
+      TRACE ("File %s - file read error %d", full_path.c_str (), ferror(fin));
       ret = HTTPD_ERR_FREAD;
     }
     ws.write (buf, cnt);
     if (!ws.good ())
     {
-      TRACE ("File %s - socket write failure", full_path);
+      TRACE ("File %s - socket write failure", full_path.c_str());
       ret = HTTPD_ERR_WRITE;
       break;
     }

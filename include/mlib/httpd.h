@@ -65,9 +65,9 @@ public:
   void        respond (unsigned int code, const char *reason=0);
   void        redirect (const char *uri, unsigned int code=303);
   void        serve404 (const char *text = 0);
-  int         serve_file (const char *full_path);
-  int         serve_buffer(BYTE *full_path, size_t sz);
-  int         serve_shtml (const char *full_path);
+  int         serve_file (const std::string& full_path);
+  int         serve_buffer (BYTE *full_path, size_t sz);
+  int         serve_shtml (const std::string& full_path);
   bool        parse_formbody (str_pairs& params);
 
   void        respond_part (const char *part_type, const char *bound);
