@@ -5,7 +5,7 @@ VisualStudioVersion = 15.0.27130.2024
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mlib", "mlib.vcxproj", "{F9E11AA9-FAB8-40D8-96D9-F92C5725762B}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mlib_test", "mlib_test.vcxproj", "{F32484D8-7598-4833-BE1A-27A35CF8E5DE}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mlib_test", "tests\mlib_test.vcxproj", "{F32484D8-7598-4833-BE1A-27A35CF8E5DE}"
 	ProjectSection(ProjectDependencies) = postProject
 		{F9E11AA9-FAB8-40D8-96D9-F92C5725762B} = {F9E11AA9-FAB8-40D8-96D9-F92C5725762B}
 	EndProjectSection

@@ -18,6 +18,22 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="source\tests_base64.cpp" />
+    <ClCompile Include="source\tests_basename.cpp" />
+    <ClCompile Include="source\tests_crc32.cpp" />
+    <ClCompile Include="source\tests_dogbone.cpp" />
+    <ClCompile Include="source\tests_httpd.cpp" />
+    <ClCompile Include="source\tests_main.cpp" />
+    <ClCompile Include="source\tests_options.cpp" />
+    <ClCompile Include="source\tests_profile.cpp" />
+    <ClCompile Include="source\tests_ringbuffer.cpp" />
+    <ClCompile Include="source\tests_serenum.cpp" />
+    <ClCompile Include="source\tests_shmem.cpp" />
+    <ClCompile Include="source\tests_sock.cpp" />
+    <ClCompile Include="source\tests_sqlitepp.cpp" />
+    <ClCompile Include="source\tests_utf8.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{F32484D8-7598-4833-BE1A-27A35CF8E5DE}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
@@ -69,23 +85,27 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IntDir>o\$(PlatformTarget)\$(Configuration)\$(ProjectName)\</IntDir>
-    <OutDir>tests\$(PlatformTarget)\$(Configuration)\</OutDir>
+    <IntDir>o\$(PlatformTarget)\$(Configuration)\</IntDir>
+    <OutDir>exe\$(PlatformTarget)\$(Configuration)\</OutDir>
+    <IncludePath>$(SolutionDir)include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IntDir>o\$(PlatformTarget)\$(Configuration)\$(ProjectName)\</IntDir>
-    <OutDir>tests\$(PlatformTarget)\$(Configuration)\</OutDir>
+    <IntDir>o\$(PlatformTarget)\$(Configuration)\</IntDir>
+    <OutDir>exe\$(PlatformTarget)\$(Configuration)\</OutDir>
+    <IncludePath>$(SolutionDir)include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IntDir>o\$(PlatformTarget)\$(Configuration)\$(ProjectName)\</IntDir>
-    <OutDir>tests\$(PlatformTarget)\$(Configuration)\</OutDir>
+    <IntDir>o\$(PlatformTarget)\$(Configuration)\</IntDir>
+    <OutDir>exe\$(PlatformTarget)\$(Configuration)\</OutDir>
+    <IncludePath>$(SolutionDir)include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IntDir>o\$(PlatformTarget)\$(Configuration)\$(ProjectName)\</IntDir>
-    <OutDir>tests\$(PlatformTarget)\$(Configuration)\</OutDir>
+    <IntDir>o\$(PlatformTarget)\$(Configuration)\</IntDir>
+    <OutDir>exe\$(PlatformTarget)\$(Configuration)\</OutDir>
+    <IncludePath>$(SolutionDir)include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -95,14 +115,12 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_TRACE;_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>include\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>lib\$(PlatformTarget)\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib\$(PlatformTarget)\$(Configuration)</AdditionalLibraryDirectories>
       <AdditionalDependencies>mlib.lib;utpp.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ShowProgress>LinkVerbose</ShowProgress>
     </Link>
     <PostBuildEvent>
       <Command>
@@ -117,12 +135,11 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_TRACE;_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>include\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>lib\$(PlatformTarget)\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib\$(PlatformTarget)\$(Configuration)</AdditionalLibraryDirectories>
       <AdditionalDependencies>mlib.lib;utpp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
@@ -140,14 +157,13 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>include\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>lib\$(PlatformTarget)\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib\$(PlatformTarget)\$(Configuration)</AdditionalLibraryDirectories>
       <AdditionalDependencies>mlib.lib;utpp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
@@ -164,36 +180,19 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>include\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>lib\$(PlatformTarget)\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)lib\$(PlatformTarget)\$(Configuration)</AdditionalLibraryDirectories>
       <AdditionalDependencies>mlib.lib;utpp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>"$(TargetPath)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="source\mlib\tests\tests_base64.cpp" />
-    <ClCompile Include="source\mlib\tests\tests_basename.cpp" />
-    <ClCompile Include="source\mlib\tests\tests_crc32.cpp" />
-    <ClCompile Include="source\mlib\tests\tests_dogbone.cpp" />
-    <ClCompile Include="source\mlib\tests\tests_httpd.cpp" />
-    <ClCompile Include="source\mlib\tests\tests_main.cpp" />
-    <ClCompile Include="source\mlib\tests\tests_options.cpp" />
-    <ClCompile Include="source\mlib\tests\tests_profile.cpp" />
-    <ClCompile Include="source\mlib\tests\tests_ringbuffer.cpp" />
-    <ClCompile Include="source\mlib\tests\tests_serenum.cpp" />
-    <ClCompile Include="source\mlib\tests\tests_shmem.cpp" />
-    <ClCompile Include="source\mlib\tests\tests_sock.cpp" />
-    <ClCompile Include="source\mlib\tests\tests_sqlitepp.cpp" />
-    <ClCompile Include="source\mlib\tests\tests_utf8.cpp" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

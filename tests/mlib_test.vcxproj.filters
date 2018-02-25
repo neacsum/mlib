@@ -15,46 +15,46 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="source\mlib\tests\tests_main.cpp">
+    <ClCompile Include="source\tests_base64.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\mlib\tests\tests_profile.cpp">
+    <ClCompile Include="source\tests_basename.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\mlib\tests\tests_utf8.cpp">
+    <ClCompile Include="source\tests_crc32.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\mlib\tests\tests_basename.cpp">
+    <ClCompile Include="source\tests_dogbone.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\mlib\tests\tests_options.cpp">
+    <ClCompile Include="source\tests_httpd.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\mlib\tests\tests_sqlitepp.cpp">
+    <ClCompile Include="source\tests_main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\mlib\tests\tests_crc32.cpp">
+    <ClCompile Include="source\tests_options.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\mlib\tests\tests_httpd.cpp">
+    <ClCompile Include="source\tests_profile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\mlib\tests\tests_base64.cpp">
+    <ClCompile Include="source\tests_ringbuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\mlib\tests\tests_sock.cpp">
+    <ClCompile Include="source\tests_serenum.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\mlib\tests\tests_dogbone.cpp">
+    <ClCompile Include="source\tests_shmem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\mlib\tests\tests_shmem.cpp">
+    <ClCompile Include="source\tests_sock.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\mlib\tests\tests_serenum.cpp">
+    <ClCompile Include="source\tests_sqlitepp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\mlib\tests\tests_ringbuffer.cpp">
+    <ClCompile Include="source\tests_utf8.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

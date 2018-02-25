@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\nmea">
+      <UniqueIdentifier>{901ce238-0ede-4045-8925-f90dae8c7a01}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\mlib\defs.h">
@@ -119,98 +122,173 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="source\mlib\dprintf.c">
+    <ClCompile Include="source\base64.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\mlib\log.cpp">
+    <ClCompile Include="source\basename.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\mlib\profile.cpp">
+    <ClCompile Include="source\convert.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\mlib\utf8.cpp">
+    <ClCompile Include="source\crc32.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\mlib\basename.cpp">
+    <ClCompile Include="source\dogbone.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\mlib\options.cpp">
+    <ClCompile Include="source\dprintf.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\mlib\sqlite3.c">
+    <ClCompile Include="source\errorcode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\mlib\sqlitepp.cpp">
+    <ClCompile Include="source\event.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\mlib\errorcode.cpp">
+    <ClCompile Include="source\firewall.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\mlib\crc32.c">
+    <ClCompile Include="source\httpd.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\mlib\event.cpp">
+    <ClCompile Include="source\inaddr.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\mlib\httpd.cpp">
+    <ClCompile Include="source\jbridge.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\mlib\inaddr.cpp">
+    <ClCompile Include="source\log.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\mlib\md5.c">
+    <ClCompile Include="source\md5.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\mlib\mutex.cpp">
+    <ClCompile Include="source\mutex.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\mlib\syncbase.cpp">
+    <ClCompile Include="source\options.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\mlib\tcpserv.cpp">
+    <ClCompile Include="source\profile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\mlib\thread.cpp">
+    <ClCompile Include="source\semaphore.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\mlib\wsockstream.cpp">
+    <ClCompile Include="source\serenum1.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\mlib\wtimer.cpp">
+    <ClCompile Include="source\serenum2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\mlib\semaphore.cpp">
+    <ClCompile Include="source\serenum3.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\mlib\shmem.cpp">
+    <ClCompile Include="source\shmem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\mlib\firewall.cpp">
+    <ClCompile Include="source\sqlite3.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\mlib\base64.cpp">
+    <ClCompile Include="source\sqlitepp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\mlib\convert.cpp">
+    <ClCompile Include="source\stopwatch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\mlib\dogbone.c">
+    <ClCompile Include="source\syncbase.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\mlib\jbridge.cpp">
+    <ClCompile Include="source\tcpserv.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\mlib\stopwatch.cpp">
+    <ClCompile Include="source\thread.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\mlib\serenum1.cpp">
+    <ClCompile Include="source\utf8.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\mlib\serenum2.cpp">
+    <ClCompile Include="source\wsockstream.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\mlib\serenum3.cpp">
+    <ClCompile Include="source\wtimer.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\nmea\checksum.cpp">
+      <Filter>Source Files\nmea</Filter>
+    </ClCompile>
+    <ClCompile Include="source\nmea\dbs.cpp">
+      <Filter>Source Files\nmea</Filter>
+    </ClCompile>
+    <ClCompile Include="source\nmea\dbt.cpp">
+      <Filter>Source Files\nmea</Filter>
+    </ClCompile>
+    <ClCompile Include="source\nmea\dpt.cpp">
+      <Filter>Source Files\nmea</Filter>
+    </ClCompile>
+    <ClCompile Include="source\nmea\gga.cpp">
+      <Filter>Source Files\nmea</Filter>
+    </ClCompile>
+    <ClCompile Include="source\nmea\ggk.cpp">
+      <Filter>Source Files\nmea</Filter>
+    </ClCompile>
+    <ClCompile Include="source\nmea\gll.cpp">
+      <Filter>Source Files\nmea</Filter>
+    </ClCompile>
+    <ClCompile Include="source\nmea\gns.cpp">
+      <Filter>Source Files\nmea</Filter>
+    </ClCompile>
+    <ClCompile Include="source\nmea\gsa.cpp">
+      <Filter>Source Files\nmea</Filter>
+    </ClCompile>
+    <ClCompile Include="source\nmea\gst.cpp">
+      <Filter>Source Files\nmea</Filter>
+    </ClCompile>
+    <ClCompile Include="source\nmea\gsv.cpp">
+      <Filter>Source Files\nmea</Filter>
+    </ClCompile>
+    <ClCompile Include="source\nmea\gxp.cpp">
+      <Filter>Source Files\nmea</Filter>
+    </ClCompile>
+    <ClCompile Include="source\nmea\hdg.cpp">
+      <Filter>Source Files\nmea</Filter>
+    </ClCompile>
+    <ClCompile Include="source\nmea\hdm.cpp">
+      <Filter>Source Files\nmea</Filter>
+    </ClCompile>
+    <ClCompile Include="source\nmea\hdt.cpp">
+      <Filter>Source Files\nmea</Filter>
+    </ClCompile>
+    <ClCompile Include="source\nmea\llq.cpp">
+      <Filter>Source Files\nmea</Filter>
+    </ClCompile>
+    <ClCompile Include="source\nmea\nmeac.cpp">
+      <Filter>Source Files\nmea</Filter>
+    </ClCompile>
+    <ClCompile Include="source\nmea\pashr.cpp">
+      <Filter>Source Files\nmea</Filter>
+    </ClCompile>
+    <ClCompile Include="source\nmea\psat-hpr.cpp">
+      <Filter>Source Files\nmea</Filter>
+    </ClCompile>
+    <ClCompile Include="source\nmea\ptnl-ggk.cpp">
+      <Filter>Source Files\nmea</Filter>
+    </ClCompile>
+    <ClCompile Include="source\nmea\ptnl-qa.cpp">
+      <Filter>Source Files\nmea</Filter>
+    </ClCompile>
+    <ClCompile Include="source\nmea\rmc.cpp">
+      <Filter>Source Files\nmea</Filter>
+    </ClCompile>
+    <ClCompile Include="source\nmea\ttm.cpp">
+      <Filter>Source Files\nmea</Filter>
+    </ClCompile>
+    <ClCompile Include="source\nmea\vtg.cpp">
+      <Filter>Source Files\nmea</Filter>
+    </ClCompile>
+    <ClCompile Include="source\nmea\zda.cpp">
+      <Filter>Source Files\nmea</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -38,4 +38,4 @@ int ttm (const char *buf, double *utc, int *num, char *name, double *dist, doubl
 int vtg (const char *buf, double *speed, double *head);
 int zda (const char *buf, double *time, unsigned short *day, unsigned short *month, unsigned short *year);
 
-#pragma comment (lib, "nmea.lib")
+#pragma comment (lib, "mlib.lib")

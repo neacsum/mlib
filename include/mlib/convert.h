@@ -7,6 +7,11 @@
 @{
 */
 
+#ifndef _USE_MATH_DEFINES
+#define _USE_MATH_DEFINES
+#include <math.h>
+#endif
+
 // Useful constants
 #define D2R       0.01745329251994      ///< Degrees to radians conversion factor
 #define MPS2KNOT  1.94384449244         ///< Meters/sec to knots conversion factor

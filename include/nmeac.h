@@ -3,7 +3,8 @@
 #include <memory.h>
 #include <stdlib.h>
 #include <string.h>
-#include <nmea.h>
+
+// Internal stuff needed by NMEA parser
 
 struct parse_context {
   char *lcl;            //local copy of string to parse

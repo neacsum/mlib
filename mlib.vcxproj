@@ -68,20 +68,24 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IntDir>o\$(PlatformTarget)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IntDir>o\$(PlatformTarget)\$(Configuration)\</IntDir>
     <OutDir>lib\$(PlatformTarget)\$(Configuration)\</OutDir>
+    <IncludePath>$(SolutionDir)include\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IntDir>o\$(PlatformTarget)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IntDir>o\$(PlatformTarget)\$(Configuration)\</IntDir>
     <OutDir>lib\$(PlatformTarget)\$(Configuration)\</OutDir>
+    <IncludePath>$(SolutionDir)include\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IntDir>o\$(PlatformTarget)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IntDir>o\$(PlatformTarget)\$(Configuration)\</IntDir>
     <OutDir>lib\$(PlatformTarget)\$(Configuration)\</OutDir>
+    <IncludePath>$(SolutionDir)include\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IntDir>o\$(PlatformTarget)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IntDir>o\$(PlatformTarget)\$(Configuration)\</IntDir>
     <OutDir>lib\$(PlatformTarget)\$(Configuration)\</OutDir>
+    <IncludePath>$(SolutionDir)include\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -90,7 +94,6 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_TRACE;_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>include/</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -104,7 +107,6 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_TRACE;_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>include/</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -120,7 +122,6 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>include/</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -138,7 +139,6 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>_CRT_NONSTDC_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>include/</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -184,37 +184,62 @@
     <ClInclude Include="include\mlib\wtimer.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="source\mlib\base64.cpp" />
-    <ClCompile Include="source\mlib\basename.cpp" />
-    <ClCompile Include="source\mlib\convert.cpp" />
-    <ClCompile Include="source\mlib\crc32.c" />
-    <ClCompile Include="source\mlib\dogbone.c" />
-    <ClCompile Include="source\mlib\dprintf.c" />
-    <ClCompile Include="source\mlib\errorcode.cpp" />
-    <ClCompile Include="source\mlib\event.cpp" />
-    <ClCompile Include="source\mlib\firewall.cpp" />
-    <ClCompile Include="source\mlib\httpd.cpp" />
-    <ClCompile Include="source\mlib\inaddr.cpp" />
-    <ClCompile Include="source\mlib\jbridge.cpp" />
-    <ClCompile Include="source\mlib\log.cpp" />
-    <ClCompile Include="source\mlib\md5.c" />
-    <ClCompile Include="source\mlib\mutex.cpp" />
-    <ClCompile Include="source\mlib\options.cpp" />
-    <ClCompile Include="source\mlib\profile.cpp" />
-    <ClCompile Include="source\mlib\semaphore.cpp" />
-    <ClCompile Include="source\mlib\serenum1.cpp" />
-    <ClCompile Include="source\mlib\serenum2.cpp" />
-    <ClCompile Include="source\mlib\serenum3.cpp" />
-    <ClCompile Include="source\mlib\shmem.cpp" />
-    <ClCompile Include="source\mlib\sqlite3.c" />
-    <ClCompile Include="source\mlib\sqlitepp.cpp" />
-    <ClCompile Include="source\mlib\stopwatch.cpp" />
-    <ClCompile Include="source\mlib\syncbase.cpp" />
-    <ClCompile Include="source\mlib\tcpserv.cpp" />
-    <ClCompile Include="source\mlib\thread.cpp" />
-    <ClCompile Include="source\mlib\utf8.cpp" />
-    <ClCompile Include="source\mlib\wsockstream.cpp" />
-    <ClCompile Include="source\mlib\wtimer.cpp" />
+    <ClCompile Include="source\base64.cpp" />
+    <ClCompile Include="source\basename.cpp" />
+    <ClCompile Include="source\convert.cpp" />
+    <ClCompile Include="source\crc32.c" />
+    <ClCompile Include="source\dogbone.c" />
+    <ClCompile Include="source\dprintf.c" />
+    <ClCompile Include="source\errorcode.cpp" />
+    <ClCompile Include="source\event.cpp" />
+    <ClCompile Include="source\firewall.cpp" />
+    <ClCompile Include="source\httpd.cpp" />
+    <ClCompile Include="source\inaddr.cpp" />
+    <ClCompile Include="source\jbridge.cpp" />
+    <ClCompile Include="source\log.cpp" />
+    <ClCompile Include="source\md5.c" />
+    <ClCompile Include="source\mutex.cpp" />
+    <ClCompile Include="source\nmea\checksum.cpp" />
+    <ClCompile Include="source\nmea\dbs.cpp" />
+    <ClCompile Include="source\nmea\dbt.cpp" />
+    <ClCompile Include="source\nmea\dpt.cpp" />
+    <ClCompile Include="source\nmea\gga.cpp" />
+    <ClCompile Include="source\nmea\ggk.cpp" />
+    <ClCompile Include="source\nmea\gll.cpp" />
+    <ClCompile Include="source\nmea\gns.cpp" />
+    <ClCompile Include="source\nmea\gsa.cpp" />
+    <ClCompile Include="source\nmea\gst.cpp" />
+    <ClCompile Include="source\nmea\gsv.cpp" />
+    <ClCompile Include="source\nmea\gxp.cpp" />
+    <ClCompile Include="source\nmea\hdg.cpp" />
+    <ClCompile Include="source\nmea\hdm.cpp" />
+    <ClCompile Include="source\nmea\hdt.cpp" />
+    <ClCompile Include="source\nmea\llq.cpp" />
+    <ClCompile Include="source\nmea\nmeac.cpp" />
+    <ClCompile Include="source\nmea\pashr.cpp" />
+    <ClCompile Include="source\nmea\psat-hpr.cpp" />
+    <ClCompile Include="source\nmea\ptnl-ggk.cpp" />
+    <ClCompile Include="source\nmea\ptnl-qa.cpp" />
+    <ClCompile Include="source\nmea\rmc.cpp" />
+    <ClCompile Include="source\nmea\ttm.cpp" />
+    <ClCompile Include="source\nmea\vtg.cpp" />
+    <ClCompile Include="source\nmea\zda.cpp" />
+    <ClCompile Include="source\options.cpp" />
+    <ClCompile Include="source\profile.cpp" />
+    <ClCompile Include="source\semaphore.cpp" />
+    <ClCompile Include="source\serenum1.cpp" />
+    <ClCompile Include="source\serenum2.cpp" />
+    <ClCompile Include="source\serenum3.cpp" />
+    <ClCompile Include="source\shmem.cpp" />
+    <ClCompile Include="source\sqlite3.c" />
+    <ClCompile Include="source\sqlitepp.cpp" />
+    <ClCompile Include="source\stopwatch.cpp" />
+    <ClCompile Include="source\syncbase.cpp" />
+    <ClCompile Include="source\tcpserv.cpp" />
+    <ClCompile Include="source\thread.cpp" />
+    <ClCompile Include="source\utf8.cpp" />
+    <ClCompile Include="source\wsockstream.cpp" />
+    <ClCompile Include="source\wtimer.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
