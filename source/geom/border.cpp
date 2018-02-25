@@ -2,7 +2,7 @@
   \file BORDER.CPP - Implementation of Border object
 */
 
-#include <geom/border.h>
+#include <mlib/border.h>
 #include <stdio.h>
 #include <algorithm>
 #include <mlib/utf8.h>
@@ -52,7 +52,7 @@ Border::Border (const char *fname)
   closing.x = 0;
   closing.y = 0;
   closing_outside = 0;
-  FILE *f = _wfopen (widen(fname).c_str(), L"r");
+  FILE *f = _wfopen (utf8::widen(fname).c_str(), L"r");
   if (!f)
     return;
 

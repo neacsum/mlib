@@ -3,7 +3,7 @@
   \file BORDER.H - Small class to represent simple non-intersecting polygons
 */
 #include <mlib/defs.h>
-#include <geom/point.h>
+#include <mlib/point.h>
 
 #include <deque>
 

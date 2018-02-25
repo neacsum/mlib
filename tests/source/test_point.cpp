@@ -1,7 +1,10 @@
 #include <utpp/utpp.h>
-#include <geom/point.h>
+#include <mlib/point.h>
 
 using namespace MLIBSPACE;
+
+SUITE (Point)
+{
 
 TEST (point_dist) {
   dpoint O, A (3, 0), B (0, 4);
@@ -31,9 +34,5 @@ TEST (point_collinear) {
   CHECK (O.collinear (A, B));
 }
 
-
-int main (int argc, char **argv)
-{
-  return UnitTest::RunAllTests ();
 }
 

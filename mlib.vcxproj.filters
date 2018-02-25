@@ -16,6 +16,9 @@
     <Filter Include="Source Files\nmea">
       <UniqueIdentifier>{901ce238-0ede-4045-8925-f90dae8c7a01}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\geom">
+      <UniqueIdentifier>{1fc6422d-5ea8-4d51-8ac1-1622df6d0d3f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\mlib\defs.h">
@@ -289,6 +292,12 @@
     </ClCompile>
     <ClCompile Include="source\nmea\zda.cpp">
       <Filter>Source Files\nmea</Filter>
+    </ClCompile>
+    <ClCompile Include="source\geom\border.cpp">
+      <Filter>Source Files\geom</Filter>
+    </ClCompile>
+    <ClCompile Include="source\geom\chull.cpp">
+      <Filter>Source Files\geom</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -33,7 +33,7 @@
 
 #include <stdlib.h>
 
-#include <geom/chull.h>
+#include <mlib/chull.h>
 
 #ifdef MLIBSPACE
 namespace MLIBSPACE {

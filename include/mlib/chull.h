@@ -1,6 +1,6 @@
 #pragma once
 
-#include <geom/point.h>
+#include <mlib/point.h>
 
 #ifdef MLIBSPACE
 namespace MLIBSPACE {

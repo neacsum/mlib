@@ -193,6 +193,8 @@
     <ClCompile Include="source\errorcode.cpp" />
     <ClCompile Include="source\event.cpp" />
     <ClCompile Include="source\firewall.cpp" />
+    <ClCompile Include="source\geom\border.cpp" />
+    <ClCompile Include="source\geom\chull.cpp" />
     <ClCompile Include="source\httpd.cpp" />
     <ClCompile Include="source\inaddr.cpp" />
     <ClCompile Include="source\jbridge.cpp" />
