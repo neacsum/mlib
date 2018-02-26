@@ -12,7 +12,7 @@
 extern "C" {
 #endif
 
-void dprintf (char *fmt, ... );
+void dprintf (const char *fmt, ... );
 
 #ifdef __cplusplus
 };
