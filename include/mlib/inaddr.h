@@ -12,11 +12,6 @@
 #include "defs.h"
 #include "errorcode.h"
 
-//get rid of a deprecation warning related to inet_ntoa (MN 22-Jan-17) 
-#ifndef _WINSOCK_DEPRECATED_NO_WARNINGS
-#define _WINSOCK_DEPRECATED_NO_WARNINGS
-#endif
-
 #ifndef _WINSOCK2API_
 #include <WinSock2.h>
 #endif
@@ -63,7 +58,7 @@ public:
   const char* hostname ();
 
   /// return host address in dotted format
-  const char *ntoa()                      { return inet_ntoa(sa.sin_addr); };
+  const char *ntoa ();
 
   /// check if it's multicast host
   bool is_multicast () const             {return ((host() & 0xe0000000) ==  0xe0000000);};

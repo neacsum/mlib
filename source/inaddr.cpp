@@ -5,6 +5,12 @@
 
 
 */
+
+//get rid of a deprecation warning related to inet_ntoa (MN 22-Jan-17) 
+#ifndef _WINSOCK_DEPRECATED_NO_WARNINGS
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
+#endif
+
 #include <mlib/inaddr.h>
 #include <mlib/wsockstream.h>
 #include <mlib/trace.h>
@@ -147,6 +153,11 @@ unsigned inaddr::localhost ()
     closesocket (sock);   // we're done with the socket
   }
   return ntohl ((lcl_addr.sin_addr.s_addr));
+}
+
+const char *inaddr::ntoa ()
+{
+  return inet_ntoa (sa.sin_addr);
 }
 
 #ifdef MLIBSPACE
