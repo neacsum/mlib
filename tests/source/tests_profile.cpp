@@ -25,6 +25,21 @@ TEST (PutGetString)
   _unlink ("test.ini");
 }
 
+// Check GetString that returns a C++ string
+TEST (GetStringString)
+{
+  _unlink ("test.ini");
+  Sleep (200);
+  Profile test ("test.ini");
+  CHECK (test.PutString ("key0", "value00", "section0"));
+  CHECK (test.PutString ("key1", "value01", "section0"));
+  CHECK (test.PutString ("key0", "value10", "section1"));
+  CHECK (test.PutString ("key1", "value11", "section1"));
+  CHECK_EQUAL ("value11", test.GetString ("key1", "section1", "default"));
+  CHECK_EQUAL ("default", test.GetString ("missing_key", "section1", "default"));
+  _unlink ("test.ini");
+}
+
 /*
   Check PutString, PutDouble, PutInt, PutBool fail when ini file cannot be created
 */
@@ -77,7 +92,7 @@ TEST (PutDelete)
 }
 
 /*
-  Write 2 sections in an verify that GetSections retrieves them.
+  Write 2 sections in and verify that GetSections retrieves them.
 */
 TEST (GetSections)
 {

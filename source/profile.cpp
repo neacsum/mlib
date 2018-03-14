@@ -42,7 +42,8 @@
 namespace MLIBSPACE {
 #endif
 
-static int getkeystring (FILE* fp, const char* Section, const char* Key, char* Buffer, int BufferSize);
+static bool getkeychars (FILE* fp, const char* Section, const char* Key, char* Buffer, int BufferSize);
+static bool getkeystring (FILE* fp, const char* Section, const char* Key, std::string& str);
 static char* skipleading (char* str);
 static char* skiptrailing (char* str, char* base);
 static char *striptrailing(char *str);
@@ -722,20 +723,48 @@ int Profile::GetKeys( char *keys, int sz, const char *section )
 int Profile::GetString (char *value, int len, const char *key, const char *section, const char *defval ) const
 {
   FILE *fp;
-  int found = 0;
+  bool found = false;
 
   if (!value || len <= 0 || !key)
     return 0;
   fp = ini_openread (filename);
   if (fp) 
   {
-    found = getkeystring (fp, section, key, value, len);
+    found = getkeychars (fp, section, key, value, len);
     fclose(fp);
   }
   if (!found)
     strncpy (value, defval, len);
   return (int)strlen (value);
 }
+
+/*!
+  \param key      key name
+  \param section  section name
+  \param defval   default value
+  \return         key value
+*/
+std::string Profile::GetString (const char *key, const char *section, const char *defval) const
+{
+  FILE *fp;
+  bool found = false;
+  std::string value;
+
+  if (key)
+  {
+    fp = ini_openread (filename);
+    if (fp)
+    {
+      found = getkeystring (fp, section, key, value);
+      fclose (fp);
+    }
+  }
+  if (!found)
+    value = defval;
+
+  return value;
+}
+
 
 /*!
   \param value    key value
@@ -850,7 +879,7 @@ static bool ini_puts (const char *key, const char *value, const char *section, c
   if (key != NULL && value != NULL) 
   {
     fgetpos(rfp, &mark);
-    match = getkeystring(rfp, section, key, buffer, sizeof(buffer));
+    match = getkeychars(rfp, section, key, buffer, sizeof(buffer));
     if (match && strcmp (buffer, value) == 0) 
     {
       fclose(rfp);
@@ -1001,16 +1030,16 @@ static bool ini_puts (const char *key, const char *value, const char *section, c
 }
 
 /*!
-  Read a key string.
+  Read a key string in a C-style buffer.
   \param  fp      input file
   \param  section section name
   \param  key     input key
   \param  val     key value buffer
   \param  size    length of value buffer
 
-  \return 1 if key was found; 0 otherwise
+  \return true if key was found; false otherwise
 */
-static int getkeystring(FILE *fp, const char *section, const char *key, char *val, int size)
+static bool getkeychars(FILE *fp, const char *section, const char *key, char *val, int size)
 {
   char *sp, *ep;
   int len;
@@ -1057,10 +1086,69 @@ static int getkeystring(FILE *fp, const char *section, const char *key, char *va
     sp = skipleading(ep + 1);
     sp = cleanstring(sp);  /* Remove a trailing comment */
     strncpy(val, sp, size);
-    return 1;
   }
-  return 0;   /* key not found*/
 
+  return found;
+}
+
+/*!
+  Read a key string in a C++ string
+  \param  fp      input file
+  \param  section section name
+  \param  key     input key
+  \param  val     key value
+
+  \return 1 if key was found; 0 otherwise
+*/
+static bool getkeystring (FILE *fp, const char *section, const char *key, std::string& val)
+{
+  char *sp, *ep;
+  int len;
+  char buffer[INI_BUFFERSIZE];
+  assert (fp != NULL);
+
+  
+  /* Move through file 1 line at a time until the section is matched or EOF.
+   */
+  len = (int)strlen(section);
+  do 
+  {
+    if (!fgets(buffer, INI_BUFFERSIZE, fp))
+      return 0;
+    sp = skipleading(buffer);
+    ep = strchr(sp, ']');
+  } while (*sp != '[' || ep == NULL || (((int)(ep-sp-1) != len || strnicmp(sp+1,section,len) != 0)));
+
+  /* Now that the section has been found, find the entry.
+   * Stop searching upon leaving the section's area.
+   */
+  assert(key != NULL);
+  len = (int)strlen(key);
+  bool found = false;
+  do 
+  {
+    if (!fgets(buffer, INI_BUFFERSIZE,fp) || *(sp = skipleading(buffer)) == '[')
+      return 0;
+    sp = skipleading(buffer);
+    ep = strchr(sp, '='); /* Parse out the equal sign */
+    if (ep == NULL)
+      ep = strchr(sp, ':');
+    if (!ep)
+      continue;
+
+    found = (skiptrailing(ep,sp) - sp) == len && !strnicmp(sp,key,len);
+  } while (*sp == ';' || *sp == '#' || ep == NULL || !found);
+
+  if (found) 
+  {
+    /* put chars to string */
+    assert(ep != NULL);
+    assert(*ep == '=' || *ep == ':');
+    sp = skipleading(ep + 1);
+    sp = cleanstring(sp);  /* Remove a trailing comment */
+    val = sp;
+  }
+  return found;
 }
 
 static char* skipleading (char *str)

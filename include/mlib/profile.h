@@ -6,6 +6,8 @@
 
 #include "defs.h"
 
+#include <string>
+
 #ifdef MLIBSPACE
 namespace MLIBSPACE {
 #endif
@@ -40,6 +42,9 @@ public:
   
   ///Get a string key
   virtual int GetString (char *value, int len, const char *key, const char *section, const char *defval="") const;
+
+  ///Return a string key as a string
+  std::string GetString (const char *key, const char *section, const char *defval = "") const;
 
   ///Return an integer key
   int GetInt (const char *key, const char *section, int defval=0) const;
