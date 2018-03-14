@@ -26,13 +26,13 @@ namespace utf8 {
 */
 std::string narrow (const wchar_t* s)
 {
-  if (!s)
+  int nsz;
+  if (!s || !(nsz = WideCharToMultiByte (CP_UTF8, 0, s, -1, 0, 0, 0, 0)))
     return string ();
-  int wsz = (int)wcslen (s);
-  int nsz = WideCharToMultiByte (CP_UTF8, 0, s, wsz, 0, 0, 0, 0);
+
   string out (nsz, 0);
-  if (nsz)
-    WideCharToMultiByte (CP_UTF8, 0, s, wsz, &out[0], nsz, 0, 0);
+  WideCharToMultiByte (CP_UTF8, 0, s, -1, &out[0], nsz, 0, 0);
+  out.resize (nsz - 1); //output is null-terminated
   return out;
 }
 
@@ -45,11 +45,13 @@ std::string narrow (const wchar_t* s)
 */
 std::string narrow (const std::wstring& s)
 {
-  int wsz = (int)s.size ();
-  int nsz = WideCharToMultiByte (CP_UTF8, 0, &s[0], wsz, 0, 0, 0, 0);
+  int nsz = WideCharToMultiByte (CP_UTF8, 0, s.c_str(), -1, 0, 0, 0, 0);
+  if (!nsz)
+    return string ();
+
   string out (nsz, 0);
-  if (nsz)
-    WideCharToMultiByte (CP_UTF8, 0, &s[0], wsz, &out[0], nsz, 0, 0);
+  WideCharToMultiByte (CP_UTF8, 0, s.c_str (), -1, &out[0], nsz, 0, 0);
+  out.resize (nsz - 1); //output is null-terminated
   return out;
 }
 
@@ -63,24 +65,26 @@ std::string narrow (const std::wstring& s)
   */
 std::wstring widen (const char* s)
 {
-  if (!s)
+  int wsz;
+  if (!s || !(wsz = MultiByteToWideChar (CP_UTF8, 0, s, -1, 0, 0)))
     return wstring ();
-  int nsz = (int)strlen (s);
-  int wsz = MultiByteToWideChar (CP_UTF8, 0, s, nsz, 0, 0);
+
   wstring out (wsz, 0);
-  if (wsz)
-    MultiByteToWideChar (CP_UTF8, 0, s, nsz, &out[0], wsz);
+  MultiByteToWideChar (CP_UTF8, 0, s, -1, &out[0], wsz);
+  out.resize (wsz - 1); //output is null-terminated
   return out;
 }
 
 
 std::wstring widen (const std::string& s)
 {
-  int nsz = (int)s.size ();
-  int wsz = MultiByteToWideChar (CP_UTF8, 0, &s[0], nsz, 0, 0);
+  int wsz = MultiByteToWideChar (CP_UTF8, 0, s.c_str(), -1, 0, 0);
+  if (!wsz)
+    return wstring ();
+
   wstring out (wsz, 0);
-  if (wsz)
-    MultiByteToWideChar (CP_UTF8, 0, &s[0], nsz, &out[0], wsz);
+  MultiByteToWideChar (CP_UTF8, 0, s.c_str (), -1, &out[0], wsz);
+  out.resize (wsz - 1); //output is null-terminated
   return out;
 }
 ///\}
