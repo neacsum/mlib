@@ -47,7 +47,7 @@ typedef struct jsonvar_t {
 /*!
   Generates an entry in JSON dictionary for a variable that has the same
   external name (name used in the JSON response) as the variable name.
-  \param V  Name of the variable
+  \param V  Name of variable
   \param T  Type of variable (one of JT_... values)
   \param C  Number of elements (for arrays)
   \param S  Element size (only for JT_STR and JT_PSTR types)
@@ -58,13 +58,13 @@ typedef struct jsonvar_t {
 /*!
   Generates an entry in JSON dictionary for a variable that has a different
   external name (name used in the JSON response) than the variable name.
-  \param V  Name of the variable
+  \param V  Address of variable
   \param N  External (JSON) name of the variable
   \param T  Type of variable (one of JT_... values)
   \param C  Number of elements (for arrays)
   \param S  Element size (only for JT_STR and JT_PSTR types)
-  */
-#define JSDN(V, N, T, C, S) {N, &##V, T, S, C}
+*/
+#define JSDN(V, N, T, C, S) {N, V, T, S, C}
 
 ///Generate entry for a composite object
 #define JSD_OBJECT(N) {N, 0, JT_OBJECT, 0, 1}
@@ -84,7 +84,7 @@ public:
   void lock ();
   void unlock ();
   const char *path ();
-
+  bool set_var (const char *name, void *addr, unsigned short count = 1, unsigned short sz = 0);
   virtual void post_parse (http_connection& client);
 
 protected:
@@ -92,7 +92,7 @@ protected:
   void bprintf (const char *fmt, ...);
   void not_found (const char *varname);
   bool strquote (const char *str);
-  const JSONVAR *find (const char *name, int *idx);
+  JSONVAR *find (const char *name, int *idx);
   http_connection *client;
 
 private:

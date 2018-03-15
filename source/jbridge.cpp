@@ -23,9 +23,19 @@ namespace MLIBSPACE {
 #define MAX_JSONRESPONSE 8192
 
 // Sizes of data elements (same order as JT_.. values)
-const int jsz[] = { sizeof (short int), sizeof (unsigned short int), 
-sizeof (int), sizeof (unsigned int), sizeof (long), sizeof (unsigned long), 
-sizeof (float), sizeof (double), sizeof (char*), sizeof(char), sizeof(bool) };
+const int jsz[] = { 
+  sizeof (short int),             //JT_SHORT
+  sizeof (unsigned short int),    //JT_USHORT
+  sizeof (int),                   //JT_INT
+  sizeof (unsigned int),          //JT_UINT
+  sizeof (long),                  //JT_LONG
+  sizeof (unsigned long),         //JT_ULONG
+  sizeof (float),                 //JT_FLT
+  sizeof (double),                //JT_DBL
+  sizeof (char*),                 //JT_PSTR
+  sizeof(char),                   //JT_STR
+  sizeof(bool)                    //JT_BOOL
+};
 
 
 static int url_decode (const char *in, char *out);
@@ -261,9 +271,9 @@ bool JSONBridge::strquote (const char *str)
   Search a variable in JSON dictionary. The variable name can be a construct
   '<name>_<index>' for an indexed variable.
 */
-const JSONVAR* JSONBridge::find (const char *name, int *pidx)
+JSONVAR* JSONBridge::find (const char *name, int *pidx)
 {
-  const JSONVAR *entry;
+  JSONVAR *entry;
   char varname[256];
   char *pi, *tail;
   int idx;
@@ -293,6 +303,20 @@ const JSONVAR* JSONBridge::find (const char *name, int *pidx)
     }
   }
   return NULL;
+}
+
+/// Set/change address of a dictionary entry
+bool JSONBridge::set_var (const char *name, void *addr, unsigned short count, unsigned short sz)
+{
+  int idx;
+  JSONVAR *entry = find (name, &idx);
+  if (!entry || idx != 0)
+    return false;
+
+  entry->addr = addr;
+  entry->cnt = count;
+  entry->sz = sz;
+  return true;
 }
 
 /*!
