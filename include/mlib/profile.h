@@ -12,8 +12,6 @@
 namespace MLIBSPACE {
 #endif
 
-#define INI_BUFFERSIZE  1024
-
 ///Operations on INI files
 class Profile
 {
@@ -28,7 +26,7 @@ public:
   Profile (const Profile& p);
 
   /// Destructor
-  virtual ~Profile ();
+  ~Profile ();
 
   /// Assignment operator
   Profile& operator= (const Profile&);
@@ -41,7 +39,7 @@ public:
   void File (const char *filename);
   
   ///Get a string key
-  virtual int GetString (char *value, int len, const char *key, const char *section, const char *defval="") const;
+  int GetString (char *value, int len, const char *key, const char *section, const char *defval="") const;
 
   ///Return a string key as a string
   std::string GetString (const char *key, const char *section, const char *defval = "") const;
@@ -65,7 +63,7 @@ public:
   bool HasKey (const char *key, const char *section) const;
 
   /// Write a string key
-  virtual bool PutString (const char *key, const char *value, const char *section);
+  bool PutString (const char *key, const char *value, const char *section);
 
   /// Write an integer key
   bool PutInt (const char *key, long value, const char *section);

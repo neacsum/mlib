@@ -38,6 +38,8 @@
 #include <mlib/utf8.h>
 #include <mlib/trace.h>
 
+#define INI_BUFFERSIZE  1024
+
 #ifdef MLIBSPACE
 namespace MLIBSPACE {
 #endif
