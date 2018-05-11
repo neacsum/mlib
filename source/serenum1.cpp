@@ -5,8 +5,8 @@
   These functions are heavily inspired from [CEnumerateSerial] (http://www.naughter.com/enumser.html)
   code.
 */
-#include <Windows.h>
 #include <mlib/serenum.h>
+#include <Windows.h>
 
 #ifdef MLIBSPACE
 namespace MLIBSPACE {

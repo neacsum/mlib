@@ -1,6 +1,10 @@
 #pragma once
 
-#include <mlib/point.h>
+#if __has_include ("defs.h")
+#include "defs.h"
+#endif
+
+#include "point.h"
 
 #ifdef MLIBSPACE
 namespace MLIBSPACE {

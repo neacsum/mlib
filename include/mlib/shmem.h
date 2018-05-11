@@ -5,7 +5,10 @@
     (c) Mircea Neacsu 2004-2017
 */
 
+#if __has_include ("defs.h")
 #include "defs.h"
+#endif
+
 #include <stdexcept>
 
 #ifdef MLIBSPACE

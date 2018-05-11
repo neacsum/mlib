@@ -4,7 +4,9 @@
 
   (c) Mircea Neacsu 2017
 */
+#if __has_include ("defs.h")
 #include "defs.h"
+#endif
 
 #ifdef MLIBSPACE
 namespace MLIBSPACE {

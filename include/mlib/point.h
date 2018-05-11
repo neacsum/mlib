@@ -1,6 +1,8 @@
 #pragma once
 
-#include <mlib/defs.h>
+#if __has_include ("defs.h")
+#include "defs.h"
+#endif
 
 #define _USE_MATH_DEFINES
 #include <math.h>

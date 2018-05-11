@@ -2,8 +2,11 @@
 /*!
   \file BORDER.H - Small class to represent simple non-intersecting polygons
 */
-#include <mlib/defs.h>
-#include <mlib/point.h>
+#if __has_include ("defs.h")
+#include "defs.h"
+#endif
+
+#include "point.h"
 
 #include <deque>
 

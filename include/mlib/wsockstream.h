@@ -6,7 +6,9 @@
 
 */
 
+#if __has_include ("defs.h")
 #include "defs.h"
+#endif
 
 #ifndef _WINSOCK2API_
 #error WINSOCK2 required

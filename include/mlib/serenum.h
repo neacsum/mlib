@@ -20,6 +20,9 @@
 
 #include <vector>
 
+#if __has_include ("defs.h")
+#include "defs.h"
+#endif
 
 #ifdef MLIBSPACE
 namespace MLIBSPACE {
