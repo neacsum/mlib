@@ -181,9 +181,9 @@ static const char *processname (char *name)
   the INI file, hence you can turn on file logging or debug string messages
   (OutputDebugString) just by changing the settings in the INI file.
 */
-void set_log_ini_param (char* inifile, char *section)
+void set_log_ini_param (const char* inifile, const char *section)
 {
-  dprintf ("Setting syslog ini params from %s [%s]", inifile, section);
+  TRACE ("Setting syslog ini params from %s [%s]", inifile, section);
   MLIBSPACE::Profile ini(inifile);
   char tmp[256];
   if (!ini.GetString (tmp, sizeof(tmp), SERVER_INI_KEY, section))

@@ -92,7 +92,7 @@ void syslog (int facility_priority, char *fmt, ...);
 void syslog_debug (char *fmt, ...);
 
 /// Load default parameters from an INI file
-void set_log_ini_param (char* inifname, char *section);
+void set_log_ini_param (const char* inifname, const char *section);
 #ifdef __cplusplus
 }
 #endif
