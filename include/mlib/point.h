@@ -42,9 +42,10 @@ public:
   double azimuth (const Point<T>& P2) const;
   double angle (const Point<T>& P1, const Point<T>& P2) const;
 
-  Point<T> operator + (const Point<T>& p) const {return { x + p.x, y + p.y };}
-  Point<T> operator - (const Point<T>& p) const {return{ p1.x - p2.x, p1.y - p2.y };}
-  Point<T> operator * (double scalar) const {return{ x*scalar, y*scalar };}
+  Point<T> operator + (const Point<T>& p) const { return { x + p.x, y + p.y }; }
+  Point<T> operator - (const Point<T>& p) const { return{ p1.x - p2.x, p1.y - p2.y }; }
+  Point<T> operator * (double scalar) const { return{ x*scalar, y*scalar }; }
+  Point<T> operator / (double scalar) const { return{ x / scalar, y / scalar }; }
 
   T operator * (const Point<T>& p) const { return x*p.x + y*p.y; }
   
