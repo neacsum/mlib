@@ -42,19 +42,20 @@ public:
   double azimuth (const Point<T>& P2) const;
   double angle (const Point<T>& P1, const Point<T>& P2) const;
 
-  Point<T> operator + (const Point<T>& p) const { return { x + p.x, y + p.y }; }
-  Point<T> operator - (const Point<T>& p) const { return{ p1.x - p2.x, p1.y - p2.y }; }
-  Point<T> operator * (double scalar) const { return{ x*scalar, y*scalar }; }
-  Point<T> operator / (double scalar) const { return{ x / scalar, y / scalar }; }
+  Point<T> operator + (const Point<T>& p) const   { return { x + p.x, y + p.y }; }
+  Point<T> operator - (const Point<T>& p) const   { return{ x - p.x, y - p.y }; }
+  Point<T> operator * (double scalar) const       { return{ x*scalar, y*scalar }; }
+  Point<T> operator / (double scalar) const       { return{ x / scalar, y / scalar }; }
 
   T operator * (const Point<T>& p) const { return x*p.x + y*p.y; }
   
-  Point<T>& operator += (const Point<T>& other)  { x += other.x; y += other.y; return *this; }
-  Point<T>& operator -= (const Point<T>& other)  { x -= other.x; y -= other.y; return *this; }
-  Point<T>& operator *= (double scalar)         { x *= scalar;  y *= scalar;  return *this; }
-  Point<T>& operator /= (double scalar)         { x /= scalar;  y /= scalar;  return *this; }
+  Point<T>& operator += (const Point<T>& other)   { x += other.x; y += other.y; return *this; }
+  Point<T>& operator -= (const Point<T>& other)   { x -= other.x; y -= other.y; return *this; }
+  Point<T>& operator *= (double scalar)           { x *= scalar;  y *= scalar;  return *this; }
+  Point<T>& operator /= (double scalar)           { x /= scalar;  y /= scalar;  return *this; }
 
   double distance (const Point<T>& P2) const;
+  double magnitude () const                       { return hypot (x, y); }
   int operator ==(const Point<T>& p) const;
   int operator !=(const Point<T>& p) const;
 
@@ -68,8 +69,6 @@ Point<T> operator *(double scalar, const Point<T>& p)
 {
   return{ p.x*scalar, p.y*scalar };
 }
-
-
 
 /// Specialization of Point using double as underlining type
 typedef Point<double> dpoint;
@@ -125,7 +124,7 @@ int Point<T>::operator != (const Point<T>& p) const
 template<class T>
 double Point<T>::distance (const Point<T>& P2) const
 {
-  return _hypot (x-P2.x, y-P2.y);
+  return hypot (x-P2.x, y-P2.y);
 }
 
 /*!
