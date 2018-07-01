@@ -48,7 +48,7 @@ static bool getkeychars (FILE* fp, const char* Section, const char* Key, char* B
 static bool getkeystring (FILE* fp, const char* Section, const char* Key, std::string& str);
 static char* skipleading (char* str);
 static char* skiptrailing (char* str, char* base);
-static char *striptrailing(char *str);
+static char *striptrailing (char *str);
 inline static FILE *ini_openread (const char* fname) {return _wfopen (utf8::widen(fname).c_str(), L"rb, ccs=UTF-8");};
 inline static FILE *ini_openwrite (const char* fname) {return _wfopen (utf8::widen(fname).c_str(), L"wb, ccs=UTF-8");};
 static void ini_tempname (char* dest, const char* source, int maxlength);
@@ -56,7 +56,7 @@ static void writesection (char* LocalBuffer, const char* Section, FILE *fp);
 static void writekey (char* buffer, const char* key, const char* value, FILE *fp);
 static int cache_accum (const char* string, int* size, int max);
 static int cache_flush (char* buffer, int* size, FILE* rfp, FILE* wfp, fpos_t* mark);
-static bool close_rename(FILE* rfp, FILE* wfp, const char* filename);
+static bool close_rename (FILE* rfp, FILE* wfp, const char* filename);
 static char* cleanstring (char* string);
 static bool ini_puts (const char *key, const char *value, const char *section, char *filename);
 
@@ -142,15 +142,9 @@ Profile& Profile::operator = (const Profile& p)
 
 /*!
   Return \b true if specified key exists in the INI file.
-
-  \pre  key != NULL <br>
-        section != NULL
 */
-bool Profile::HasKey( const char *key, const char *section ) const
+bool Profile::HasKey (const std::string& key, const std::string& section) const
 {
-  assert (key);
-  assert (section);
-
   char buffer[80];
   return (GetString (buffer, sizeof(buffer), key, section) != 0);
 }
@@ -159,40 +153,22 @@ bool Profile::HasKey( const char *key, const char *section ) const
   \param key      key name
   \param section  section name
   \param defval   default value if key is missing
-  \pre key != NULL <br>
-       section != NULL
 */
-int Profile::GetInt (const char *key, const char *section, int defval) const
+int Profile::GetInt (const std::string& key, const std::string& section, int defval) const
 {
-  assert (key);
-  assert (section);
-
-  /*We don't use GetPrivateProfileInt because it returns
-  an UNSIGNED number which isn't very nice.*/
-
   char buffer[80];
-  if (!GetString (buffer, sizeof(buffer), key, section))
-   return defval;
-  return atoi (buffer);
+  return GetString (buffer, sizeof (buffer), key, section) ? atoi (buffer) : defval;
 }
 
 /*!
   \param key      key name
   \param section  section name
   \param defval   default value if key is missing
-  \pre key != NULL <br>
-       section != NULL
 */
-double Profile::GetDouble (const char *key, const char *section, double defval) const
+double Profile::GetDouble (const std::string& key, const std::string& section, double defval) const
 {
   char value[80];
-
-  assert (key);
-  assert (section);
-
-  if (!GetString (value, sizeof(value), key, section))
-   return defval;
-  return atof (value);
+  return GetString (value, sizeof (value), key, section) ? atof (value) : defval;
 }
 
 /*!
@@ -200,18 +176,12 @@ double Profile::GetDouble (const char *key, const char *section, double defval) 
   \param value    key value
   \param section  section name
   \return         true if successful, false otherwise
-
-  \pre key != NULL <br>
-       section != NULL
 */
-bool Profile::PutInt (const char *key, long value, const char *section)
+bool Profile::PutInt (const std::string& key, long value, const std::string& section)
 {
-  char buffer[35];
+  char buffer[80];
 
-  assert (key);
-  assert (section);
-
-  _itoa (value, buffer, 10);
+  _itoa_s (value, buffer, 10);
   return PutString (key, buffer, section);
 }
 
@@ -222,18 +192,11 @@ bool Profile::PutInt (const char *key, long value, const char *section)
   \param section  section name
   \param dec      number of decimals
   \return         true if successful, false otherwise
-
-  \pre key != NULL <br>
-       section != NULL
 */
-bool Profile::PutDouble (const char *key, double value, const char *section, int dec)
+bool Profile::PutDouble (const std::string& key, double value, const std::string& section, int dec)
 {
   char buffer[80];
-
-  assert (key);
-  assert (section);
-
-  sprintf (buffer, "%.*lf", dec, value);
+  sprintf_s (buffer, "%.*lf", dec, value);
   return PutString (key, buffer, section);
 }
 
@@ -245,17 +208,12 @@ bool Profile::PutDouble (const char *key, double value, const char *section, int
   \param key      key name
   \param section  section name
   \param defval   default value if key is missing
-  \pre key != NULL <br>
-       section != NULL
 */
-HFONT Profile::GetFont (const char *key, const char *section, HFONT defval) const
+HFONT Profile::GetFont (const std::string& key, const std::string& section, HFONT defval) const
 {
   LOGFONT lfont;
   char value[255];
   char *szptr = value;
-
-  assert (key);
-  assert (section);
 
   GetString (value, sizeof(value), key, section);
   if (*szptr)
@@ -366,20 +324,14 @@ HFONT Profile::GetFont (const char *key, const char *section, HFONT defval) cons
   \param key      key name
   \param section  section name
   \param defval   default value if key is missing
-
-  \pre key != NULL <br>
-       section != NULL
 */
-COLORREF Profile::GetColor (const char *key, const char *section, COLORREF defval) const
+COLORREF Profile::GetColor (const std::string& key, const std::string& section, COLORREF defval) const
 {
   int R=0, G=0, B=0;
   char value[80];
 
-  assert (key);
-  assert (section);
-
   if (GetString (value, sizeof(value), key, section)
-   && sscanf (value, "%i%i%i", &R, &G, &B) == 3)
+   && sscanf_s (value, "%i%i%i", &R, &G, &B) == 3)
     return RGB (R,G,B);
   else
     return defval;
@@ -392,18 +344,12 @@ COLORREF Profile::GetColor (const char *key, const char *section, COLORREF defva
   \param section  section name
   \param c        color specification
   \return         true if successful, false otherwise
-
-  \pre key != NULL <br>
-       section != NULL
 */
-bool Profile::PutColor (const char *key, COLORREF c, const char *section)
+bool Profile::PutColor (const std::string& key, COLORREF c, const std::string& section)
 {
   char buffer[80];
 
-  assert (key);
-  assert (section);
-
-  sprintf (buffer, "%i %i %i", GetRValue(c), GetGValue(c), GetBValue(c));
+  sprintf_s (buffer, "%i %i %i", GetRValue(c), GetGValue(c), GetBValue(c));
   return PutString (key, buffer, section);
 }
 
@@ -415,21 +361,15 @@ bool Profile::PutColor (const char *key, COLORREF c, const char *section)
   \param section  section name
   \param font     key value
   \return         true if successful, false otherwise
-
-  \pre key != NULL <br>
-       section != NULL
 */
-bool Profile::PutFont (const char *key, HFONT font, const char *section)
+bool Profile::PutFont (const std::string& key, HFONT font, const std::string& section)
 {
   LOGFONT lfont;
   char buffer[256];
 
-  assert (key);
-  assert (section);
-
   if (!GetObject (font, sizeof(lfont), &lfont))
     return false;
-  sprintf_s (buffer, sizeof(buffer), "%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%S",
+  sprintf_s (buffer, "%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%S",
     lfont.lfHeight,
     lfont.lfWidth,
     lfont.lfEscapement,
@@ -454,17 +394,10 @@ bool Profile::PutFont (const char *key, HFONT font, const char *section)
   \param key      key name
   \param section  section name
   \param defval   default value if key is missing
-
-  \pre key != NULL <br>
-       section != NULL
-
 */
-bool Profile::GetBool (const char *key, const char *section, bool defval) const
+bool Profile::GetBool (const std::string& key, const std::string& section, bool defval) const
 {
   char buffer[80];
-
-  assert (key);
-  assert (section);
 
   if (!GetString (buffer, sizeof(buffer), key, section))
     return defval;
@@ -475,16 +408,14 @@ bool Profile::GetBool (const char *key, const char *section, bool defval) const
 }
 
 /*!
-  Boolean values are encodes as "On" "Off" strings.
+  Boolean values are encoded as "On" "Off" strings.
 
   \param key      key name
   \param section  section name
   \param value    key value
   \return         true if successful, false otherwise
-  \pre key != NULL <br>
-       section != NULL
 */
-bool Profile::PutBool (const char *key, bool value, const char *section)
+bool Profile::PutBool (const std::string& key, bool value, const std::string& section)
 {
   return PutString (key, (value)?"On":"Off", section);
 }
@@ -532,7 +463,7 @@ bool Profile::CopySection (const Profile& from_file, const char *from_sect, cons
   fgets (buffer, INI_BUFFERSIZE, fpfrom);
   while (!feof (fpfrom))
   {
-    if (buffer[0] == '[' && strncmp (&buffer[1], from_sect, len) == 0)
+    if (buffer[0] == '[' && strnicmp (&buffer[1], from_sect, len) == 0)
       break;
     fgets (buffer, INI_BUFFERSIZE, fpfrom);
   }
@@ -562,7 +493,7 @@ bool Profile::CopySection (const Profile& from_file, const char *from_sect, cons
   fgets (buffer, INI_BUFFERSIZE, fp);
   while (!feof (fp))
   {
-    if (buffer[0] == '[' && strncmp (&buffer[1], to_sect, len) == 0)
+    if (buffer[0] == '[' && strnicmp (&buffer[1], to_sect, len) == 0)
       break;
     fputs (buffer, fpt);
     fgets (buffer, INI_BUFFERSIZE, fp);
@@ -600,14 +531,11 @@ bool Profile::CopySection (const Profile& from_file, const char *from_sect, cons
 
 /*!
   \param section  section name
-
-  \pre section != NULL
 */
-bool Profile::HasSection (const char *section)
+bool Profile::HasSection (const std::string& section)
 {
   char buffer[256];  //Doesn't matter if buffer is small. We want to check only
               //if there are any entries
-  assert (section);
 
   return GetKeys (buffer, sizeof(buffer), section) != 0;
 }
@@ -616,26 +544,18 @@ bool Profile::HasSection (const char *section)
   \param key      key name
   \param section  section name
   \return         true if successful, false otherwise
-
-  \pre key != NULL <br>
-       section != NULL
 */
-bool Profile::DeleteKey( const char *key, const char *section )
+bool Profile::DeleteKey (const std::string& key, const std::string& section)
 {
-  assert (key);
-  assert (section);
-
-  return ini_puts (key, NULL, section, filename );
+  return ini_puts (key.c_str(), NULL, section.c_str(), filename );
 }
 
 /*!
   \param section  section name
-
-  \pre section != NULL
 */
-bool Profile::DeleteSection( const char *section )
+bool Profile::DeleteSection (const std::string& section)
 {
-  return ini_puts (NULL, NULL, section, filename);
+  return ini_puts (NULL, NULL, section.c_str(), filename);
 }
 
 /*!
@@ -645,18 +565,13 @@ bool Profile::DeleteSection( const char *section )
   \param sz       size of buffer
   \param section  section name
   \return number of keys in section
-
-  \pre keys !=NULL <br>
-       section != NULL
 */
-int Profile::GetKeys( char *keys, int sz, const char *section )
+int Profile::GetKeys( char *keys, size_t sz, const std::string& section )
 {
   char buffer[INI_BUFFERSIZE];
-
-  assert (section);
-
   FILE* fp;
-  if (buffer == NULL ||sz <= 0)
+
+  if (buffer == NULL ||sz == 0)
     return 0;
 
   if (!(fp = ini_openread(filename)))
@@ -668,7 +583,7 @@ int Profile::GetKeys( char *keys, int sz, const char *section )
 
   /* Move through file 1 line at a time until the section is matched or EOF.
    */
-  int slen = (int)strlen(section);
+  int slen = (int)strlen(section.c_str());
   char *sp, *ep;
   do
   {
@@ -679,7 +594,7 @@ int Profile::GetKeys( char *keys, int sz, const char *section )
     }
     sp = skipleading(buffer);
     ep = strchr(sp, ']');
-  } while (*sp != '[' || ep == NULL || (((int)(ep-sp-1) != slen || strnicmp(sp+1,section,slen) != 0)));
+  } while (*sp != '[' || ep == NULL || (((int)(ep-sp-1) != slen || strnicmp(sp+1,section.c_str(),slen) != 0)));
 
   /* Now that the section has been found start enumerating entries.
    * Stop when reaching section end.
@@ -716,28 +631,23 @@ int Profile::GetKeys( char *keys, int sz, const char *section )
   \param section  section name
   \param defval   default value
   \return         length of returned string
-
-  \pre value != NULL <br>
-       key != NULL <br>
-       section != NULL <br>
-       defval != NULL
 */
-int Profile::GetString (char *value, int len, const char *key, const char *section, const char *defval ) const
+size_t Profile::GetString (char *value, size_t len, const std::string& key, const std::string& section, const std::string& defval) const
 {
   FILE *fp;
   bool found = false;
 
-  if (!value || len <= 0 || !key)
+  if (!value || !len)
     return 0;
   fp = ini_openread (filename);
   if (fp) 
   {
-    found = getkeychars (fp, section, key, value, len);
+    found = getkeychars (fp, section.c_str(), key.c_str(), value, len);
     fclose(fp);
   }
   if (!found)
-    strncpy (value, defval, len);
-  return (int)strlen (value);
+    strncpy_s (value, len, defval.c_str(), _TRUNCATE);
+  return strlen (value);
 }
 
 /*!
@@ -746,25 +656,19 @@ int Profile::GetString (char *value, int len, const char *key, const char *secti
   \param defval   default value
   \return         key value
 */
-std::string Profile::GetString (const char *key, const char *section, const char *defval) const
+std::string Profile::GetString (const std::string& key, const std::string& section, const std::string& defval) const
 {
   FILE *fp;
   bool found = false;
   std::string value;
 
-  if (key)
+  fp = ini_openread (filename);
+  if (fp)
   {
-    fp = ini_openread (filename);
-    if (fp)
-    {
-      found = getkeystring (fp, section, key, value);
-      fclose (fp);
-    }
+    found = getkeystring (fp, section.c_str(), key.c_str(), value);
+    fclose (fp);
   }
-  if (!found)
-    value = defval;
-
-  return value;
+  return found ? value : defval;
 }
 
 
@@ -773,14 +677,10 @@ std::string Profile::GetString (const char *key, const char *section, const char
   \param key      key name
   \param section  section name
   \return         true if successful, false otherwise
-
-  \pre value != NULL <br>
-       key != NULL <br>
-       section != NULL <br>
 */
-bool Profile::PutString( const char *key, const char *value, const char *section )
+bool Profile::PutString (const std::string& key, const std::string& value, const std::string& section)
 {
-  return ini_puts (key, value, section, filename);
+  return ini_puts (key.c_str(), value.c_str (), section.c_str (), filename);
 }
 
 /*!
@@ -836,7 +736,7 @@ int Profile::GetSections (char *sects, int sz)
 }
 
 /*
-  Write a string in the INI file. This is the back engine used by all Get... functions.
+  Write a string in the INI file. This is the back engine used by all Put... functions.
 
   \param  key       name of key to write
   \param  value     key value
@@ -889,7 +789,7 @@ static bool ini_puts (const char *key, const char *value, const char *section, c
     }
     /* key not found, or different value -> proceed (but rewind the input file first) */
     fsetpos(rfp, &mark);
-  } /* if */
+  }
 
   ini_tempname(buffer, filename, INI_BUFFERSIZE);
   if (!(wfp = ini_openwrite(buffer))) 
@@ -914,14 +814,14 @@ static bool ini_puts (const char *key, const char *value, const char *section, c
       {
         /* Failed to find section, so add one to the end */
         flag = cache_flush(buffer, &cachelen, rfp, wfp, &mark);
-        if (key!=NULL && value!=NULL) 
+        if (key != NULL && value != NULL)
         {
           if (!flag)
             fputs ("\r\n", wfp);  /* force a new line behind the last line of the INI file */
-          writesection(buffer, section, wfp);
-          writekey(buffer, key, value, wfp);
+          writesection (buffer, section, wfp);
+          writekey (buffer, key, value, wfp);
         }
-        return close_rename(rfp, wfp, filename);  /* clean up and rename */
+        return close_rename (rfp, wfp, filename);  /* clean up and rename */
       }
       /* Copy the line from source to dest, but not if this is the section that
        * we are looking for and this section must be removed
@@ -956,40 +856,40 @@ static bool ini_puts (const char *key, const char *value, const char *section, c
    * upon leaving the section's area. Copy the file as it is read
    * and create an entry if one is not found.
    */
-  len = (key!=NULL) ? (int)strlen(key) : 0;
-  for( ;; ) 
+  len = (key != NULL) ? (int)strlen (key) : 0;
+  for (;; )
   {
-    if (!fgets(buffer, INI_BUFFERSIZE, rfp)) 
+    if (!fgets (buffer, INI_BUFFERSIZE, rfp))
     {
       /* EOF without an entry so make one */
-      flag = cache_flush(buffer, &cachelen, rfp, wfp, &mark);
-      if (key!=NULL && value!=NULL) 
+      flag = cache_flush (buffer, &cachelen, rfp, wfp, &mark);
+      if (key != NULL && value != NULL)
       {
         if (!flag)
-          fputs("\r\n", wfp);  /* force a new line behind the last line of the INI file */
-        writekey(buffer, key, value, wfp);
+          fputs ("\r\n", wfp);  /* force a new line behind the last line of the INI file */
+        writekey (buffer, key, value, wfp);
       }
-      return close_rename(rfp, wfp, filename);  /* clean up and rename */
+      return close_rename (rfp, wfp, filename);  /* clean up and rename */
     }
-    sp = skipleading(buffer);
-    ep = strchr(sp, '='); /* Parse out the equal sign */
+    sp = skipleading (buffer);
+    ep = strchr (sp, '='); /* Parse out the equal sign */
     if (ep == NULL)
-      ep = strchr(sp, ':');
-    match = (ep != NULL && (int)(skiptrailing(ep,sp)-sp) == len && strnicmp(sp,key,len) == 0);
+      ep = strchr (sp, ':');
+    match = (ep != NULL && (int)(skiptrailing (ep, sp) - sp) == len && strnicmp (sp, key, len) == 0);
     if ((key != NULL && match) || *sp == '[')
       break;  /* found the key, or found a new section */
     /* copy other keys in the section */
-    if (key == NULL) 
+    if (key == NULL)
     {
       fgetpos (rfp, &mark);  /* we are deleting the entire section, so update the read position */
-    } 
-    else 
+    }
+    else
     {
-      if (!cache_accum(buffer, &cachelen, INI_BUFFERSIZE)) 
+      if (!cache_accum (buffer, &cachelen, INI_BUFFERSIZE))
       {
-        cache_flush(buffer, &cachelen, rfp, wfp, &mark);
-        fgets(buffer, INI_BUFFERSIZE, rfp);
-        cache_accum(buffer, &cachelen, INI_BUFFERSIZE);
+        cache_flush (buffer, &cachelen, rfp, wfp, &mark);
+        fgets (buffer, INI_BUFFERSIZE, rfp);
+        cache_accum (buffer, &cachelen, INI_BUFFERSIZE);
       }
     }
   }
@@ -1170,10 +1070,10 @@ static char* skiptrailing (char* str, char* base)
   return str;
 }
 
-static char *striptrailing(char *str)
+static char *striptrailing (char *str)
 {
-  char *ptr = skiptrailing(strchr(str, '\0'), str);
-  assert(ptr != NULL);
+  char *ptr = skiptrailing (strchr (str, '\0'), str);
+  assert (ptr != NULL);
   *ptr = '\0';
   return str;
 }
@@ -1183,30 +1083,30 @@ static char* cleanstring (char* string)
   bool isstring;
   char* ep;
 
-  assert(string != NULL);
+  assert (string != NULL);
 
   /* Remove a trailing comment */
   isstring = false;
-  for (ep = string; *ep != '\0' && ((*ep != ';' && *ep != '#') || isstring); ep++) 
+  for (ep = string; *ep != '\0' && ((*ep != ';' && *ep != '#') || isstring); ep++)
   {
-    if (*ep == '"') 
+    if (*ep == '"')
     {
       if (*(ep + 1) == '"')
         ep++;                 /* skip "" (both quotes) */
       else
         isstring = !isstring; /* single quote, toggle isstring */
-    } 
-    else if (*ep == '\\' && *(ep + 1) == '"') 
+    }
+    else if (*ep == '\\' && *(ep + 1) == '"')
       ep++;                   /* skip \" (both quotes */
   }
-  assert(ep != NULL && (*ep == '\0' || *ep == ';' || *ep == '#'));
+  assert (ep != NULL && (*ep == '\0' || *ep == ';' || *ep == '#'));
   *ep = '\0';                 /* terminate at a comment */
-  striptrailing(string);
+  striptrailing (string);
   return string;
 }
 
 
-/* 
+/*
   Get a temporary file name to copy to. Use the existing name, but with
   the last character set to a '~'.
 */
@@ -1214,14 +1114,14 @@ static void ini_tempname (char* dest, const char* source, int maxlength)
 {
   char *p;
 
-  strncpy(dest, source, maxlength);
-  p = dest + strlen(dest);
+  strncpy (dest, source, maxlength);
+  p = dest + strlen (dest);
   *(p - 1) = '~';
 }
 
 static void writesection (char* buffer, const char* section, FILE *fp)
 {
-  if (section != NULL && strlen (section) > 0) 
+  if (section != NULL && strlen (section) > 0)
   {
     buffer[0] = '[';
     strncpy (buffer + 1, section, INI_BUFFERSIZE - 4);  /* -1 for '[', -1 for ']', -2 for '\r\n' */
@@ -1233,18 +1133,18 @@ static void writesection (char* buffer, const char* section, FILE *fp)
 static void writekey (char* buffer, const char* key, const char* value, FILE *fp)
 {
   char *p;
-  p = strncpy(buffer, key, INI_BUFFERSIZE - 3);  /* -1 for '=', -2 for '\r\n' */
-  p += strlen(p);
+  p = strncpy (buffer, key, INI_BUFFERSIZE - 3);  /* -1 for '=', -2 for '\r\n' */
+  p += strlen (p);
   *p++ = '=';
-  strncpy(p, value, INI_BUFFERSIZE - (p - buffer) - 2); /* -2 for '\r\n' */
-  p += strlen(p);
+  strncpy (p, value, INI_BUFFERSIZE - (p - buffer) - 2); /* -2 for '\r\n' */
+  p += strlen (p);
   strcpy (p, "\r\n"); /* copy line terminator*/
   fputs (buffer, fp);
 }
 
 static int cache_accum (const char* string, int* size, int max)
 {
-  int len = (int)strlen(string);
+  int len = (int)strlen (string);
   if (*size + len >= max)
     return 0;
   *size += len;
@@ -1261,18 +1161,18 @@ static int cache_flush (char* buffer, int* size, FILE* rfp, FILE* wfp, fpos_t* m
   assert (buffer != NULL);
   buffer[0] = '\0';
   assert (size != NULL);
-  while (pos < *size) 
+  while (pos < *size)
   {
     fgets (buffer + pos, INI_BUFFERSIZE - pos, rfp);
     pos += (int)strlen (buffer + pos);
-    assert(pos <= *size);
+    assert (pos <= *size);
   }
   if (buffer[0] != '\0')
     fputs (buffer, wfp);
   fgetpos (rfp, mark);  /* update mark */
   *size = 0;
   /* return whether the buffer ended with a line termination */
-  return (buffer[pos-1] == '\n');
+  return (buffer[pos - 1] == '\n');
 }
 
 /*!
@@ -1280,29 +1180,29 @@ static int cache_flush (char* buffer, int* size, FILE* rfp, FILE* wfp, fpos_t* m
   input file name. Previous input file is deleted.
 
   Had an issue with Kaspersky anti-virus that seems to keep opened the old input file
-  making the rename operation to fail. Solved by adding a few retries before 
+  making the rename operation to fail. Solved by adding a few retries before
   failing.
 */
-static bool close_rename(FILE* rfp, FILE* wfp, const char* filename)
+static bool close_rename (FILE* rfp, FILE* wfp, const char* filename)
 {
   const int RETRIES = 50;
   int i;
   char tmpname[_MAX_PATH];
-  fclose(rfp);
-  fclose(wfp);
-  ini_tempname(tmpname, filename, sizeof(tmpname));
+  fclose (rfp);
+  fclose (wfp);
+  ini_tempname (tmpname, filename, sizeof (tmpname));
 
   //retry a few times to allow for stupid anti-virus
   i = 0;
-  while (i++ < RETRIES && utf8::remove(filename))
-    Sleep(0);
+  while (i++ < RETRIES && utf8::remove (filename))
+    Sleep (0);
 
   if (i >= RETRIES)
     return false;
 
   i = 0;
-  while (i++ < RETRIES && !utf8::rename(tmpname, filename))
-    Sleep(0);
+  while (i++ < RETRIES && !utf8::rename (tmpname, filename))
+    Sleep (0);
   return (i < RETRIES);
 }
 

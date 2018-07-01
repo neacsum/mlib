@@ -41,61 +41,61 @@ public:
   void File (const char *filename);
   
   ///Get a string key
-  int GetString (char *value, int len, const char *key, const char *section, const char *defval="") const;
+  size_t GetString (char *value, size_t len, const std::string& key, const std::string& section, const std::string& defval = std::string()) const;
 
-  ///Return a string key as a string
-  std::string GetString (const char *key, const char *section, const char *defval = "") const;
+  ///Return a string key
+  std::string GetString (const std::string& key, const std::string& section, const std::string& defval = std::string ()) const;
 
   ///Return an integer key
-  int GetInt (const char *key, const char *section, int defval=0) const;
+  int GetInt (const std::string& key, const std::string& section, int defval=0) const;
 
   /// Return a floating point value
-  double GetDouble (const char *key, const char *section, double defval=0.) const;
+  double GetDouble (const std::string& key, const std::string& section, double defval=0.) const;
 
   ///Return a color specification key
-  COLORREF GetColor (const char *key, const char *section, COLORREF defval=RGB(0,0,0)) const;
+  COLORREF GetColor (const std::string& key, const std::string& section, COLORREF defval=RGB(0,0,0)) const;
 
   ///Return a boolean key
-  bool GetBool (const char *key, const char *section, bool defval=false) const;
+  bool GetBool (const std::string& key, const std::string& section, bool defval=false) const;
 
   ///Return a font specification key
-  HFONT GetFont (const char *key, const char *section, HFONT defval=NULL) const;
+  HFONT GetFont (const std::string& key, const std::string& section, HFONT defval=NULL) const;
 
   ///Check for key existence
-  bool HasKey (const char *key, const char *section) const;
+  bool HasKey (const std::string& key, const std::string& section) const;
 
   /// Write a string key
-  bool PutString (const char *key, const char *value, const char *section);
+  bool PutString (const std::string& key, const std::string& value, const std::string& section);
 
   /// Write an integer key
-  bool PutInt (const char *key, long value, const char *section);
+  bool PutInt (const std::string& key, long value, const std::string& section);
 
   /// Write a font specification key
-  bool PutFont (const char *key, HFONT font, const char *section);
+  bool PutFont (const std::string& key, HFONT font, const std::string& section);
 
   /// Write a boolean key
-  bool PutBool (const char *key, bool value, const char *section);
+  bool PutBool (const std::string& key, bool value, const std::string& section);
 
   /// Write a color specification key
-  bool PutColor (const char *key, COLORREF value, const char *section);
+  bool PutColor (const std::string& key, COLORREF value, const std::string& section);
 
   /// Write a floating point value key
-  bool PutDouble (const char *key, double value, const char *section, int dec = 2);
+  bool PutDouble (const std::string& key, double value, const std::string& section, int dec = 2);
 
   /// Delete a key
-  bool DeleteKey (const char *key, const char *section);
+  bool DeleteKey (const std::string& key, const std::string& section);
 
   /// Delete an entire section
-  bool DeleteSection (const char *section);
+  bool DeleteSection (const std::string& section);
 
   /// Copy all keys from one section to another.
   bool CopySection (const Profile& from_file, const char *from_sect, const char *to_sect=NULL);
 
   /// Return \b true if profile contains a non empty section with the given name
-  bool HasSection (const char *section);
+  bool HasSection (const std::string& section);
 
   /// Retrieve names of all keys in a section.
-  int GetKeys (char *buffer, int sz, const char *section);
+  int GetKeys (char *buffer, size_t sz, const std::string& section);
 
   /// Return the names of all sections in the INI file.
   int GetSections (char *sects, int sz);
