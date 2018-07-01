@@ -44,7 +44,7 @@
 namespace MLIBSPACE {
 #endif
 
-static bool getkeychars (FILE* fp, const char* Section, const char* Key, char* Buffer, int BufferSize);
+static bool getkeychars (FILE* fp, const char* Section, const char* Key, char* Buffer, size_t BufferSize);
 static bool getkeystring (FILE* fp, const char* Section, const char* Key, std::string& str);
 static char* skipleading (char* str);
 static char* skiptrailing (char* str, char* base);
@@ -579,7 +579,7 @@ int Profile::GetKeys( char *keys, size_t sz, const std::string& section )
 
   int idx = 0;
   char *p = keys;
-  int blen = sz-2;
+  size_t blen = sz-2;
 
   /* Move through file 1 line at a time until the section is matched or EOF.
    */
@@ -594,17 +594,17 @@ int Profile::GetKeys( char *keys, size_t sz, const std::string& section )
     }
     sp = skipleading(buffer);
     ep = strchr(sp, ']');
-  } while (*sp != '[' || ep == NULL || (((int)(ep-sp-1) != slen || strnicmp(sp+1,section.c_str(),slen) != 0)));
+  } while (*sp != '[' || ep == NULL || (((int)(ep - sp - 1) != slen || strnicmp (sp + 1, section.c_str (), slen) != 0)));
 
   /* Now that the section has been found start enumerating entries.
    * Stop when reaching section end.
    */
   int cnt = 0;
-  while (fgets(buffer, INI_BUFFERSIZE,fp) && *(sp = skipleading(buffer)) != '[')
+  while (fgets (buffer, INI_BUFFERSIZE, fp) && *(sp = skipleading (buffer)) != '[')
   {
     if (*sp == ';' || *sp == '#') //ignore comment lines
       continue;
-    ep = strchr(sp, '=');         //Parse out the equal sign
+    ep = strchr (sp, '=');         //Parse out the equal sign
     if (!ep)
       continue;                     //ignore malformed or blank lines
     cnt++;
@@ -612,7 +612,7 @@ int Profile::GetKeys( char *keys, size_t sz, const std::string& section )
     if (blen > 1)
     {
       strncpy (p, sp, blen);
-      int l = min (blen, (int)strlen(p));
+      size_t l = min (blen, strlen(p));
       p += l;
       *p++ = 0;
       blen -= l+1;
@@ -620,7 +620,7 @@ int Profile::GetKeys( char *keys, size_t sz, const std::string& section )
     idx++;
   }
   *p = 0;
-  fclose(fp);
+  fclose (fp);
   return cnt;
 }
 
@@ -941,10 +941,10 @@ static bool ini_puts (const char *key, const char *value, const char *section, c
 
   \return true if key was found; false otherwise
 */
-static bool getkeychars(FILE *fp, const char *section, const char *key, char *val, int size)
+static bool getkeychars(FILE *fp, const char *section, const char *key, char *val, size_t size)
 {
   char *sp, *ep;
-  int len;
+  size_t len;
   char buffer[INI_BUFFERSIZE];
   assert (fp != NULL);
 
