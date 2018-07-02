@@ -172,6 +172,7 @@
     <ClInclude Include="include\mlib\point.h" />
     <ClInclude Include="include\mlib\profile.h" />
     <ClInclude Include="include\mlib\ringbuf.h" />
+    <ClInclude Include="include\mlib\rotmat.h" />
     <ClInclude Include="include\mlib\semaphore.h" />
     <ClInclude Include="include\mlib\serenum.h" />
     <ClInclude Include="include\mlib\shmem.h" />
@@ -200,6 +201,7 @@
     <ClCompile Include="source\firewall.cpp" />
     <ClCompile Include="source\geom\border.cpp" />
     <ClCompile Include="source\geom\chull.cpp" />
+    <ClCompile Include="source\geom\rotmat.cpp" />
     <ClCompile Include="source\httpd.cpp" />
     <ClCompile Include="source\inaddr.cpp" />
     <ClCompile Include="source\jbridge.cpp" />

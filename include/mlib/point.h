@@ -42,14 +42,33 @@ public:
   double azimuth (const Point<T>& P2) const;
   double angle (const Point<T>& P1, const Point<T>& P2) const;
 
+  Point<T> operator + (const Point<T>& p) const   { return { x + p.x, y + p.y }; }
+  Point<T> operator - (const Point<T>& p) const   { return{ x - p.x, y - p.y }; }
+  Point<T> operator * (double scalar) const       { return{ x*scalar, y*scalar }; }
+  Point<T> operator / (double scalar) const       { return{ x / scalar, y / scalar }; }
+
+  T operator * (const Point<T>& p) const { return x*p.x + y*p.y; }
+  
+  Point<T>& operator += (const Point<T>& other)   { x += other.x; y += other.y; return *this; }
+  Point<T>& operator -= (const Point<T>& other)   { x -= other.x; y -= other.y; return *this; }
+  Point<T>& operator *= (double scalar)           { x *= scalar;  y *= scalar;  return *this; }
+  Point<T>& operator /= (double scalar)           { x /= scalar;  y /= scalar;  return *this; }
 
   double distance (const Point<T>& P2) const;
+  double magnitude () const                       { return hypot (x, y); }
   int operator ==(const Point<T>& p) const;
   int operator !=(const Point<T>& p) const;
 
   bool leftof (const Point<T>& a, const Point<T>& b) const;
   bool collinear (const Point<T>& a, const Point<T>& b) const;
+  void rotate (double angle);
 };
+
+template <class T>
+Point<T> operator *(double scalar, const Point<T>& p)
+{
+  return{ p.x*scalar, p.y*scalar };
+}
 
 /// Specialization of Point using double as underlining type
 typedef Point<double> dpoint;
@@ -57,14 +76,14 @@ typedef Point<double> dpoint;
 //Member functions templates --------------------------------------------------
 
 /// Build a Point from a pair of T's
-template<class T> inline
+template<class T>
 Point<T>::Point( T a, T b ) :
   x(a),y(b)
 {
 }
 
 /// Default constructor
-template<class T> inline
+template<class T>
 Point<T>::Point() :
   x(0),y(0)
 {
@@ -87,9 +106,8 @@ double Point<T>::azimuth (const Point<T>& P2) const
   }
 }
 
-
 /// Return TRUE if p and this are closer than tolerance
-template<class T> inline
+template<class T>
 int Point<T>::operator == (const Point<T>& p) const
 {
   return distance (p) < point_traits<T>::tolerance ();
@@ -103,10 +121,10 @@ int Point<T>::operator != (const Point<T>& p) const
 }
 
 /// Return distance between this and P2
-template<class T> inline
+template<class T>
 double Point<T>::distance (const Point<T>& P2) const
 {
-  return _hypot (x-P2.x, y-P2.y);
+  return hypot (x-P2.x, y-P2.y);
 }
 
 /*!
@@ -138,6 +156,15 @@ template <class T>
 bool Point<T>::collinear (const Point& a, const Point& b) const
 {
   return abs((a.x - x)*(b.y - y) - (a.y - y)*(b.x - x)) <= point_traits<T>::tolerance ();
+}
+
+template <class T>
+void Point<T>::rotate (double angle)
+{
+  double c, s;
+  double x1 = x*(c = cos (angle)) - y*(s = sin (angle));
+  double y1 = x*s + y*c;
+  x = x1; y = y1;
 }
 
 #ifdef MLIBSPACE

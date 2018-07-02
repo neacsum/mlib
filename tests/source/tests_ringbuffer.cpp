@@ -2,6 +2,10 @@
 #include <mlib/ringbuf.h>
 #include <vector>
 #include <iostream>
+#include <random>
+#include <set>
+#include <functional>
+#include <list>
 
 #ifdef MLIBSPACE
 using namespace MLIBSPACE;
@@ -56,7 +60,7 @@ SUITE (RingBuffer)
     CHECK_EQUAL (0, counted_int::counter);
   }
 
-  TEST(ctor_dtor2)
+  TEST (ctor_dtor2)
   {
     counted_int::counter = 0;
     ring_buffer <counted_int> emptybuf;
@@ -69,7 +73,7 @@ SUITE (RingBuffer)
     counted_int::counter = 0;
     ring_buffer <counted_int> testbuf (10);
     ring_buffer <counted_int> otherbuf (testbuf);
-    
+
     // VERIFY: object constructor called for each element in container
     CHECK_EQUAL (20, counted_int::counter);
   }
@@ -86,7 +90,7 @@ SUITE (RingBuffer)
 
   TEST (copy_ctor3)
   {
-    ring_buffer <int> testbuf(10);
+    ring_buffer <int> testbuf (10);
     for (int i = 1; i <= 10; i++)
       testbuf.push_back (i);
 
@@ -143,7 +147,7 @@ SUITE (RingBuffer)
     empty1 = empty2;
 
     // VERIFY: assigning empty to empty is OK
-    CHECK (empty1.empty() && empty2.empty());
+    CHECK (empty1.empty () && empty2.empty ());
   }
 
   TEST (assignment_op4)
@@ -229,12 +233,12 @@ SUITE (RingBuffer)
     iter == --testbuf.begin ();
 
     // VERIFY: begin iterator doesn't change when decremented
-    CHECK (iter == testbuf.begin());
+    CHECK (iter == testbuf.begin ());
 
     iter--;
 
     // VERIFY: postfix decrement doesn't change begin iterator
-    CHECK (iter == testbuf.begin());
+    CHECK (iter == testbuf.begin ());
   }
 
   TEST (end)
@@ -269,20 +273,20 @@ SUITE (RingBuffer)
 
   TEST (addition)
   {
-    const ring_buffer<int> testbuf ({100, 101, 102});
+    const ring_buffer<int> testbuf ({ 100, 101, 102 });
 
-    auto it1 = testbuf.begin();
-    
+    auto it1 = testbuf.begin ();
+
     // VERIFY: increment and addition give the same result
     auto it2 = it1++ + 1;
     CHECK (it1 == it2);
 
     // VERIFY: addition works
-    int v = *(testbuf.begin() + 2);
+    int v = *(testbuf.begin () + 2);
     CHECK_EQUAL (102, v);
 
     // VERIFY: addition stops at end
-    it2 = it1 + (testbuf.size ()-1);
+    it2 = it1 + (testbuf.size () - 1);
     CHECK (it2 == std::end (testbuf));
   }
 
@@ -387,6 +391,51 @@ SUITE (RingBuffer)
     CHECK (expected == actual);
   }
 
+  TEST (difference_op)
+  {
+    ring_buffer<int> testbuf ({ 100, 101, 102 });
+    size_t d;
+
+    //VERIFY: end - begin == size when buffer full
+    d = testbuf.end () - testbuf.begin ();
+    CHECK_EQUAL (testbuf.size (), d);
+
+    //VERIFY: end - begin  == size after popping one object
+    testbuf.pop_front ();
+    d = testbuf.end () - testbuf.begin ();
+    CHECK_EQUAL (testbuf.size () , d);
+
+    //VERIFY: end - begin == 0 when buffer empty
+    testbuf.clear ();
+    d = testbuf.end () - testbuf.begin ();
+    CHECK_EQUAL (0, d);
+
+    testbuf.push_back (0);
+    for (size_t i = 0; i < testbuf.capacity (); i++)
+    {
+      //VERIFY: end - begin == 1 for different positions in buffer
+      d = testbuf.end () - testbuf.begin ();
+      CHECK_EQUAL (1, d);
+      testbuf.push_back (i+1);
+      testbuf.pop_front ();
+    }
+  }
+
+  TEST (sort)
+  {
+    ring_buffer<int> testbuf ({ 103, 101, 102 });
+    std::vector<int> expected ({ 101, 102, 103 });
+
+    std::sort (testbuf.begin (), testbuf.end ());
+    CHECK (expected == (std::vector<int>)testbuf);
+  }
+}
+
+// Usage and performance samples
+SUITE (ringbuf_samples)
+{
+
+  //Using ring buffer with a standard algorithm
   TEST (find_algorithm)
   {
     const ring_buffer<int> testbuf ({ 100, 101, 102 });
@@ -395,8 +444,139 @@ SUITE (RingBuffer)
 
     //VERIFY: found second element
     CHECK (testbuf.begin () + 1 == it);
+  }
 
-    *it = 104;
+  //Using ring buffer with a range for sentence
+  TEST (for_loop)
+  {
+    const ring_buffer<int> testbuf ({ 100, 101, 102 });
+
+    std::cout << "Circular buffer: ";
+    for (auto i : testbuf)
+      std::cout << i << " ";
+    std::cout << "\n";
+  }
+
+  /*
+    Testing performance of ring buffer
+    Using code inspired from "Performance of a Circular Buffer vs. Vector, Deque, and List"
+    (https://www.codeproject.com/Articles/1185449/Performance-of-a-Circular-Buffer-vs-Vector-Deque-a)
+  */
+
+  //key-value structure used for performance testing 
+  struct kvstruct {
+    char key[9];
+    unsigned value; //  could be anything at all
+    kvstruct (unsigned k = 0) : value (k)
+    {
+      char buf[9];
+      strcpy_s (key, stringify (k, buf));
+    }
+
+    kvstruct (kvstruct const& other) : value (other.value) {
+      strcpy_s (key, other.key);
+    }
+
+    static char const* stringify (unsigned i, char* buf) {
+      buf[8] = 0;
+      char* bufp = &buf[8];
+      do {
+        *--bufp = "0123456789ABCDEF"[i & 0xf];
+        i >>= 4;
+      } while (i != 0);
+      return bufp;
+    }
+
+    bool operator<(kvstruct const& that)  const { return strcmp (this->key, that.key) < 0; }
+    bool operator==(kvstruct const& that) const { return strcmp (this->key, that.key) == 0; }
+  };
+
+  //Fill a vector with randomly ordered kvstruct objects
+  void build_random_vector (std::vector<kvstruct>& v, unsigned count)
+  {
+    unsigned i;
+    for (i = 0; i<count; i++)
+      v.push_back (kvstruct (i));
+
+    //Fisher-Yates shuffle using Durstenfeld algorithm
+    std::default_random_engine eng;
+    for (i = count - 1; i > 0; i--)
+    {
+      std::uniform_int_distribution<unsigned> d (0, i);
+      unsigned r = d (eng);
+      std::swap (v[r], v[i]);
+    }
+  }
+
+  TEST (assignment_timming)
+  {
+    UnitTest::Timer t;
+    int ms;
+#ifdef _DEBUG
+    size_t sz = 1000000;
+#else
+    size_t sz = 10000000;
+#endif
+    std::vector<kvstruct> random_vector;
+
+    t.Start ();
+    build_random_vector (random_vector, sz);
+    std::cout << "Random vector prepared in " << t.GetTimeInMs () << "ms\n";
+
+    {
+      ring_buffer<kvstruct> test_container (sz);
+
+      t.Start ();
+      for (auto kv : random_vector)
+        test_container.push_back (kv);
+      int ms = t.GetTimeInMs ();
+      std::cout << "ring_buffer push_back of " << sz << " elements in " << ms << "ms\n";
+      std::cout << "size is " << sz * sizeof (kvstruct) / 1024 << "kb\n";
+    }
+
+    {
+      std::vector<kvstruct> test_container;
+
+      t.Start ();
+      for (auto kv : random_vector)
+        test_container.push_back (kv);
+      ms = t.GetTimeInMs ();
+      std::cout << "vector push_back of " << sz << " elements in " << ms << "ms\n";
+    }
+
+    {
+      std::vector<kvstruct> test_container;
+      test_container.reserve (sz);
+
+      t.Start ();
+      for (auto kv : random_vector)
+        test_container.push_back (kv);
+      ms = t.GetTimeInMs ();
+      std::cout << "vector with reserve push_back of " << sz << " elements in " << ms << "ms\n";
+    }
+
+    {
+      std::list<kvstruct> test_container;
+
+      t.Start ();
+      for (auto kv : random_vector)
+        test_container.push_back (kv);
+      ms = t.GetTimeInMs ();
+      std::cout << "list push_back of " << sz << " elements in " << ms << "ms\n";
+    }
+
+    {
+      ring_buffer<kvstruct> test_container (sz);
+      std::vector<kvstruct> test_vector;
+
+      for (auto kv : random_vector)
+        test_container.push_back (kv);
+
+      t.Start ();
+      test_vector = test_container;
+      ms = t.GetTimeInMs ();
+      std::cout << "ring to vector conversion of " << sz << " elements in " << ms << "ms\n";
+      CHECK (test_vector == random_vector);
+    }
   }
 }
-

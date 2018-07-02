@@ -143,6 +143,18 @@ public:
       return *this;
     }
 
+    ///Difference operator
+    ptrdiff_t operator -(const iterator& other) const
+    {
+      assert (ring == other.ring);
+      size_t p1 = (pos != -1)? pos : (ring->back_idx == ring->front_idx)? ring->sz : ring->back_idx;
+      size_t p2 = (other.pos != -1) ? other.pos : (ring->back_idx == ring->front_idx) ? ring->sz : ring->back_idx;
+      if (p1 >= p2)
+        return p1 - p2;
+      else
+        return ring->cap - p2 + p1;
+    }
+
   private:
     iterator (const ring_buffer* ring_, size_t pos_)
       : ring (ring_)
