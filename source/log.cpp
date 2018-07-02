@@ -226,7 +226,7 @@ void set_log_ini_param (const char* inifile, const char *section)
   You can cause the syslog to drop the reference to \p ident and go back to the 
   default string (the program name), by calling closelog().
 */
-void openlog( char* ident, int option, int facility )
+void openlog (const char* ident, int option, int facility)
 {
   if (!proclog)
     init ();
@@ -392,7 +392,7 @@ void syslog (int facility_priority, char* fmt, ...)
 
 }
 
-void syslog_debug(char* fmt, ...)
+void syslog_debug (const char* fmt, ...)
 {
   SYSTEMTIME stm;
   va_list ap;
