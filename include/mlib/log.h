@@ -77,7 +77,7 @@ extern "C" {
 void closelog (void);
 
 /// Open connection to logger.
-void openlog (char *ident, int option, int facility);
+void openlog (const char *ident, int option, int facility);
 
 /// Set the log mask level.
 int setlogmask (int mask);
@@ -89,10 +89,10 @@ int setlogopt (int opt);
 void syslog (int facility_priority, char *fmt, ...);
 
 /// Generate a log message at debug level using FMT string and option arguments. 
-void syslog_debug (char *fmt, ...);
+void syslog_debug (const char *fmt, ...);
 
 /// Load default parameters from an INI file
-void set_log_ini_param (char* inifname, char *section);
+void set_log_ini_param (const char* inifname, const char *section);
 #ifdef __cplusplus
 }
 #endif
