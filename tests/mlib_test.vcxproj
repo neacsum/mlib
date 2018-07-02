@@ -22,7 +22,6 @@
     <ClCompile Include="source\tests_base64.cpp" />
     <ClCompile Include="source\tests_basename.cpp" />
     <ClCompile Include="source\tests_crc32.cpp" />
-    <ClCompile Include="source\tests_dogbone.cpp" />
     <ClCompile Include="source\tests_httpd.cpp" />
     <ClCompile Include="source\tests_main.cpp" />
     <ClCompile Include="source\tests_options.cpp" />
