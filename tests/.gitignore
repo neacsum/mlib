@@ -1,0 +1,5 @@
+﻿# Additional ignored folders and files
+
+/exe
+/o
+*.xml
