@@ -7,6 +7,8 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+#include <ostream>
+
 #ifdef MLIBSPACE
 namespace MLIBSPACE {
 #endif
@@ -47,7 +49,11 @@ public:
   Point<T> operator * (double scalar) const       { return{ x*scalar, y*scalar }; }
   Point<T> operator / (double scalar) const       { return{ x / scalar, y / scalar }; }
 
-  T operator * (const Point<T>& p) const { return x*p.x + y*p.y; }
+  /// unary minus operator
+  Point<T> operator - () const                    { return { -x, -y }; }
+
+  ///dot product operator
+  T operator * (const Point<T>& p) const          { return x*p.x + y*p.y; }
   
   Point<T>& operator += (const Point<T>& other)   { x += other.x; y += other.y; return *this; }
   Point<T>& operator -= (const Point<T>& other)   { x -= other.x; y -= other.y; return *this; }
@@ -64,11 +70,28 @@ public:
   void rotate (double angle);
 };
 
+/// Scalar multiplication function makes scalar multiplication commutative
 template <class T>
 Point<T> operator *(double scalar, const Point<T>& p)
 {
   return{ p.x*scalar, p.y*scalar };
 }
+
+/// Alias for magnitude function
+template <class T>
+double abs (const Point<T>& p)
+{
+  return p.magnitude ();
+}
+
+
+template <class T>
+std::ostream& operator << (std::ostream& s, const Point<T>& p)
+{
+  s << '(' << p.x << ',' << p.y << ')';
+  return s;
+}
+
 
 /// Specialization of Point using double as underlining type
 typedef Point<double> dpoint;
@@ -155,7 +178,7 @@ bool Point<T>::leftof (const Point<T>& a, const Point<T>& b) const
 template <class T>
 bool Point<T>::collinear (const Point& a, const Point& b) const
 {
-  return abs((a.x - x)*(b.y - y) - (a.y - y)*(b.x - x)) <= point_traits<T>::tolerance ();
+  return ::abs((a.x - x)*(b.y - y) - (a.y - y)*(b.x - x)) <= point_traits<T>::tolerance ();
 }
 
 template <class T>
