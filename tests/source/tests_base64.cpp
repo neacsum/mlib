@@ -4,16 +4,17 @@
 using namespace mlib;
 
 //Test vectors from RFC4648
+const char *expect[] = {
+  "Zg==",
+  "Zm8=",
+  "Zm9v",
+  "Zm9vYg==",
+  "Zm9vYmE=",
+  "Zm9vYmFy" };
+
 TEST (Base64_Encode)
 {
   const char *v = "foobar";
-  const char *expect[] = { 
-    "Zg==",
-    "Zm8=",
-    "Zm9v",
-    "Zm9vYg==",
-    "Zm9vYmE=",
-    "Zm9vYmFy" };
 
   for (int i = 1; i <= 6; i++)
   {
@@ -22,6 +23,15 @@ TEST (Base64_Encode)
     len = base64enc (v, result, i);
     CHECK_EQUAL (len, strlen (expect[i - 1])+1);
     CHECK_EQUAL (expect[i - 1], result);
+  }
+
+  //test string-aware version
+  for (int i = 1; i <= 6; i++)
+  {
+    std::string in ("foobar", i);
+    std::string out = base64enc (in);
+    std::string ok (expect[i - 1]);
+    CHECK_EQUAL (ok, out);
   }
 }
 
@@ -33,45 +43,39 @@ TEST (Base64_Encode_Zero_Length)
 
   CHECK_EQUAL (1, len);
   CHECK_EQUAL ("", result);
+
+  //test string-aware version
+  std::string in;
+  std::string out = base64enc (in);
+  CHECK_EQUAL (0, out.size());
+  CHECK_EQUAL (in, out);
 }
 
 TEST (Base64_Decode)
 {
   char out[256];
   size_t len;
+  std::string outstr;
+  const char *foobar = "foobar";
 
   memset (out, 0, sizeof (out));
   len = base64dec ("TWFu", out);  //from Wikipedia Base64 page
   CHECK_EQUAL (len, 3);
   CHECK_EQUAL ("Man", out);
 
-  memset (out, 0, sizeof (out));
-  len = base64dec ("Zg==", out);
-  CHECK_EQUAL (len, 1);
-  CHECK_EQUAL ("f", out);
+  outstr = base64dec ("TWFu");
+  CHECK_EQUAL ("Man", outstr);
 
-  memset (out, 0, sizeof (out));
-  len = base64dec ("Zm8=", out);
-  CHECK_EQUAL (len, 2);
-  CHECK_EQUAL ("fo", out);
+  //Check test vectors from RFC4648
+  for (int i = 0; i < 6; i++)
+  {
+    memset (out, 0, sizeof (out));
+    len = base64dec (expect[i], out);
+    CHECK_EQUAL (len, i+1);
+    CHECK (!strncmp (out, foobar, len));
 
-  memset (out, 0, sizeof (out));
-  len = base64dec ("Zm9v", out);
-  CHECK_EQUAL (len, 3);
-  CHECK_EQUAL ("foo", out);
+    outstr = base64dec (expect[i]);
+    CHECK_EQUAL (std::string(foobar, i+1), outstr);
+  }
 
-  memset (out, 0, sizeof (out));
-  len = base64dec ("Zm9vYg==", out);
-  CHECK_EQUAL (len, 4);
-  CHECK_EQUAL ("foob", out);
-
-  memset (out, 0, sizeof (out));
-  len = base64dec ("Zm9vYmE=", out);
-  CHECK_EQUAL (len, 5);
-  CHECK_EQUAL ("fooba", out);
-
-  memset (out, 0, sizeof (out));
-  len = base64dec ("Zm9vYmFy", out);
-  CHECK_EQUAL (len, 6);
-  CHECK_EQUAL ("foobar", out);
 }

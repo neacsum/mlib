@@ -4,6 +4,8 @@
 namespace MLIBSPACE {
 #endif
 
+using namespace std;
+
 static char enctab[64] = {
   'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
   'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f',
@@ -57,7 +59,7 @@ size_t base64dec (const char *in, void *out)
 
   int k = 0, no = (int)olen;
   union {
-    unsigned char sextet[4];
+    unsigned char sixbit[4];
     int si;
   };
   si = 0;
@@ -65,12 +67,12 @@ size_t base64dec (const char *in, void *out)
   {
     int decval = dectab[*in++];
     if (decval)
-      sextet[k++] = decval;
+      sixbit[k++] = decval;
     if (k == 4)
     {
-      *oc++ = sextet[0] << 2 | sextet[1] >> 4;
-      *oc++ = sextet[1] << 4 | sextet[2] >> 2;
-      *oc++ = sextet[2] << 6 | sextet[3];
+      *oc++ = sixbit[0] << 2 | sixbit[1] >> 4;
+      *oc++ = sixbit[1] << 4 | sixbit[2] >> 2;
+      *oc++ = sixbit[2] << 6 | sixbit[3];
       k = 0;
       no -= 3;
       si = 0;
@@ -80,18 +82,31 @@ size_t base64dec (const char *in, void *out)
 
   if (no)
   {
-    *oc++ = sextet[0] << 2 | sextet[1] >> 4;
+    *oc++ = sixbit[0] << 2 | sixbit[1] >> 4;
     no--;
   }
   if (no)
   {
-    *oc++ = sextet[1] << 4 | sextet[2] >> 2;
+    *oc++ = sixbit[1] << 4 | sixbit[2] >> 2;
     no--;
   }
   if (no)
-    *oc++ = sextet[2] << 6 | sextet[3];
+    *oc++ = sixbit[2] << 6 | sixbit[3];
 
   return olen;
+}
+
+/*! 
+  String-aware overload
+  \param in     input string
+  \return       decoded string
+*/
+string base64dec (const string& in)
+{
+  size_t sz = base64dec (in.c_str(), nullptr);
+  std::string out (sz, '\0');
+  base64dec (in.c_str(), &out[0]);
+  return out;
 }
 
 /*!
@@ -107,32 +122,52 @@ size_t base64dec (const char *in, void *out)
 size_t base64enc (const void* in, char* out, size_t ilen)
 {
   size_t olen = 4*((ilen+2)/3)+1;
-  union {
-    unsigned char sextet[4];
-    int si;
-  };
-  const unsigned char *cin = (const unsigned char *)in;
   if (!out)
     return olen;
 
-  int k = 0;
-  si = 0;
-  while (ilen)
+  union {
+    unsigned char sixbit[4];
+    int si;
+  };
+  const unsigned char *cin = (const unsigned char *)in;
+  int k;
+
+  k = si = 0;
+  while (ilen--)
   {
-    sextet[k++] = *cin++;
-    ilen--;
-    if (k == 3 || !ilen)
+    sixbit[k++] = *cin++;
+    if (k == 3)
     {
-      *out++ = enctab[sextet[0] >> 2];
-      *out++ = enctab[((sextet[0] & 3) << 4) | (sextet[1] >> 4)];
-      *out++ = (k >= 2) ? enctab[((sextet[1] & 0x0f) << 2) | (sextet[2] >> 6)] : '=';
-      *out++ = (k == 3) ? enctab[sextet[2] & 0x3f] : '=';
-      k = 0;
-      si = 0;
+      *out++ = enctab[sixbit[0] >> 2];
+      *out++ = enctab[((sixbit[0] & 3) << 4) | (sixbit[1] >> 4)];
+      *out++ = enctab[((sixbit[1] & 0x0f) << 2) | (sixbit[2] >> 6)];
+      *out++ = enctab[sixbit[2] & 0x3f];
+      k = si = 0;
     }
+  }
+  if (k)
+  {
+    *out++ = enctab[sixbit[0] >> 2];
+    *out++ = enctab[((sixbit[0] & 3) << 4) | (sixbit[1] >> 4)];
+    *out++ = (k >= 2) ? enctab[((sixbit[1] & 0x0f) << 2) | (sixbit[2] >> 6)] : '=';
+    *out++ = (k == 3) ? enctab[sixbit[2] & 0x3f] : '=';
   }
   *out++ = 0; //terminating null
   return olen;
+}
+
+/*! 
+  String-aware overload
+  \param in     input string
+  \return       decoded string
+*/
+string base64enc (const string& in)
+{
+  size_t sz = base64enc (in.data(), nullptr, in.size());
+  std::string out (sz, '\0');
+  base64enc (in.data(), &out[0], in.size());
+  out.pop_back (); //get rid of terminating NULL
+  return out;
 }
 
 #ifdef MLIBSPACE
