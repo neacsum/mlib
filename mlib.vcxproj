@@ -150,6 +150,7 @@
   <ItemGroup>
     <ClInclude Include="include\mlib\base64.h" />
     <ClInclude Include="include\mlib\basename.h" />
+    <ClInclude Include="include\mlib\bitstream.h" />
     <ClInclude Include="include\mlib\border.h" />
     <ClInclude Include="include\mlib\chull.h" />
     <ClInclude Include="include\mlib\convert.h" />
@@ -191,6 +192,7 @@
   <ItemGroup>
     <ClCompile Include="source\base64.cpp" />
     <ClCompile Include="source\basename.cpp" />
+    <ClCompile Include="source\bitstream.cpp" />
     <ClCompile Include="source\convert.cpp" />
     <ClCompile Include="source\crc32.c" />
     <ClCompile Include="source\dprintf.c" />

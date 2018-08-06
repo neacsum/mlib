@@ -4,6 +4,8 @@
   (c) Mircea Neacsu 2017
 
 */
+bool checksum (const char *buf);
+
 int dbs (const char *buf, double *depth);
 int dbt (const char *buf, double *depth);
 int dpt (const char *buf, double *depth, double *offset, double *range);

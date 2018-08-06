@@ -138,6 +138,9 @@
     <ClInclude Include="include\mlib\rotmat.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\mlib\bitstream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\base64.cpp">
@@ -313,6 +316,9 @@
     </ClCompile>
     <ClCompile Include="source\geom\rotmat.cpp">
       <Filter>Source Files\geom</Filter>
+    </ClCompile>
+    <ClCompile Include="source\bitstream.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
