@@ -8,4 +8,7 @@ rem
 
 pushd "%~dp0"
 mklink /d lib %DEV_ROOT%\lib
+
+cd include
+mklink /d utpp %DEV_ROOT%\utpp\include\utpp
 popd

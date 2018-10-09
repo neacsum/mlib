@@ -31,7 +31,7 @@ TEST (leftof) {
   CHECK (O.leftof (A, B));
 
   dpoint A1{ 2, 16 }, B1{ 1, 9 }, C1{ 1, 10 };
-  CHECK (C1.leftof (A1, B1));
+  CHECK (!C1.leftof (A1, B1));
 }
 
 TEST (collinear) {
@@ -55,7 +55,7 @@ TEST (subtract) {
   dpoint A{ 6, 5 }, B{ 5, 4 };
 
   dpoint C = B - A;
-  CHECK_EQUAL (dpoint (-1, 1), C);
+  CHECK_EQUAL (dpoint (-1, -1), C);
 }
 
 TEST (scalar_multiplication)
