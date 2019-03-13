@@ -59,6 +59,9 @@ bool rename (const std::string& oldname, const std::string& newname);
 void splitpath (const char* path, char* drive, char* dir, char* fname, char* ext);
 void splitpath (const char* path, std::string& drive, std::string& dir, std::string& fname, std::string& ext);
 
+std::string getenv (const std::string& var);
+int putenv (const std::string& str);
+
 class ifstream : public std::ifstream
 {
 public:
@@ -136,5 +139,19 @@ bool valid (const std::string& s)
 }
 
 }
+
+inline
+int putenv (const std::string & str)
+{
+  return _wputenv (utf8::widen (str).c_str ());
+}
+
+inline
+std::string getenv (const std::string & var)
+{
+  return utf8::narrow (_wgetenv (utf8::widen (var).c_str ()));
+}
+
+
 
 #endif
