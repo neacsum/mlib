@@ -68,23 +68,23 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IntDir>o\$(PlatformTarget)\$(Configuration)\</IntDir>
-    <OutDir>lib\$(PlatformTarget)\$(Configuration)\</OutDir>
+    <IntDir>o\$(PlatformShortName)\$(Configuration)\</IntDir>
+    <OutDir>lib\$(PlatformShortName)\$(Configuration)\</OutDir>
     <IncludePath>$(SolutionDir)include\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IntDir>o\$(PlatformTarget)\$(Configuration)\</IntDir>
-    <OutDir>lib\$(PlatformTarget)\$(Configuration)\</OutDir>
+    <IntDir>o\$(PlatformShortName)\$(Configuration)\</IntDir>
+    <OutDir>lib\$(PlatformShortName)\$(Configuration)\</OutDir>
     <IncludePath>$(SolutionDir)include\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IntDir>o\$(PlatformTarget)\$(Configuration)\</IntDir>
-    <OutDir>lib\$(PlatformTarget)\$(Configuration)\</OutDir>
+    <IntDir>o\$(PlatformShortName)\$(Configuration)\</IntDir>
+    <OutDir>lib\$(PlatformShortName)\$(Configuration)\</OutDir>
     <IncludePath>$(SolutionDir)include\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IntDir>o\$(PlatformTarget)\$(Configuration)\</IntDir>
-    <OutDir>lib\$(PlatformTarget)\$(Configuration)\</OutDir>
+    <IntDir>o\$(PlatformShortName)\$(Configuration)\</IntDir>
+    <OutDir>lib\$(PlatformShortName)\$(Configuration)\</OutDir>
     <IncludePath>$(SolutionDir)include\;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -184,7 +184,6 @@
     <ClInclude Include="include\mlib\tcpserv.h" />
     <ClInclude Include="include\mlib\thread.h" />
     <ClInclude Include="include\mlib\trace.h" />
-    <ClInclude Include="include\mlib\utf8.h" />
     <ClInclude Include="include\mlib\wsockstream.h" />
     <ClInclude Include="include\mlib\wtimer.h" />
     <ClInclude Include="include\nmeac.h" />
@@ -246,7 +245,6 @@
     <ClCompile Include="source\syncbase.cpp" />
     <ClCompile Include="source\tcpserv.cpp" />
     <ClCompile Include="source\thread.cpp" />
-    <ClCompile Include="source\utf8.cpp" />
     <ClCompile Include="source\wsockstream.cpp" />
     <ClCompile Include="source\wtimer.cpp" />
   </ItemGroup>

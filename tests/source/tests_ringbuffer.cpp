@@ -416,7 +416,7 @@ SUITE (RingBuffer)
       //VERIFY: end - begin == 1 for different positions in buffer
       d = testbuf.end () - testbuf.begin ();
       CHECK_EQUAL (1, d);
-      testbuf.push_back (i+1);
+      testbuf.push_back ((int)i+1);
       testbuf.pop_front ();
     }
   }
@@ -521,7 +521,7 @@ SUITE (ringbuf_samples)
     std::vector<kvstruct> random_vector;
 
     t.Start ();
-    build_random_vector (random_vector, sz);
+    build_random_vector (random_vector, (unsigned int)sz);
     std::cout << "Random vector prepared in " << t.GetTimeInMs () << "ms\n";
 
     {

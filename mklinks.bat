@@ -6,9 +6,17 @@ rem
 rem  This script should be run as administrator
 rem
 
-pushd "%~dp0"
+if exist lib\nul goto LIBDONE
 mklink /d lib %DEV_ROOT%\lib
 
-cd include
+:LIBDONE
+pushd "%~dp0include"
+if exist utpp\nul goto UTPPDONE
 mklink /d utpp %DEV_ROOT%\utpp\include\utpp
+
+:UTPPDONE
+if exist utf8\nul goto UTF8DONE
+mklink /d utf8 %DEV_ROOT%\utf8\include\utf8
+
+:UTF8DONE
 popd

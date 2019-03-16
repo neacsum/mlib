@@ -29,7 +29,11 @@ SOFTWARE.
 
 ## Contents ##
  - mlib                      - Main Library
- - mlib_test
+ - mlib_test                 - Test Program
+
+## Building ##
+mlib requires the [UTF-8 Library](https://bitbucket.org/neacsum/utf8). The test
+program requires the [UTPP Library](https://bitbucket.org/neacsum/utpp).
 
 ## Installation ##
 All projects have been tested under Visual Studio 2017. The libraries can be 

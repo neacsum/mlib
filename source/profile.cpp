@@ -35,7 +35,7 @@
 #include <math.h>        // for atof
 #include <stdlib.h>      // for atoi
 #include <assert.h>
-#include <mlib/utf8.h>
+#include <utf8/utf8.h>
 #include <mlib/trace.h>
 
 #define INI_BUFFERSIZE  1024

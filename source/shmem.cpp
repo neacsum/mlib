@@ -11,7 +11,7 @@
 #include <mlib/shmem.h>
 #include <mlib/trace.h>
 #include <assert.h>
-#include <mlib/utf8.h>
+#include <utf8/utf8.h>
 
 #ifdef MLIBSPACE
 namespace MLIBSPACE {

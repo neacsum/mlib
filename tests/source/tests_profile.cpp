@@ -1,6 +1,6 @@
 #include <mlib/defs.h>
 #include <mlib/profile.h>
-#include <mlib/utf8.h>
+#include <utf8/utf8.h>
 #include <utpp/utpp.h>
 
 #ifdef MLIBSPACE
@@ -63,7 +63,7 @@ TEST (PutReplaceGet)
   Profile test ("test.ini");
   CHECK(test.PutString ("key0", "value00", "section0"));
   CHECK(test.PutString ("key0", "newval", "section0"));
-  int sz = test.GetString (val, sizeof(val), "key0", "section0");
+  size_t sz = test.GetString (val, sizeof(val), "key0", "section0");
   CHECK_EQUAL ("newval", val);
   CHECK_EQUAL (strlen("newval"), sz);
   _unlink ("test.ini");
