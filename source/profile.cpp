@@ -69,10 +69,9 @@ using namespace std;
   needed to manipulate INI (profile) files.
   \pre file != NULL
 */
-Profile::Profile (const char *file)
+Profile::Profile (const std::string& file)
 {
-  assert (file);
-  strcpy( filename, file );
+  strcpy( filename, file.c_str() );
   temp_file = false;
 }
 
@@ -109,16 +108,16 @@ Profile::~Profile()
   Change the file associated with this object. If previous one was a
   temporary file, it is deleted now (loosing all settings in the process).
   
-  If \p fname is NULL it creates a temporary file.
+  If \p fname is empty it creates a temporary file.
 */
-void Profile::File (const char *fname)
+void Profile::File (const std::string& fname)
 {
   if (temp_file)
     utf8::remove (filename);
 
-  if (fname)
+  if (!fname.empty())
   {
-    strcpy (filename, fname);
+    strcpy (filename, fname.c_str());
     temp_file = false;
   }
   else

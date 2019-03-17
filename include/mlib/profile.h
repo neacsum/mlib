@@ -19,7 +19,7 @@ class Profile
 {
 public:
   /// Constructor based on an existing or new INI file.
-  Profile (const char *name);
+  Profile (const std::string& name);
 
   /// Default constructor uses a temporary file.
   Profile ();
@@ -38,7 +38,7 @@ public:
     { return filename; };
 
   /// Set the file name associated with this object
-  void File (const char *filename);
+  void File (const std::string& filename);
   
   ///Get a string key
   size_t GetString (char *value, size_t len, const std::string& key, const std::string& section, const std::string& defval = std::string()) const;
