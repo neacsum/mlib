@@ -6,6 +6,12 @@ rem
 rem  This script should be run as administrator
 rem
 
+if defined DEV_ROOT goto MAKELINKS
+echo Environment variable DEV_ROOT is not set!
+echo Cannot create symlinks.
+goto :EOF
+
+:MAKELINKS
 if exist lib\nul goto LIBDONE
 mklink /d lib %DEV_ROOT%\lib
 
