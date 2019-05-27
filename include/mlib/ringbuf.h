@@ -1,7 +1,7 @@
 /*!
-  \file RINGBUF.H - Simple circular (ring) buffer class
-  (c) Mircea Neacsu 2018
+  \file RINGBUF.H Simple circular (ring) buffer class
 
+  (c) Mircea Neacsu 2018
 */
 #pragma once
 

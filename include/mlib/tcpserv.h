@@ -1,9 +1,9 @@
-#pragma once
 /*!
   \file TCPSERV.H Definition of tcpserv class
 
   (c) Mircea Neacsu 2003
 */
+#pragma once
 
 #include "wsockstream.h"
 #include "inaddr.h"

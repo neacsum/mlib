@@ -14,12 +14,12 @@
 
 // Useful constants
 #define D2R       0.01745329251994      ///< Degrees to radians conversion factor
-#define MPS2KNOT  1.94384449244         ///< Meters/sec to knots conversion factor
 #define A_WGS84   6378137.000           ///< Semimajor axis of WGS84 ellipsoid
 #define F_WGS84   0.003352810664747     ///< Flattening of WGS84 ellipsoid
 #define F1_WGS84  298.257223563         ///< Inverse of flattening for WGS84 ellipsoid
 #define NM2M      1852                  ///< Nautical mile to meters conversion factor
-#define USFOOT    0.3048006096          ///< US Survey foot to meters conversion factor
+#define MPS2KNOT  (3600/NM2M)           ///< Meters/sec to knots conversion factor
+#define USFOOT    (1200/3937)           ///< US Survey foot to meters conversion factor
 #define MAS       (M_PI/(180*3600000.)) ///< milli-arcsecond
 
 /// New syntax for degrees to radians conversion

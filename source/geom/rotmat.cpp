@@ -1,5 +1,14 @@
+/*!
+  \file rotmat.cpp Implementation of a rotation calculator class
+
+  (c) Mircea Neacsu 2017. All rights reserved.
+*/
 #include <mlib/rotmat.h>
 #include <math.h>
+
+#ifdef MLIBSPACE
+namespace MLIBSPACE {
+#endif
 
 RotMat::RotMat ()
 {
@@ -87,3 +96,6 @@ void RotMat::multiply (double m[3][3])
       r[i][j] = t[i][j];
 }
 
+#ifdef MLIBSPACE
+}
+#endif

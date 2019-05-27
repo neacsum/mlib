@@ -1,9 +1,10 @@
-#pragma once
 /*!
-  \file jbridge.h - Definition of JSONBridge class
+  \file jbridge.h Definition of JSONBridge class
   
   (c) Mircea Neacsu 2017. All rights reserved.
 */
+#pragma once
+
 #include "httpd.h"
 
 #ifdef MLIBSPACE
@@ -75,6 +76,7 @@ typedef struct jsonvar_t {
 ///Generate entry for POST function call
 #define JSDN_POSTFUNC(F, N) {N, F, JT_POSTFUN, 0, 1}
 
+/// JSON objects support
 class JSONBridge {
 public:
   JSONBridge (const char *path);

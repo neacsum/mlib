@@ -1,9 +1,9 @@
-#pragma once
 /*!
   \file wtimer.h definition of waitable timer class
 
   (c) Mircea Neacsu 1999
 */
+#pragma once
 
 #include "syncbase.h"
 

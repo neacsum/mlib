@@ -1,9 +1,9 @@
 #include <mlib/options.h>
 #include <ctype.h>
 /*!
-  \file OPTIONS.CPP - Implementation of command line parsing class.
+  \file OPTIONS.CPP Implementation of command line parsing class.
 
-  \class Options 
+  \class MLIBSPACE::Options 
   \brief Command Line Parsing class
 
   The parser matches approximately the POSIX specifications from:
@@ -11,6 +11,47 @@
   and GNU Standard for Command line Interface at
   http://www.gnu.org/prep/standards/html_node/Command_002dLine-Interfaces.html
 
+  ## Usage Instructions ##
+  1. Construct an options parsing object with it's list of valid options.
+  2. Call the Options::parse() function to process the command line arguments.
+  3. Call Options::getopt() function to retrieve the status of the varios options
+
+  ## Example ##
+  The following example shows the different formats available for options.
+````
+  const char *optlist[] {
+    "a? optional_arg",        // option -a can have an argument
+                              // example: -a 1 or -a xyz
+    "b: required_arg",        // option -b must be followed by an argument
+                              // example: -b mmm
+    "c+ one_or_more_args",    // option -c can be followed by one or more arguments
+                              // example: -c 12 ab cd.
+                              // The arguments finish at the next option
+    "d* 0_or_more_args",      // option -d can have zero or more arguments
+    "e|",                     // option -e doesn't have any arguments
+    "f?longorshort optional", // option -f can be also written as --longorshort
+                              // and can have an argument
+    ":longopt required",      // option --longopt must have an argument
+    0 };
+
+  Options optparser (optlist);
+
+  //sample command line
+  const char *samp_argv[]{ "program", "-a", "1", "-e", "--longopt", "par" };
+
+  optparser.parse (6, samp_argv);
+  string lo;
+  if (optparser.getopt ("longopt", lo))
+  {
+    // lo should be "par"
+  }
+
+  if (optparser.hasopt ('e'))
+  {
+    // option -e is present
+  }
+
+````
 */
 
 #ifdef MLIBSPACE
@@ -45,13 +86,13 @@ Options::Options (const char* const *list)
   description
 
   Example:
-  \code "l?list option_argument" \endcode
+  ` "l?list option_argument" `
 
   In this example the option syntax part is \c"l?list" and the argument description
   is \c"option_argument"
 
   The option syntax string has the following syntax:
-   [short_form][arg_char][long_form]
+  `[short_form][arg_char][long_form]`
 
   \e short_form is a letter giving the short form of the option ('l' in the example
   above).

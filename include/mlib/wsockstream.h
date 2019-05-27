@@ -1,10 +1,9 @@
-#pragma once
 /*! 
-	\file wsockstream.h sock and sockstream classes
+  \file wsockstream.h sock and sockstream classes
 
  Copyright (c) 2001 Mircea Neacsu, Coastal Oceanographics
-
 */
+#pragma once
 
 #if __has_include ("defs.h")
 #include "defs.h"

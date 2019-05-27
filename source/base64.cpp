@@ -1,3 +1,8 @@
+/*!
+  \file base64.cpp Implementation of Base64 encoding/decoding functions
+
+  (c) Mircea Neacsu 2017
+*/
 #include <mlib/base64.h>
 
 #ifdef MLIBSPACE
@@ -18,7 +23,7 @@ bool dectab_initialized = false;
 
 
 /*!
-  Decode a base-64 string
+  Decode a Base64 string
   \param in     input string
   \param out    output decoded bytes
   \return       size of decoded memory area
@@ -110,7 +115,7 @@ string base64dec (const string& in)
 }
 
 /*!
-  Encode input bytes to base 64 producing a null-terminated string
+  Encode input bytes to Base64 producing a null-terminated string
   \param in     input bytes
   \param out    output encoded string
   \param ilen   number of bytes to encode

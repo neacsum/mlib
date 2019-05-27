@@ -1,8 +1,15 @@
 #pragma once
-
 /*!
-  3D Rotation Calculator
+  \file rotmat.h Definition of a rotation calculator class
+
+  (c) Mircea Neacsu 2017. All rights reserved.
 */
+
+#ifdef MLIBSPACE
+namespace MLIBSPACE {
+#endif
+
+///  3D Rotation Calculator
 class RotMat
 {
 public:
@@ -31,3 +38,7 @@ private:
   double r[3][3];
   void multiply (double m[3][3]);
 };
+
+#ifdef MLIBSPACE
+}
+#endif

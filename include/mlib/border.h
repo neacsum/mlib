@@ -1,6 +1,8 @@
 #pragma once
 /*!
-  \file BORDER.H - Small class to represent simple non-intersecting polygons
+  \file BORDER.H Small class to represent simple non-intersecting polygons
+
+  (c) Mircea Neacsu 2017
 */
 #if __has_include ("defs.h")
 #include "defs.h"

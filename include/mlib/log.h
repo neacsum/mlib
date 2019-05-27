@@ -45,7 +45,7 @@
 
 \{
   \name Masks and Operations
-  The following definitions can be used for operations on priorites and
+  The following definitions can be used for operations on priorities and
   facilities. See syslog() and setlogmask() for examples.
 */
 #define  LOG_PRIMASK  0x7       ///< mask to extract priority part
@@ -58,7 +58,7 @@
 
 /*!
   \name Flags for openlog
-  The following flags can be specifed in the opt argument of openlog():
+  The following flags can be specified in the opt argument of openlog():
 \{
  */
 #define LOGOPT_PID        0x01    ///< log the process id with each message

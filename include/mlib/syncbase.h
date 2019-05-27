@@ -1,9 +1,9 @@
-#pragma once
 /*!
   \file SYNCBASE.H syncbase class definition.
 
   (c) Mircea Neacsu 1999
 */
+#pragma once
 
 #if __has_include ("defs.h")
 #include "defs.h"

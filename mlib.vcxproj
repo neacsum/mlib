@@ -166,6 +166,7 @@
     <ClInclude Include="include\mlib\jbridge.h" />
     <ClInclude Include="include\mlib\log.h" />
     <ClInclude Include="include\mlib\md5.h" />
+    <ClInclude Include="include\mlib\mlib.h" />
     <ClInclude Include="include\mlib\mutex.h" />
     <ClInclude Include="include\mlib\nmea.h" />
     <ClInclude Include="include\mlib\options.h" />
@@ -186,7 +187,6 @@
     <ClInclude Include="include\mlib\trace.h" />
     <ClInclude Include="include\mlib\wsockstream.h" />
     <ClInclude Include="include\mlib\wtimer.h" />
-    <ClInclude Include="include\nmeac.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\base64.cpp" />
@@ -207,31 +207,7 @@
     <ClCompile Include="source\log.cpp" />
     <ClCompile Include="source\md5.c" />
     <ClCompile Include="source\mutex.cpp" />
-    <ClCompile Include="source\nmea\checksum.cpp" />
-    <ClCompile Include="source\nmea\dbs.cpp" />
-    <ClCompile Include="source\nmea\dbt.cpp" />
-    <ClCompile Include="source\nmea\dpt.cpp" />
-    <ClCompile Include="source\nmea\gga.cpp" />
-    <ClCompile Include="source\nmea\ggk.cpp" />
-    <ClCompile Include="source\nmea\gll.cpp" />
-    <ClCompile Include="source\nmea\gns.cpp" />
-    <ClCompile Include="source\nmea\gsa.cpp" />
-    <ClCompile Include="source\nmea\gst.cpp" />
-    <ClCompile Include="source\nmea\gsv.cpp" />
-    <ClCompile Include="source\nmea\gxp.cpp" />
-    <ClCompile Include="source\nmea\hdg.cpp" />
-    <ClCompile Include="source\nmea\hdm.cpp" />
-    <ClCompile Include="source\nmea\hdt.cpp" />
-    <ClCompile Include="source\nmea\llq.cpp" />
-    <ClCompile Include="source\nmea\nmeac.cpp" />
-    <ClCompile Include="source\nmea\pashr.cpp" />
-    <ClCompile Include="source\nmea\psat-hpr.cpp" />
-    <ClCompile Include="source\nmea\ptnl-ggk.cpp" />
-    <ClCompile Include="source\nmea\ptnl-qa.cpp" />
-    <ClCompile Include="source\nmea\rmc.cpp" />
-    <ClCompile Include="source\nmea\ttm.cpp" />
-    <ClCompile Include="source\nmea\vtg.cpp" />
-    <ClCompile Include="source\nmea\zda.cpp" />
+    <ClCompile Include="source\nmea.cpp" />
     <ClCompile Include="source\options.cpp" />
     <ClCompile Include="source\profile.cpp" />
     <ClCompile Include="source\semaphore.cpp" />

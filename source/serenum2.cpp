@@ -1,9 +1,8 @@
 /*!
-  \file serenum2.cpp - Implementation of SerEnum_UsingSetupAPI() function.
+  \file serenum2.cpp Implementation of SerEnum_UsingSetupAPI() function.
+
   (c) Mircea Neacsu 2017. All rights reserved.
 
-  These functions are heavily inspired from [CEnumerateSerial] (http://www.naughter.com/enumser.html)
-  code.
 */
 #include <mlib/serenum.h>
 #include <Windows.h>
@@ -19,7 +18,7 @@ namespace MLIBSPACE {
 #endif
 
 /*!
-  \addtogroup serenum
+  \ingroup serenum
   Uses SetupDiEnumDeviceInfo function to retrieve available COM ports and their
   friendly name.
 */

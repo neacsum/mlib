@@ -1,5 +1,5 @@
 /*!
-  \file SQLITEPP.CPP - Implementation of Database and Query classes
+  \file SQLITEPP.CPP Implementation of Database and Query classes
 
   \defgroup sqlite SQLite Interface
   \brief Object-oriented wrappers for SQLITE3 functions.

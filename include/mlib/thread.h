@@ -1,9 +1,9 @@
-#pragma once
 /*!
   \file thread.h thread class definition.
 
   (c) Mircea Neacsu 1999-2017
 */
+#pragma once
 
 #include "event.h"
 #include <functional>

@@ -1,10 +1,19 @@
-#pragma once
-/**
-  NMEA-0183 parsing library
-  (c) Mircea Neacsu 2017
+/*!
+  \file NMEA.H Definition of NMEA-0183 parsing functions
 
+  (c) Mircea Neacsu 2017
 */
-bool checksum (const char *buf);
+#pragma once
+
+#if __has_include ("defs.h")
+#include "defs.h"
+#endif
+
+#ifdef MLIBSPACE
+namespace MLIBSPACE {
+#endif
+
+bool nmea_checksum (const char *buf);
 
 int dbs (const char *buf, double *depth);
 int dbt (const char *buf, double *depth);
@@ -40,4 +49,6 @@ int ttm (const char *buf, double *utc, int *num, char *name, double *dist, doubl
 int vtg (const char *buf, double *speed, double *head);
 int zda (const char *buf, double *time, unsigned short *day, unsigned short *month, unsigned short *year);
 
-#pragma comment (lib, "mlib.lib")
+#ifdef MLIBSPACE
+};
+#endif

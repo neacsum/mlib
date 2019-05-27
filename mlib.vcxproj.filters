@@ -13,9 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Source Files\nmea">
-      <UniqueIdentifier>{901ce238-0ede-4045-8925-f90dae8c7a01}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\geom">
       <UniqueIdentifier>{1fc6422d-5ea8-4d51-8ac1-1622df6d0d3f}</UniqueIdentifier>
     </Filter>
@@ -126,9 +123,6 @@
     <ClInclude Include="include\mlib\point.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\nmeac.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\mlib\nmea.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -136,6 +130,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\mlib\bitstream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\mlib\mlib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -227,81 +224,6 @@
     <ClCompile Include="source\wtimer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\nmea\checksum.cpp">
-      <Filter>Source Files\nmea</Filter>
-    </ClCompile>
-    <ClCompile Include="source\nmea\dbs.cpp">
-      <Filter>Source Files\nmea</Filter>
-    </ClCompile>
-    <ClCompile Include="source\nmea\dbt.cpp">
-      <Filter>Source Files\nmea</Filter>
-    </ClCompile>
-    <ClCompile Include="source\nmea\dpt.cpp">
-      <Filter>Source Files\nmea</Filter>
-    </ClCompile>
-    <ClCompile Include="source\nmea\gga.cpp">
-      <Filter>Source Files\nmea</Filter>
-    </ClCompile>
-    <ClCompile Include="source\nmea\ggk.cpp">
-      <Filter>Source Files\nmea</Filter>
-    </ClCompile>
-    <ClCompile Include="source\nmea\gll.cpp">
-      <Filter>Source Files\nmea</Filter>
-    </ClCompile>
-    <ClCompile Include="source\nmea\gns.cpp">
-      <Filter>Source Files\nmea</Filter>
-    </ClCompile>
-    <ClCompile Include="source\nmea\gsa.cpp">
-      <Filter>Source Files\nmea</Filter>
-    </ClCompile>
-    <ClCompile Include="source\nmea\gst.cpp">
-      <Filter>Source Files\nmea</Filter>
-    </ClCompile>
-    <ClCompile Include="source\nmea\gsv.cpp">
-      <Filter>Source Files\nmea</Filter>
-    </ClCompile>
-    <ClCompile Include="source\nmea\gxp.cpp">
-      <Filter>Source Files\nmea</Filter>
-    </ClCompile>
-    <ClCompile Include="source\nmea\hdg.cpp">
-      <Filter>Source Files\nmea</Filter>
-    </ClCompile>
-    <ClCompile Include="source\nmea\hdm.cpp">
-      <Filter>Source Files\nmea</Filter>
-    </ClCompile>
-    <ClCompile Include="source\nmea\hdt.cpp">
-      <Filter>Source Files\nmea</Filter>
-    </ClCompile>
-    <ClCompile Include="source\nmea\llq.cpp">
-      <Filter>Source Files\nmea</Filter>
-    </ClCompile>
-    <ClCompile Include="source\nmea\nmeac.cpp">
-      <Filter>Source Files\nmea</Filter>
-    </ClCompile>
-    <ClCompile Include="source\nmea\pashr.cpp">
-      <Filter>Source Files\nmea</Filter>
-    </ClCompile>
-    <ClCompile Include="source\nmea\psat-hpr.cpp">
-      <Filter>Source Files\nmea</Filter>
-    </ClCompile>
-    <ClCompile Include="source\nmea\ptnl-ggk.cpp">
-      <Filter>Source Files\nmea</Filter>
-    </ClCompile>
-    <ClCompile Include="source\nmea\ptnl-qa.cpp">
-      <Filter>Source Files\nmea</Filter>
-    </ClCompile>
-    <ClCompile Include="source\nmea\rmc.cpp">
-      <Filter>Source Files\nmea</Filter>
-    </ClCompile>
-    <ClCompile Include="source\nmea\ttm.cpp">
-      <Filter>Source Files\nmea</Filter>
-    </ClCompile>
-    <ClCompile Include="source\nmea\vtg.cpp">
-      <Filter>Source Files\nmea</Filter>
-    </ClCompile>
-    <ClCompile Include="source\nmea\zda.cpp">
-      <Filter>Source Files\nmea</Filter>
-    </ClCompile>
     <ClCompile Include="source\geom\border.cpp">
       <Filter>Source Files\geom</Filter>
     </ClCompile>
@@ -312,6 +234,9 @@
       <Filter>Source Files\geom</Filter>
     </ClCompile>
     <ClCompile Include="source\bitstream.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\nmea.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

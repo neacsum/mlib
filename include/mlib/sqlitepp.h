@@ -1,10 +1,16 @@
-#pragma once
 /*!
-  \file SQLITEPP.H - C++ wrapper for SQLITE3
+  \file SQLITEPP.H C++ wrapper for SQLITE3
+
+  (c) Mircea Neacsu 2017. All rights reserved.
 */
+#pragma once
 
 #include <string>
 #include <map>
+
+#if __has_include ("defs.h")
+#include "defs.h"
+#endif
 
 #include "sqlite3.h"
 #include "errorcode.h"

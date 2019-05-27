@@ -1,9 +1,10 @@
-#pragma once
 /*!
   \file STOPWATCH.H Definition of stopwatch class
 
   (c) Mircea Neacsu 2017
 */
+#pragma once
+
 #if __has_include ("defs.h")
 #include "defs.h"
 #endif
@@ -12,6 +13,7 @@
 namespace MLIBSPACE {
 #endif
 
+/// Simple stopwatch timer (yet another one!)
 class stopwatch
 {
 public:

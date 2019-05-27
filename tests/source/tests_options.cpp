@@ -333,6 +333,45 @@ TEST (NextAdvances)
   CHECK_EQUAL ("b", argopt);
   CHECK_EQUAL ("efgh", argval);
 }
+
+TEST (SampleOptionsCode)
+{
+  const char *optlist[] {
+    "a? optional_arg",        // option -a can have an argument
+                              // example: -a 1 or -a xyz
+    "b: required_arg",        // option -b must be followed by an argument
+                              // example: -b mmm
+    "c+ one_or_more_args",    // option -c can be followed by one or more arguments
+                              // example: -c 12 ab cd.
+                              // The arguments finish at the next option
+    "d* 0_or_more_args",      // option -d can have zero or more arguments
+    "e|",                     // option -e doesn't have any arguments
+    "f?longorshort optional", // option -f can be also written as --longorshort
+                              // and can have an argument
+    ":longopt required",      // option --longopt must have an argument
+    0 };
+
+  Options optparser (optlist);
+
+  //sample command line
+  const char *samp_argv[]{ "program", "-a", "1", "-e", "--longopt", "par" };
+
+  optparser.parse (6, samp_argv);
+  string lo;
+  if (optparser.getopt ("longopt", lo))
+  {
+    // lo should be "par"
+    CHECK_EQUAL ("par", lo);
+  }
+
+  if (optparser.hasopt ('e'))
+  {
+    // option -e is present
+  }
+  else
+    CHECK ("Missing option");
+
+}
 }
 
 

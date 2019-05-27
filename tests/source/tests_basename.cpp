@@ -1,6 +1,7 @@
 #include <mlib/basename.h>
 #include <utpp/utpp.h>
 
+using namespace mlib;
 
 TEST (dirname)
 {

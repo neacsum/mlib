@@ -1,5 +1,5 @@
 /*!
-  \file SHMEM.CPP - Implementation of shared memory areas with support for
+  \file SHMEM.CPP Implementation of shared memory areas with support for
   single-writer multiple-readers.
 
     (c) Mircea Neacsu. 2004-2017
@@ -77,10 +77,10 @@ shmem_base::~shmem_base()
   \param  nam   name of SMA
   \param  sz_   size of SMA (not including size of synchronization stuff)
 
-  The SMA is called '<nam>.MEM'. Additionally, the following objects are
+  The SMA is called `<nam>.MEM`. Additionally, the following objects are
   created:
-  - event flag '<nam>.EVT'
-  - Mutex '<nam>.MUT'
+  - event flag `<nam>.EVT`
+  - Mutex `<nam>.MUT`
 
 */
 bool shmem_base::open (const char * nam, size_t sz_)

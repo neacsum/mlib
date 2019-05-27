@@ -1,5 +1,7 @@
 /*!
-  \file BITSTREAM.CPP - Implementation of bitstream class
+  \file BITSTREAM.CPP Implementation of bitstream class
+
+  (c) Mircea Neacsu 2017
 */
 #include <mlib/bitstream.h>
 

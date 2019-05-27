@@ -1,7 +1,10 @@
+/*!
+  \file OPTIONS.H Command line parser class
+
+  (c) Mircea Neacsu 2017
+*/
 #pragma once
 
-/*  \file OPTIONS.H - Command line parser
-*/
 #include <string>
 #include <deque>
 
@@ -19,7 +22,7 @@ class Options
 {
 public:
   Options ();
-  Options (const char* const *list);
+  Options (const char* const* list);
   ~Options ();
 
   void set_optlist (const char* const *list);

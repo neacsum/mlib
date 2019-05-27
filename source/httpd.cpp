@@ -1,5 +1,6 @@
 /*!
-  \file HTTPD.CPP - Implementation of httpd and http_connection classes
+  \file HTTPD.CPP Implementation of httpd and http_connection classes
+
   (c) Mircea Neacsu 2007-2017. All rights reserved.
 
 */

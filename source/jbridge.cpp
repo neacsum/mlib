@@ -1,8 +1,7 @@
 /*!
-  \file   jbridge.cpp
-  (c) Mircea Neacsu 2017
+  \file   jbridge.cpp Implementation of JSONBridge class
 
-  Implementation of JSONBridge class
+  (c) Mircea Neacsu 2017
 */
 #include <memory.h>
 #include <string.h>
@@ -43,7 +42,6 @@ static int hexdigit (char *bin, char c);
 static int hexbyte (char *bin, const char *str);
 /*!
   \class JSONBridge
-  \brief JSON objects support
   \ingroup sockets
 
   JSONBridge class provides an easy access mechanism to program variables for

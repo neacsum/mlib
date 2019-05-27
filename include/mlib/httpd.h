@@ -1,6 +1,6 @@
 #pragma once
 /*!
-  \file HTTPD.H - Implementation of httpd and http_connection classes
+  \file HTTPD.H Implementation of httpd and http_connection classes
 
   (c) Mircea Neacsu 2007-2014. All rights reserved.
 */

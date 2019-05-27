@@ -1,3 +1,9 @@
+/*!
+  \file POINT.H Definition of Point template class
+
+  (c) Mircea Neacsu 2017
+
+*/
 #pragma once
 
 #if __has_include ("defs.h")

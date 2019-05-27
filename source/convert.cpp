@@ -1,6 +1,7 @@
 /*!
   \file CONVERT.CPP Conversion functions
 
+  (c) Mircea Neacsu 2017
 */
 
 double DMD2deg( double value )

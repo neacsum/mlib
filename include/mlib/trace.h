@@ -1,23 +1,21 @@
-#pragma once
-/*  TRACE.H
-    (c) Mircea Neacsu 1999-2002. All rights reserved.
+/*!
+  \file TRACE.H Definition of trace debugging macros.
 
-    Definition of trace debugging macros.
+  (c) Mircea Neacsu 1999-2002. All rights reserved.
 
-
-	  TRACE
-    Usage: TRACE(  fmt, arg1, arg2, .... );
-
-    If _TRACE symbol is defined the macro produces a
-    printf-like string to the debug output.
-    Otherwise TRACE has no effect.
-
-    There are also 9 additional macros TRACEx (where x is 1 to 9) that behave
-    like TRACE if _TRACE_LEVEL is greater than x. The intended usage is
-    to have very detailed trace information if _TRACE_LEVEL is high with
-    diminishing amounts of information as _TRACE_LEVEL is lowered.
+  TRACE
+  Usage: TRACE(  fmt, arg1, arg2, .... );
+  
+  If _TRACE symbol is defined the macro produces a
+  printf-like string to the debug output.
+  Otherwise TRACE has no effect.
+  
+  There are also 9 additional macros TRACEx (where x is 1 to 9) that behave
+  like TRACE if _TRACE_LEVEL is greater than x. The intended usage is
+  to have very detailed trace information if _TRACE_LEVEL is high with
+  diminishing amounts of information as _TRACE_LEVEL is lowered.
 */
-
+#pragma once
 
 #include "dprintf.h"
 

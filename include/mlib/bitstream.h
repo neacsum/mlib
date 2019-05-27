@@ -1,5 +1,7 @@
 /*!
-  \file BITSTREAM.H - Definition of bitstream class.
+  \file BITSTREAM.H Definition of bitstream class.
+
+  (c) Mircea Neacsu 2017
 */
 #pragma once
 #include <iostream>

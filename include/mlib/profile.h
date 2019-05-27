@@ -1,8 +1,9 @@
-#pragma once
 /*
   \file PROFILE.H Definition of Profile
 
+  (c) Mircea Neacsu 2017
 */
+#pragma once
 
 #if __has_include ("defs.h")
 #include "defs.h"

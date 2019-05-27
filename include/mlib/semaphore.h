@@ -1,7 +1,7 @@
 #pragma once
 
 /*!
-  \file semaphore.h semaphore class implementation
+  \file semaphore.h semaphore class definition
 
   (c) Mircea Neacsu 1999
 

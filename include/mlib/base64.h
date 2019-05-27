@@ -1,3 +1,8 @@
+/*!
+  \file   base64.h Definition of Base64 encoding/decoding functions
+
+  (c) Mircea Neacsu 2017
+*/
 #pragma once
 
 #if __has_include ("defs.h")
