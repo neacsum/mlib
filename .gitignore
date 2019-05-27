@@ -6,7 +6,6 @@
 *.obj
 *.bak
 *.user
-/docs
 /o
 *.ipch
 .vs/
