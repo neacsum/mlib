@@ -20,6 +20,7 @@
 #include "nmea.h"
 #include "options.h"
 #include "profile.h"
+#include "rdir.h"
 #include "ringbuf.h"
 #include "semaphore.h"
 #include "serenum.h"

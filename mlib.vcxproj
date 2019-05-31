@@ -172,6 +172,7 @@
     <ClInclude Include="include\mlib\options.h" />
     <ClInclude Include="include\mlib\point.h" />
     <ClInclude Include="include\mlib\profile.h" />
+    <ClInclude Include="include\mlib\rdir.h" />
     <ClInclude Include="include\mlib\ringbuf.h" />
     <ClInclude Include="include\mlib\rotmat.h" />
     <ClInclude Include="include\mlib\semaphore.h" />
@@ -194,6 +195,7 @@
     <ClCompile Include="source\bitstream.cpp" />
     <ClCompile Include="source\convert.cpp" />
     <ClCompile Include="source\crc32.c" />
+    <ClCompile Include="source\rdir.cpp" />
     <ClCompile Include="source\dprintf.c" />
     <ClCompile Include="source\errorcode.cpp" />
     <ClCompile Include="source\event.cpp" />
