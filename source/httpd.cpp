@@ -109,7 +109,6 @@ ws (socket),
 req_len (0),
 body (0),
 query (0),
-fragment (0),
 http_version (0),
 response_sent (false),
 content_len (-1)
@@ -721,11 +720,8 @@ bool http_connection::parse_url()
       *ptr++ = 0;
       query = ptr;
     }
-    else if (*ptr == '#' && !fragment)
-    {
-      *ptr++ = 0;
-      fragment = ptr;
-    }
+    else if (*ptr == '#')
+      *ptr = 0;
     else
       ptr++;
   }
