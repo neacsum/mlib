@@ -5,6 +5,10 @@
   (c) Mircea Neacsu 2017. All rights reserved.
 */
 
+#if __has_include ("defs.h")
+#include "defs.h"
+#endif
+
 #ifdef MLIBSPACE
 namespace MLIBSPACE {
 #endif
