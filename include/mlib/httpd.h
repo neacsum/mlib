@@ -59,6 +59,10 @@ public:
   const char* get_query ();
   const char* get_body ();
   int         get_content_length ();
+  const std::string& get_qparam (const char* key);
+  bool        has_qparam (const char* key);
+  const std::string& get_bparam (const char* key);
+  bool        has_bparam (const char* key);
 
   sockstream& out ();
   void        respond (unsigned int code, const char *reason=0);
@@ -67,7 +71,6 @@ public:
   int         serve_file (const std::string& full_path);
   int         serve_buffer (BYTE *full_path, size_t sz);
   int         serve_shtml (const std::string& full_path);
-  bool        parse_formbody (str_pairs& params);
 
   void        respond_part (const char *part_type, const char *bound);
   void        respond_next (bool last);
@@ -83,6 +86,8 @@ protected:
 private:
   bool        parse_url ();
   bool        parse_headers ();
+  bool        parse_body ();
+  void        parse_query ();
   void        process_valid_request ();
   void        process_ssi (const char *request);
   int         do_auth ();
@@ -100,6 +105,9 @@ private:
   size_t req_len;
   str_pairs oheaders;
   str_pairs iheaders;
+  str_pairs qparams;
+  str_pairs bparams;
+  bool query_parsed, body_parsed;
 
   struct user {
     std::string name;
@@ -118,7 +126,7 @@ public:
 
   void        add_ohdr (const char *field, const char *value);
   void        remove_ohdr (const char *field);
-  void        add_handler (const char *uri, uri_handler func, void *info);
+  void        add_handler (const char *uri, uri_handler func, void *info=0);
   void        add_alias (const char *uri, const char *path);
   bool        add_user (const char *realm, const char *username, const char *pwd);
   bool        remove_user(const char *realm, const char *username);
@@ -225,6 +233,7 @@ sockstream& http_connection::out () { return ws; };
 inline
 unsigned short httpd::port () { return port_num; }
 
+void parse_urlparams (const char* par_str, str_pairs& params);
 
 #ifdef MLIBSPACE
 }

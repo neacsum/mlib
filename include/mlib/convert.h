@@ -17,9 +17,9 @@
 #define A_WGS84   6378137.000           ///< Semimajor axis of WGS84 ellipsoid
 #define F_WGS84   0.003352810664747     ///< Flattening of WGS84 ellipsoid
 #define F1_WGS84  298.257223563         ///< Inverse of flattening for WGS84 ellipsoid
-#define NM2M      1852                  ///< Nautical mile to meters conversion factor
-#define MPS2KNOT  (3600/NM2M)           ///< Meters/sec to knots conversion factor
-#define USFOOT2M  (1200/3937)           ///< US Survey foot to meters conversion factor
+#define NM2M      1852.                 ///< Nautical mile to meters conversion factor
+#define MPS2KNOT  (3600./NM2M)          ///< Meters/sec to knots conversion factor
+#define USFOOT2M  (1200./3937.)         ///< US Survey foot to meters conversion factor
 #define MAS       (M_PI/(180*3600000.)) ///< milli-arcsecond
 
 /// Degrees literal operator converts a value to radians

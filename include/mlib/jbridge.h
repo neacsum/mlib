@@ -87,7 +87,8 @@ public:
   void unlock ();
   const char *path ();
   bool set_var (const char *name, void *addr, unsigned short count = 1, unsigned short sz = 0);
-  virtual void post_parse (http_connection& client);
+  virtual void post_parse ();
+  http_connection& client ();
 
 protected:
   bool jsonify (const JSONVAR*& entry);
@@ -95,14 +96,14 @@ protected:
   void not_found (const char *varname);
   bool strquote (const char *str);
   JSONVAR *find (const char *name, int *idx);
-  http_connection *client;
 
 private:
-  bool json_begin (http_connection& client);
-  void json_end (http_connection& client);
-  bool parse_urlencoded (http_connection& client);
+  bool json_begin ();
+  void json_end ();
+  bool parse_urlencoded ();
 
   const char *path_;
+  http_connection *client_;
   char *buffer;
   char *bufptr;
   criticalsection in_use;
@@ -123,6 +124,9 @@ void JSONBridge::unlock (){ in_use.leave (); }
 /// Return the context path 
 inline
 const char* JSONBridge::path () { return path_; }
+
+inline
+http_connection& JSONBridge::client () { return *client_; };
 
 #ifdef MLIBSPACE
 }

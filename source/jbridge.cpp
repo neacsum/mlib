@@ -68,8 +68,9 @@ static int hexbyte (char *bin, const char *str);
 */
 
 ///Creates a JSONBridge object for the given path
-JSONBridge::JSONBridge (const char *path) :
-path_ (path)
+JSONBridge::JSONBridge (const char *path)
+  : path_ (path)
+  , client_ (0)
 {
   buffer = new char[MAX_JSONRESPONSE];
 }
@@ -86,13 +87,12 @@ void JSONBridge::attach_to (httpd& server)
 }
 
 /// Initializes the response buffer 
-bool JSONBridge::json_begin (http_connection& cl)
+bool JSONBridge::json_begin ()
 {
   TRACE ("JSONBridge::json_begin");
   in_use.enter ();
-  client = &cl;
   int idx;
-  const JSONVAR *entry = find (cl.get_query (), &idx);
+  const JSONVAR *entry = find (client().get_query (), &idx);
   if (!entry)
     return false;
   bufptr = buffer;
@@ -105,19 +105,19 @@ bool JSONBridge::json_begin (http_connection& cl)
   }
   else if (!jsonify (entry))
     return false;
-  json_end (cl);
+  json_end ();
   return true;
 }
 
 /// Send out the JSON formatted buffer
-void JSONBridge::json_end (http_connection& client)
+void JSONBridge::json_end ()
 {
   if (',' == *(bufptr - 1))
     bufptr--; //kill the trailing comma 
 
   strcpy (bufptr, "}\r\n");
   bufptr += 3;
-  client.out ()
+  client().out ()
     << "HTTP/1.1 200 OK\r\n"
        "Cache-Control: no-cache, no-store\r\n"
        "Content-Type: text/plain\r\n"
@@ -225,7 +225,7 @@ void JSONBridge::not_found (const char *varname)
 {
   char tmp[1024];
   sprintf (tmp, "HTTP/1.1 415 Unknown variable %s\r\n", varname);
-  client->out() << "HTTP/1.1 415 Unknown variable " << varname << "\r\n"
+  client().out() << "HTTP/1.1 415 Unknown variable " << varname << "\r\n"
     << "Content-Type: text/plain\r\n"
     << "Content-Length: " << strlen (tmp) << "\r\n"
     << "\r\n"
@@ -321,16 +321,15 @@ bool JSONBridge::set_var (const char *name, void *addr, unsigned short count, un
   Parse the URL-encoded body of a POST request assigning new values to all
   variables.
 */
-bool JSONBridge::parse_urlencoded (http_connection& cl)
+bool JSONBridge::parse_urlencoded ()
 {
   char val[1024];
   int idx;
   void *pv;
 
   mlib::lock l (in_use);
-  client = &cl;
   str_pairs vars;
-  cl.parse_formbody (vars);
+  parse_urlparams (client().get_body (), vars);
   for (auto var = vars.begin (); var != vars.end (); var++)
   {
     if (!var->second.length ())
@@ -397,9 +396,9 @@ bool JSONBridge::parse_urlencoded (http_connection& cl)
 /*!
   Redirect client to root
 */
-void JSONBridge::post_parse (http_connection& client)
+void JSONBridge::post_parse ()
 {
-  client.redirect ("/");
+  client().redirect ("/");
 }
 
 int JSONBridge::callback (const char *uri, http_connection& client, JSONBridge *ctx)
@@ -407,18 +406,19 @@ int JSONBridge::callback (const char *uri, http_connection& client, JSONBridge *
   const char *req = client.get_method ();
   const char *query = client.get_query ();
   TRACE ("ui_callback req=%s query=%s", req, query);
+  ctx->client_ = &client;
   if (!_strcmpi (req, "GET"))
   {
     int ret;
-    if (200 == (ret = ctx->json_begin (client)))
-      ctx->json_end (client);
+    if (200 == (ret = ctx->json_begin ()))
+      ctx->json_end ();
     else if (ret == 404)
       client.respond (404);
   }
   else if (!_strcmpi (req, "POST"))
   {
     if (!_strcmpi (client.get_ihdr ("Content-Type"), "application/x-www-form-urlencoded"))
-      ctx->parse_urlencoded (client);
+      ctx->parse_urlencoded ();
     const JSONVAR* entry;
     int idx;
     if (strlen (client.get_query ()) 
@@ -427,7 +427,7 @@ int JSONBridge::callback (const char *uri, http_connection& client, JSONBridge *
     {
       uri_handler(entry->addr)(uri, client, 0);
     }
-    ctx->post_parse (client);
+    ctx->post_parse ();
 
   }
   return 1;

@@ -31,7 +31,7 @@ using namespace std;
 #define INADDR_ANY (unsigned int)0
 
 #ifdef MLIBSPACE
-using namespace MLIBSPACE;
+namespace MLIBSPACE {
 #endif
 
 ///Table of known mime types
@@ -102,28 +102,29 @@ static int hexdigit (char *bin, char c);
   class to directly create this object. Derived classes should maintain this
   convention.
 */
-http_connection::http_connection (sock& socket, httpd& server) :
-thread ("http_connection"),
-parent (server),
-ws (socket),
-req_len (0),
-body (0),
-query (0),
-http_version (0),
-response_sent (false),
-content_len (-1)
+http_connection::http_connection (sock& socket, httpd& server)
+  : thread ("http_connection")
+  , parent (server)
+  , ws (socket)
+  , req_len (0)
+  , body (0)
+  , query (0)
+  , http_version (0)
+  , response_sent (false)
+  , content_len (-1)
+  , query_parsed (false)
 {
 }
 
 /*!
   Thread run loop.
 
-  The loop collects the client request, parses, validates an processes it.
+  The loop collects the client request, parses, validates and processes it.
 */
 void http_connection::run ()
 {
   ws->recvtimeout (HTTPD_TIMEOUT);
-  TRACE ("Connection from %s\n", inaddr(ws->name()).hostname());
+  TRACE ("Connection from %s\n", inaddr (ws->name ()).hostname ());
   try {
     while (1)
     {
@@ -134,6 +135,9 @@ void http_connection::run ()
       bool eol_seen = false;
       iheaders.clear ();
       oheaders.clear ();
+      qparams.clear ();
+      bparams.clear ();
+      query_parsed = body_parsed = false;
       delete body;
       body = 0;
 
@@ -141,12 +145,12 @@ void http_connection::run ()
       while (req_len < HTTPD_MAX_HEADER)
       {
         //wait for chars.
-        *ptr = ws.get();
+        *ptr = ws.get ();
 
         if (ws.eof ())
           return;  //client closed 
 
-        if (!ws.good())
+        if (!ws.good ())
         {
           TRACE ("Timeout!\n");
           respond (408);
@@ -170,7 +174,7 @@ void http_connection::run ()
           eol_seen = false;
         ptr++;
       }
-        
+
       if (req_len == HTTPD_MAX_HEADER)
       {
         TRACE ("Request too long!\n");
@@ -179,14 +183,15 @@ void http_connection::run ()
       }
 
       *ptr = 0;   //NULL terminated
-    
+
       response_sent = false;
-      if (req_ok && parse_url() && parse_headers ())
+      if (req_ok && parse_url () && parse_headers ())
       {
         int auth_stat = do_auth ();
         if (auth_stat > 0)
         {
-          if (!strcmpi (get_method (), "POST"))
+          if (!strcmpi (get_method (), "POST")
+           || !strcmpi (get_method (), "PUT"))
           {
             //read request body
             const char *cl = get_ihdr ("Content-Length");
@@ -194,7 +199,7 @@ void http_connection::run ()
               content_len = atoi (cl);
             if (content_len > 0)
             {
-              body = new char[content_len+1];
+              body = new char[content_len + 1];
               ws.read (body, content_len);
               body[content_len] = 0;
             }
@@ -213,14 +218,15 @@ void http_connection::run ()
       //should close connection?
       const char *ph;
       if (!get_ohdr ("Content-Length")  //could not generate content length (shtml pages)
-       || ((ph = get_ihdr ("Connection")) && !strcmpi (ph, "Close"))  //client wants to close
-       || ((ph = get_ohdr ("Connection")) && !strcmpi (ph, "Close"))) //server wants to close
+        || ((ph = get_ihdr ("Connection")) && !strcmpi (ph, "Close"))  //client wants to close
+        || ((ph = get_ohdr ("Connection")) && !strcmpi (ph, "Close"))) //server wants to close
         return;
       ws.flush ();
     }
-  } catch (erc &err) {
+  }
+  catch (erc &err) {
     respond (500);
-    TRACE ("http_connection errcode=%d\n", err.code());
+    TRACE ("http_connection errcode=%d\n", err.code ());
   }
 
   //all cleanup is done by term function
@@ -399,38 +405,93 @@ bool http_connection::parse_headers ()
   return true;
 }
 
-bool http_connection::parse_formbody (str_pairs& params)
+bool http_connection::parse_body ()
 {
-  char *ptr = body;
-  char *val, *next;
-  char k[MAX_PAR], v[MAX_PAR];
-
-  //check if we have what to parse (both body and proper encoding)
-  if (!body || strcmpi (get_ihdr ("Content-Type"), "application/x-www-form-urlencoded"))
+  //check if we have what to parse
+  if (!body)
     return false;
 
-  while (ptr && *ptr)
+  if (!strcmpi (get_ihdr ("Content-Type"), "application/x-www-form-urlencoded"))
   {
-    if (next = strchr (ptr, '&'))
-      *next++ = 0;
-    else
-      next = ptr + strlen(ptr);
-
-    if (val = strchr (ptr, '='))
-    {
-      *val++ = 0;
-      strcpy (v, val);
-      url_decode (v);
-    }
-    else
-      *v = 0;
-    strcpy (k, ptr);
-    url_decode (k);
-    string key (k);
-    params[ptr] = string(v);
-    ptr = next;
+    if (body_parsed)
+      return true;
+    parse_urlparams (body, bparams);
+    body_parsed = true;
+    return true;
   }
-  return true;
+  //TODO - add parsing of other content types
+  return false;
+}
+
+/// Parse an URL encoded query
+void http_connection::parse_query ()
+{
+  if (query_parsed)
+    return; //don't repeat parsing
+  parse_urlparams (query, qparams);
+  query_parsed = true;
+}
+
+/*!
+  Return the value of a query parameter or the empty string if the query doesn't
+  have the parameter.
+
+  \param key query parameter to look for
+  \return parameter value or empty string if parameter is not found.
+
+  Even though query parameters and their values are URL encoded, the returned
+  value is decoded.
+
+  The function also returns an empty string if the parameter exists but it
+  doesn't have a value. For instance `get_qparam("mypar")` will return an empty
+  string for any of these queries: `http://example.com/page/` and
+  `http://examplre.com/page?mypar`. You can use the function
+  http_connection::has_qparam() to distinguish between the two cases.
+*/
+const std::string& http_connection::get_qparam (const char* key)
+{
+  static const std::string empty;
+  if (!query_parsed)
+    parse_query ();
+  auto p = qparams.find (key);
+  if (p != qparams.end ())
+    return p->second;
+
+  return empty;
+}
+
+/// Return true if the query contains the given parameter
+bool http_connection::has_qparam (const char* key)
+{
+  if (!query_parsed)
+    parse_query ();
+  auto p = qparams.find (key);
+  return p != qparams.end ();
+}
+
+/*!
+  Return the value of a form parameter or the empty string if the body doesn't
+  have the parameter.
+*/
+const std::string& http_connection::get_bparam (const char* key)
+{
+  static const std::string empty;
+  if (!body_parsed)
+    parse_body ();
+  auto p = bparams.find (key);
+  if (p != bparams.end ())
+    return p->second;
+
+  return empty;
+}
+
+/// Return true if the body contains the given parameter
+bool http_connection::has_bparam (const char* key)
+{
+  if (!body_parsed)
+    parse_body ();
+  auto p = bparams.find (key);
+  return p != bparams.end ();
 }
 
 /*!
@@ -447,11 +508,16 @@ bool http_connection::parse_formbody (str_pairs& params)
 */
 int http_connection::serve_shtml (const std::string& full_path)
 {
-  FILE *fn = _wfopen (utf8::widen(full_path).c_str(), L"r");
+  FILE *fn = utf8::fopen (full_path, "r");
   if (fn == NULL)
     return -2;
 
   respond (200);
+  if (!strcmpi (get_method (), "HEAD"))
+  {
+    fclose (fn);
+    return 0; //don't send body in response to a HEAD request
+  }
   int parser_state = 0;
   char ssi_buf[256];
   int ssi_len;
@@ -628,7 +694,7 @@ int http_connection::serve_buffer(BYTE *src_buff, size_t sz)
 int http_connection::serve_file (const std::string& full_path)
 {
   int ret = HTTPD_OK;
-  FILE *fin = _wfopen (utf8::widen(full_path).c_str(), L"rbS");
+  FILE *fin = utf8::fopen (full_path, "rbS");
   if (!fin)
   {
     TRACE ("File %s - open error", full_path.c_str());
@@ -644,25 +710,28 @@ int http_connection::serve_file (const std::string& full_path)
   sprintf (flen, "%d", len);
   add_ohdr ("Content-Length", flen);
   respond (200);
-  char buf[1024];
-  int cnt = 1;
-  DWORD start;
-  while (cnt)
+  if (strcmpi (get_method (), "HEAD"))
   {
-    start = GetTickCount();
-    cnt = (int)fread (buf, 1, sizeof(buf), fin);
-    start = GetTickCount();
-    if (!cnt && ferror (fin))
+    char buf[1024];
+    int cnt = 1;
+    DWORD start;
+    while (cnt)
     {
-      TRACE ("File %s - file read error %d", full_path.c_str (), ferror(fin));
-      ret = HTTPD_ERR_FREAD;
-    }
-    ws.write (buf, cnt);
-    if (!ws.good ())
-    {
-      TRACE ("File %s - socket write failure", full_path.c_str());
-      ret = HTTPD_ERR_WRITE;
-      break;
+      start = GetTickCount ();
+      cnt = (int)fread (buf, 1, sizeof (buf), fin);
+      start = GetTickCount ();
+      if (!cnt && ferror (fin))
+      {
+        TRACE ("File %s - file read error %d", full_path.c_str (), ferror (fin));
+        ret = HTTPD_ERR_FREAD;
+      }
+      ws.write (buf, cnt);
+      if (!ws.good ())
+      {
+        TRACE ("File %s - socket write failure", full_path.c_str ());
+        ret = HTTPD_ERR_WRITE;
+        break;
+      }
     }
   }
   fclose (fin);
@@ -1259,7 +1328,6 @@ void httpd::add_alias (const char *uri, const char *path)
   'c:\local folder\documentation\project1\filename.html'.
 
 */
-
 bool httpd::find_alias (const char *uri, char *path)
 {
   auto idx = aliases.begin();
@@ -1451,9 +1519,10 @@ int url_decode (char *buf)
   *out = 0;
   return 1;
 }
+
 /*!
-Return number of matching characters at beginning of str1 and str2.
-Comparison is case insensitive.
+  Return number of matching characters at beginning of str1 and str2.
+  Comparison is case insensitive.
 */
 int match (const char *str1, const char *str2)
 {
@@ -1463,4 +1532,35 @@ int match (const char *str1, const char *str2)
   return n;
 }
 
+/// Parse a URL encoded string of parameters
+void parse_urlparams (const char* par_str, str_pairs& params)
+{
+  char *ptr, *val, *next;
+  char k[MAX_PAR], v[MAX_PAR];
 
+
+  char *dup = strdup (par_str);
+  for (ptr = dup; ptr && *ptr; ptr = next)
+  {
+    next = strchr (ptr, '&');
+    if (next)
+      *next++ = 0;
+
+    if (val = strchr (ptr, '='))
+    {
+      *val++ = 0;
+      strcpy (v, val);
+      url_decode (v);
+    }
+    else
+      *v = 0;
+    strcpy (k, ptr);
+    url_decode (k);
+    params[k] = v;
+  }
+  free (dup);
+}
+
+#ifdef MLIBSPACE
+}
+#endif

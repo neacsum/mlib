@@ -8,6 +8,8 @@
 #define UNICODE
 #endif
 
+#define _TRACE_LEVEL 2
+
 #include <mlib/shmem.h>
 #include <mlib/trace.h>
 #include <assert.h>
