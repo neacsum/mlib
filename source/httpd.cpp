@@ -809,9 +809,7 @@ bool http_connection::parse_url()
 */
 void http_connection::add_ohdr (const char *hdr, const char *value)
 {
-  string key (hdr);
-  string val (value);
-  oheaders[key] = val;
+  oheaders[hdr] = value;
 }
 
 /*!
