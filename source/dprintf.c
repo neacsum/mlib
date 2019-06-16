@@ -16,17 +16,29 @@
 //*********************************************************
 void dprintf (const char *fmt, ...)
 {
-  static char buffer[1024];
-  static wchar_t out[1024];
+  char buffer[1024];
   size_t sz;
+#ifdef UNICODE
+  int nsz, wsz;
+  wchar_t *out;
+#endif
   va_list params;
   va_start (params, fmt);
   sprintf (buffer, "[%x] ", GetCurrentThreadId ());
   sz = sizeof (buffer) - strlen (buffer) - 3;
   vsnprintf (buffer + strlen (buffer), sz, fmt, params);
   strcat (buffer, "\n");
-
-  MultiByteToWideChar (CP_UTF8, 0, buffer, -1, out, _countof(out));
-  OutputDebugStringW (out);
+#ifndef UNICODE
+  OutputDebugString (buffer);
+#else
+  nsz = (int)strlen (buffer);
+  wsz = MultiByteToWideChar (CP_UTF8, 0, buffer, nsz, 0, 0);
+  out = (wchar_t*)calloc (wsz + 1, sizeof (wchar_t));
+  if (wsz)
+    MultiByteToWideChar (CP_UTF8, 0, buffer, nsz, &out[0], wsz);
+  out[wsz] = 0;
+  OutputDebugString (out);
+  free (out);
+#endif
 }
 
