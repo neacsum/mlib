@@ -195,8 +195,8 @@
     <ClCompile Include="source\bitstream.cpp" />
     <ClCompile Include="source\convert.cpp" />
     <ClCompile Include="source\crc32.c" />
+    <ClCompile Include="source\dprintf.cpp" />
     <ClCompile Include="source\rdir.cpp" />
-    <ClCompile Include="source\dprintf.c" />
     <ClCompile Include="source\errorcode.cpp" />
     <ClCompile Include="source\event.cpp" />
     <ClCompile Include="source\firewall.cpp" />

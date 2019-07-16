@@ -1,5 +1,6 @@
-#include <utpp/utpp.h>
+﻿#include <utpp/utpp.h>
 #include <fstream>
+#include <mlib/mlib.h>
 
 int main (int argc, char **argv)
 {
@@ -8,3 +9,26 @@ int main (int argc, char **argv)
   return UnitTest::RunAllTests (xml);
 }
 
+TEST (dprintf_ok)
+{
+  char *greek = u8"ελληνικό αλφάβητο";
+
+  CHECK (dprintf ("This is OK"));
+  CHECK (dprintf ("A Greek text sample: %s", greek));
+}
+
+TEST (dprintf_long)
+{
+  char superlong[MAX_DPRINTF_CHARS + 256];
+  memset (superlong, 0, sizeof (superlong));
+
+  for (int i = 0; i < MAX_DPRINTF_CHARS; i++)
+    superlong[i] = (i % 100 != 0) ? ' ' : i / 100 % 10 + '0';
+  CHECK (dprintf (superlong));
+  for (int i = 0; i < MAX_DPRINTF_CHARS; i++)
+    superlong[i] = (i % 10 != 0) ? ' ' : i / 10 % 10 + '0';
+  CHECK (dprintf (superlong));
+  for (int i = 0; i < MAX_DPRINTF_CHARS; i++)
+    superlong[i] = i % 10 + '0';
+  CHECK (dprintf (superlong));
+}

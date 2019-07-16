@@ -152,9 +152,6 @@
     <ClCompile Include="source\crc32.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\dprintf.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="source\errorcode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -243,6 +240,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\rdir.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\dprintf.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

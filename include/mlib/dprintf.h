@@ -1,19 +1,9 @@
 #pragma once
+/*!
+  \file dprintf.cpp Definition of dprintf() function
 
-// DPRINTF.H
-//	(c) Mircea Neacsu 1999-2000. All rights reserved.
-//
-// Definition of dprintf. This is a printf style function that will write messages
-//	using OutputDebugString.
-//
-//	Message length is limited to 512 characters.
-//
-#ifdef __cplusplus
-extern "C" {
-#endif
+  (c) Mircea Neacsu 1999-2000. All rights reserved.
+*/
 
-void dprintf (const char *fmt, ... );
-
-#ifdef __cplusplus
-};
-#endif
+#define MAX_DPRINTF_CHARS 1024  ///< maximum message size
+bool dprintf (const char *fmt, ... );
