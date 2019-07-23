@@ -181,6 +181,7 @@
     <ClInclude Include="include\mlib\sqlite3.h" />
     <ClInclude Include="include\mlib\sqlite3ext.h" />
     <ClInclude Include="include\mlib\sqlitepp.h" />
+    <ClInclude Include="include\mlib\statpars.h" />
     <ClInclude Include="include\mlib\stopwatch.h" />
     <ClInclude Include="include\mlib\syncbase.h" />
     <ClInclude Include="include\mlib\tcpserv.h" />
@@ -219,6 +220,7 @@
     <ClCompile Include="source\shmem.cpp" />
     <ClCompile Include="source\sqlite3.c" />
     <ClCompile Include="source\sqlitepp.cpp" />
+    <ClCompile Include="source\statpars.cpp" />
     <ClCompile Include="source\stopwatch.cpp" />
     <ClCompile Include="source\syncbase.cpp" />
     <ClCompile Include="source\tcpserv.cpp" />
