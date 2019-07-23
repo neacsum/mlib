@@ -38,7 +38,7 @@
 #   define TRACE dprintf
 # endif
 # if defined (_TRACE_LEVEL)
-#  define __TRL(A) (A >= _TRACE_LEVEL)? (void)0 : TRACE
+#  define __TRL(A) (A >= _TRACE_LEVEL)? 0 : TRACE
 #  define TRACE1 __TRL(1)
 #  define TRACE2 __TRL(2)
 #  define TRACE3 __TRL(3)
@@ -71,14 +71,14 @@
 # undef TRACE8
 # undef TRACE9
 
-# define TRACE 1? (void)0 : dprintf
-# define TRACE1 1? (void)0 : dprintf
-# define TRACE2 1? (void)0 : dprintf
-# define TRACE3 1? (void)0 : dprintf
-# define TRACE4 1? (void)0 : dprintf
-# define TRACE5 1? (void)0 : dprintf
-# define TRACE6 1? (void)0 : dprintf
-# define TRACE7 1? (void)0 : dprintf
-# define TRACE8 1? (void)0 : dprintf
-# define TRACE9 1? (void)0 : dprintf
+# define TRACE 1? 0 : dprintf
+# define TRACE1 1? 0 : dprintf
+# define TRACE2 1? 0 : dprintf
+# define TRACE3 1? 0 : dprintf
+# define TRACE4 1? 0 : dprintf
+# define TRACE5 1? 0 : dprintf
+# define TRACE6 1? 0 : dprintf
+# define TRACE7 1? 0 : dprintf
+# define TRACE8 1? 0 : dprintf
+# define TRACE9 1? 0 : dprintf
 #endif
