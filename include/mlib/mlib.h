@@ -26,6 +26,7 @@
 #include "serenum.h"
 #include "shmem.h"
 #include "sqlitepp.h"
+#include "statpars.h"
 #include "stopwatch.h"
 #include "trace.h"
 #include "wtimer.h"
