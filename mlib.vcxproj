@@ -163,6 +163,7 @@
     <ClInclude Include="include\mlib\firewall.h" />
     <ClInclude Include="include\mlib\httpd.h" />
     <ClInclude Include="include\mlib\inaddr.h" />
+    <ClInclude Include="include\mlib\ipow.h" />
     <ClInclude Include="include\mlib\jbridge.h" />
     <ClInclude Include="include\mlib\log.h" />
     <ClInclude Include="include\mlib\md5.h" />
