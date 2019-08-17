@@ -19,8 +19,11 @@ namespace MLIBSPACE {
 class statpars {
 public:
   statpars (int nmax = 0);
+  statpars (std::vector<double> vec);
+
   void add (double val);
   void add (double *vals, int count);
+  void add (std::vector<double> v);
   void clear ();
   int count ();
   double average ();
@@ -35,7 +38,7 @@ private:
   std::deque<double> values;
   int nmax;
   bool calc;
-  double ave, adev, var, sdev, skew, kurt;
+  double sum, adev, var, sdev, skew, kurt;
 };
 
 /// Add a value to the calculator
@@ -43,8 +46,12 @@ inline
 void statpars::add (double val)
 {
   if (nmax && values.size () == nmax)
+  {
+    sum -= values.front ();
     values.pop_front ();
+  }
   values.push_back (val);
+  sum += val;
   calc = false;
 }
 
@@ -53,21 +60,24 @@ inline
 void statpars::add (double *vals, int count)
 {
   for (int i = 0; i < count; i++)
-  {
-    if (nmax && values.size () == nmax)
-      values.pop_front ();
-    values.push_back (*vals++);
-  }
-  calc = false;
+    add (vals[i]);
+}
+
+inline
+void statpars::add (std::vector<double> vals)
+{
+  for (double v : vals)
+    add (v);
 }
 
 /// Return distribution's average (first order moment)
 inline 
 double statpars::average ()
 {
-  if (!calc)
-    calculate ();
-  return ave;
+  if (!values.empty ())
+    return sum / values.size ();
+  else
+    return 0.;
 }
 
 /// Return distribution's variance (2nd order moment)
@@ -128,6 +138,7 @@ void statpars::clear ()
 {
   values.clear ();
   calc = false;
+  sum = 0.;
 }
 
 #ifdef MLIBSPACE

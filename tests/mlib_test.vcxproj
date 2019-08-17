@@ -34,6 +34,7 @@
     <ClCompile Include="source\test_point.cpp" />
     <ClCompile Include="tests_ipow.cpp" />
     <ClCompile Include="tests_rdir.cpp" />
+    <ClCompile Include="tests_statpars.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{F32484D8-7598-4833-BE1A-27A35CF8E5DE}</ProjectGuid>
