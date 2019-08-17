@@ -144,12 +144,11 @@ int errfac::operator != (const errfac& other) const
   return !operator == (other);
 }
 
-/// The SUCCESS indicator
-#define ERR_SUCCESS (erc (0, ERROR_PRI_SUCCESS))
-
-
 #ifdef MLIBSPACE
 }
 #endif
+
+/// The SUCCESS indicator
+#define ERR_SUCCESS (MLIBSPACE::erc (0, ERROR_PRI_SUCCESS))
 
 
