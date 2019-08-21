@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <mlib/sqlitepp.h>
 #include <mlib/trace.h>
+#include <assert.h>
 
 using namespace std;
 
@@ -158,6 +159,12 @@ erc Database::make_query (Query &q, const std::string &sql)
   q.dbase = db;
   q.col_mapped = false;
   return ERR_SUCCESS;
+}
+
+int Database::extended_error ()
+{
+  assert (db);
+  return sqlite3_extended_errcode (db);
 }
 
 //-----------------------------------------------------------------------------

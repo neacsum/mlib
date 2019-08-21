@@ -74,6 +74,9 @@ public:
   ///Change or set the prepared statement of a Query object
   erc make_query (Query& q, const std::string& sql);
 
+  /// Return extended result code
+  int extended_error ();
+
 private:
   /// prohibit default function 
   Database (const Database& t);
