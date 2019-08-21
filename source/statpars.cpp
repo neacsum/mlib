@@ -40,7 +40,7 @@ values (n), sum (0), adev (0), sdev (0), var (0), skew (0), kurt (0), calc (fals
   \param nvec vector of samples.
 */
 statpars::statpars (std::vector<double> vec) :
-  values (vec.size()), nmax (vec.size()), sum (0), adev (0), sdev (0), var (0), skew (0), kurt (0), calc (false)
+  values (vec.size()), nmax ((int)vec.size()), sum (0), adev (0), sdev (0), var (0), skew (0), kurt (0), calc (false)
 {
   add (vec);
 }
