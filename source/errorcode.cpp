@@ -5,7 +5,7 @@
     Based on an idea from Marc Guillermont (CUJ 05/2000)
 */
 #include <mlib/errorcode.h>
-#include <string.h>
+#include <string>
 #include <stdio.h>
 #include <assert.h>
 #include <stdlib.h>
@@ -158,15 +158,23 @@ void errfac::raise (const erc& e)
 
 void errfac::message(const erc& e, char *msg, size_t sz) const
 {
-  _snprintf (msg, sz, "Log -- %s %d\n", name_, e.value);
+  _snprintf (msg, sz, "%s %d", name_, e.value);
 }
+
+std::string errfac::message (const erc& e) const
+{
+  int sz = _snprintf (0, 0, "%s %d", name_, e.value);
+  std::string s (sz, '\0');
+  _snprintf ((char*)s.data(), sz, "%s %d", name_, e.value);
+  return s;
+}
+
 
 /// Logging action. Default is to use dprintf
 void errfac::log( const erc& e )
 {
-  char msg[1024];
-  message (e, msg, sizeof(msg));
-  dprintf (msg);
+  std::string msg{ "Log -- " + message (e) + "\n" };
+  dprintf (msg.c_str());
 }
 
 /*!

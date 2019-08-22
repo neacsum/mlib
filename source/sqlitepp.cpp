@@ -29,6 +29,7 @@ public:
   sqlite3* db;                              ///<handle of db that generated last error
 protected:
   void message (const erc& e, char *msg, size_t sz) const;
+  std::string message (const erc& e) const;
 };
 
 /*!
@@ -260,7 +261,7 @@ std::string Query::sql () const
 
 /*!
   When a new row of results is available the function returns SQLITE_ROW. When
-  there are no more reults the function returns SQLITE_DONE. Both codes are 
+  there are no more result the function returns SQLITE_DONE. Both codes are 
   wrapped in ercs with priority level ERROR_PRI_INFO that normally doesn't throw
   an exception. Any other error is return at the normal priority level ERROR_PRI_ERROR.
  */ 
@@ -282,16 +283,13 @@ Query& Query::reset()
 
 /*!
   Statements are automatically finalized when Query objects are destructed or
-  assigned a new SQL text. Ocacasionally user might need to manually finalize a
+  assigned a new SQL text. Occasionally user might need to manually finalize a
   query (for instance if he needs to close a database connection).
 */
-erc Query::finalize ()
+void Query::finalize ()
 {
-  int rc = sqlite3_finalize (stmt);
-  if (rc != SQLITE_OK)
-    return sqerc (rc, dbase);
+  sqlite3_finalize (stmt);
   stmt = 0;
-  return ERR_SUCCESS;
 }
 
 //  ---------------------------------------------------------------------------
@@ -642,6 +640,29 @@ void sqlitefac::message(const erc &e, char *msg, size_t sz) const
   else
     _snprintf (msg, sz, "%s %d (cannot find message)", name(), e.code());
 }
+
+/*!
+  If there is a handle to the database that produced the error, calls
+  <a href="http://sqlite.org/c3ref/errcode.html">sqlite3_errmsg</a>
+  to obtain the error message. Otherwise generates a bland message with the error
+  code numerical value.
+
+  \param  e       error code
+*/
+std::string sqlitefac::message (const erc &e) const
+{
+  int sz = db?
+    _snprintf (0, 0, "%s %d (%s)", name (), e.code (), sqlite3_errmsg (db)) :
+    _snprintf (0, 0, "%s %d (cannot find message)", name (), e.code ());
+
+  string s (sz, '\0');
+  if (db)
+    _snprintf ((char*)s.data (), sz, "%s %d (%s)", name (), e.code (), sqlite3_errmsg (db));
+  else
+    _snprintf ((char*)s.data(), sz, "%s %d (cannot find message)", name (), e.code ());
+  return s;
+}
+
 
 //-----------------------------------------------------------------------------
 /*!

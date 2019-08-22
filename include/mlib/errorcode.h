@@ -11,6 +11,8 @@
 #include "defs.h"
 #endif
 
+#include <string>
+
 #ifdef MLIBSPACE
 namespace MLIBSPACE {
 #endif
@@ -67,6 +69,7 @@ public:
 
   /// return message to be logged
   virtual void  message (const erc& e, char *msg, size_t sz) const;
+  virtual std::string message (const erc& e) const;
 
   /// get name
   const char*   name () const                  { return name_; };
@@ -114,7 +117,8 @@ public:
   int             code () const          { return value;};
 
   ///Get logging message
-  void            message (char *msg, size_t sz);
+  void            message (char *msg, size_t sz) const;
+  std::string     message () const;
 
 private:
   int             value;
@@ -127,9 +131,15 @@ friend class errfac;
 };
 
 inline
-void erc::message(char *msg, size_t sz)
+void erc::message (char *msg, size_t sz) const
 {
   facility_->message (*this, msg, sz);
+}
+
+inline
+std::string erc::message () const
+{
+  return facility_->message (*this);
 }
 
 inline

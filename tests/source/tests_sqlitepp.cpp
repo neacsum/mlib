@@ -32,7 +32,7 @@ TEST (DbExecStatements)
 
 struct TestDatabase {
   TestDatabase () : db(""), q(db) {
-    db.exec ("CREATE TABLE tab (col)");
+    db.exec ("CREATE TABLE tab (col);CREATE TABLE tab2 (a PRIMARY KEY, b UNIQUE);");
   };
   ~TestDatabase () {q.finalize (); db.close ();};
 
@@ -149,4 +149,14 @@ TEST_FIXTURE (TestDatabase, InsertBlob)
   memcpy (&out, q.column_blob (0), sz);
   CHECK_EQUAL (in.ix, out.ix);
   CHECK_EQUAL (in.str, out.str);
+}
+
+TEST_FIXTURE (TestDatabase, InsertDuplicate)
+{
+  q = "INSERT INTO tab2 values (1, 2);";
+  CHECK_EQUAL (SQLITE_DONE, q.step ());
+  q = "INSERT INTO tab2 values (2, 2);";
+  CHECK_EQUAL (SQLITE_CONSTRAINT, q.step ());
+  CHECK_EQUAL (SQLITE_CONSTRAINT_UNIQUE, db.extended_error ());
+
 }

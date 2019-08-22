@@ -159,7 +159,7 @@ public:
   ///Reset statement to initial state
   Query&        reset ();
 
-  erc           finalize ();
+  void          finalize ();
 
 private:
   /// prohibit default function 
