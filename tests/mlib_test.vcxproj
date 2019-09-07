@@ -24,18 +24,18 @@
     <ClCompile Include="source\tests_crc32.cpp" />
     <ClCompile Include="source\tests_errorcode.cpp" />
     <ClCompile Include="source\tests_httpd.cpp" />
+    <ClCompile Include="source\tests_ipow.cpp" />
     <ClCompile Include="source\tests_main.cpp" />
     <ClCompile Include="source\tests_options.cpp" />
     <ClCompile Include="source\tests_profile.cpp" />
+    <ClCompile Include="source\tests_rdir.cpp" />
     <ClCompile Include="source\tests_ringbuffer.cpp" />
     <ClCompile Include="source\tests_serenum.cpp" />
     <ClCompile Include="source\tests_shmem.cpp" />
     <ClCompile Include="source\tests_sock.cpp" />
     <ClCompile Include="source\tests_sqlitepp.cpp" />
+    <ClCompile Include="source\tests_statpars.cpp" />
     <ClCompile Include="source\test_point.cpp" />
-    <ClCompile Include="tests_ipow.cpp" />
-    <ClCompile Include="tests_rdir.cpp" />
-    <ClCompile Include="tests_statpars.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{F32484D8-7598-4833-BE1A-27A35CF8E5DE}</ProjectGuid>
