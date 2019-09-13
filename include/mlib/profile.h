@@ -10,6 +10,7 @@
 #endif
 
 #include <string>
+#include <deque>
 
 #ifdef MLIBSPACE
 namespace MLIBSPACE {
@@ -97,6 +98,9 @@ public:
 
   /// Retrieve names of all keys in a section.
   int GetKeys (char *buffer, size_t sz, const std::string& section);
+
+  /// Retrieve names of all keys in a section.
+  int GetKeys (std::deque<std::string>& keys, const std::string& section);
 
   /// Return the names of all sections in the INI file.
   int GetSections (char *sects, int sz);

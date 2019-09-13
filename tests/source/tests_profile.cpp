@@ -7,6 +7,8 @@
 using namespace MLIBSPACE;
 #endif
 
+using namespace std;
+
 /* 
   Write some keys and verify their retrieval.
 */
@@ -146,6 +148,24 @@ TEST (GetKeys)
   CHECK_EQUAL ("key2", p);
   p += strlen(p)+1;
   CHECK_EQUAL ("", p);
+  _unlink ("test.ini");
+}
+
+TEST (GetKeys_deque)
+{
+  _unlink ("test.ini");
+  Sleep (200);
+  Profile test ("test.ini");
+  test.PutString ("key0", "value00", "section0");
+  test.PutString ("key1", "value01", "section0");
+  test.PutString ("key2", "value02", "section0");
+  deque<string> keys;
+  int i = test.GetKeys (keys, "section0");
+  CHECK_EQUAL (3, i);
+  CHECK_EQUAL (3, keys.size ());
+  CHECK_EQUAL ("key0", keys[0]);
+  CHECK_EQUAL ("key1", keys[1]);
+  CHECK_EQUAL ("key2", keys[2]);
   _unlink ("test.ini");
 }
 

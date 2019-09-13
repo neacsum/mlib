@@ -570,7 +570,7 @@ int Profile::GetKeys( char *keys, size_t sz, const std::string& section )
   char buffer[INI_BUFFERSIZE];
   FILE* fp;
 
-  if (buffer == NULL ||sz == 0)
+  if (keys == 0 || sz == 0)
     return 0;
 
   if (!(fp = ini_openread(filename)))
@@ -619,6 +619,57 @@ int Profile::GetKeys( char *keys, size_t sz, const std::string& section )
     idx++;
   }
   *p = 0;
+  fclose (fp);
+  return cnt;
+}
+
+/*!
+  Key names are returned as null-terminated strings followed by one final null.
+
+  \param keys     container for returned keys
+  \param section  section name
+  \return number of keys in section
+*/
+int Profile::GetKeys (deque<string>& keys, const std::string& section)
+{
+  char buffer[INI_BUFFERSIZE];
+  FILE* fp;
+
+  if (!(fp = ini_openread (filename)))
+    return 0;
+
+  keys.clear ();
+
+  /* Move through file 1 line at a time until the section is matched or EOF.
+   */
+  int slen = (int)strlen (section.c_str ());
+  char *sp, *ep;
+  do
+  {
+    if (!fgets (buffer, INI_BUFFERSIZE, fp))
+    {
+      fclose (fp);
+      return 0;
+    }
+    sp = skipleading (buffer);
+    ep = strchr (sp, ']');
+  } while (*sp != '[' || ep == NULL || (((int)(ep - sp - 1) != slen || strnicmp (sp + 1, section.c_str (), slen) != 0)));
+
+  /* Now that the section has been found start enumerating entries.
+   * Stop when reaching section end.
+   */
+  int cnt = 0;
+  while (fgets (buffer, INI_BUFFERSIZE, fp) && *(sp = skipleading (buffer)) != '[')
+  {
+    if (*sp == ';' || *sp == '#') //ignore comment lines
+      continue;
+    ep = strchr (sp, '=');         //Parse out the equal sign
+    if (!ep)
+      continue;                     //ignore malformed or blank lines
+    cnt++;
+    *ep = 0;
+    keys.push_back (sp);
+  }
   fclose (fp);
   return cnt;
 }
