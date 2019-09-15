@@ -22,6 +22,18 @@ TEST (ConnectedDbObject)
   CHECK (hdb != 0);
 }
 
+TEST (DbReadonly)
+{
+  Database db;
+  CHECK_EX (db.is_readonly (), "Not connected database should be read-only");
+  db.open ("", Database::readonly);
+  CHECK ((sqlite3*)db != 0);
+  CHECK_EX (db.is_readonly (), "Read-only database should be read-only");
+  db.close ();
+  db.open ("");
+  CHECK_EX (!db.is_readonly (), "Read-write database shouls not be read-only");
+}
+
 TEST (DbExecStatements)
 {
   Database db("");

@@ -105,6 +105,20 @@ const char *Database::filename ()
 }
 
 /*!
+  Returns FALSE only for connected read-write databases.
+  If database is not connected or it is read-only, returns TRUE.
+*/
+bool
+Database::is_readonly ()
+{
+  if (db)
+    return (sqlite3_db_readonly (db, "main") == 1);
+  else
+    return true;
+}
+
+
+/*!
   If the object is associated with another connection, the previous connection
   is closed and a new one is opened.
   \param name     Database name

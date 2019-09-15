@@ -50,6 +50,9 @@ public:
   ///Check if database is opened or not
   bool connected () {return (db != 0);};
 
+  /// Return true if database connection is read-only
+  bool is_readonly ();
+
   ///Return handle of database connection
   operator sqlite3* () {return db;};
 
@@ -79,9 +82,9 @@ public:
 
 private:
   /// prohibit default function 
-  Database (const Database& t);
+  Database (const Database& t) = delete;
   /// prohibit default function 
-  Database& operator =(const Database& rhs);
+  Database& operator =(const Database& rhs) = delete;
 
   sqlite3 *db;
   bool handle_owned;
