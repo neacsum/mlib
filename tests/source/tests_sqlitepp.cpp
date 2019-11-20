@@ -1,5 +1,6 @@
 #include <mlib/sqlitepp.h>
 #include <utpp/utpp.h>
+#include <iostream>
 
 #ifdef MLIBSPACE
 using namespace MLIBSPACE;
@@ -60,9 +61,8 @@ TEST_FIXTURE (TestDatabase, SqlSyntaxError)
   }
   catch (erc & x)
   {
-    char msg[256];
-    x.message (msg, sizeof(msg));
-    printf ("Message %s\n", msg);
+    std::string s ("Message " + x.message ());
+    std::cout << s << std::endl;
     caught = true;
   }
   CHECK (caught);

@@ -8,8 +8,14 @@ using namespace std;
 
 SUITE (errorcode)
 {
-  erc f (int i) {return erc (i);}
+  erc f (int i) {return i;}
   erc g (int i) {return erc (i, ERROR_PRI_WARNING);}
+  erc ff () 
+  {
+    erc fret;
+    fret = f (2);
+    return fret;
+  }
 
   // Default erc objects are thrown
   TEST (erc_trhow)
@@ -17,11 +23,54 @@ SUITE (errorcode)
     CHECK_THROW (erc, f (2));
   }
 
+  // Assigned erc object is thrown
+  TEST (erc_assign)
+  {
+    CHECK_THROW (erc, ff ());
+  }
+
   // Integer conversion operator deactivates the erc
   TEST (erc_to_int)
   {
     int i = f (2);
     CHECK_EQUAL (2, i);
+    cout << "Size of erc is " << sizeof (erc) << endl;
+  }
+
+  //Reactivated erc objects are thrown
+  TEST (erc_reactivate)
+  {
+    int caught = 0;
+    erc r;
+    try {
+      erc rr;
+      rr = ff ();
+      CHECK_EQUAL (2, rr);
+      rr.reactivate ();
+    }
+    catch (erc& x)
+    {
+      caught = 1;
+      r = x;
+    }
+    CHECK_EQUAL (1, caught);
+    CHECK_EQUAL (2, r);
+  }
+
+  //Assign to active erc throws
+  TEST (assign_to_active)
+  {
+    int caught = 0;
+    try {
+      erc r = ff (); //r is 2 now
+      r = f (3); //should throw a 2
+    }
+    catch (erc& x)
+    {
+      caught = 1;
+      CHECK_EQUAL (2, x);
+    }
+    CHECK_EQUAL (1, caught);
   }
 
   // Low priority erc objects are not thrown

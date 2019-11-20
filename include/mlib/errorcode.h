@@ -44,51 +44,41 @@ class errfac
 
 public:
   // constructors/destructor
-  errfac (const char *name=0);
-  errfac (const errfac& other);
-  virtual       ~errfac();
-
-  /// assignment operator
-  errfac&  operator = (const errfac& other);
+  errfac (const std::string& name = "Error");
   
-  /// comparison
-  virtual int operator == (const errfac& other) const;
-  virtual int operator != (const errfac& other) const;
-
   /// set throw priority
-  void          throw_priority (short int pri);
+  void throw_priority (unsigned int pri);
 
   /// get throw priority
-  short int     throw_priority () const        { return throw_level; };
+  unsigned int throw_priority () const;
 
   /// set log priority
-  void          log_priority (short int pri);
+  void log_priority (unsigned int pri);
 
   /// get log priority
-  short int     log_priority () const          { return log_level; };
+  unsigned int log_priority () const;
 
   /// return message to be logged
-  virtual void  message (const erc& e, char *msg, size_t sz) const;
   virtual std::string message (const erc& e) const;
 
   /// get name
-  const char*   name () const                  { return name_; };
+  const std::string& name () const;
 
   /// set default facility
   static void Default (errfac *f);
 
   /// get default facility
-  static errfac* Default () { return default_facility; };
+  static errfac* Default ();
 
 protected:
   virtual void raise (const erc& e);
   virtual void log (const erc& e);
 
 private:
-  short int  log_level;
-  short int  throw_level;
-  char*      name_;
-  static errfac* default_facility;
+  unsigned int    log_level;
+  unsigned int    throw_level;
+  std::string     name_;
+  static errfac*  default_facility;
 };
 
 class erc
@@ -96,44 +86,85 @@ class erc
 public:
   erc ();
   erc (int value , short int priority=ERROR_PRI_ERROR, errfac* f = 0);
-  erc (const erc& other);
+  erc (const erc& other) = default;
+  erc (erc&& other);
+
   ~erc () noexcept(false);
+  erc& operator= (const erc& rhs) = default;
+  erc& operator= (erc&& rhs);
+  operator int () const;
+  
+  ///Return priority value
+  unsigned int priority () const;
 
-  erc&           operator= (const erc& other);
+  ///Return reference to facility
+  errfac& facility () const;
 
-                 operator int () const;
-  ///return priority value
-  short int      priority () const      { return priority_; };
+  erc& reactivate ();
+  erc& deactivate ();
 
-  ///return pointer to facility
-  errfac&        facility () const      { return *facility_;};
-
-  erc&           reactivate ();
-  erc&           deactivate ();
-
-  /*! Return numerical value.
-  As opposed to the integer conversion operator this function doesn't
-  change the activity flag*/
-  int             code () const          { return value;};
+  int code () const;
 
   ///Get logging message
-  void            message (char *msg, size_t sz) const;
-  std::string     message () const;
+  std::string  message () const;
 
 private:
-  int             value;
-  short int       priority_;
-  mutable bool    thrown;
-  mutable bool    active;
+  //bit fields
+  int             value : 24;
+  unsigned int    priority_ : 4;
+  mutable unsigned int active : 1;
+
   errfac*         facility_;
 
 friend class errfac;
 };
 
 inline
-void erc::message (char *msg, size_t sz) const
+unsigned int  errfac::throw_priority () const 
 {
-  facility_->message (*this, msg, sz);
+  return throw_level;
+}
+
+inline
+unsigned int errfac::log_priority () const 
+{
+  return log_level;
+}
+
+inline
+const std::string& errfac::name () const
+{
+  return name_;
+}
+
+inline
+errfac* errfac::Default ()
+{
+  return default_facility;
+}
+
+inline
+unsigned int erc::priority () const
+{
+  return priority_;
+}
+
+inline
+errfac& erc::facility () const 
+{
+  return *facility_;
+}
+
+/*!
+  Return numerical value.
+
+  As opposed to the integer conversion operator, this function doesn't
+  change the activity flag.
+*/
+inline
+int erc::code () const
+{
+  return value;
 }
 
 inline
@@ -142,17 +173,6 @@ std::string erc::message () const
   return facility_->message (*this);
 }
 
-inline
-int errfac::operator == (const errfac& other) const
-{
-  return !strcmp (name_, other.name_);
-}
-
-inline
-int errfac::operator != (const errfac& other) const
-{
-  return !operator == (other);
-}
 
 #ifdef MLIBSPACE
 }

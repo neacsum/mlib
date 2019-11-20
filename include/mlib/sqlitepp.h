@@ -56,9 +56,6 @@ public:
   ///Return handle of database connection
   operator sqlite3* () {return db;};
 
-  ///Return filename
-  const char *filename ();
-
   ///Return rowid of last successful insert
   __int64 last_rowid ();
 
@@ -76,6 +73,9 @@ public:
 
   ///Change or set the prepared statement of a Query object
   erc make_query (Query& q, const std::string& sql);
+
+  ///Return filename of a database connection
+  std::string filename (const std::string& conn = "main");
 
   /// Return extended result code
   int extended_error ();

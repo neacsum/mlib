@@ -10,7 +10,7 @@
 #include <assert.h>
 #include <stdlib.h>
 
-#include <mlib/dprintf.h>
+#include <mlib/trace.h>
 
 #ifdef MLIBSPACE
 namespace MLIBSPACE {
@@ -84,45 +84,22 @@ errfac* errfac::default_facility = &deffac;
 /*!
   Set defaults for log and throw levels.
 */
-errfac::errfac (const char *nam) :
-throw_level (ERROR_PRI_ERROR),
-log_level (ERROR_PRI_WARNING)
-{
-  name_ = strdup (nam?nam:"Error");
-}
-
-/// Copy ctor
-errfac::errfac (const errfac& other) :
-throw_level (other.throw_level),
-log_level (other.log_level),
-name_ (strdup(other.name_))
+errfac::errfac (const std::string& name)
+  : throw_level (ERROR_PRI_ERROR)
+  , log_level (ERROR_PRI_WARNING)
+  , name_ (name)
 {
 }
 
-/// Release space allocated for name
-errfac::~errfac()
-{
-  free(name_);
-}
-
-/// Assignment operator
-errfac& errfac::operator= (const errfac& other)
-{
-  free(name_);
-  name_ = strdup(other.name_);
-  throw_level = other.throw_level;
-  log_level = other.log_level;
-  return *this;
-}
 
 /*!
   Throw priority must be between ERROR_PRI_SUCCESS and ERROR_PRI_EMERG
   \ref ERROR_PRI "see Error Priorities"
 */
-void errfac::throw_priority (short int level)
+void errfac::throw_priority (unsigned int level)
 {
-  throw_level = (level < ERROR_PRI_INFO)  ? (short)ERROR_PRI_INFO :
-                (level > ERROR_PRI_EMERG) ? (short)ERROR_PRI_EMERG :
+  throw_level = (level < ERROR_PRI_INFO)  ? ERROR_PRI_INFO :
+                (level > ERROR_PRI_EMERG) ? ERROR_PRI_EMERG :
                                             level;
 }
 
@@ -130,10 +107,10 @@ void errfac::throw_priority (short int level)
   Logging priority must be between ERROR_PRI_SUCCESS and ERROR_PRI_EMERG
   \ref ERROR_PRI "see Error Priorities"
 */
-void errfac::log_priority (short int level)
+void errfac::log_priority (unsigned int level)
 {
-  log_level = (level < ERROR_PRI_INFO)  ? (short)ERROR_PRI_INFO :
-              (level > ERROR_PRI_EMERG) ? (short)ERROR_PRI_EMERG :
+  log_level = (level < ERROR_PRI_INFO)  ? ERROR_PRI_INFO :
+              (level > ERROR_PRI_EMERG) ? ERROR_PRI_EMERG :
                                           level;
 }
 
@@ -151,22 +128,16 @@ void errfac::raise (const erc& e)
     log (e);
   if (e.priority_ >= throw_level)
   {
-    e.thrown = true;
+    // Make sure this erc is not thrown again
+    e.active = false;
     throw e;
   }
 }
 
-void errfac::message(const erc& e, char *msg, size_t sz) const
-{
-  _snprintf (msg, sz, "%s %d", name_, e.value);
-}
-
+/// Default message the facility name followed by the error code value
 std::string errfac::message (const erc& e) const
 {
-  int sz = _snprintf (0, 0, "%s %d", name_, e.value);
-  std::string s (sz, '\0');
-  _snprintf ((char*)s.data(), sz, "%s %d", name_, e.value);
-  return s;
+  return name_ + ' ' + std::to_string (e.value);
 }
 
 
@@ -204,7 +175,6 @@ erc::erc() :
   value (0),
   priority_ (ERROR_PRI_SUCCESS),
   active (false),
-  thrown (false),
   facility_ (errfac::Default ())
 {
 }
@@ -216,27 +186,19 @@ erc::erc (int v, short int l, errfac* f) :
   value (v),
   priority_ (l),
   facility_ (f? f : errfac::Default ()),
-  thrown (false),
   active (true)
 {
 }
 
-/*!
-  Copy ctor. The copy ctor is invoked in the catch part of a try/catch block
-  so if the other error was thrown we shouldn't get thrown again.
-*/
-erc::erc (const erc& other) :
+erc::erc (erc&& other) :
   value (other.value),
   priority_ (other.priority_),
   active (other.active),
   facility_ (other.facility_)
 {
+  TRACE ("erc move ctor");
   //we become the active error, the other is deactivated
   other.active = false;
-
-  //if the other was thrown make sure we don't get thrown again
-  if (other.thrown)
-    active = false;
 }
 
 /*! 
@@ -245,34 +207,35 @@ erc::erc (const erc& other) :
 */
 erc::~erc () noexcept(false)
 {
-  if (value && active && priority_ > ERROR_PRI_SUCCESS)
+  if (value && active && priority_)
     facility_->raise (*this);
 }
 
 /*!
-  Assignment operator.
+  Move assignment operator.
   
   If we were active before, call the facility to log or throw. 
   Anyhow copy new values from the assigned object and take away it's active
   flag.
 */
-erc& erc::operator= (const erc& other)
+erc& erc::operator= (erc&& rhs)
 {
-  if (active && priority_ > ERROR_PRI_SUCCESS)
+  TRACE ("erc move assignment");
+  bool rhs_active = rhs.active;
+  rhs.active = false; //prevent rhs from throwing if we throw
+  if (active && priority_)
     facility_->raise (*this);
-  value = other.value;
-  priority_ = other.priority_;
-  facility_ = other.facility_;
-  active = other.active;
-  thrown = false;
-  other.active = false;
+  value = rhs.value;
+  priority_ = rhs.priority_;
+  facility_ = rhs.facility_;
+  active = rhs_active;
   return *this;
 }
 
 /*!
   Integer conversion operator. 
   
-  Assume the error has been delt with and reset the active flag. 
+  Assume the error has been dealt with and reset the active flag. 
 */
 erc::operator int () const
 {

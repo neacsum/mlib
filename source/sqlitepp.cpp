@@ -28,7 +28,6 @@ public:
   sqlitefac () : errfac ("SQLite Error") {};
   sqlite3* db;                              ///<handle of db that generated last error
 protected:
-  void message (const erc& e, char *msg, size_t sz) const;
   std::string message (const erc& e) const;
 };
 
@@ -94,14 +93,16 @@ Database::~Database ()
 }
 
 /*!
-  Return NULL if database is not opened
+  Return an empty string if database is not opened or there is no database
+  connection with that name or if the database is a temporary or in-memory
+  database.
 */
-const char *Database::filename ()
+string Database::filename (const string& conn)
 {
+  const char *pfn = 0;
   if (db)
-    return sqlite3_db_filename (db, "main");
-  else
-    return 0;
+    pfn = sqlite3_db_filename (db, conn.c_str());
+  return pfn ? pfn : string ();
 }
 
 /*!
@@ -203,7 +204,7 @@ int Database::extended_error ()
 \endcode
 
   For data extraction, the class provides \c column_xxx functions that return the value
-  of a column specified either by name or by index (first colum index is 0).
+  of a column specified either by name or by index (first column index is 0).
 
   \ingroup sqlite
 */
@@ -450,8 +451,8 @@ Query& Query::clear_bindings()
 ///  \name Other column functions
 ///@{  
 /*!
-  Return data type for a column specifed by name or number.
-  \retval SQLITE_INTEGER  64-bit signed intger
+  Return data type for a column specified by name or number.
+  \retval SQLITE_INTEGER  64-bit signed integer
   \retval SQLITE_FLOAT    64-bit IEEE floating point
   \retval SQLITE_TEXT     string
   \retval SQLITE_BLOB     BLOB
@@ -469,7 +470,7 @@ int Query::column_type (const char *colname)
 }
 
 /*!
-  Return numebr of bytes in a column that contains a BLOB or a string. If
+  Return number of bytes in a column that contains a BLOB or a string. If
   the result is NULL the function returns 0. For a numerical column, the function
   returns the size of the string representation of the value.
 */
@@ -637,23 +638,6 @@ erc Query::check_errors(int rc)
 }
 
 //-----------------------------------------------------------------------------
-/*!
-  If there is a handle to the database that produced the error, calls 
-  <a href="http://sqlite.org/c3ref/errcode.html">sqlite3_errmsg</a>
-  to obtain the error message. Otherwise generates a bland message with the error
-  code numerical value.
-
-  \param  e       error code
-  \param  msg     error message buffer
-  \param  sz      size of message buffer
-*/
-void sqlitefac::message(const erc &e, char *msg, size_t sz) const
-{
-  if (db)
-    _snprintf (msg, sz, "%s %d (%s)", name(), e.code(), sqlite3_errmsg (db));
-  else
-    _snprintf (msg, sz, "%s %d (cannot find message)", name(), e.code());
-}
 
 /*!
   If there is a handle to the database that produced the error, calls
@@ -665,23 +649,23 @@ void sqlitefac::message(const erc &e, char *msg, size_t sz) const
 */
 std::string sqlitefac::message (const erc &e) const
 {
-  int sz = db?
-    _snprintf (0, 0, "%s %d (%s)", name (), e.code (), sqlite3_errmsg (db)) :
-    _snprintf (0, 0, "%s %d (cannot find message)", name (), e.code ());
-
-  string s (sz, '\0');
   if (db)
-    _snprintf ((char*)s.data (), sz, "%s %d (%s)", name (), e.code (), sqlite3_errmsg (db));
+  {
+    const char *file = sqlite3_db_filename (db, "main");
+    string s = name () + ' ' + to_string (e.code ()) + ' ' + sqlite3_errmsg (db);
+    if (file && strlen(file))
+      s += " Database: " + string(file);
+    return s;
+  }
   else
-    _snprintf ((char*)s.data(), sz, "%s %d (cannot find message)", name (), e.code ());
-  return s;
+    return name () + ' ' + to_string (e.code ()) + " (cannot find message)";
 }
 
 
 //-----------------------------------------------------------------------------
 /*!
   \param value    error code
-  \param db       handle to datbase connection that triggered the error. Can be NULL.
+  \param db       handle to database connection that triggered the error. Can be NULL.
   \param pri      error severity
 */
 sqerc::sqerc (int value, sqlite3* db, short int pri) : 
