@@ -39,7 +39,7 @@ hl (new handle_life),
 name_ (a_name?strcpy (new char[strlen(a_name)+1], a_name):NULL)
 {
   hl->handle_ = NULL;
-  hl->life = 1;
+  hl->lives = 1;
 }
 
 /// Copy constructor
@@ -47,14 +47,14 @@ syncbase::syncbase (const syncbase& other) :
 hl (other.hl),
 name_ (other.name_?strcpy (new char[strlen(other.name_)+1],other.name_):NULL)
 {
-  hl->life++;
+  hl->lives++;
 }
 
 
 /// Destructor
 syncbase::~syncbase ()
 {
-  if (hl && --hl->life == 0)
+  if (hl && --hl->lives == 0)
   {
     if (hl->handle_)
       CloseHandle (hl->handle_);
@@ -70,7 +70,7 @@ syncbase& syncbase::operator =(const syncbase& rhs)
   if (&rhs == this)
     return *this;       //trivial assignment
 
-  if (hl && --hl->life == 0)
+  if (hl && --hl->lives == 0)
   {
     if (hl->handle_)
       CloseHandle (hl->handle_);
@@ -79,7 +79,7 @@ syncbase& syncbase::operator =(const syncbase& rhs)
   delete name_;
   hl = rhs.hl;
   if (hl)
-    hl->life++;
+    hl->lives++;
   name_ = rhs.name_?strcpy (new char[strlen(rhs.name_)+1], rhs.name_):NULL;
   return *this;
 }
@@ -116,7 +116,7 @@ void syncbase::set_handle (HANDLE h)
   else
   {
     hl = new handle_life;
-    hl->life = 1;
+    hl->lives = 1;
   }
   hl->handle_ = h;
 }

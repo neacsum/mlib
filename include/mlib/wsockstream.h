@@ -1,7 +1,7 @@
 /*! 
   \file wsockstream.h sock and sockstream classes
 
- Copyright (c) 2001 Mircea Neacsu, Coastal Oceanographics
+ Copyright (c) 2001-2019 Mircea Neacsu
 */
 #pragma once
 
@@ -27,10 +27,10 @@ namespace MLIBSPACE {
 extern errfac *sockerrors;
 
 //sockbuf flags
-#define _S_ALLOCBUF		0x0002				///< locally allocated buffer
-#define _S_NO_READS		0x0004				///< write only flag
-#define _S_NO_WRITES  0x0008				///< read only flag
-#define _S_EOF_SEEN		0x0010				///< read eof condition
+#define _S_ALLOCBUF   0x0002    ///< locally allocated buffer
+#define _S_NO_READS   0x0004    ///< write only flag
+#define _S_NO_WRITES  0x0008    ///< read only flag
+#define _S_EOF_SEEN   0x0010    ///< read eof condition
 
 /// Encapsulation of a Windows socket
 class sock
@@ -43,7 +43,7 @@ public:
     shut_write=SD_SEND,     ///< blocked for writing
     shut_readwrite=SD_BOTH  ///< blocked for both
   };
-	
+
   sock (SOCKET soc = INVALID_SOCKET);
   sock (int type, int domain=AF_INET, int proto=0);
   sock (const sock&);
@@ -118,7 +118,7 @@ protected:
 private:
     struct sock_life {
     SOCKET  handle;
-	  int     life;
+    int     lives;
   } *sl;
 };
 

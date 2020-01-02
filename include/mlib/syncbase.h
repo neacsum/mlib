@@ -45,7 +45,7 @@ protected:
 private:
   struct handle_life {
     HANDLE handle_;
-    unsigned int life;
+    unsigned int lives;
   } *hl;
   char *name_;
 };

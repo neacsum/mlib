@@ -39,14 +39,14 @@ static sock_initializer init;
 /// Pointer to error handler
 errfac *sockerrors;
 
-
+/// Throws an error code with the value returned by WSAGetLastError
 #define WSALASTERROR (erc( WSAGetLastError(), ERROR_PRI_ERROR, sockerrors))
 
 /*!
   \class sock
   \ingroup sockets
 
-  We keep a life counter associated with each sock object because sockets
+  We keep a 'lives' counter associated with each sock object because sockets
   cannot be safely duplicated (it seems) and anyway would be more expensive 
   to call DuplicateHandle.
 */
@@ -57,7 +57,7 @@ errfac *sockerrors;
 sock::sock (SOCKET soc) :
   sl (new sock_life)
 {
-  sl->life = 1;
+  sl->lives = 1;
   sl->handle = soc;
   TRACE ("sock::sock (SOCKET %x)", sl->handle);
 }
@@ -74,7 +74,7 @@ sock::sock (SOCKET soc) :
 sock::sock (int type, int domain, int proto) : 
   sl (new sock_life)
 {
-  sl->life = 1;
+  sl->lives = 1;
   if ((sl->handle = ::socket (domain, type, proto)) == INVALID_SOCKET) 
   {
     delete sl;
@@ -86,14 +86,13 @@ sock::sock (int type, int domain, int proto) :
 /*!
   Copy constructor.
 
-  Increments the life counter associated with this socket
+  Increments the 'lives' counter associated with this socket
 */
 sock::sock (const sock& sb)
 {
   sl = sb.sl;
-  sl->life++;
-  TRACE ("sock::sock (sock %x) has %d lives", sl->handle,sl->life);
-
+  sl->lives++;
+  TRACE ("sock::sock (sock %x) has %d lives", sl->handle,sl->lives);
 }
 
 /*!
@@ -103,9 +102,10 @@ sock& sock::operator = (const sock& rhs)
 {
   if (this == &rhs)
     return *this;       //trivial assignment
-    
-  if (--sl->life == 0)
+  
+  if (--sl->lives == 0)
   {
+    //close our previous socket if we had one
     if (sl->handle != INVALID_SOCKET)
     {
       TRACE ("sock::operator= -- closesocket(%x)", sl->handle);
@@ -115,19 +115,19 @@ sock& sock::operator = (const sock& rhs)
     TRACE ("sock::operator= deleting old sl");
   }
   sl = rhs.sl;
-  sl->life++;
-  TRACE ("sock::operator= -- handle=%x has %d lives", sl->handle, sl->life);
+  sl->lives++;
+  TRACE ("sock::operator= -- handle=%x has %d lives", sl->handle, sl->lives);
   return *this;
 }
 
 /*!
   Destructor.
 
-  If the life counter is 0 calls closesocket to free the Winsock handle.
+  If the 'lives' counter is 0, calls closesocket to free the Winsock handle.
 */
 sock::~sock ()
 {
-  if (--sl->life == 0)
+  if (--sl->lives == 0)
   {
     if (sl->handle != INVALID_SOCKET)
     {
@@ -138,7 +138,7 @@ sock::~sock ()
     TRACE ("sock::~sock deleting sl");
   }
   else
-    TRACE ("sock::~sock -- handle=%x has %d lives)", sl->handle, sl->life);
+    TRACE ("sock::~sock -- handle=%x has %d lives)", sl->handle, sl->lives);
 }
 
 /*!
