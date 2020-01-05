@@ -14,8 +14,8 @@ namespace MLIBSPACE {
 /*!
   \class bitstream
   
-  This class allows reading/writing of bit fields from/to a byte stream.
-  It allows for different byte encodings using the protected enc/dec functions.
+  This class allows reading and writing of bit fields from or to a byte stream.
+  It allows for different byte encodings using the protected encode/decode functions.
   
   \remarks Maximum field width is limited to 32 bits.
 */
@@ -35,7 +35,7 @@ bitstream::bitstream (std::iostream& str, unsigned int pack)
 
 /*!
   Read a single bit from stream. If there are no more bits available in current
-  byte tries to get a new byte and decodes it using #dec function.
+  byte tries to get a new byte and decodes it using #decode function.
 
   \return Bit value
 
@@ -49,7 +49,7 @@ bool bitstream::read ()
     s >> next;
     if (s.eof () || s.bad ())
       return false;
-    dec (buffer, next);
+    decode (buffer, next);
     nbits = packing;
   }
   bool val = buffer & (1<<(packing-1));
@@ -59,7 +59,7 @@ bool bitstream::read ()
 }
 
 /*!
-  If it has accumulated enough bits calls #enc function to encode them and
+  If it has accumulated enough bits calls #encode function to encode them and
   writes a new byte to underlining stream.
   
   \param val    Bit value to write
@@ -70,7 +70,7 @@ void bitstream::write (int val)
   if (nbits == packing)
   {
     char next;
-    enc (buffer, next);
+    encode (buffer, next);
     s << next;
     buffer = 0;
     nbits = 0;
@@ -79,6 +79,23 @@ void bitstream::write (int val)
   if (val)
     buffer |= 1;
   nbits++;
+}
+
+/*!
+  If there are any leftover bits, encode them in one character and
+  write them out to stream.
+*/
+void bitstream::flush ()
+{
+  if (nbits)
+  {
+    char next;
+    encode (buffer, next);
+    s << next;
+    buffer = 0;
+    nbits = 0;
+  }
+  s.flush ();
 }
 
 /*!

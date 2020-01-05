@@ -4,9 +4,14 @@
 
 int main (int argc, char **argv)
 {
-  std::ofstream os ("mlib_tests.xml");
-  UnitTest::ReporterXml xml (os);
-  return UnitTest::RunAllTests (xml);
+  if (argc == 1)
+  {
+    std::ofstream os ("mlib_tests.xml");
+    UnitTest::ReporterXml xml (os);
+    return UnitTest::RunAllTests (xml);
+  }
+  else
+    return UnitTest::RunSuite (argv[1]);
 }
 
 TEST (dprintf_ok)

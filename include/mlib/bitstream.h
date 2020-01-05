@@ -22,6 +22,7 @@ public:
 
   bool read ();                     ///< Read the next bit
   void write (int val);             ///< Write a bit to stream
+  void flush ();
 
   ///Read a variable number of bits
   int mread (unsigned int sz, bool is_signed = false);
@@ -34,10 +35,10 @@ protected:
   std::iostream& s;
 
   ///Encode bit field in a byte
-  virtual void enc (unsigned char bits, char &chr);
+  virtual void encode (unsigned char bits, char &chr);
 
   ///Decode bit field from a byte
-  virtual void dec (unsigned char& bits, char chr);
+  virtual void decode (unsigned char& bits, char chr);
 
 private:
   unsigned char buffer;
@@ -50,7 +51,7 @@ private:
   \param chr      encoded byte
 */
 inline void
-bitstream::enc (unsigned char bits, char &chr)
+bitstream::encode (unsigned char bits, char &chr)
 {
   chr = (bits & (1 << packing) - 1);
 }
@@ -61,7 +62,7 @@ bitstream::enc (unsigned char bits, char &chr)
   \param chr      encoded byte
 */
 inline void
-bitstream::dec (unsigned char& bits, char chr)
+bitstream::decode (unsigned char& bits, char chr)
 {
   bits = (chr & (1 << packing) - 1);
 }

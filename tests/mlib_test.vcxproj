@@ -36,6 +36,7 @@
     <ClCompile Include="source\tests_sqlitepp.cpp" />
     <ClCompile Include="source\tests_statpars.cpp" />
     <ClCompile Include="source\test_point.cpp" />
+    <ClCompile Include="tests_bitstream.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{F32484D8-7598-4833-BE1A-27A35CF8E5DE}</ProjectGuid>
