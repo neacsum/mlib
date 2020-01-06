@@ -46,8 +46,7 @@ bool bitstream::read ()
   if (nbits == 0)
   {
     char next;
-    s >> next;
-    if (s.eof () || s.bad ())
+    if (!s.get (next))
       return false;
     decode (buffer, next);
     nbits = packing;
