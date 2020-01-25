@@ -27,9 +27,6 @@
     <ClInclude Include="include\mlib\log.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\mlib\profile.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\mlib\trace.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -186,9 +183,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\options.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="source\profile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\semaphore.cpp">

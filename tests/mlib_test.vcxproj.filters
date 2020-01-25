@@ -33,9 +33,6 @@
     <ClCompile Include="source\tests_options.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\tests_profile.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="source\tests_ringbuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

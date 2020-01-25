@@ -7,13 +7,11 @@
 #endif
 
 #include <mlib/defs.h>
-#include <windows.h>
 #include <mlib/log.h>
 #include <psapi.h>
 #include <mlib/trace.h>
 #include <stdio.h>
 #include <utf8/utf8.h>
-#include <mlib/profile.h>
 
 
 #ifdef _MSC_VER
@@ -152,58 +150,6 @@ static const char *processname (char *name)
   return pname;
 }
 
-
-/**
-  \ingroup syslog
-  \param inifile    name of INI file
-  \param section    section of the INI file
-
-  If set_log_ini_param is called before a call to openlog,  the default values
-  for server name, log options, and logmask are replaced with settings from the
-  INI file. The following entries in the INI file are used:
-\verbatim
-  LogServername=<host name or IP address[:<port number>]
-  LogFilename=<file name>
-  LogOptions=<value>
-  LogPriorityMask=<value>
-\endverbatim
-  The default values for these settings are:
-  - LogServerName=localhost:514
-  - LogFilename=program name.log
-  - LogOptions=0
-  - LogPriorityMask=0xff
-
-  If set_log_ini_param is called after openlog the new settings will not be
-  used until a call to closelog.
-
-  \note 
-  The options specified in openlog() are OR'ed with the options specified in
-  the INI file, hence you can turn on file logging or debug string messages
-  (OutputDebugString) just by changing the settings in the INI file.
-*/
-void set_log_ini_param (const char* inifile, const char *section)
-{
-  TRACE ("Setting syslog ini params from %s [%s]", inifile, section);
-  MLIBSPACE::Profile ini(inifile);
-  char tmp[256];
-  if (!ini.GetString (tmp, sizeof(tmp), SERVER_INI_KEY, section))
-    _snprintf (tmp, sizeof(tmp), "%s:%d", DEFAULT_SERVERNAME, LOG_PORT);
-  if (server_hostname)
-    free (server_hostname);
-  server_hostname = strdup (tmp);
-
-  if (!ini.GetString (tmp, sizeof(tmp), FILE_INI_KEY, section))
-    _snprintf (tmp, sizeof(tmp), "%s.log", processname(0));
-  if (logfname)
-    free (logfname);
-  logfname = strdup (tmp);
-
-  defopt = ini.GetInt (FLAGS_INI_KEY, section);
-
-  int itmp = ini.GetInt (PRI_INI_KEY, section);
-  if (itmp = atoi(tmp))
-    defmask = itmp;
-}
 
 
 /**  
