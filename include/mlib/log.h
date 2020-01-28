@@ -10,7 +10,7 @@
 */
 
 /*!
-  \name Priorites
+  \name Priorities
 
   priorities/facilities are encoded into a single 32-bit quantity, where the
   bottom 3 bits are the priority (0-7) and the top 28 bits are the facility
@@ -25,20 +25,6 @@
 #define  LOG_NOTICE   5   ///< normal but significant condition
 #define  LOG_INFO     6   ///< informational
 #define  LOG_DEBUG    7   ///< debug-level messages
-///\}
-
-/*!
-  \name Facility codes
-  Codes 0 through 32 are reserved by standard syslog implementations.
-  Some of them are reused here because they are applicable to HYPACK system.
-\{
-*/
-#define  LOG_USER       (1<<3)  ///< random user-level messages
-#define  LOG_SECURITY   (4<<3)  ///< security module messages
-#define  LOG_HYPACK    (32<<3)  ///< generic HYPACK message
-#define  LOG_SURVEY    (33<<3)  ///< survey module messages
-#define  LOG_HYSWEEP   (34<<3)  ///< HYSWEEP messages
-#define  LOG_SSS       (35<<3)  ///< side scan sonar messages
 ///\}
 
 /*!
@@ -91,8 +77,6 @@ void syslog (int facility_priority, char *fmt, ...);
 /// Generate a log message at debug level using FMT string and option arguments. 
 void syslog_debug (const char *fmt, ...);
 
-/// Load default parameters from an INI file
-void set_log_ini_param (const char* inifname, const char *section);
 #ifdef __cplusplus
 }
 #endif
