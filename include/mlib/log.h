@@ -9,6 +9,9 @@
 
 */
 
+// facility codes 0 to 24 are defined in syslog.h
+#define	LOG_USER	(1<<3)	///< facility for random user-level messages
+
 /*!
   \name Priorities
 
