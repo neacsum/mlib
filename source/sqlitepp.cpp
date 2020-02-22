@@ -326,9 +326,9 @@ Query& Query::bind (int par, const std::string& str)
 }
 
 /// Bind a parameter specified by name to a character string
-Query& Query::bind (const char *parname, const std::string& str)
+Query& Query::bind (const std::string& parname, const std::string& str)
 {
-  int idx = sqlite3_bind_parameter_index (stmt, parname);
+  int idx = sqlite3_bind_parameter_index (stmt, parname.c_str());
   return bind (idx, str);
 }
 
@@ -340,9 +340,9 @@ Query& Query::bind (int par, int val)
 }
 
 /// Bind a parameter specified by name to a floating point value
-Query& Query::bind (const char *parname, double val)
+Query& Query::bind (const std::string& parname, double val)
 {
-  int idx = sqlite3_bind_parameter_index (stmt, parname);
+  int idx = sqlite3_bind_parameter_index (stmt, parname.c_str());
   return bind (idx, val);
 }
 
@@ -354,9 +354,9 @@ Query& Query::bind (int par, double val)
 }
 
 /// Bind a parameter specified by name to a large integer
-Query& Query::bind (const char *parname, __int64 val)
+Query& Query::bind (const std::string& parname, __int64 val)
 {
-  int idx = sqlite3_bind_parameter_index (stmt, parname);
+  int idx = sqlite3_bind_parameter_index (stmt, parname.c_str());
   return bind (idx, val);
 }
 
@@ -368,9 +368,9 @@ Query& Query::bind (int par, __int64 val)
 }
 
 /// Bind a parameter specified by name to an integer value
-Query& Query::bind (const char *parname, int val)
+Query& Query::bind (const std::string& parname, int val)
 {
-  int idx = sqlite3_bind_parameter_index (stmt, parname);
+  int idx = sqlite3_bind_parameter_index (stmt, parname.c_str());
   return bind (idx, val);
 }
 
@@ -401,9 +401,9 @@ Query& Query::bind (int par, void *val, int len)
 
   The function makes a local copy of the value so user can free it immediately.
 */
-Query& Query::bind (const char *parname, void *val, int len)
+Query& Query::bind (const std::string& parname, void *val, int len)
 {
-  int idx = sqlite3_bind_parameter_index (stmt, parname);
+  int idx = sqlite3_bind_parameter_index (stmt, parname.c_str());
   return bind (idx, val, len);
 }
 
@@ -411,9 +411,9 @@ Query& Query::bind (const char *parname, void *val, int len)
   Bind a parameter specified by name to a SYSTEMTIME value.
   The value is written in a format compatible with SQLITE strftime function
 */
-Query& Query::bind (const char *parname, const SYSTEMTIME& val)
+Query& Query::bind (const std::string& parname, const SYSTEMTIME& val)
 {
-  int idx = sqlite3_bind_parameter_index (stmt, parname);
+  int idx = sqlite3_bind_parameter_index (stmt, parname.c_str());
   return bind (idx, val);
 }
 
@@ -464,9 +464,9 @@ int Query::column_type (int nc)
 }
 
 /// \copydoc Query::column_type(int)
-int Query::column_type (const char *colname)
+int Query::column_type (const std::string& colname)
 {
-  return column_type (find_col(colname));
+  return column_type (find_col (colname));
 }
 
 /*!
@@ -480,9 +480,9 @@ int Query::column_size (int nc)
 }
 
 /// \copydoc Query::column_size(int)
-int Query::column_size(const char *colname)
+int Query::column_size (const std::string& colname)
 {
-  return column_size (find_col(colname));
+  return column_size (find_col (colname));
 }
 
 ///@}
@@ -507,9 +507,9 @@ int Query::column_int (int nc)
   return sqlite3_column_int (stmt, nc);
 }
 
-int Query::column_int (const char *colname)
+int Query::column_int (const std::string& colname)
 {
-  return column_int (find_col(colname));
+  return column_int (find_col (colname));
 }
 
 string Query::column_str(int nc)
@@ -521,23 +521,23 @@ string Query::column_str(int nc)
     return string ();
 }
 
-string Query::column_str (const char *colname)
+string Query::column_str (const std::string& colname)
 {
-  return column_str (find_col(colname));
+  return column_str (find_col (colname));
 }
 
 /*!
   Return a pointer to a NULL-terminated text with the column content. 
   The memory for the string is freed automatically.
 */
-const char *Query::column_text(int nc)
+const char *Query::column_text (int nc)
 {
   return (const char*)sqlite3_column_text (stmt, nc);
 }
 
-const char *Query::column_text (const char *colname)
+const char *Query::column_text (const std::string& colname)
 {
-  return column_text (find_col(colname));
+  return column_text (find_col (colname));
 }
 
 double Query::column_double (int nc)
@@ -545,9 +545,9 @@ double Query::column_double (int nc)
   return sqlite3_column_double (stmt, nc);
 }
 
-double Query::column_double(const char *colname)
+double Query::column_double (const std::string& colname)
 {
-  return column_double (find_col(colname));
+  return column_double (find_col (colname));
 }
 
 __int64 Query::column_int64 (int nc)
@@ -555,9 +555,9 @@ __int64 Query::column_int64 (int nc)
   return sqlite3_column_int64 (stmt, nc);
 }
 
-__int64 Query::column_int64(const char *colname)
+__int64 Query::column_int64 (const std::string& colname)
 {
-  return column_int64 (find_col(colname));
+  return column_int64 (find_col (colname));
 }
 
 /*!
@@ -571,9 +571,9 @@ const void* Query::column_blob (int nc)
 }
 
 /// \copydoc Query::column_blob(int)
-const void* Query::column_blob(const char *colname)
+const void* Query::column_blob (const std::string& colname)
 {
-  return column_blob (find_col(colname));
+  return column_blob (find_col (colname));
 }
 ///@}
 
@@ -597,9 +597,9 @@ SYSTEMTIME Query::column_time (int nc)
 }
 
 /// \copydoc Query::column_time(int)
-SYSTEMTIME Query::column_time(const char *colname)
+SYSTEMTIME Query::column_time (const std::string& colname)
 {
-  return column_time (find_col(colname));
+  return column_time (find_col (colname));
 }
 ///@}
 
@@ -619,7 +619,7 @@ void Query::map_columns()
   col_mapped = true;
 }
 
-int Query::find_col(const char *colname)
+int Query::find_col (const std::string& colname)
 {
   if (!col_mapped)
     map_columns ();
@@ -630,7 +630,7 @@ int Query::find_col(const char *colname)
   return index[colname];
 }
 
-erc Query::check_errors(int rc)
+erc Query::check_errors (int rc)
 {
   if (rc != SQLITE_OK)
     return sqerc (rc, sqlite3_db_handle (stmt));

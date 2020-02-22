@@ -120,17 +120,17 @@ public:
   erc           step ();
 
   Query&        bind (int par, const std::string& val);
-  Query&        bind (const char *parname, const std::string& val);
+  Query&        bind (const std::string& parname, const std::string& val);
   Query&        bind (int par, int val);
-  Query&        bind (const char *parname, int val);
+  Query&        bind (const std::string& parname, int val);
   Query&        bind (int par, double val);
-  Query&        bind (const char *parname, double val);
+  Query&        bind (const std::string& parname, double val);
   Query&        bind (int par, __int64 val);
-  Query&        bind (const char *parname, __int64 val);
+  Query&        bind (const std::string& parname, __int64 val);
   Query&        bind (int par, void *val, int len);
-  Query&        bind (const char *parname, void* val, int len);
+  Query&        bind (const std::string& parname, void* val, int len);
   Query&        bind (int par, const SYSTEMTIME& st);
-  Query&        bind (const char *parname, const SYSTEMTIME& st);
+  Query&        bind (const std::string& parname, const SYSTEMTIME& st);
 
   Query&        clear_bindings ();
 
@@ -142,19 +142,19 @@ public:
   const void*   column_blob (int nc);
   SYSTEMTIME    column_time (int nc);
 
-  int           column_int (const char *colname);
-  std::string   column_str (const char *colname);
-  const char*   column_text(const char *colname);
-  double        column_double (const char *colname);
-  __int64       column_int64 (const char *name);
-  const void*   column_blob (const char *name);
-  SYSTEMTIME    column_time (const char *name);
+  int           column_int (const std::string& colname);
+  std::string   column_str (const std::string& colname);
+  const char*   column_text(const std::string& colname);
+  double        column_double (const std::string& colname);
+  __int64       column_int64 (const std::string& name);
+  const void*   column_blob (const std::string& name);
+  SYSTEMTIME    column_time (const std::string& name);
 
   int           column_type (int nc);
-  int           column_type (const char *colname);
+  int           column_type (const std::string& colname);
 
   int           column_size (int nc);
-  int           column_size (const char *colname);
+  int           column_size (const std::string& colname);
 
   /// Return number of columns in the result set
   int           columns ();
@@ -171,7 +171,7 @@ private:
   Query& operator= (const Query& rhs);
 
   void          map_columns ();
-  int           find_col (const char *colname);
+  int           find_col (const std::string& colname);
   erc           check_errors (int rc);
 
   sqlite3_stmt* stmt;
