@@ -25,7 +25,7 @@ namespace MLIBSPACE {
 class sqlitefac : public errfac
 {
 public:
-  sqlitefac () : errfac ("SQLite Error") {};
+  sqlitefac () : errfac ("SQLite Error"), db(nullptr) {};
   sqlite3* db;                              ///<handle of db that generated last error
 protected:
   std::string message (const erc& e) const;

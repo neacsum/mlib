@@ -6,6 +6,7 @@
 #pragma once
 
 #include <vector>
+#include <string>
 
 #if __has_include ("defs.h")
 #include "defs.h"
