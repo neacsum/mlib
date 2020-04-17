@@ -20,19 +20,19 @@ namespace MLIBSPACE {
 
 /*!
   Recursively create a new directory
-  \param dir path for new directory
+  \param dir path for new directory (UTF-8 encoded)
 
   \return - 0 if new directory was created
           - ENOENT if path was not found
           - EEXIST if path already exists
 */
-int r_mkdir (const char* dir)
+int r_mkdir (const string& dir)
 {
-  assert (dir && strlen(dir));
+  assert (!dir.empty());
 
   string ldir;
-  const char* p = dir;
-  while (*p)
+  auto p = dir.begin();
+  while (p != dir.end())
   {
     if (*p == '\\' || *p == '/')
     {
@@ -61,14 +61,14 @@ int r_mkdir (const char* dir)
 
 /*!
   Recursively remove a directory
-  \param dir path for directory to remove
+  \param dir path for directory to remove (UTF-8 encoded)
 
   \return - 0 if new directory was removed
           - ENOTEMPTY if directory is not empty
 */
-int r_rmdir (const char* dir)
+int r_rmdir (const string& dir)
 {
-  assert (dir && strlen(dir));
+  assert (!dir.empty());
 
   string ldir(dir);
   if (ldir.back () == '\\' || ldir.back () == '/')

@@ -67,6 +67,17 @@ typedef struct jsonvar_t {
 */
 #define JSDN(V, N, T, C, S) {N, &##V, T, S, C}
 
+/*!
+  Generates an entry in JSON dictionary for a variable whose address is not
+  yet known. Address must be set using set_var function.
+
+  \param N  External (JSON) name of the variable
+  \param T  Type of variable (one of JT_... values)
+  \param C  Number of elements (for arrays)
+  \param S  Element size (only for JT_STR and JT_PSTR types)
+*/
+#define JSDX(N, T, C, S) {N, nullptr, T, S, C}
+
 ///Generate entry for a composite object
 #define JSD_OBJECT(N) {N, 0, JT_OBJECT, 0, 1}
 

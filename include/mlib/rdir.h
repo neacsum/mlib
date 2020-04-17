@@ -15,8 +15,8 @@
 namespace MLIBSPACE {
 #endif
 
-int r_mkdir (const char* dir);
-int r_rmdir (const char* dir);
+int r_mkdir (const std::string& dir);
+int r_rmdir (const std::string& dir);
 
 #ifdef MLIBSPACE
 };
