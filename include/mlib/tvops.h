@@ -142,5 +142,3 @@ inline int operator !=(const timeval& t1, const timeval& t2)
 {
   return !operator==(t1, t2);
 }
-
-#pragma comment (lib, "hybase.lib")
