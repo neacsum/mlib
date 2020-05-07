@@ -1,6 +1,16 @@
-#include <stdio.h>
+/*!
+  \file tvops.cpp Operations on timeval structure.
+
+  (c) Mircea Neacsu 2002. All rights reserved.
+
+*/
 
 #include <mlib/tvops.h>
+#include <assert.h>
+
+#ifdef MLIBSPACE
+namespace MLIBSPACE {
+#endif
 
 //100ns intervals between 1/1/1601 and 1/1/1970 as reported by SystemTimeToFileTime()
 #define FILETIME_1970     0x019db1ded53e8000
@@ -64,56 +74,10 @@ void tolocaltime (const timeval& tv, SYSTEMTIME* st)
   FileTimeToSystemTime ((FILETIME*)&ft, st);
 }
 
-/*
-  Convart from local time milliseconds from midnight to Unix time UTC
+/*!
+  Following an arithmetic operation, brings timeval structure to a canonical
+  form where tv_usec is less than 1000000 and has the same sign as tv_sec member.
 */
-void fromlocal (DWORD ms, WORD usec, timeval& tv)
-{
-  static DWORD last_ms = 86500000;
-  static timeval ut_midnight;
-
-  if (ms < last_ms)
-  {
-    //if time since midnight has wrapped around recalculate Unix time at midnight
-    SYSTEMTIME lt;
-    __int64 ft;
-    GetLocalTime (&lt);
-    lt.wHour = lt.wMinute = lt.wSecond = lt.wMilliseconds = 0;
-    SystemTimeToFileTime (&lt, (FILETIME *)&ft);
-    ft -= FILETIME_1970;
-    ut_midnight.tv_sec = (long)(ft / 10000000i64);
-    ut_midnight.tv_usec =(long)((ft / 10i64) % 1000000i64);
-  }
-  last_ms = ms;
-
-  //find bias of local time if not known already
-  if (bias.tv_usec != 0)
-     get_bias();
-
-  tv.tv_sec = ms/1000;
-  tv.tv_usec = (ms % 1000) * 1000 + usec;
-  tv += bias;
-  tv += ut_midnight;
-  
-  normalize (tv);
-}
-
-/*
-  Convart from Unix time UTC to local time milliseconds from midnight
-*/
-void tolocal (const timeval& tv, DWORD* msSinceMidnight, WORD* usec)
-{
-  assert (tv.tv_usec > -ONE_SECOND && tv.tv_usec < ONE_SECOND);
-
-  if (bias.tv_usec != 0)
-    get_bias ();
-
-  timeval temp = tv - bias;
-  *msSinceMidnight = ((temp.tv_sec % 86400) * 1000) + temp.tv_usec/1000;
-  if (usec)
-    *usec = (WORD)(temp.tv_usec % 1000);
-}
-
 void normalize (timeval& tv)
 {
   if (tv.tv_usec >= ONE_SECOND)
@@ -135,15 +99,19 @@ void normalize (timeval& tv)
     while (tv.tv_usec <= -ONE_SECOND);
   }
 
-	if (tv.tv_sec >= 1 && tv.tv_usec < 0) 
+  if (tv.tv_sec >= 1 && tv.tv_usec < 0) 
   {
-		tv.tv_sec--;
-		tv.tv_usec += ONE_SECOND;
-	}
-	else if (tv.tv_sec < 0 && tv.tv_usec > 0) 
+    tv.tv_sec--;
+    tv.tv_usec += ONE_SECOND;
+  }
+  else if (tv.tv_sec < 0 && tv.tv_usec > 0) 
   {
-		tv.tv_sec++;
-		tv.tv_usec -= ONE_SECOND;
-	}
+    tv.tv_sec++;
+    tv.tv_usec -= ONE_SECOND;
+  }
   assert (tv.tv_usec > -ONE_SECOND && tv.tv_usec < ONE_SECOND);
 }
+
+#ifdef MLIBSPACE
+};
+#endif

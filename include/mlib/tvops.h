@@ -1,7 +1,17 @@
 #pragma once
 
-#include <windows.h>
+#if __has_include ("defs.h")
+#include "defs.h"
+#endif
+
 #include <assert.h>
+#include <ostream>
+
+
+#ifdef MLIBSPACE
+namespace MLIBSPACE {
+#endif
+
 /*
       TVOPS.H - operations with timeval structures
 */
@@ -17,9 +27,11 @@ int      operator <(const timeval& t1, const timeval& t2);
 int      operator ==(const timeval& t1, const timeval& t2);
 int      operator !=(const timeval& t1, const timeval& t2);
 
+#if 0
 //conversion to/from milliseconds since midnight
 void tolocal (const timeval& tv, DWORD *msSinceMidnight, WORD *usec=NULL);
 void fromlocal (DWORD ms, WORD usec, timeval& tv);
+#endif
 
 //conversion to/from microseconds
 LONGLONG usec64 (const timeval& tv);
@@ -38,7 +50,10 @@ void normalize (timeval& tv);
 timeval fromdouble (double d);
 
 // Inline implementations ----------------------------------------------------
-inline timeval operator +(const timeval& t1, const timeval& t2)
+
+/// Addition operator
+inline timeval 
+operator +(const timeval& t1, const timeval& t2)
 {
   timeval ans;
   ans.tv_usec = t1.tv_usec + t2.tv_usec;
@@ -47,7 +62,9 @@ inline timeval operator +(const timeval& t1, const timeval& t2)
   return ans;
 }
 
-inline timeval operator -(const timeval& t1, const timeval& t2)
+/// Subtraction operator
+inline timeval
+operator -(const timeval& t1, const timeval& t2)
 {
   timeval ans;
   
@@ -57,7 +74,9 @@ inline timeval operator -(const timeval& t1, const timeval& t2)
   return ans;
 }
 
-inline timeval& operator += (timeval& lhs, const timeval& rhs)
+/// Addition assignment operator
+inline timeval&
+operator += (timeval& lhs, const timeval& rhs)
 {
   lhs.tv_usec += rhs.tv_usec;
   lhs.tv_sec += rhs.tv_sec;
@@ -65,7 +84,9 @@ inline timeval& operator += (timeval& lhs, const timeval& rhs)
   return lhs;
 }
 
-inline timeval& operator -= (timeval& lhs, const timeval& rhs)
+/// Subtraction assignment
+inline timeval&
+operator -= (timeval& lhs, const timeval& rhs)
 {
   lhs.tv_usec -= rhs.tv_usec;
   lhs.tv_sec -= rhs.tv_sec;
@@ -73,17 +94,23 @@ inline timeval& operator -= (timeval& lhs, const timeval& rhs)
   return lhs;
 }
 
-inline double secd (const timeval& tv)
+/// Conversion to floating-point seconds
+inline double 
+secd (const timeval& tv)
 {
   return tv.tv_sec + (double)tv.tv_usec/1000000;
 }
 
-inline LONGLONG usec64 (const timeval& tv)
+/// Conversion to 64-bit microseconds
+inline LONGLONG 
+usec64 (const timeval& tv)
 {
   return (LONGLONG)tv.tv_sec * 1000000L + (LONGLONG)tv.tv_usec;
 }
 
-inline timeval fromusec (LONGLONG us)
+/// Conversion from 64-bit microseconds
+inline timeval
+fromusec (LONGLONG us)
 {
   timeval tv;
   tv.tv_sec = (int)(us / 1000000L);
@@ -91,7 +118,9 @@ inline timeval fromusec (LONGLONG us)
   return tv;
 }
 
-inline timeval fromdouble (double d)
+/// Conversion from floating-point seconds
+inline timeval
+fromdouble (double d)
 {
   timeval tv;
   tv.tv_sec = (long)d;
@@ -99,7 +128,9 @@ inline timeval fromdouble (double d)
   return tv;
 }
 
-inline timeval operator *(const timeval& op1, int op2)
+/// Multiplication by an integer
+inline timeval 
+operator *(const timeval& op1, int op2)
 {
   timeval tv;
 
@@ -109,12 +140,16 @@ inline timeval operator *(const timeval& op1, int op2)
   return tv;
 }
 
-inline timeval operator *(int op1, const timeval& op2)
+/// Multiplication by an integer
+inline timeval
+operator *(int op1, const timeval& op2)
 {
   return op2*op1;
 }
 
-inline timeval operator /(const timeval& op1, int op2)
+/// Division by an integer
+inline timeval
+operator /(const timeval& op1, int op2)
 {
   timeval tv;
   tv.tv_usec = op1.tv_usec / op2;
@@ -123,7 +158,9 @@ inline timeval operator /(const timeval& op1, int op2)
   return tv;
 }
 
-inline int operator <(const timeval& t1, const timeval& t2)
+/// "Less than" operator
+inline int 
+operator <(const timeval& t1, const timeval& t2)
 {
   if (t1.tv_sec != t2.tv_sec)
     return (t1.tv_sec < t2.tv_sec);
@@ -131,14 +168,54 @@ inline int operator <(const timeval& t1, const timeval& t2)
     return  (t1.tv_usec < t2.tv_usec);
 }
 
-inline int operator ==(const timeval& t1, const timeval& t2)
+/// "Greater than" operator
+inline int
+operator >(const timeval& t1, const timeval& t2)
+{
+  if (t1.tv_sec != t2.tv_sec)
+    return (t1.tv_sec > t2.tv_sec);
+  else
+    return  (t1.tv_usec > t2.tv_usec);
+}
+
+/// Equality operator
+inline int 
+operator ==(const timeval& t1, const timeval& t2)
 {
   if (t1.tv_sec == t2.tv_sec)
     return  (t1.tv_usec == t2.tv_usec);
   return 0;
 }
 
-inline int operator !=(const timeval& t1, const timeval& t2)
+/// Inequality operator
+inline int
+operator !=(const timeval& t1, const timeval& t2)
 {
   return !operator==(t1, t2);
 }
+
+/// "Greater or equal" operator
+inline int
+operator >=(const timeval& t1, const timeval& t2)
+{
+  return (t1 > t2) || (t1 == t2);
+}
+
+/// "Less or equal" operator
+inline int
+operator <=(const timeval& t1, const timeval& t2)
+{
+  return (t1 < t2) || (t1 == t2);
+}
+
+inline ::std::ostream&
+operator << (::std::ostream& os, const timeval& tv)
+{
+  os << "{ tv_sec: " << tv.tv_sec << ", tv_usec: " << tv.tv_usec << '}';
+  return os;
+}
+
+#ifdef MLIBSPACE
+}
+#endif
+
