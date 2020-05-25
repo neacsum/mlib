@@ -27,16 +27,15 @@ namespace MLIBSPACE {
 */
 
 /// Default constructor
-syncbase::syncbase () :
-hl (NULL),
-name_ (NULL)
+syncbase::syncbase ()
+  : hl (NULL)
 {
 }
 
 /// Protected constructor
-syncbase::syncbase (const char *a_name) :
-hl (new handle_life),
-name_ (a_name?strcpy (new char[strlen(a_name)+1], a_name):NULL)
+syncbase::syncbase (const char *a_name)
+  : hl (new handle_life)
+  , name_ (a_name?a_name:std::string())
 {
   hl->handle_ = NULL;
   hl->lives = 1;
@@ -45,7 +44,7 @@ name_ (a_name?strcpy (new char[strlen(a_name)+1], a_name):NULL)
 /// Copy constructor
 syncbase::syncbase (const syncbase& other) :
 hl (other.hl),
-name_ (other.name_?strcpy (new char[strlen(other.name_)+1],other.name_):NULL)
+name_ (other.name_)
 {
   hl->lives++;
 }
@@ -61,7 +60,6 @@ syncbase::~syncbase ()
     delete hl;
     hl = 0;
   }
-  delete []name_;
 }
 
 /// Assignment operator
@@ -76,18 +74,18 @@ syncbase& syncbase::operator =(const syncbase& rhs)
       CloseHandle (hl->handle_);
     delete hl;
   }
-  delete name_;
   hl = rhs.hl;
   if (hl)
     hl->lives++;
-  name_ = rhs.name_?strcpy (new char[strlen(rhs.name_)+1], rhs.name_):NULL;
+  name_ = rhs.name_;
   return *this;
 }
 
 /// Equality operator
 int syncbase::operator ==(const syncbase& rhs) const
 {
-  return (!hl && !rhs.hl) || (hl->handle_ == rhs.hl->handle_);
+  return (!hl && !rhs.hl) 
+    || ((hl && rhs.hl) && (hl->handle_ == rhs.hl->handle_));
 }
 
 /// Wait for the object to become signaled
@@ -124,8 +122,7 @@ void syncbase::set_handle (HANDLE h)
 /// Change object's name
 void syncbase::set_name(const char *name)
 {
-  delete []name_;
-  name_ = name?strcpy (new char[strlen(name)+1],name):NULL;
+  name_ = name?name:std::string();
 }
 
 /// Check if object is signaled
@@ -189,7 +186,7 @@ void udelay (unsigned short usec)
   if (!freq.QuadPart)
     QueryPerformanceFrequency (&freq);
   QueryPerformanceCounter (&interval);
-  interval.QuadPart += usec * 1000000L / freq.QuadPart;
+  interval.QuadPart += (LONGLONG)usec * 1000000L / freq.QuadPart;
   do {
     QueryPerformanceCounter (&crt);
   } while (crt.QuadPart < interval.QuadPart);

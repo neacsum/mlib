@@ -13,3 +13,5 @@
 #pragma comment (lib, "mlib.lib")
 #endif
 
+#define MLIB_LOGFAC (25<<3) //log facility claimed by MLIB
+

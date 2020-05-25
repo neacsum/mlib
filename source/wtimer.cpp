@@ -46,7 +46,7 @@ wtimer::wtimer(mode m, const char *name, bool use_apc) :
   syncbase( name ),
   apc_ (use_apc)
 {
-  HANDLE h=CreateWaitableTimer( NULL, (m==manual), name?utf8::widen(name).c_str():0 );
+  HANDLE h=CreateWaitableTimerW( NULL, (m==manual), name?utf8::widen(name).c_str():0 );
 
   assert (h);
   set_handle( h );

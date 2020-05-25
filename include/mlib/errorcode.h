@@ -59,7 +59,7 @@ public:
   unsigned int log_priority () const;
 
   /// return message to be logged
-  virtual std::string message (const erc& e) const;
+  virtual std::string message (const mlib::erc& e) const;
 
   /// get name
   const std::string& name () const;

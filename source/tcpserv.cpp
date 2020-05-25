@@ -227,7 +227,7 @@ void tcpserver::termconn (sock& socket, thread *th)
 
       //read and discard any pending data
       char buf [256];
-      while (socket.recv (buf, sizeof(buf)) != EOF)
+      while (socket.is_readready (0) && socket.recv (buf, sizeof(buf)) != EOF)
         ;
       socket.close ();
     }

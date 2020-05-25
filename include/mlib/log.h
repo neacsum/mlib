@@ -80,6 +80,11 @@ void syslog (int facility_priority, char *fmt, ...);
 /// Generate a log message at debug level using FMT string and option arguments. 
 void syslog_debug (const char *fmt, ...);
 
+extern int log_defaultopt;
+extern int log_defaultmask;
+extern char log_servhostname[_MAX_PATH];
+extern char log_fname[_MAX_PATH];
+
 #ifdef __cplusplus
 }
 #endif

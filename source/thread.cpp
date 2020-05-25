@@ -70,14 +70,14 @@ thread::thread (HANDLE h, DWORD i) :
 /*!
   Constructor for another thread
 */
-thread::thread (const char *name, bool inherit, DWORD stack_size, PSECURITY_DESCRIPTOR sd) :
-  syncbase (name),
-  shouldKill (true),
-  started (event::manual),
-  running (false),
-  exitcode_ (0),
-  stack (stack_size),
-  arg_ (0)
+thread::thread (const char *name, bool inherit, DWORD stack_size, PSECURITY_DESCRIPTOR sd)
+  : syncbase (name)
+  , shouldKill (true)
+  , started (event::manual)
+  , running (false)
+  , exitcode_ (0)
+  , stack (stack_size)
+  , arg_ (0)
 {
   //setup SECURITY_ATTRIBUTES structure
   sa.nLength = sizeof(SECURITY_ATTRIBUTES);
@@ -87,34 +87,6 @@ thread::thread (const char *name, bool inherit, DWORD stack_size, PSECURITY_DESC
   TRACE2 ("Created thread %s[%x]", name?name:"", id());
 }
 
-#if 0
-/*!
-  Make a thread from a function. 
-  
-  The function pointer argument becomes the run function of the newly created thread.
-  When the thread is started (using the start() function), the run function is called
-  with the given argument.
-
-  The return value of the run function becomes the exit code of the thread.
-*/
-thread::thread(int (*pfunc)(void *), void *arg, const char *name) :
-  syncbase (name),
-  shouldKill (true),
-  started (event::manual),
-  running (false),
-  exitcode_ (0),
-  stack (0),
-  thfunc (pfunc),
-  arg_ (arg)
-{
-  //setup SECURITY_ATTRIBUTES structure
-  sa.nLength = sizeof(SECURITY_ATTRIBUTES);
-  sa.lpSecurityDescriptor = NULL;
-  sa.bInheritHandle = false;
-  initialize ();
-  TRACE2 ("Created thread %s[%x]", name?name:"", id());
-}
-#endif
 /*!
   Make a thread from a function. 
   
@@ -125,15 +97,15 @@ thread::thread(int (*pfunc)(void *), void *arg, const char *name) :
 
   The return value of the run function becomes the exit code of the thread.
 */
-thread::thread (std::function<int (void*)> func, void *arg, const char *name) :
-  syncbase (name),
-  shouldKill (true),
-  started (event::manual),
-  running (false),
-  exitcode_ (0),
-  stack (0),
-  thfunc (func),
-  arg_ (arg)
+thread::thread (std::function<int (void*)> func, void *arg, const char *name)
+  : syncbase (name)
+  , shouldKill (true)
+  , started (event::manual)
+  , running (false)
+  , exitcode_ (0)
+  , stack (0)
+  , thfunc (func)
+  , arg_ (arg)
 {
   //setup SECURITY_ATTRIBUTES structure
   sa.nLength = sizeof(SECURITY_ATTRIBUTES);
@@ -182,7 +154,7 @@ void thread::initialize ()
 */
 thread::~thread()
 {
-  TRACE2 ("Thread %s[%x] in destructor", name()?name():"", id_);
+  TRACE2 ("Thread %s[%x] in destructor", name().c_str(), id_);
   if (shouldKill)
   {
     if (running)
@@ -211,7 +183,7 @@ UINT _stdcall thread::entryProc (thread *th)
   if (th->init())
     th->run ();
   th->term ();
-  TRACE2 ("Thread %s[%x] is ending", th->name()?th->name():"", th->id_);
+  TRACE2 ("Thread %s[%x] is ending", th->name().c_str(), th->id_);
   _endthreadex (th->exitcode_);
   return th->exitcode_;
 }
@@ -230,7 +202,7 @@ void thread::run()
 */
 void thread::start ()
 {
-  TRACE2 ("Thread %s[%x] is starting", name()?name():"", id_);
+  TRACE2 ("Thread %s[%x] is starting", name().c_str(), id_);
   assert (handle ());
   assert (!running);
   started.signal ();

@@ -9,6 +9,8 @@
 #include "defs.h"
 #endif
 
+#include <string>
+
 #ifdef MLIBSPACE
 namespace MLIBSPACE {
 #endif
@@ -34,7 +36,7 @@ public:
   HANDLE handle () const { return hl->handle_; };
 
   /// Return object's name
-  const char *name () const { return name_; };
+  const std::string& name () const { return name_; };
 
 
 protected:
@@ -47,7 +49,7 @@ private:
     HANDLE handle_;
     unsigned int lives;
   } *hl;
-  char *name_;
+  std::string name_;
 };
 
 /*!

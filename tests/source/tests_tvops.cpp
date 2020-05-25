@@ -37,7 +37,7 @@ SUITE (tvops)
     GetSystemTime (&st1);
     GetLocalTime (&st2);
 
-    timeval tv1, tv2;
+    timeval tv1;
 
     tv1 = fromsystime (st1);
     tolocaltime (tv1, &st1);

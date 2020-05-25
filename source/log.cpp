@@ -43,11 +43,10 @@
 
 static char local_hostname[_MAX_PATH];
 
-//values loaded from INI file
-static int defopt = DEFAULT_FLAGS;
-static int defmask = DEFAULT_PRIMASK;
-static char *server_hostname = 0;
-static char *logfname = 0;
+int log_defaultopt = DEFAULT_FLAGS;
+int log_defaultmask = DEFAULT_PRIMASK;
+char log_servhostname[_MAX_PATH] = { DEFAULT_SERVERNAME };
+char log_fname[_MAX_PATH];
 
 
 //logger data
@@ -95,18 +94,15 @@ static void init ()
   else
   {
     if (!GetComputerNameEx (ComputerNameDnsFullyQualified, whost, &namesz))
-      GetComputerName (whost, &namesz);
-      
-    if (!server_hostname)
-      server_hostname = strdup (DEFAULT_SERVERNAME);
+      GetComputerName (whost, &namesz);      
   }
   strcpy(local_hostname, utf8::narrow(whost).c_str());
   proclog = (LOG*)malloc (sizeof(LOG));
   //init LOG structure
   memset (proclog, 0, sizeof (LOG));
   proclog->pid = GetCurrentProcessId();
-  proclog->mask = defmask;
-  proclog->option = defopt;
+  proclog->mask = log_defaultmask;
+  proclog->option = log_defaultopt;
   proclog->sock = INVALID_SOCKET;
 }
 
@@ -115,11 +111,6 @@ static void dnit ()
   closelog ();
 
   WSACleanup ();
-  if (server_hostname)
-  {
-    free (server_hostname);
-    server_hostname = NULL;
-  }
   free (proclog);
   proclog = 0;
 }
@@ -180,7 +171,7 @@ void openlog (const char* ident, int option, int facility)
   if (ident)
     proclog->ident = strdup (ident);
   proclog->facility = facility? facility : DEFAULT_FACILITY;
-  proclog->option = option | defopt;
+  proclog->option = option | log_defaultopt;
   proclog->sock = INVALID_SOCKET;
   if( proclog->option & LOGOPT_PID )
     _snprintf( proclog->str_pid, sizeof(proclog->str_pid), "[%lu]", GetCurrentProcessId() );
@@ -189,13 +180,10 @@ void openlog (const char* ident, int option, int facility)
 
   if (proclog->option & LOGOPT_FILE)
   {
-    char fname[MAX_PATH];
-    if (!logfname)
-    {
-      _snprintf (fname, MAX_PATH, ".\\%s.log", proclog->ident);
-      logfname = strdup(fname);
-    }
-    proclog->file = fopen (logfname, "ac");
+    if (!strlen(log_fname))
+      _snprintf (log_fname, MAX_PATH, "%s\\%s.log", getenv ("localappdata"), proclog->ident);
+
+    proclog->file = fopen (log_fname, "ac");
   }
 
   if (!(proclog->option & LOGOPT_NOUDP))
@@ -222,7 +210,7 @@ static void logger_addr(LOG *plog)
   char *p;
   struct hostent * phe;
 
-  strcpy (host, server_hostname);
+  strcpy (host, log_servhostname);
   plog->sa_logger.sin_family = AF_INET;
   
   p = strchr( host, ':' );
@@ -424,10 +412,10 @@ int setlogmask (int mask)
 {
   int prev;
 
-  prev = proclog?proclog->mask : defmask;
+  prev = proclog?proclog->mask : log_defaultmask;
   if (mask)
   {
-    defmask = mask;
+    log_defaultmask = mask;
     if (proclog)
       proclog->mask = mask;
   }
@@ -450,8 +438,8 @@ int setlogopt (int opt)
 {
   int prev;
 
-  prev = proclog?proclog->option : defopt;
-  defopt = opt;
+  prev = proclog?proclog->option : log_defaultopt;
+  log_defaultopt = opt;
   if (proclog)
     proclog->option = opt;
   return prev;
