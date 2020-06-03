@@ -1,5 +1,4 @@
-# MLIB - Multi-purpose Library #                                   {#mainpage}
-
+# MLIB - Multi-purpose Library #
 This is a collection of bits and pieces crafted over the years. It is released
 with the hope that other people might find it useful or interesting.
 
@@ -7,7 +6,7 @@ with the hope that other people might find it useful or interesting.
 
 The MIT License (MIT)
  
-Copyright (c) 1999-2017 Mircea Neacsu
+Copyright (c) 1999-2020 Mircea Neacsu
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -32,9 +31,9 @@ SOFTWARE.
  - mlib_test                 - Test Program
 
 ## Building ##
-mlib requires the [UTF-8 Library](https://bitbucket.org/neacsum/utf8). The test
-program requires the [UTPP Library](https://bitbucket.org/neacsum/utpp).
+mlib requires the [UTF-8 Library](https://github.com/neacsum/utf8). The test
+program requires the [UTPP Library](https://github.com/neacsum/utpp).
 
 ## Installation ##
-All projects have been tested under Visual Studio 2017. The libraries can be 
+All projects have been tested under Visual Studio 2019. The libraries can be 
 built in 32 or 64 bit version, with or without debug information.
