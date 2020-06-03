@@ -9,9 +9,13 @@
 //comment this line if you want debug messages from this module
 #undef _TRACE
 
+//comment this line to disable server syslog messages
+#define USE_SYSLOG
+
 #include <mlib/defs.h>
 #include <mlib/tcpserv.h>
 #include <mlib/trace.h>
+#include <mlib/log.h>
 
 ///Allocation increment for connections table
 #define ALLOC_INCR 5
@@ -38,13 +42,16 @@ namespace MLIBSPACE {
 /*!
   Opens the socket and initializes the connections table
 */
-tcpserver::tcpserver (unsigned int max_conn, DWORD idle_timeout) : 
-limit (max_conn),
-count (0),
-alloc (ALLOC_INCR),
-contab (new conndata* [ALLOC_INCR]),
-end_req (false),
-idle (idle_timeout)
+tcpserver::tcpserver (unsigned int max_conn, DWORD idle_timeout, const char *name) 
+  : sock (SOCK_STREAM)
+  , thread (name)
+  , limit (max_conn)
+  , count (0)
+  , alloc (ALLOC_INCR)
+  , contab (new conndata* [ALLOC_INCR])
+  , end_req (false)
+  , idle (idle_timeout)
+  , connfunc (nullptr)
 {
   memset (contab, 0, alloc*sizeof (conndata*));
 }
@@ -77,6 +84,10 @@ bool tcpserver::init ()
     open (SOCK_STREAM); 
   setevent (evt.handle (), FD_ACCEPT);
   listen ();
+#ifdef USE_SYSLOG
+  syslog (LOG_MAKEPRI (MLIB_LOGFAC, LOG_INFO), 
+    "TCP server %s started", thread::name().c_str());
+#endif
   return thread::init ();
 }
 
@@ -105,7 +116,13 @@ void tcpserver::run ()
       if (limit && count >= limit)
       {
         TRACE ("Max number of connections (%d) reached", limit);
-        accept().close ();
+        sock s = accept ();
+#ifdef USE_SYSLOG
+        syslog (LOG_MAKEPRI (MLIB_LOGFAC, LOG_NOTICE), 
+          "TCP server %s - rejected connection from %s",
+          thread::name().c_str(), s.peer().ntoa ());
+#endif
+        s.close ();
         continue;
       }
       contab_lock.enter ();
@@ -125,15 +142,15 @@ void tcpserver::run ()
         TRACE ("tcpserver::run - increased connection table size to %d", alloc);
       }
 
-      inaddr claddr;
+      inaddr peer;
       contab[i] = new conndata;
-      contab[i]->socket = accept (claddr);
+      contab[i]->socket = accept (peer);
 
       /* clear inherited attributes (nonblocking mode and event mask)*/
       contab[i]->socket.setevent (0, 0);
       contab[i]->socket.blocking (true);
       
-      TRACE ("tcpserver::run contab[%d] - request from %s:%d",i, claddr.ntoa(), claddr.port());
+      TRACE ("tcpserver::run contab[%d] - request from %s:%d",i, peer.ntoa(), peer.port());
 
       /// - invoke make_thread to get a servicing thread
       contab[i]->thread = make_thread (contab[i]->socket);
@@ -197,12 +214,46 @@ void tcpserver::close_connection (sock& s)
   If the connection has associated a servicing thread 
   (returned by make_thread), this thread is started now.
 */
-void tcpserver::initconn (sock& /*socket*/, thread* th)
+void tcpserver::initconn (sock& socket, thread* th)
 {
   TRACE ("tcpserver::initconn");
+#ifdef USE_SYSLOG
+  syslog (LOG_MAKEPRI (MLIB_LOGFAC, LOG_NOTICE),
+    "TCP server %s - Accepted connection with %s:%d",
+    thread::name ().c_str (), socket.peer().ntoa (), socket.peer().port ());
+#endif
   if (th)
     th->start ();
 }
+
+void tcpserver::set_connfunc (std::function<int (sock& conn)> f)
+{
+  connfunc = f;
+}
+
+
+/*!
+  Return a servicing thread for each connection.
+
+  If user has set a connection function (using set_connfunc() function), make_thread
+  returns a thread whose body is the connection function.
+
+  If the connection doesn't need a servicing thread (single-threaded TCP server)
+  return NULL.
+
+  The returned thread should not be started. It will be started from the initconn
+  function.
+*/
+thread* tcpserver::make_thread (sock& connection)
+{
+  if (connfunc)
+  {
+    auto f = std::bind (connfunc, connection);
+    return new thread (f);
+  }
+  return NULL;
+};
+
 
 /*!
   Finalizes a connection.
@@ -221,6 +272,11 @@ void tcpserver::termconn (sock& socket, thread *th)
   try {
     if (socket.handle() != INVALID_SOCKET)
     {
+#ifdef USE_SYSLOG
+      syslog (LOG_MAKEPRI (MLIB_LOGFAC, LOG_NOTICE),
+        "TCP server %s - Closed connection with %s:%d",
+        thread::name ().c_str (), socket.peer().ntoa (), socket.peer().port ());
+#endif
       //set linger option to avoid socket hanging around after close
       socket.linger (true, 1);
       socket.shutdown (sock::shut_write);
@@ -259,6 +315,10 @@ void tcpserver::terminate ()
   TRACE ("tcpserver::terminate");
   close ();
   end_req = true;
+#ifdef USE_SYSLOG
+  syslog (LOG_MAKEPRI (MLIB_LOGFAC, LOG_NOTICE),
+    "TCP server %s stopped", thread::name ().c_str ());
+#endif
   if (is_running())
   {
     TRACE ("tcpserver::terminate - stopping running thread");
@@ -283,7 +343,7 @@ void tcpserver::foreach (conn_iter_func f, void *param)
 /*!
   Set max number of accepted connections
 */
-void tcpserver::maxconn(unsigned int new_max)
+void tcpserver::maxconn (unsigned int new_max)
 {
   limit = new_max;
 }

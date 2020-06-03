@@ -77,7 +77,6 @@ thread::thread (const char *name, bool inherit, DWORD stack_size, PSECURITY_DESC
   , running (false)
   , exitcode_ (0)
   , stack (stack_size)
-  , arg_ (0)
 {
   //setup SECURITY_ATTRIBUTES structure
   sa.nLength = sizeof(SECURITY_ATTRIBUTES);
@@ -93,11 +92,11 @@ thread::thread (const char *name, bool inherit, DWORD stack_size, PSECURITY_DESC
   Uses a polymorphic function wrapper that can be a lambda expression, a bind
   expression or any other type of function object as a run function of the 
   newly created thread. When the thread is started (using the start() function), 
-  the run function is called with the given argument.
+  the run function is called.
 
   The return value of the run function becomes the exit code of the thread.
 */
-thread::thread (std::function<int (void*)> func, void *arg, const char *name)
+thread::thread (std::function<int ()> func, const char *name)
   : syncbase (name)
   , shouldKill (true)
   , started (event::manual)
@@ -105,7 +104,6 @@ thread::thread (std::function<int (void*)> func, void *arg, const char *name)
   , exitcode_ (0)
   , stack (0)
   , thfunc (func)
-  , arg_ (arg)
 {
   //setup SECURITY_ATTRIBUTES structure
   sa.nLength = sizeof(SECURITY_ATTRIBUTES);
@@ -194,7 +192,7 @@ UINT _stdcall thread::entryProc (thread *th)
 void thread::run()
 {
   if (thfunc)
-    exitcode_ = thfunc (arg_);
+    exitcode_ = thfunc ();
 }
 
 /*!
