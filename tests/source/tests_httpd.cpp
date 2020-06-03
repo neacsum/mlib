@@ -55,7 +55,7 @@ public:
   string request;
   string uri;
   string answer;
-  std::function<int(void*)> cfunc;
+  std::function<int()> cfunc;
   int status_code;
 };
 
@@ -68,7 +68,7 @@ HttpServerFixture::HttpServerFixture () :
   idx.close ();
   srv.docroot (".");
   srv.start ();
-  cfunc = [&] (void*) -> int {
+  cfunc = [&] () -> int {
     sockstream ws(inaddr ("127.0.0.1", 8080));
     ws << "GET " << uri << " HTTP/1.1" << endl;
     TRACE ("GET %s", uri.c_str ());
@@ -101,7 +101,7 @@ HttpServerFixture::~HttpServerFixture ()
 
 TEST_FIXTURE (HttpServerFixture, OkAnswer)
 {
-  thread client (cfunc, 0, "HTTPclient");
+  thread client (cfunc, "HTTPclient");
   client.start ();
   client.wait ();
   CHECK_EQUAL (200, status_code);
@@ -111,7 +111,7 @@ TEST_FIXTURE (HttpServerFixture, Answer404)
 {
   uri = "no_such_thing";
 
-  thread client (cfunc, 0, "HTTPclient");
+  thread client (cfunc, "HTTPclient");
   client.start ();
   client.wait ();
   CHECK_EQUAL (404, status_code);
@@ -121,7 +121,7 @@ TEST_FIXTURE (HttpServerFixture, Answer401)
 {
   srv.add_realm ("Control", "/");
 
-  thread client (cfunc, 0, "HTTPclient");
+  thread client (cfunc, "HTTPclient");
   client.start ();
   client.wait ();
   CHECK_EQUAL (401, status_code);
@@ -133,7 +133,7 @@ TEST_FIXTURE (HttpServerFixture, AuthOk)
   srv.add_user ("Control", "Alice", "password");
   request = "Authorization: Basic QWxpY2U6cGFzc3dvcmQ=\r\n";
 
-  thread client (cfunc, 0, "HTTPclient");
+  thread client (cfunc, "HTTPclient");
   client.start ();
   client.wait ();
   CHECK_EQUAL (200, status_code);
@@ -145,7 +145,7 @@ TEST_FIXTURE (HttpServerFixture, HttpBadPassword)
   srv.add_user ("Control", "Alice", "password");
   request = "Authorization: Basic QWxpY2U6d3Jvbmc=\r\n"; //wrong password
 
-  thread client (cfunc, 0, "HTTPclient");
+  thread client (cfunc, "HTTPclient");
   client.start ();
   client.wait ();
   CHECK_EQUAL (401, status_code);

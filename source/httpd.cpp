@@ -124,7 +124,7 @@ http_connection::http_connection (sock& socket, httpd& server)
 void http_connection::run ()
 {
   ws->recvtimeout (HTTPD_TIMEOUT);
-  TRACE ("Connection from %s\n", inaddr (ws->name ()).hostname ());
+  TRACE ("Connection from %s\n", ws->peer ().hostname ());
   try {
     while (1)
     {
