@@ -187,25 +187,25 @@ void tcpserver::run ()
 void tcpserver::close_connection (sock& s)
 {
   size_t i;
-  for (i=0; i<alloc; i++)
+  for (i = 0; i < alloc; i++)
+  {
     if ((contab[i] != NULL) && (s == contab[i]->socket))
     {
 #ifdef _TRACE
-    if (contab[i]->socket.is_open ())
-    {
-      inaddr peer = contab[i]->socket.peer ();
-      TRACE ("tcpserver::close_connection closing contab[%d] to %s:%d",
-        i, peer.ntoa (), peer.port ());
-    }
-    else
-      TRACE ("tcpserver::close_connection closing contab[%d] - socket closed", i);
+      if (contab[i]->socket.is_open ())
+      {
+        inaddr peer = contab[i]->socket.peer ();
+        TRACE ("tcpserver::close_connection closing contab[%d] to %s:%d",
+          i, peer.ntoa (), peer.port ());
+      }
+      else
+        TRACE ("tcpserver::close_connection closing contab[%d] - socket closed", i);
 #endif
       contab[i]->condemned = true;
       evt.signal ();
       break;
     }
-  if (i == alloc)
-    TRACE ("tcpserver::close_connection cannot find contab entry");
+  }
 }
 
 /*!
@@ -248,11 +248,16 @@ thread* tcpserver::make_thread (sock& connection)
 {
   if (connfunc)
   {
-    auto f = std::bind (connfunc, connection);
+    auto f = /*std::bind (connfunc, connection);*/
+      [&]()->int {
+      int ret = connfunc (connection);
+      close_connection (connection);
+      return ret;
+    };
     return new thread (f);
   }
   return NULL;
-};
+}
 
 
 /*!
@@ -269,27 +274,32 @@ void tcpserver::termconn (sock& socket, thread *th)
     th->wait (10);
     delete th;
   }
-  try {
-    if (socket.handle() != INVALID_SOCKET)
-    {
+  if (socket.handle () != INVALID_SOCKET)
+  {
+    try {
+      /* Throughout this sequence we might get slapped with a WSACONNRESET error
+      if the client has already closed the connection but we don't care: the
+      catch clause will take care of it. */
 #ifdef USE_SYSLOG
       syslog (LOG_MAKEPRI (MLIB_LOGFAC, LOG_NOTICE),
         "TCP server %s - Closed connection with %s:%d",
-        thread::name ().c_str (), socket.peer().ntoa (), socket.peer().port ());
+        thread::name ().c_str (), socket.peer ().ntoa (), socket.peer ().port ());
 #endif
-      //set linger option to avoid socket hanging around after close
+      /* Set linger option with a short timeout to avoid socket hanging around
+        after close. */
       socket.linger (true, 1);
       socket.shutdown (sock::shut_write);
 
       //read and discard any pending data
-      char buf [256];
-      while (socket.is_readready (0) && socket.recv (buf, sizeof(buf)) != EOF)
+      char buf[256];
+      while (socket.is_readready (0) && socket.recv (buf, sizeof (buf)) != EOF)
         ;
-      socket.close ();
     }
-  } catch (erc& x) {
-    x.deactivate ();
-    TRACE ("tcpserver::termconn caught %d", x);
+    catch (erc& x) {
+      x.deactivate ();
+      TRACE ("tcpserver::termconn caught %d", x);
+    }
+    socket.close ();
   }
 }
 
