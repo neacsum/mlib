@@ -3,7 +3,9 @@
 
 #include <iostream>
 
+#ifdef MLIBSPACE
 using namespace MLIBSPACE;
+#endif
 using namespace std;
 
 #define NMAX 1000000

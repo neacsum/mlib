@@ -2,15 +2,9 @@
   \file HTTPD.CPP Implementation of httpd and http_connection classes
 
   (c) Mircea Neacsu 2007-2017. All rights reserved.
-
 */
-#include <mlib/errorcode.h>
-#include <winsock2.h>
-#include <io.h>
-#include <fcntl.h>
-#include <string>
-#include <mlib/trace.h>
 #include <mlib/httpd.h>
+#include <mlib/trace.h>
 #include <mlib/base64.h>
 #include <utf8/utf8.h>
 
@@ -339,7 +333,7 @@ void http_connection::process_valid_request ()
 
   if (fullpath[strlen(fullpath)-1] == '/' || fullpath[strlen(fullpath)-1] == '\\')
     strcat (fullpath, parent.default_uri ());
-  if (!_access (fullpath, 4))
+  if (utf8::access (fullpath, 4))
   {
     bool shtml = false;
     int ret;

@@ -2,7 +2,9 @@
 #include <mlib/serenum.h>
 
 using namespace std;
-using namespace mlib;
+#ifdef MLIBSPACE
+using namespace MLIBSPACE;
+#endif
 
 TEST (SerEnum_Test)
 {

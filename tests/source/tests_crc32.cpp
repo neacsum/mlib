@@ -1,4 +1,3 @@
-#include <windows.h>
 #include <mlib/crc32.h>
 #include <utpp/utpp.h>
 

@@ -9,6 +9,7 @@
 #include "defs.h"
 #endif
 
+#include <Winsock2.h>
 #include <stdexcept>
 
 #ifdef MLIBSPACE

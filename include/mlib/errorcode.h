@@ -17,6 +17,7 @@
 namespace MLIBSPACE {
 #endif
 
+class erc;
 
 /*! 
   \anchor ERROR_PRI
@@ -59,7 +60,7 @@ public:
   unsigned int log_priority () const;
 
   /// return message to be logged
-  virtual std::string message (const mlib::erc& e) const;
+  virtual std::string message (const erc& e) const;
 
   /// get name
   const std::string& name () const;
@@ -176,9 +177,11 @@ std::string erc::message () const
 
 #ifdef MLIBSPACE
 }
-#endif
-
 /// The SUCCESS indicator
 #define ERR_SUCCESS (MLIBSPACE::erc (0, ERROR_PRI_SUCCESS))
+#else
+#define ERR_SUCCESS (::erc (0, ERROR_PRI_SUCCESS))
+#endif
+
 
 

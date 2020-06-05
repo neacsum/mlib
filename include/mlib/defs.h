@@ -7,11 +7,16 @@
 
 #include <winsock2.h>
 
+/*!
+  Namespace for all objects in MLIB. You can move everything into a different
+  namespace or the global namespace by changing (or removing) this definition
+*/
 #define MLIBSPACE mlib
 
 #ifndef NODEFAULTLIB
 #pragma comment (lib, "mlib.lib")
 #endif
 
-#define MLIB_LOGFAC (25<<3) //log facility claimed by MLIB
+/// log facility claimed by MLIB
+#define MLIB_LOGFAC (25<<3)
 

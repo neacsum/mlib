@@ -9,10 +9,7 @@
 #include "defs.h"
 #endif
 
-#ifndef _WINSOCK2API_
-#error WINSOCK2 required
-#endif
-
+#include <WinSock2.h>
 #include <iostream>
 
 #include "errorcode.h"

@@ -1,4 +1,3 @@
-#include <mlib/defs.h>
 #include <mlib/shmem.h>
 #include <utpp/utpp.h>
 #include <string>

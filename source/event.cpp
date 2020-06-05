@@ -8,11 +8,10 @@
 #define UNICODE
 #endif
 
-#include <mlib/defs.h>
-
 #include <mlib/event.h>
 #include <assert.h>
 #include <utf8/utf8.h>
+
 
 #ifdef MLIBSPACE
 namespace MLIBSPACE {
@@ -34,8 +33,11 @@ event::event (mode md, bool signaled, const char *name) :
   syncbase (name),
   m (md)
 {
+#ifdef HAS_UTF8
   HANDLE h = CreateEventW (NULL, m==manual, signaled, name?utf8::widen(name).c_str():0);
-
+#else
+  HANDLE h = CreateEventA (NULL, m == manual, signaled, name);
+#endif
   assert (h);
   set_handle (h);
 }

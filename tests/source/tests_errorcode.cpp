@@ -3,7 +3,9 @@
 
 #include <iostream>
 
+#ifdef MLIBSPACE
 using namespace MLIBSPACE;
+#endif
 using namespace std;
 
 SUITE (errorcode)

@@ -1,7 +1,10 @@
 #include <utpp/utpp.h>
 #include <mlib/point.h>
 
+#ifdef MLIBSPACE
 using namespace MLIBSPACE;
+#endif
+
 
 SUITE (Point)
 {

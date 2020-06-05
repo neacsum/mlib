@@ -9,6 +9,8 @@
 #include "defs.h"
 #endif
 
+#include <Winsock2.h>
+
 #ifdef MLIBSPACE
 namespace MLIBSPACE {
 #endif

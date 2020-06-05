@@ -5,7 +5,6 @@
 
 */
 #include <mlib/serenum.h>
-#include <Windows.h>
 #include <utf8/utf8.h>
 
 #include <SetupAPI.h>

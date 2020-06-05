@@ -2,8 +2,6 @@
   \file inaddr.cpp Implementation of inaddr class.
 
   (c) Mircea Neacsu 2002. All rights reserved.
-
-
 */
 
 //get rid of a deprecation warning related to inet_ntoa (MN 22-Jan-17) 
@@ -113,7 +111,7 @@ const char* inaddr::hostname ()
 */
 void inaddr::hostname (char *name, size_t sz)
 {
-  strncpy (name, hostname(), sz);
+  strncpy_s (name, sz, hostname(), _TRUNCATE);
 }
 
 /*!

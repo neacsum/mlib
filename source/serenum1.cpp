@@ -19,7 +19,6 @@
   (under 1 ms) but does not provide the friendly name.
 */
 #include <mlib/serenum.h>
-#include <Windows.h>
 
 #ifdef MLIBSPACE
 namespace MLIBSPACE {

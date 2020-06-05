@@ -12,12 +12,17 @@
 
 using namespace std;
 
-/// The JSON data dictionary
-extern mlib::JSONVAR json_dict[];
 
 #ifdef MLIBSPACE
+#define NS MLIBSPACE
 namespace MLIBSPACE {
+#else
+//dirty tricks to prevent name clash for 'lock' function
+#define NS
 #endif
+
+/// The JSON data dictionary
+extern JSONVAR json_dict[];
 
 #define MAX_JSONRESPONSE 8192
 
@@ -327,7 +332,7 @@ bool JSONBridge::parse_urlencoded ()
   int idx;
   void *pv;
 
-  mlib::lock l (in_use);
+  NS::lock l (in_use);
   str_pairs vars;
   parse_urlparams (client().get_body (), vars);
   for (auto var = vars.begin (); var != vars.end (); var++)

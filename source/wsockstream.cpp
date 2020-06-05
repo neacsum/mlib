@@ -9,10 +9,8 @@
 //comment this line if you want debug messages from this module
 #undef _TRACE
 
-#include <mlib/defs.h>
 #include <mlib/wsockstream.h>
 #include <mlib/inaddr.h>
-#include <mlib/dprintf.h>
 #include <mlib/trace.h>
 
 //default buffer size
@@ -1121,7 +1119,7 @@ const char* sock_facility::msg (const erc& e)
 {
   static struct errtab {
     int code;
-    char *str;
+    const char *str;
   } errors[] = {
 
     ENTRY (WSAEINTR),

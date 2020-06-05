@@ -4,6 +4,7 @@
 #include "defs.h"
 #endif
 
+#include <winsock2.h>
 #include <assert.h>
 #include <ostream>
 

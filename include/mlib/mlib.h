@@ -5,6 +5,12 @@
   (c) Mircea Neacsu 2019
 */
 
+#if __has_include ("defs.h")
+#include "defs.h"
+#endif
+
+#include <Winsock2.h>
+
 #include "base64.h"
 #include "basename.h"
 #include "bitstream.h"

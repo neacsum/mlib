@@ -5,13 +5,14 @@
 */
 #pragma once
 
-#include <string>
-#include <map>
-
 #if __has_include ("defs.h")
 #include "defs.h"
 #endif
 
+#include <string>
+#include <map>
+
+#include <Winsock2.h>
 #include "sqlite3.h"
 #include "errorcode.h"
 

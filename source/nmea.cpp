@@ -6,7 +6,8 @@
 
 #include <mlib/nmea.h>
 #include <mlib/convert.h>
-
+#include <string.h>
+#include <stdlib.h>
 
 #ifdef MLIBSPACE
 namespace MLIBSPACE {

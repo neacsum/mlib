@@ -1,7 +1,9 @@
 #include <utpp/utpp.h>
 #include <mlib/base64.h>
 
-using namespace mlib;
+#ifdef MLIBSPACE
+using namespace MLIBSPACE;
+#endif
 
 //Test vectors from RFC4648
 const char *expect[] = {

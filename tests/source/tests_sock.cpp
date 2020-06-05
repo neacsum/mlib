@@ -1,7 +1,9 @@
 #include <utpp/utpp.h>
 #include <mlib/wsockstream.h>
 
-using namespace mlib;
+#ifdef MLIBSPACE
+using namespace MLIBSPACE;
+#endif
 
 
 TEST (connect_timeout)

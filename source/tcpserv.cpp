@@ -7,15 +7,17 @@
 */
 
 //comment this line if you want debug messages from this module
-#undef _TRACE
+//#undef _TRACE
 
 //comment this line to disable server syslog messages
-#define USE_SYSLOG
+//#define USE_SYSLOG
 
-#include <mlib/defs.h>
 #include <mlib/tcpserv.h>
 #include <mlib/trace.h>
+
+#ifdef USE_SYSLOG
 #include <mlib/log.h>
+#endif
 
 ///Allocation increment for connections table
 #define ALLOC_INCR 5

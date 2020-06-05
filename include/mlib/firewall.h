@@ -1,5 +1,11 @@
 #pragma once
 
+#if __has_include ("defs.h")
+#include "defs.h"
+#endif
+
+#include <Winsock2.h>
+
 #include <netfw.h>
 #include "errorcode.h"
 

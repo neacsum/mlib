@@ -5,8 +5,9 @@
   (c) Mircea Neacsu 2017
 */
 #include <mlib/basename.h>
-#include <windows.h>
+#include <string>
 #include <utf8/utf8.h>
+
 
 using namespace std;
 

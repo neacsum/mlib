@@ -1,5 +1,9 @@
+/*!
+  \file FIREWALL.CPP Implementation of firwall object
 
-#include <mlib/defs.h>
+    (c) Mircea Neacsu 2007-2019
+*/
+
 #include <mlib/firewall.h>
 #include <mlib/trace.h>
 //#include <comutil.h>
