@@ -37,3 +37,10 @@ program requires the [UTPP Library](https://github.com/neacsum/utpp).
 ## Installation ##
 All projects have been tested under Visual Studio 2019. The libraries can be 
 built in 32 or 64 bit version, with or without debug information.
+
+## Documentation ##
+You can find Doxygen generated documentation [here](https://neacsum.github.io/mlib/html/index.html).
+
+Also there are some articles on CodeProject detailing some of the features:
+ - [Error code objects](https://www.codeproject.com/Articles/5251693/Cplusplus-Error-Handling-with-Error-Code-Objects)
+ - [Windows Sockets Streams](https://www.codeproject.com/Articles/5252621/Windows-Sockets-Streams)
