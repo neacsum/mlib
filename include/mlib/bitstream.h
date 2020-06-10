@@ -1,5 +1,5 @@
 /*!
-  \file BITSTREAM.H Definition of bitstream class.
+  \file bitstream.h Definition of bitstream class.
 
   (c) Mircea Neacsu 2017
 */
@@ -10,9 +10,7 @@
 #include "defs.h"
 #endif
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 /// Read and write bit fields
 class bitstream
@@ -67,6 +65,4 @@ bitstream::decode (unsigned char& bits, char chr)
   bits = (chr & (1 << packing) - 1);
 }
 
-#ifdef MLIBSPACE
 };
-#endif

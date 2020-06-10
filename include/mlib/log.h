@@ -1,6 +1,6 @@
 #pragma once
 /*!
-  \file LOG.H syslog related functions.
+  \file log.h syslog related functions.
 
   (c) Mircea Neacsu 2008
 

@@ -8,9 +8,7 @@
 #include "event.h"
 #include <functional>
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 /// Wrapper for a Windows %thread
 class thread : public syncbase
@@ -100,6 +98,4 @@ int thread::priority() {return GetThreadPriority (handle());};
 inline
 void thread::priority (int pri) {SetThreadPriority (handle(), pri);};
 
-#ifdef MLIBSPACE
-};
-#endif
+}

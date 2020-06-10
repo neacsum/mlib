@@ -1,5 +1,5 @@
 /*!
-  \file RDIR.H - Recursive directory functions
+  \file rdir.h - Recursive directory functions
 
   (c) Mircea Neacsu 2019
 */
@@ -11,13 +11,9 @@
 
 #include <string>
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 int r_mkdir (const std::string& dir);
 int r_rmdir (const std::string& dir);
 
-#ifdef MLIBSPACE
-};
-#endif
+}

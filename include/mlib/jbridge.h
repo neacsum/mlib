@@ -7,9 +7,7 @@
 
 #include "httpd.h"
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 /// JSON dictionary entry types
 enum js_type {
@@ -139,7 +137,5 @@ const char* JSONBridge::path () { return path_; }
 inline
 http_connection& JSONBridge::client () { return *client_; };
 
-#ifdef MLIBSPACE
 }
-#endif
 

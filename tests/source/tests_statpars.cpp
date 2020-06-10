@@ -1,9 +1,7 @@
 #include <utpp/utpp.h>
 #include <mlib/mlib.h>
 
-#ifdef MLIBSPACE
-using namespace MLIBSPACE;
-#endif
+using namespace mlib;
 
 SUITE (statpars)
 {

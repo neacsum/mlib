@@ -11,9 +11,7 @@
 
 #include <deque>
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 /// Calculator for statistical parameters of a distribution
 class statpars {
@@ -63,6 +61,7 @@ void statpars::add (double *vals, int count)
     add (vals[i]);
 }
 
+/// Add a vector of values
 inline
 void statpars::add (std::vector<double> vals)
 {
@@ -141,7 +140,5 @@ void statpars::clear ()
   sum = 0.;
 }
 
-#ifdef MLIBSPACE
-};
-#endif
+}
 

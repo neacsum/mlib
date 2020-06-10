@@ -20,9 +20,7 @@
 */
 #include <mlib/serenum.h>
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 
 /*!
@@ -65,6 +63,4 @@ bool SerEnum_UsingCreateFile (std::vector<int>& ports)
   return true;
 }
 
-#ifdef MLIBSPACE
-};
-#endif
+}

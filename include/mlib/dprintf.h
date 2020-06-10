@@ -1,6 +1,6 @@
 #pragma once
 /*!
-  \file dprintf.cpp Definition of dprintf() function
+  \file dprintf.h Definition of dprintf() function
 
   (c) Mircea Neacsu 1999-2000. All rights reserved.
 */

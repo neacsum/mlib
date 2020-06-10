@@ -4,9 +4,7 @@
 #include <mlib/thread.h>
 #include <mlib/trace.h>
 
-#ifdef MLIBSPACE
-using namespace MLIBSPACE;
-#endif
+using namespace mlib;
 using namespace std;
 
 struct S{

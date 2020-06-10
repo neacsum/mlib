@@ -1,5 +1,5 @@
 /*!
-  \file STOPWATCH.H Definition of stopwatch class
+  \file stopwatch.h Definition of stopwatch class
 
   (c) Mircea Neacsu 2017
 */
@@ -11,9 +11,7 @@
 
 #include <Winsock2.h>
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 /// Simple stopwatch timer (yet another one!)
 class stopwatch
@@ -29,6 +27,5 @@ private:
   static LARGE_INTEGER freq;
   LARGE_INTEGER tbeg, tend;
 };
-#ifdef MLIBSPACE
-};
-#endif
+
+}

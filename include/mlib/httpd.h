@@ -1,6 +1,6 @@
 #pragma once
 /*!
-  \file HTTPD.H Implementation of httpd and http_connection classes
+  \file httpd.h Implementation of httpd and http_connection classes
 
   (c) Mircea Neacsu 2007-2014. All rights reserved.
 */
@@ -24,9 +24,7 @@
 #define HTTPD_ERR_FREAD       -3      ///< File read failure
 ///\}
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 class http_connection;
 
@@ -235,6 +233,4 @@ unsigned short httpd::port () { return port_num; }
 
 void parse_urlparams (const char* par_str, str_pairs& params);
 
-#ifdef MLIBSPACE
 }
-#endif

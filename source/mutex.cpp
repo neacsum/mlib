@@ -12,9 +12,7 @@
 #include <assert.h>
 #include <utf8/utf8.h>
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 /*!
   \class mutex
   \brief Wrapper for Windows mutexes.
@@ -45,6 +43,5 @@ mutex::operator bool ()
   if (result) signal ();
   return result;
 }
-#ifdef MLIBSPACE
-};
-#endif
+
+}

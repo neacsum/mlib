@@ -1,5 +1,5 @@
 /*!
-  \file BITSTREAM.CPP Implementation of bitstream class
+  \file bitstream.cpp Implementation of bitstream class
 
   (c) Mircea Neacsu 2017
 */
@@ -7,9 +7,7 @@
 
 using namespace std;
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 /*!
   \class bitstream
@@ -135,7 +133,5 @@ int bitstream::mread (unsigned int sz, bool sign)
 }
 
 
-#ifdef MLIBSPACE
-};
-#endif
+}
 

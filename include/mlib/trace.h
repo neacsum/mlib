@@ -1,10 +1,10 @@
 /*!
-  \file TRACE.H Definition of trace debugging macros.
+  \file trace.h Definition of trace debugging macros.
 
   (c) Mircea Neacsu 1999-2002. All rights reserved.
 
   TRACE
-  Usage: TRACE(  fmt, arg1, arg2, .... );
+  Usage: TRACE (fmt, arg1, arg2, ....);
   
   If _TRACE symbol is defined the macro produces a
   printf-like string to the debug output.

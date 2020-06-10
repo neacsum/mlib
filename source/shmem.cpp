@@ -1,5 +1,5 @@
 /*!
-  \file SHMEM.CPP Implementation of shared memory areas with support for
+  \file shmem.cpp Implementation of shared memory areas with support for
   single-writer multiple-readers.
 
     (c) Mircea Neacsu. 2004-2017
@@ -17,9 +17,7 @@
 #include <assert.h>
 #include <utf8/utf8.h>
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 /*! 
   Default constructor.
@@ -339,7 +337,5 @@ bool shmem_base::read (void * pData)
   return false;
 }
 
-#ifdef MLIBSPACE
 }
-#endif
 

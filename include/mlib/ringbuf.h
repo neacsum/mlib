@@ -1,5 +1,5 @@
 /*!
-  \file RINGBUF.H Simple circular (ring) buffer class
+  \file ringbuf.h Simple circular (ring) buffer class
 
   (c) Mircea Neacsu 2018
 */
@@ -12,9 +12,7 @@
 #include "defs.h"
 #endif
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 
 /// Circular buffer
@@ -421,6 +419,4 @@ private:
 
 };
 
-#ifdef MLIBSPACE
 }
-#endif

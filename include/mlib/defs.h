@@ -7,11 +7,6 @@
 
 #include <winsock2.h>
 
-/*!
-  Namespace for all objects in MLIB. You can move everything into a different
-  namespace or the global namespace by changing (or removing) this definition
-*/
-#define MLIBSPACE mlib
 
 #ifndef NODEFAULTLIB
 #pragma comment (lib, "mlib.lib")

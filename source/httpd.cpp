@@ -1,5 +1,5 @@
 /*!
-  \file HTTPD.CPP Implementation of httpd and http_connection classes
+  \file httpd.cpp Implementation of httpd and http_connection classes
 
   (c) Mircea Neacsu 2007-2017. All rights reserved.
 */
@@ -24,9 +24,7 @@ using namespace std;
 #undef INADDR_ANY
 #define INADDR_ANY (unsigned int)0
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 ///Table of known mime types
 static struct smime
@@ -1553,6 +1551,4 @@ void parse_urlparams (const char* par_str, str_pairs& params)
   free (dup);
 }
 
-#ifdef MLIBSPACE
 }
-#endif

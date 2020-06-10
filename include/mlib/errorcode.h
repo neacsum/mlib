@@ -13,9 +13,7 @@
 
 #include <string>
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 class erc;
 
@@ -87,11 +85,11 @@ class erc
 public:
   erc ();
   erc (int value , short int priority=ERROR_PRI_ERROR, errfac* f = 0);
-  erc (const erc& other) = default;
+  erc (const erc& other);
   erc (erc&& other);
 
   ~erc () noexcept(false);
-  erc& operator= (const erc& rhs) = default;
+  erc& operator= (const erc& rhs);
   erc& operator= (erc&& rhs);
   operator int () const;
   
@@ -175,13 +173,9 @@ std::string erc::message () const
 }
 
 
-#ifdef MLIBSPACE
 }
 /// The SUCCESS indicator
-#define ERR_SUCCESS (MLIBSPACE::erc (0, ERROR_PRI_SUCCESS))
-#else
-#define ERR_SUCCESS (::erc (0, ERROR_PRI_SUCCESS))
-#endif
+#define ERR_SUCCESS (mlib::erc (0, ERROR_PRI_SUCCESS))
 
 
 

@@ -1,5 +1,5 @@
 /*!
-  \file POINT.H Definition of Point template class
+  \file point.h Definition of Point template class
 
   (c) Mircea Neacsu 2017
 
@@ -15,9 +15,7 @@
 
 #include <ostream>
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 
 /*!
@@ -196,6 +194,4 @@ void Point<T>::rotate (double angle)
   x = x1; y = y1;
 }
 
-#ifdef MLIBSPACE
-};
-#endif
+}

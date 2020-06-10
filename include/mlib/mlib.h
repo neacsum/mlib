@@ -1,6 +1,6 @@
 #pragma once
 /*!
-  \file MLIB.H Uber-include file for mlib library
+  \file mlib.h Uber-include file for mlib library
 
   (c) Mircea Neacsu 2019
 */

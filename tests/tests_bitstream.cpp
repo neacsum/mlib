@@ -2,12 +2,7 @@
 #include <mlib/bitstream.h>
 #include <sstream>
 
-#ifdef MLIBSPACE
-using namespace MLIBSPACE;
-#define NS MLIBSPACE
-#else
-#define NS
-#endif
+using namespace mlib;
 
 SUITE (bitstreams)
 {
@@ -47,7 +42,7 @@ SUITE (bitstreams)
     CHECK_EQUAL ('A', bs.mread (8));
   }
 
-  class NMEAstream : public NS::bitstream
+  class NMEAstream : public bitstream
   {
   public:
     NMEAstream (std::iostream& is) : bitstream (is, 6) {};

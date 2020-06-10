@@ -11,9 +11,7 @@
 #include <mlib/thread.h>
 
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 //----------------- current_thread member functions -------------------
 /*!
@@ -227,6 +225,4 @@ void thread::resume()
   ResumeThread (handle());
 }
 
-#ifdef MLIBSPACE
-};
-#endif
+}

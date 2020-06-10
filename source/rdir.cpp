@@ -1,5 +1,5 @@
 /*!
-  \file RDIR.CPP Recursive directory functions
+  \file rdir.cpp Recursive directory functions
 
     (c) Mircea Neacsu 2019
 */
@@ -14,9 +14,7 @@
 
 using namespace std;
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 /*!
   Recursively create a new directory
@@ -95,6 +93,4 @@ int r_rmdir (const string& dir)
   }
 }
 
-#ifdef MLIBSPACE
 }
-#endif

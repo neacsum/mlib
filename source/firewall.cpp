@@ -1,5 +1,5 @@
 /*!
-  \file FIREWALL.CPP Implementation of firwall object
+  \file firewall.cpp Implementation of firwall object
 
     (c) Mircea Neacsu 2007-2019
 */
@@ -10,9 +10,7 @@
 //#include <comip.h>
 
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 BSTR ConvertStringToBSTR(const char* in);
 
@@ -391,6 +389,4 @@ BSTR ConvertStringToBSTR(const char* in)
   return out;
 }
 
-#ifdef MLIBSPACE
 }
-#endif

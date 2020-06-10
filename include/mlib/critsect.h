@@ -12,9 +12,7 @@
 
 #include <Winsock2.h>
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 /*!
   \class criticalsection
@@ -146,6 +144,4 @@ lock::~lock ()
 }
 
 
-#ifdef MLIBSPACE
-};
-#endif
+}

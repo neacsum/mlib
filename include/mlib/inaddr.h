@@ -17,9 +17,7 @@
 #include "errorcode.h"
 
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 
 ///sockaddr wrapper
@@ -94,6 +92,4 @@ int inaddr::operator != (const inaddr& other) const
 }
 
 
-#ifdef MLIBSPACE
 }
-#endif

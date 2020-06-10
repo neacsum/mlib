@@ -7,9 +7,7 @@
 
 #include "syncbase.h"
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 class wtimer : public syncbase
 {
@@ -33,6 +31,4 @@ private:
   static void CALLBACK timerProc (wtimer *obj, DWORD loval, DWORD hival);
 };
 
-#ifdef MLIBSPACE
-};
-#endif
+}

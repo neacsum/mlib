@@ -13,10 +13,9 @@
 #include <assert.h>
 #include <utf8/utf8.h>
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
-/*!
+namespace mlib {
+
+  /*!
   \class semaphore
   \ingroup syncro
   \brief Wrapper for Windows semaphore objects.
@@ -54,6 +53,4 @@ semaphore::operator bool()
   return result;
 }
 
-#ifdef MLIBSPACE
-};
-#endif
+}

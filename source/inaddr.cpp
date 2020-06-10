@@ -13,9 +13,7 @@
 #include <mlib/wsockstream.h>
 #include <mlib/trace.h>
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 
 #define WSALASTERROR (erc( WSAGetLastError(), ERROR_PRI_ERROR, sockerrors))
@@ -158,6 +156,4 @@ const char *inaddr::ntoa ()
   return inet_ntoa (sa.sin_addr);
 }
 
-#ifdef MLIBSPACE
-};
-#endif
+}

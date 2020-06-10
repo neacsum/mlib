@@ -13,13 +13,7 @@
 using namespace std;
 
 
-#ifdef MLIBSPACE
-#define NS MLIBSPACE
-namespace MLIBSPACE {
-#else
-//dirty tricks to prevent name clash for 'lock' function
-#define NS
-#endif
+namespace mlib {
 
 /// The JSON data dictionary
 extern JSONVAR json_dict[];
@@ -332,7 +326,7 @@ bool JSONBridge::parse_urlencoded ()
   int idx;
   void *pv;
 
-  NS::lock l (in_use);
+  mlib::lock l (in_use);
   str_pairs vars;
   parse_urlparams (client().get_body (), vars);
   for (auto var = vars.begin (); var != vars.end (); var++)
@@ -488,6 +482,4 @@ int url_decode (const char *in, char *out)
   return 1;
 }
 
-#ifdef MLIBSPACE
 }
-#endif

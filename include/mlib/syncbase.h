@@ -1,5 +1,5 @@
 /*!
-  \file SYNCBASE.H syncbase class definition.
+  \file syncbase.h syncbase class definition.
 
   (c) Mircea Neacsu 1999
 */
@@ -12,9 +12,7 @@
 #include <Winsock2.h>
 #include <string>
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 /// Base class for all named synchronization objects
 class syncbase
@@ -69,6 +67,4 @@ DWORD multiwait (bool all, int count, syncbase** array, DWORD time_limit=INFINIT
 DWORD multiwait_msg (bool all, int count, syncbase** array, DWORD time_limit=INFINITE, DWORD mask=QS_ALLINPUT);
 void udelay (unsigned short usec);
 
-#ifdef MLIBSPACE
-};  //namespace
-#endif
+}

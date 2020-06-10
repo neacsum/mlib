@@ -9,9 +9,7 @@
 #include <netfw.h>
 #include "errorcode.h"
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 /// Light wrapper for Windows firewall
 class firewall
@@ -36,6 +34,4 @@ private:
 
 extern errfac *fw_errptr;
 
-#ifdef MLIBSPACE
 };
-#endif

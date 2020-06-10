@@ -1,5 +1,5 @@
 /*!
-  \file EVENT.CPP event class implementation.
+  \file event.cpp event class implementation.
   (c) Mircea Neacsu 1999
 
 */
@@ -13,9 +13,7 @@
 #include <utf8/utf8.h>
 
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 /*!
   \class event
@@ -63,6 +61,4 @@ event::operator bool ()
   return result;
 }
 
-#ifdef MLIBSPACE
-};
-#endif
+}

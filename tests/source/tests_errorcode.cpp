@@ -3,9 +3,7 @@
 
 #include <iostream>
 
-#ifdef MLIBSPACE
-using namespace MLIBSPACE;
-#endif
+using namespace mlib;
 using namespace std;
 
 SUITE (errorcode)
@@ -17,6 +15,11 @@ SUITE (errorcode)
     erc fret;
     fret = f (2);
     return fret;
+  }
+
+  erc gg (int i)
+  {
+    return erc (i); //return a throwing error code
   }
 
   // Default erc objects are thrown
@@ -36,7 +39,12 @@ SUITE (errorcode)
   {
     int i = f (2);
     CHECK_EQUAL (2, i);
-    cout << "Size of erc is " << sizeof (erc) << endl;
+
+    // erc stuff is packed in one integer (plus one pointer to facility)
+    // let's verify the object size
+    struct S { int i; void* p; };
+    size_t sz = sizeof (erc);
+    CHECK_EQUAL (sizeof (S), sz);
   }
 
   //Reactivated erc objects are thrown
@@ -115,6 +123,33 @@ SUITE (errorcode)
     CHECK_EQUAL (3, r); // comparison invokes integer conversion and deactivates
                         // the error code
   }
+
+  TEST (copy_elision)
+  {
+    /* copy elision rules (https://en.cppreference.com/w/cpp/language/copy_elision)
+    require only one constructor to be invoked*/
+    erc r = gg (2);
+    CHECK_EQUAL (2, r);
+    r = gg (2); //move assignment invoked here. r takes activity flag from 
+                //object returned by gg.
+    r.deactivate ();
+  }
+
+  TEST (erc_assignment)
+  {
+    erc rf, rg;
+    rf = ff (3);
+    rg = gg (2);
+
+    // assigning to an active erc throws
+    CHECK_THROW (erc, (rf = rg));
+  }
+
+  TEST (erc_copy)
+  {
+    erc rf = ff (3);
+
+    erc rf1 (rf);
+    CHECK (rf1 == rf);
+  }
 }
-
-

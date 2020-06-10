@@ -1,5 +1,5 @@
 /*!
-  \file TCPSERV.CPP Implementation of tcpserver class
+  \file tcpserv.cpp Implementation of tcpserver class
 
   (c) Mircea Neacsu 2003
 
@@ -22,9 +22,7 @@
 ///Allocation increment for connections table
 #define ALLOC_INCR 5
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 /*!
   \class    tcpserver 
@@ -228,6 +226,10 @@ void tcpserver::initconn (sock& socket, thread* th)
     th->start ();
 }
 
+/*!
+  Set function or lambda expression that becomes the body of the thread
+  serving a new connection.
+*/
 void tcpserver::set_connfunc (std::function<int (sock& conn)> f)
 {
   connfunc = f;
@@ -360,6 +362,4 @@ void tcpserver::maxconn (unsigned int new_max)
   limit = new_max;
 }
 
-#ifdef MLIBSPACE
-};
-#endif
+}

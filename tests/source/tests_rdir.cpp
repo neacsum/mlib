@@ -3,9 +3,7 @@
 #include <utf8/utf8.h>
 #include <mlib/basename.h>
 
-#ifdef MLIBSPACE
-using namespace MLIBSPACE;
-#endif
+using namespace mlib;
 
 SUITE (rdir)
 {

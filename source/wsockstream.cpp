@@ -20,9 +20,7 @@
 
 #pragma comment (lib, "ws2_32.lib")
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 int sock_initializer_counter=0;
 
@@ -1217,7 +1215,5 @@ void sock_facility::log (const erc& e)
     dprintf ("%s - %d", name(), e.code());
 }
 
-#ifdef MLIBSPACE
-};
-#endif
+}
 

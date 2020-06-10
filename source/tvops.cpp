@@ -8,16 +8,16 @@
 #include <mlib/tvops.h>
 #include <assert.h>
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
-//100ns intervals between 1/1/1601 and 1/1/1970 as reported by SystemTimeToFileTime()
+/// \addtogroup tvops Operations with timeval structures
+/// @{
+
+/// 100ns intervals between 1/1/1601 and 1/1/1970 as reported by SystemTimeToFileTime()
 #define FILETIME_1970     0x019db1ded53e8000
 #define ONE_SECOND ((long)1000000)
-/*
-  Convert from UTC system time to Unix time scale (UTC form 01/01/70)
-*/
+
+///  Convert from UTC system time to Unix time scale (UTC form 01/01/70)
 timeval fromsystime (const SYSTEMTIME& st)
 {
   __int64 ft;
@@ -30,9 +30,7 @@ timeval fromsystime (const SYSTEMTIME& st)
   return tv;
 }
 
-/*
-  Convert from timeval format to SYSTEMTIME format
-*/
+///  Convert from timeval format to SYSTEMTIME format
 void tosystime (const timeval& tv, SYSTEMTIME* st)
 {
   assert (tv.tv_usec > -ONE_SECOND && tv.tv_usec < ONE_SECOND);
@@ -63,6 +61,7 @@ int zone_bias()
   return bias.tv_sec;
 }
 
+/// Convert to local time (in a SYSTEMTIME structure)
 void tolocaltime (const timeval& tv, SYSTEMTIME* st)
 {
   assert (tv.tv_usec > -ONE_SECOND && tv.tv_usec < ONE_SECOND);
@@ -112,6 +111,5 @@ void normalize (timeval& tv)
   assert (tv.tv_usec > -ONE_SECOND && tv.tv_usec < ONE_SECOND);
 }
 
-#ifdef MLIBSPACE
-};
-#endif
+/// @}
+}

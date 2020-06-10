@@ -11,9 +11,7 @@
 #include "defs.h"
 #endif
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 ///integer exponentiation function
 template <typename T>
@@ -31,6 +29,4 @@ T ipow (T base, int exp)
 };
 
 
-#ifdef MLIBSPACE
 };
-#endif
