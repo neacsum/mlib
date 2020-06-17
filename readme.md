@@ -34,6 +34,8 @@ SOFTWARE.
 mlib requires the [UTF-8 Library](https://github.com/neacsum/utf8). The test
 program requires the [UTPP Library](https://github.com/neacsum/utpp).
 
+`BUILD.bat` script will create all libraries and test programs.
+
 ## Installation ##
 All projects have been tested under Visual Studio 2019. The libraries can be 
 built in 32 or 64 bit version, with or without debug information.
