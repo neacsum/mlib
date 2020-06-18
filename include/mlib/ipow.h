@@ -5,7 +5,6 @@
 
   (c) Mircea Neacsu 2019
 */
-#pragma once
 
 #if __has_include ("defs.h")
 #include "defs.h"

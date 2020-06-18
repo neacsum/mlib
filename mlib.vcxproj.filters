@@ -144,6 +144,9 @@
     <ClInclude Include="include\mlib\tvops.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\mlib\poly.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\base64.cpp">

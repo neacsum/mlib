@@ -1,5 +1,9 @@
 #include <utpp/utpp.h>
 #include <mlib/ipow.h>
+#include <mlib/poly.h>
+
+#define _USE_MATH_DEFINES
+#include <math.h>
 
 #include <iostream>
 
@@ -51,5 +55,44 @@ SUITE (ipow)
   {
     go (2);
     go (32);
+  }
+}
+
+SUITE (poly)
+{
+  TEST (int_poly)
+  {
+    //coeffs for (X+1)^3
+    int cube[] { 1,3,3,1 };
+
+    int v = poly (2, cube, _countof(cube));
+    CHECK_EQUAL (27, v);
+
+    // f(x) = x^4 + 2x^3 + 3x^2 + 4x + 5
+    // f(2) = 57
+    v = poly (2, std::array<int, 5>{ 5, 4, 3, 2, 1 });
+    CHECK_EQUAL (57, v);
+  }
+
+  TEST (dbl_poly)
+  {
+    std::vector<double> a(8);
+
+    // Coefficients for sine approximation using Taylor series
+    // sin(x) = x - x^3/3! + x^5/5! - x^7/7! + ...
+    double fact = -1;
+    for (int i = 1; i <= 7; i++)
+    {
+      if (i % 2)
+      {
+        fact *= -i;
+        a[i] = 1 / fact;
+      }
+      else
+        fact *= i;
+    }
+
+    double vv = poly (M_PI/2, a);
+    CHECK_CLOSE (1.0, vv, 0.001);
   }
 }

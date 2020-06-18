@@ -36,7 +36,7 @@ SOFTWARE.
 - \ref mlib::shmem "shared memory"
 - \ref mlib::thread "thread"
 - \ref mlib::wtimer "waitable timer"
-- \ref mlib::syncbase "syncbase" - base class for all syncronization objects
+- \ref mlib::syncbase "syncbase" - base class for all synchronization objects
 
 ### Networking ###
 - \ref mlib::inaddr "inaddr"
@@ -61,13 +61,14 @@ SOFTWARE.
 - \ref mlib::RotMat "rotmat" - Rotations calculator
 - \ref mlib::Point "2D Point"
 
-### SQLITE Encpsulation ###
+### SQLITE Encapsulation ###
 - \ref mlib::Query "Query"
 - \ref mlib::Database "Database"
 
-### Ohter things ###
+### Other things ###
 - \ref mlib::bitstream "bitstream" - Reading and writing of bit fields
 - \ref mlib::ipow() "ipow" - Integer powers through multiplication
+- \ref mlib::poly() "poly" - Polynomial evaluation using Horner's scheme
 - \ref NMEA-0183 parsing
 - \ref mlib::Options "Options" - Parsing command line options
 - \ref mlib::ring_buffer "ring_buffer" - FIFO Circular buffer
