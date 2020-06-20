@@ -36,12 +36,23 @@ SUITE (ipow)
     for (int i = 0; i < NMAX; i++)
       dx = pow ((double)i, (double)exp);
     long long dt4 = t.GetTimeInUs ();
+    t.Start ();
+    for (int i = 0; i < NMAX; i++)
+      dx = pow (i, exp);
+    long long dt5 = t.GetTimeInUs ();
+
+    // Check timer
+    t.Start ();
+    Sleep (1000);
+    long long dt0 = t.GetTimeInUs ();
+    cout << endl << "One second has " << dt0 << " usec" << endl;
 
     cout << "Pow " << exp << " results (usec): " << endl <<
       " ipow - integer base, integer power - " << dt1 << endl <<
       " ipow - double base, integer power - " << dt2 << endl <<
       " pow  - double base, integer power - " << dt3 << endl <<
-      " pow  - double base, double power - " << dt4 << endl;
+      " pow  - double base, double power - " << dt4 << endl <<
+      " pow  - integer base, integer power - " << dt5 << endl;
   }
 
   TEST (pow)
