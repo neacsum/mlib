@@ -61,7 +61,7 @@ public:
   const char *ntoa ();
 
   /// check if it's multicast host
-  bool is_multicast () const             {return ((host() & 0xe0000000) ==  0xe0000000);};
+  bool is_multicast () const             {return ((host() & 0xf0000000) ==  0xe0000000);};
 
   static unsigned localhost ();
 
