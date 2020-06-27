@@ -80,8 +80,8 @@ public:
   erc               bind ();
   erc               connect (const sockaddr& peer, int wp_sec = INFINITE);
   erc               listen (int num=SOMAXCONN);
-  sockaddr          name () const;
-  sockaddr          peer () const;
+  inaddr            name () const;
+  inaddr            peer () const;
 
   virtual sock      accept ();
   virtual sock      accept (sockaddr& sa);
@@ -199,7 +199,6 @@ template <class strm>
 generic_sockstream<strm>::~generic_sockstream ()
 {
   delete std::ios::rdbuf ();
-  init (0);
 }
 
 ///Input socket stream

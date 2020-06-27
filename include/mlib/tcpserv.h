@@ -18,10 +18,10 @@ namespace MLIBSPACE {
 ///Connections iteration function
 typedef void (*conn_iter_func)(sock& conn, void *param);
 
-class tcpserver : public virtual sock, public thread
+class tcpserver : public sock, public thread
 {
 public:
-  tcpserver (unsigned int max_conn=0, DWORD idle_time = INFINITE);
+  tcpserver (unsigned int max_conn=0, DWORD idle_time = INFINITE, const char *name = 0);
   ~tcpserver ();
   
   void foreach (conn_iter_func f, void *param);
@@ -36,6 +36,8 @@ public:
 
   ///Return maximum number of connections accepted
   unsigned int maxconn () const {return limit;};
+
+  void set_connfunc (std::function<int (sock&)>f);
 
 protected:
   bool init ();
@@ -56,27 +58,14 @@ private:
   } **contab;
 
   criticalsection contab_lock;
-  unsigned int count;
-  unsigned int limit;
-  size_t alloc;
-  event evt;
-  bool end_req;
+  unsigned int count;     //number of active connections
+  unsigned int limit;     //max number of active connections
+  size_t alloc;           //number of allocated entries in conntab
+  event evt;              //main event
+  bool end_req;           //true when server must exit
   DWORD idle;
-};
+  std::function<int (sock& s)> connfunc;
 
-/*!
-  Return a servicing thread for each connection.
-
-  If the connection doesn't need a servicing thread (single-threaded TCP server)
-  return NULL.
-
-  The return thread should not be started. It will be started from the initconn
-  function.
-*/
-inline
-thread* tcpserver::make_thread (sock& connection)
-{
-  return NULL;
 };
 
 /*!

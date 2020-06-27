@@ -180,7 +180,7 @@ void sock::close()
   name function provides the only way to determine the local association 
   that has been set by the system.
 */
-sockaddr sock::name () const
+inaddr sock::name () const
 {
   sockaddr sa;
   int len = sizeof(sa);
@@ -193,7 +193,7 @@ sockaddr sock::name () const
   Retrieves the name of the peer to which the socket is connected. 
   The socket must be connected.
 */
-sockaddr sock::peer () const
+inaddr sock::peer () const
 {
   sockaddr sa;
   int len = sizeof(sa);

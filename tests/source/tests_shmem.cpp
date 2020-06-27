@@ -95,9 +95,9 @@ TEST_FIXTURE (shmem_fixture, ReadWrite_shmem)
 }
 
 
-TEST_FIXTURE (shmem_fixture, TwoTheard_shmem)
+TEST_FIXTURE (shmem_fixture, TwoThread_shmem)
 {
-  thread t1 ([=](void *)->int
+  thread t1 ([this]()->int
   {
     shmem<S> smem ("Shared");       //create shared memory
     CHECK (smem.is_opened ());
@@ -110,7 +110,7 @@ TEST_FIXTURE (shmem_fixture, TwoTheard_shmem)
   }
   );
 
-  thread t2 ([=](void *)->int
+  thread t2 ([this]()->int
   {
     Sleep (50);
     shmem<S> smem ("Shared");       //open shared memory
@@ -138,7 +138,7 @@ TEST_FIXTURE (shmem_fixture, SlowWriter_shmem)
   shmem<S, SlowMem> smem ("Shared");       //create shared memory
 
   //reader thread
-  thread t1 ([=](void *)->int
+  thread t1 ([this]()->int
   {
     memset (&rd, 0, sizeof (S));
 
@@ -153,7 +153,7 @@ TEST_FIXTURE (shmem_fixture, SlowWriter_shmem)
   });
 
   //writer thread
-  thread t2 ([=](void *)->int
+  thread t2 ([this]()->int
   {
     shmem<S, SlowMem> smem ("Shared");  //open shared memory
     smem << wr;                         //write data. Signaling to reader thread is done in SlowMem::write
@@ -175,7 +175,7 @@ TEST_FIXTURE (shmem_fixture, SlowReader_shmem)
   shmem<S, SlowMem> smem ("Shared");      //create shared memory
 
   //reader thread
-  thread t1 ([=](void *)->int
+  thread t1 ([=]()->int
   {
     memset (&rd, 0, sizeof (S));
 
@@ -188,7 +188,7 @@ TEST_FIXTURE (shmem_fixture, SlowReader_shmem)
   });
 
   //writer thread
-  thread t2 ([=](void *)->int
+  thread t2 ([=]()->int
   {
     shmem<S, SlowMem> smem ("Shared");      //open shared memory
     smem.wtmo (5);                          //5ms write timeout
