@@ -35,13 +35,14 @@ public:
   HANDLE handle () const { return hl->handle_; };
 
   /// Return object's name
-  const std::string& name () const { return name_; };
-
+  virtual const std::string& name () const { return name_; };
+  
+  /// Sets object's name
+  virtual void name (const char* nam);
 
 protected:
   syncbase (const char *name);        //protected constructor
   void set_handle (HANDLE h);
-  void set_name (const char *name);
 
 private:
   struct handle_life {

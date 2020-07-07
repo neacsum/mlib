@@ -118,9 +118,9 @@ void syncbase::set_handle (HANDLE h)
 }
 
 /// Change object's name
-void syncbase::set_name(const char *name)
+void syncbase::name (const char* nam)
 {
-  name_ = name?name:std::string();
+  name_ = nam ? nam : std::string ();
 }
 
 /// Check if object is signaled

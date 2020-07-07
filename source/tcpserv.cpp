@@ -53,7 +53,7 @@ tcpserver::tcpserver (unsigned int max_conn, DWORD idle_timeout, const char *nam
   , idle (idle_timeout)
   , connfunc (nullptr)
 {
-  memset (contab, 0, alloc*sizeof (conndata*));
+  memset (contab, 0, alloc * sizeof (conndata*));
 }
 
 /*!

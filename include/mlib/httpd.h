@@ -48,15 +48,15 @@ class http_connection : public thread
 public:
   friend class httpd;
 
-  const char* get_uri();
-  const char* get_method ();
-  const char* get_all_ihdr ();
+  const char* get_uri() const;
+  const char* get_method () const;
+  const char* get_all_ihdr () const;
   void        add_ohdr (const char *hdr, const char *value);
-  const char* get_ihdr (const char *hdr);
-  const char* get_ohdr (const char *hdr);
-  const char* get_query ();
-  const char* get_body ();
-  int         get_content_length ();
+  const char* get_ihdr (const char *hdr) const;
+  const char* get_ohdr (const char *hdr) const;
+  const char* get_query () const;
+  const char* get_body () const;
+  int         get_content_length () const;
   const std::string& get_qparam (const char* key);
   bool        has_qparam (const char* key);
   const std::string& get_bparam (const char* key);
@@ -67,8 +67,9 @@ public:
   void        redirect (const char *uri, unsigned int code=303);
   void        serve404 (const char *text = 0);
   int         serve_file (const std::string& full_path);
-  int         serve_buffer (BYTE *full_path, size_t sz);
   int         serve_shtml (const std::string& full_path);
+  int         serve_buffer (const BYTE *buffer, size_t sz);
+  int         serve_buffer (const std::string& str);
 
   void        respond_part (const char *part_type, const char *bound);
   void        respond_next (bool last);
@@ -122,26 +123,28 @@ public:
   httpd       (unsigned short port=HTTPD_DEFAULT_PORT, unsigned int maxconn=0);
   ~httpd      ();
 
-  void        add_ohdr (const char *field, const char *value);
-  void        remove_ohdr (const char *field);
+  void        add_ohdr (const char *hdr, const char *value);
+  void        remove_ohdr (const char *hdr);
   void        add_handler (const char *uri, uri_handler func, void *info=0);
-  void        add_alias (const char *uri, const char *path);
   bool        add_user (const char *realm, const char *username, const char *pwd);
   bool        remove_user(const char *realm, const char *username);
   void        add_realm (const char *realm, const char *uri);
-  void        add_var (const char *name, const char *fmt, void *addr, double multiplier=0.);
+  void        add_var (const char *name, const char *fmt, void *addr, double multiplier=1.);
   std::string get_var (const char *name);
+  void        aquire_varlock ();
+  void        release_varlock ();
+  bool        try_varlock ();
 
+  void        name (const char* nam);
   void        docroot (const char *path);
-  const char* docroot () {return root.c_str();};
+  const char* docroot () const;
+  void        add_alias (const char* uri, const char* path);
 
   void        default_uri (const char *name) {defuri = name;};
   const char* default_uri () {return defuri.c_str();};
 
   unsigned short port ();
   void        port (unsigned short portnum);
-  void        server_name (const char *name);
-  const char* server_name () {return servname.c_str();};
 
   void        add_mime_type (const char *ext, const char *type, bool shtml=false);
   void        delete_mime_type (const char *ext);
@@ -162,11 +165,13 @@ protected:
 private:
   unsigned short  port_num;       //!< port number
   str_pairs       out_headers;    //!< response headers
+  mlib::criticalsection hdr_lock; ///<! headers access lock
   str_pairs       realms;         //!< access control realms
 
   struct handle_info {
     uri_handler h;
     void *nfo;
+    mlib::criticalsection in_use;
   };
   std::map <std::string, handle_info> handlers;
 
@@ -178,6 +183,7 @@ private:
     double multiplier;
   };
   std::map <std::string, var_info> variables;
+  mlib::criticalsection varlock;
 
   struct user {
     std::string name;
@@ -194,42 +200,73 @@ private:
 
   std::string root;
   std::string defuri;
-  std::string servname;
 };
 
 /*==================== INLINE FUNCTIONS ===========================*/
 
 /// Return URI of this connection
 inline
-const char* http_connection::get_uri () { return uri; };
+const char* http_connection::get_uri () const { return uri; };
 
 /// Return HTTP method (GET, POST, etc.)
 inline
-const char* http_connection::get_method () { return request; };
+const char* http_connection::get_method () const { return request; };
 
 /// Return all incoming headers
 inline
-const char* http_connection::get_all_ihdr () { return headers; };
+const char* http_connection::get_all_ihdr () const { return headers; };
 
 /// Return URI query string (everything after '?' and before '#')
 inline
-const char* http_connection::get_query () { return query?query : ""; };
+const char* http_connection::get_query () const { return query?query : ""; };
 
 /// Return request body
 inline
-const char* http_connection::get_body () { return body; };
+const char* http_connection::get_body () const { return body; };
 
 /// Return request body
 inline
-int http_connection::get_content_length () { return content_len; };
+int http_connection::get_content_length () const { return content_len; };
 
 /// Return socket object associated with this connection
 inline
 sockstream& http_connection::out () { return ws; };
 
+/// Return current file origin
+inline
+const char* httpd::docroot () const
+{
+  return root.c_str ();
+}
+
 /// Return port number where server is listening
 inline
 unsigned short httpd::port () { return port_num; }
+
+
+/// Acquire lock on server's variables
+inline
+void httpd::aquire_varlock ()
+{
+  varlock.enter ();
+}
+
+/// Release lock on server's variables
+inline
+void httpd::release_varlock ()
+{
+  varlock.leave ();
+}
+
+/*!
+  Try to acquire lock on server's variables
+  \return _true_ if lock was acquired
+*/
+inline
+bool httpd::try_varlock ()
+{
+  return varlock.try_enter ();
+}
 
 void parse_urlparams (const char* par_str, str_pairs& params);
 

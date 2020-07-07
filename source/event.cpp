@@ -10,8 +10,10 @@
 
 #include <mlib/event.h>
 #include <assert.h>
-#include <utf8/utf8.h>
 
+#ifdef HAS_UTF8
+#include <utf8/utf8.h>
+#endif
 
 namespace mlib {
 

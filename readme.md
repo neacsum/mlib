@@ -46,3 +46,5 @@ You can find Doxygen generated documentation [here](https://neacsum.github.io/ml
 Also there are some articles on CodeProject detailing some of the features:
  - [Error code objects](https://www.codeproject.com/Articles/5251693/Cplusplus-Error-Handling-with-Error-Code-Objects)
  - [Windows Sockets Streams](https://www.codeproject.com/Articles/5252621/Windows-Sockets-Streams)
+ - [Windows Sockets Streams Part II - Multi-Threaded TCP Servers](https://www.codeproject.com/Articles/5270886/Windows-Sockets-Streams-Part-II-Multi-Threaded-TCP)
+ - [Windows Sockets Streams Part III - HTTP Server](https://www.codeproject.com/Articles/5272994/Windows-Sockets-Streams-Part-III-HTTP-Server)
