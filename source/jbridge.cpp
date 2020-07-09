@@ -15,9 +15,6 @@ using namespace std;
 
 namespace mlib {
 
-/// The JSON data dictionary
-extern JSONVAR json_dict[];
-
 #define MAX_JSONRESPONSE 8192
 
 // Sizes of data elements (same order as JT_.. values)
@@ -67,11 +64,13 @@ static int hexbyte (char *bin, const char *str);
 */
 
 ///Creates a JSONBridge object for the given path
-JSONBridge::JSONBridge (const char *path)
+JSONBridge::JSONBridge (const char *path, JSONVAR* dict)
   : path_ (path)
+  , dictionary (dict)
   , client_ (0)
+  , buffer (new char[MAX_JSONRESPONSE])
+  , bufptr (buffer)
 {
-  buffer = new char[MAX_JSONRESPONSE];
 }
 
 JSONBridge::~JSONBridge ()
@@ -289,7 +288,7 @@ JSONVAR* JSONBridge::find (const char *name, int *pidx)
       *pidx = 0;
   }
 
-  for (entry = json_dict; entry->name; entry++)
+  for (entry = dictionary; entry->name; entry++)
   {
     if (!strcmp (varname, entry->name))
     {

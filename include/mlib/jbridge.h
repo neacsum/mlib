@@ -38,7 +38,7 @@ typedef struct jsonvar_t {
 
 
 /// Mark the beginning of JSON dictionary
-#define JSD_STARTDIC JSONVAR json_dict[] ={
+#define JSD_STARTDIC(dict) JSONVAR dict[] ={
 
 /// Mark the end of JSON dictionary
 #define JSD_ENDDIC {0, 0, JT_INT, 0, 0} }
@@ -88,7 +88,7 @@ typedef struct jsonvar_t {
 /// JSON objects support
 class JSONBridge {
 public:
-  JSONBridge (const char *path);
+  JSONBridge (const char *path, JSONVAR* dict);
   ~JSONBridge ();
 
   void attach_to (httpd& server);
@@ -112,6 +112,7 @@ private:
   bool parse_urlencoded ();
 
   const char *path_;
+  JSONVAR* dictionary;
   http_connection *client_;
   char *buffer;
   char *bufptr;
