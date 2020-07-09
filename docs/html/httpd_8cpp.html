@@ -53,7 +53,7 @@ $(function() {
 <div class="textblock"><code>#include &lt;<a class="el" href="httpd_8h_source.html">mlib/httpd.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="trace_8h_source.html">mlib/trace.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="base64_8h_source.html">mlib/base64.h</a>&gt;</code><br />
-<code>#include &lt;utf8/utf8.h&gt;</code><br />
+<code>#include &lt;io.h&gt;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
@@ -72,19 +72,18 @@ Macros</h2></td></tr>
 <tr class="memdesc:a8cf9d8dd62d4a6298531051a0109e17a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default server name. <br /></td></tr>
 <tr class="separator:a8cf9d8dd62d4a6298531051a0109e17a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afb392cbae748f6a9f2c4bd75a003dd47"><td class="memItemLeft" align="right" valign="top"><a id="afb392cbae748f6a9f2c4bd75a003dd47"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>HTTPD_TIMEOUT</b>&#160;&#160;&#160;30</td></tr>
+#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="httpd_8cpp.html#afb392cbae748f6a9f2c4bd75a003dd47">HTTPD_TIMEOUT</a>&#160;&#160;&#160;30</td></tr>
+<tr class="memdesc:afb392cbae748f6a9f2c4bd75a003dd47"><td class="mdescLeft">&#160;</td><td class="mdescRight">Timeout interval whaile waiting for a client response. <br /></td></tr>
 <tr class="separator:afb392cbae748f6a9f2c4bd75a003dd47"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac751093750f3b318cc8803e85a779f6b"><td class="memItemLeft" align="right" valign="top"><a id="ac751093750f3b318cc8803e85a779f6b"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>MAX_PAR</b>&#160;&#160;&#160;1024</td></tr>
+#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="httpd_8cpp.html#ac751093750f3b318cc8803e85a779f6b">MAX_PAR</a>&#160;&#160;&#160;1024</td></tr>
+<tr class="memdesc:ac751093750f3b318cc8803e85a779f6b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Max length of a form parameter. <br /></td></tr>
 <tr class="separator:ac751093750f3b318cc8803e85a779f6b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5d1940045dc2e7de552f3d4ff13a74ab"><td class="memItemLeft" align="right" valign="top"><a id="a5d1940045dc2e7de552f3d4ff13a74ab"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>INADDR_ANY</b>&#160;&#160;&#160;(unsigned int)0</td></tr>
-<tr class="separator:a5d1940045dc2e7de552f3d4ff13a74ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:afe967d60283b2ce84a1dae08b222df8a"><td class="memItemLeft" align="right" valign="top"><a id="afe967d60283b2ce84a1dae08b222df8a"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="httpd_8h.html#afe967d60283b2ce84a1dae08b222df8a">mlib::parse_urlparams</a> (const char *par_str, str_pairs &amp;params)</td></tr>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="httpd_8h.html#afe967d60283b2ce84a1dae08b222df8a">mlib::parse_urlparams</a> (const char *par_str, <a class="el" href="httpd_8h.html#a52f5ca33adf32f8835b528cdcd77cfc9">str_pairs</a> &amp;params)</td></tr>
 <tr class="memdesc:afe967d60283b2ce84a1dae08b222df8a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Parse a URL encoded string of parameters. <br /></td></tr>
 <tr class="separator:afe967d60283b2ce84a1dae08b222df8a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -94,7 +93,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="http
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jun 17 2020 21:54:25 for MLIB by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Jul 8 2020 21:54:04 for MLIB by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.18
 </small></address>

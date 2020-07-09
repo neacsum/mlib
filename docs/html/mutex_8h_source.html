@@ -55,7 +55,7 @@ $(function() {
 <div class="line"><a name="l00013"></a><span class="lineno"><a class="line" href="classmlib_1_1mutex.html">   13</a></span>&#160;<span class="keyword">class </span><a class="code" href="classmlib_1_1mutex.html">mutex</a> : <span class="keyword">public</span> <a class="code" href="classmlib_1_1syncbase.html">syncbase</a></div>
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;{</div>
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;  <a class="code" href="classmlib_1_1mutex.html#a383d5b41c77ad7e9699bbba54303757a">mutex</a> (<span class="keyword">const</span> <span class="keywordtype">char</span> *<a class="code" href="classmlib_1_1syncbase.html#a2d0a7d9c4747206cb3d423d4e1a4236a">name</a>=NULL);</div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;  <a class="code" href="classmlib_1_1mutex.html#a383d5b41c77ad7e9699bbba54303757a">mutex</a> (<span class="keyword">const</span> <span class="keywordtype">char</span> *<a class="code" href="classmlib_1_1syncbase.html#ae56b7e140e7c723cfdcc58849b429e58">name</a>=NULL);</div>
 <div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;  <span class="keyword">operator</span> bool ();</div>
 <div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classmlib_1_1mutex.html#a72e1bcef048a53b5a40ebf61443558a3">signal</a> ();</div>
 <div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;};</div>
@@ -68,13 +68,13 @@ $(function() {
 <div class="ttc" id="aclassmlib_1_1mutex_html_a72e1bcef048a53b5a40ebf61443558a3"><div class="ttname"><a href="classmlib_1_1mutex.html#a72e1bcef048a53b5a40ebf61443558a3">mlib::mutex::signal</a></div><div class="ttdeci">void signal()</div><div class="ttdoc">Signal the mutex.</div><div class="ttdef"><b>Definition:</b> mutex.h:23</div></div>
 <div class="ttc" id="asyncbase_8h_html"><div class="ttname"><a href="syncbase_8h.html">syncbase.h</a></div></div>
 <div class="ttc" id="aclassmlib_1_1syncbase_html"><div class="ttname"><a href="classmlib_1_1syncbase.html">mlib::syncbase</a></div><div class="ttdoc">Base class for all named synchronization objects.</div><div class="ttdef"><b>Definition:</b> syncbase.h:19</div></div>
-<div class="ttc" id="aclassmlib_1_1syncbase_html_a2d0a7d9c4747206cb3d423d4e1a4236a"><div class="ttname"><a href="classmlib_1_1syncbase.html#a2d0a7d9c4747206cb3d423d4e1a4236a">mlib::syncbase::name</a></div><div class="ttdeci">const std::string &amp; name() const</div><div class="ttdoc">Return object's name.</div><div class="ttdef"><b>Definition:</b> syncbase.h:38</div></div>
 <div class="ttc" id="aclassmlib_1_1syncbase_html_a05c53e6550875d2576e92767110a2086"><div class="ttname"><a href="classmlib_1_1syncbase.html#a05c53e6550875d2576e92767110a2086">mlib::syncbase::handle</a></div><div class="ttdeci">HANDLE handle() const</div><div class="ttdoc">Return OS handle of this object.</div><div class="ttdef"><b>Definition:</b> syncbase.h:35</div></div>
 <div class="ttc" id="aclassmlib_1_1mutex_html"><div class="ttname"><a href="classmlib_1_1mutex.html">mlib::mutex</a></div><div class="ttdoc">Wrapper for Windows mutexes.</div><div class="ttdef"><b>Definition:</b> mutex.h:14</div></div>
 <div class="ttc" id="aclassmlib_1_1mutex_html_a383d5b41c77ad7e9699bbba54303757a"><div class="ttname"><a href="classmlib_1_1mutex.html#a383d5b41c77ad7e9699bbba54303757a">mlib::mutex::mutex</a></div><div class="ttdeci">mutex(const char *name=NULL)</div><div class="ttdoc">Constructor.</div><div class="ttdef"><b>Definition:</b> mutex.cpp:27</div></div>
+<div class="ttc" id="aclassmlib_1_1syncbase_html_ae56b7e140e7c723cfdcc58849b429e58"><div class="ttname"><a href="classmlib_1_1syncbase.html#ae56b7e140e7c723cfdcc58849b429e58">mlib::syncbase::name</a></div><div class="ttdeci">virtual const std::string &amp; name() const</div><div class="ttdoc">Return object's name.</div><div class="ttdef"><b>Definition:</b> syncbase.h:38</div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jun 17 2020 21:54:25 for MLIB by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Jul 8 2020 21:54:03 for MLIB by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.18
 </small></address>

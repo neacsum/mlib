@@ -28,7 +28,7 @@ SOFTWARE.
 
 ## Objects Inventory ##
 
-### Syncronization ###
+### Synchronization ###
 - \ref mlib::criticalsection "critical section"
 - \ref mlib::event "event"
 - \ref mlib::mutex "mutex"
@@ -45,7 +45,7 @@ SOFTWARE.
 - \ref mlib::generic_sockstream "generic_sockstream" and derived classes
 - \ref mlib::tcpserver "TCP server"
 - \ref mlib::httpd "HTTP server"
-- \ref mlib::JSONBridge "JSONBridge" - JSON interface to HTTP server"
+- \ref mlib::JSONBridge "JSONBridge" - JSON interface to HTTP server
 - \ref mlib::firewall "Windows firewall" configuration
 
 ### Error Logging and Handling ###

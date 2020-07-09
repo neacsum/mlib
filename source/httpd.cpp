@@ -19,16 +19,16 @@ using namespace mlib;
 //Defaults
 #define HTTPD_DEFAULT_URI "index.html"          //!< Default URL
 #define HTTPD_SERVER_NAME "MNCS_HTTPD 1.0"      //!< Default server name
+
+/// Timeout interval whaile waiting for a client response
 #define HTTPD_TIMEOUT     30
 
-#define MAX_PAR 1024                            //<! max length of a form parameter
+/// Max length of a form parameter
+#define MAX_PAR 1024
 
 #ifdef _MSC_VER
 #pragma warning (disable:4996)
 #endif
-
-#undef INADDR_ANY
-#define INADDR_ANY (unsigned int)0
 
 namespace mlib {
 
@@ -362,6 +362,9 @@ void http_connection::process_valid_request ()
   }
 }
 
+/*!
+  Sends a 404 (page not found) response
+*/
 void http_connection::serve404 (const char* text)
 {
   static const char* std404 = "<html><head><title>Page not found</title></head>"
@@ -695,7 +698,7 @@ int http_connection::serve_buffer(const BYTE *src_buff, size_t sz)
 
   The string is preceded by "Content-Length" header.
 */
-int http_connection::serve_buffer (const string& str)
+int http_connection::serve_buffer (const std::string& str)
 {
   return serve_buffer ((const BYTE*)str.data (), str.size ());
 }
@@ -982,7 +985,7 @@ const char *http_connection::get_ohdr(const char *hdr) const
 /*!
   Send first part of a multi-part response.
   \param part_type value of the 'Content-Type' header
-  \param boundary part boundary string
+  \param bound part boundary string
 */
 void http_connection::respond_part (const char *part_type, const char *bound)
 {
@@ -1076,7 +1079,7 @@ bool httpd::init ()
   try {
     if (!is_open ())
       open (SOCK_STREAM);
-    inaddr me ((unsigned long)INADDR_ANY, port_num);
+    inaddr me (INADDR_ANY, port_num);
     bind (me);
   }
   catch (erc& x)
@@ -1229,6 +1232,13 @@ void httpd::add_realm (const char *realm, const char *uri)
   realms[realm] = uri;
 }
 
+/*!
+  Add a new user to a relm or modifies password for an existing user.
+  \param realm access realm
+  \param username user name
+  \param pwd user password
+  \return _true_ if successful or _false_ if realm doesn't exist
+*/
 bool httpd::add_user (const char *realm, const char *username, const char *pwd)
 {
   if (realms.find (realm) == realms.end ())
@@ -1366,10 +1376,9 @@ void httpd::add_alias (const char *uri, const char *path)
 
   After processing the alias table, any part of the original URI that was not
   mapped is appended to the resulting path. For instance if the alias table
-  contains an entry mapping 'doc' to 'documentation' and docroot is set as
-  'c:\local folder\', an URI like '/doc/project1/filename.html' will be mapped to 
-  'c:\local folder\documentation\project1\filename.html'.
-
+  contains an entry mapping "doc" to "documentation" and docroot is set as
+  "c:\local_folder\", an URI like "/doc/project1/filename.html" will be mapped to 
+  "c:\local_folder\documentation\project1\filename.html".
 */
 bool httpd::find_alias (const char *uri, char *path)
 {

@@ -76,41 +76,39 @@ $(function() {
 <div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160; </div>
 <div class="line"><a name="l00035"></a><span class="lineno"><a class="line" href="classmlib_1_1syncbase.html#a05c53e6550875d2576e92767110a2086">   35</a></span>&#160;  HANDLE <a class="code" href="classmlib_1_1syncbase.html#a05c53e6550875d2576e92767110a2086">handle</a> ()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> hl-&gt;handle_; };</div>
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160; </div>
-<div class="line"><a name="l00038"></a><span class="lineno"><a class="line" href="classmlib_1_1syncbase.html#a2d0a7d9c4747206cb3d423d4e1a4236a">   38</a></span>&#160;  <span class="keyword">const</span> std::string&amp; <a class="code" href="classmlib_1_1syncbase.html#a2d0a7d9c4747206cb3d423d4e1a4236a">name</a> ()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> name_; };</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160; </div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160; </div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="keyword">protected</span>:</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;  <a class="code" href="classmlib_1_1syncbase.html#a53d7265f70ab184894a9b7acf72270ed">syncbase</a> (<span class="keyword">const</span> <span class="keywordtype">char</span> *<a class="code" href="classmlib_1_1syncbase.html#a2d0a7d9c4747206cb3d423d4e1a4236a">name</a>);        <span class="comment">//protected constructor</span></div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classmlib_1_1syncbase.html#a4302a7986b6f5d7cc3f0b2c28496c990">set_handle</a> (HANDLE h);</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classmlib_1_1syncbase.html#a65cf4e5822d32b354ea8b813a82e0577">set_name</a> (<span class="keyword">const</span> <span class="keywordtype">char</span> *<a class="code" href="classmlib_1_1syncbase.html#a2d0a7d9c4747206cb3d423d4e1a4236a">name</a>);</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160; </div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;  <span class="keyword">struct </span>handle_life {</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    HANDLE handle_;</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> lives;</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  } *hl;</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;  std::string name_;</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;};</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160; </div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;<span class="keyword">inline</span></div>
-<div class="line"><a name="l00060"></a><span class="lineno"><a class="line" href="classmlib_1_1syncbase.html#a65a37516b49ec619763745be562de675">   60</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="classmlib_1_1syncbase.html#a65a37516b49ec619763745be562de675">syncbase::try_wait</a> ()</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;{</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;  <span class="keywordflow">return</span> (<a class="code" href="classmlib_1_1syncbase.html#a99433891d3ccd92884b2e003c4c5e7ca">wait</a>(0) == WAIT_OBJECT_0);</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;}</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160; </div>
+<div class="line"><a name="l00038"></a><span class="lineno"><a class="line" href="classmlib_1_1syncbase.html#ae56b7e140e7c723cfdcc58849b429e58">   38</a></span>&#160;  <span class="keyword">virtual</span> <span class="keyword">const</span> std::string&amp; <a class="code" href="classmlib_1_1syncbase.html#ae56b7e140e7c723cfdcc58849b429e58">name</a> ()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> name_; };</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;  </div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;  <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classmlib_1_1syncbase.html#ae56b7e140e7c723cfdcc58849b429e58">name</a> (<span class="keyword">const</span> <span class="keywordtype">char</span>* nam);</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160; </div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="keyword">protected</span>:</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;  <a class="code" href="classmlib_1_1syncbase.html#a53d7265f70ab184894a9b7acf72270ed">syncbase</a> (<span class="keyword">const</span> <span class="keywordtype">char</span> *<a class="code" href="classmlib_1_1syncbase.html#ae56b7e140e7c723cfdcc58849b429e58">name</a>);        <span class="comment">//protected constructor</span></div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classmlib_1_1syncbase.html#a4302a7986b6f5d7cc3f0b2c28496c990">set_handle</a> (HANDLE h);</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160; </div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;  <span class="keyword">struct </span>handle_life {</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    HANDLE handle_;</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> lives;</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;  } *hl;</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;  std::string name_;</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;};</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160; </div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;<span class="keyword">inline</span></div>
+<div class="line"><a name="l00061"></a><span class="lineno"><a class="line" href="classmlib_1_1syncbase.html#a65a37516b49ec619763745be562de675">   61</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="classmlib_1_1syncbase.html#a65a37516b49ec619763745be562de675">syncbase::try_wait</a> ()</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;{</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;  <span class="keywordflow">return</span> (<a class="code" href="classmlib_1_1syncbase.html#a99433891d3ccd92884b2e003c4c5e7ca">wait</a>(0) == WAIT_OBJECT_0);</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;}</div>
 <div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160; </div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;DWORD <a class="code" href="group__syncro.html#gabbfea6149db000dda82fc04a81b824b6">multiwait</a> (<span class="keywordtype">bool</span> all, <span class="keywordtype">int</span> count, <a class="code" href="classmlib_1_1syncbase.html">syncbase</a>** array, DWORD time_limit=INFINITE);</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;DWORD <a class="code" href="group__syncro.html#gae9bba06f8f296bc6a6137bf3b7cd8fae">multiwait_msg</a> (<span class="keywordtype">bool</span> all, <span class="keywordtype">int</span> count, <a class="code" href="classmlib_1_1syncbase.html">syncbase</a>** array, DWORD time_limit=INFINITE, DWORD mask=QS_ALLINPUT);</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="keywordtype">void</span> <a class="code" href="syncbase_8h.html#a1fe8d90527b62e3fe3987f6e371e3733">udelay</a> (<span class="keywordtype">unsigned</span> <span class="keywordtype">short</span> usec);</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160; </div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;}</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160; </div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;DWORD <a class="code" href="group__syncro.html#gabbfea6149db000dda82fc04a81b824b6">multiwait</a> (<span class="keywordtype">bool</span> all, <span class="keywordtype">int</span> count, <a class="code" href="classmlib_1_1syncbase.html">syncbase</a>** array, DWORD time_limit=INFINITE);</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;DWORD <a class="code" href="group__syncro.html#gae9bba06f8f296bc6a6137bf3b7cd8fae">multiwait_msg</a> (<span class="keywordtype">bool</span> all, <span class="keywordtype">int</span> count, <a class="code" href="classmlib_1_1syncbase.html">syncbase</a>** array, DWORD time_limit=INFINITE, DWORD mask=QS_ALLINPUT);</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="keywordtype">void</span> <a class="code" href="syncbase_8h.html#a1fe8d90527b62e3fe3987f6e371e3733">udelay</a> (<span class="keywordtype">unsigned</span> <span class="keywordtype">short</span> usec);</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160; </div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;}</div>
 </div><!-- fragment --></div><!-- contents -->
-<div class="ttc" id="aclassmlib_1_1syncbase_html_a65cf4e5822d32b354ea8b813a82e0577"><div class="ttname"><a href="classmlib_1_1syncbase.html#a65cf4e5822d32b354ea8b813a82e0577">mlib::syncbase::set_name</a></div><div class="ttdeci">void set_name(const char *name)</div><div class="ttdoc">Change object's name.</div><div class="ttdef"><b>Definition:</b> syncbase.cpp:121</div></div>
 <div class="ttc" id="aclassmlib_1_1syncbase_html_a53d7265f70ab184894a9b7acf72270ed"><div class="ttname"><a href="classmlib_1_1syncbase.html#a53d7265f70ab184894a9b7acf72270ed">mlib::syncbase::syncbase</a></div><div class="ttdeci">syncbase()</div><div class="ttdoc">Default constructor.</div><div class="ttdef"><b>Definition:</b> syncbase.cpp:28</div></div>
 <div class="ttc" id="aclassmlib_1_1syncbase_html"><div class="ttname"><a href="classmlib_1_1syncbase.html">mlib::syncbase</a></div><div class="ttdoc">Base class for all named synchronization objects.</div><div class="ttdef"><b>Definition:</b> syncbase.h:19</div></div>
 <div class="ttc" id="agroup__syncro_html_gae9bba06f8f296bc6a6137bf3b7cd8fae"><div class="ttname"><a href="group__syncro.html#gae9bba06f8f296bc6a6137bf3b7cd8fae">mlib::multiwait_msg</a></div><div class="ttdeci">DWORD multiwait_msg(bool all, int count, syncbase **array, DWORD time_limit=INFINITE, DWORD mask=QS_ALLINPUT)</div><div class="ttdef"><b>Definition:</b> syncbase.cpp:168</div></div>
-<div class="ttc" id="aclassmlib_1_1syncbase_html_a2d0a7d9c4747206cb3d423d4e1a4236a"><div class="ttname"><a href="classmlib_1_1syncbase.html#a2d0a7d9c4747206cb3d423d4e1a4236a">mlib::syncbase::name</a></div><div class="ttdeci">const std::string &amp; name() const</div><div class="ttdoc">Return object's name.</div><div class="ttdef"><b>Definition:</b> syncbase.h:38</div></div>
-<div class="ttc" id="aclassmlib_1_1syncbase_html_a65a37516b49ec619763745be562de675"><div class="ttname"><a href="classmlib_1_1syncbase.html#a65a37516b49ec619763745be562de675">mlib::syncbase::try_wait</a></div><div class="ttdeci">virtual bool try_wait()</div><div class="ttdoc">Try to wait on the object.</div><div class="ttdef"><b>Definition:</b> syncbase.h:60</div></div>
+<div class="ttc" id="aclassmlib_1_1syncbase_html_a65a37516b49ec619763745be562de675"><div class="ttname"><a href="classmlib_1_1syncbase.html#a65a37516b49ec619763745be562de675">mlib::syncbase::try_wait</a></div><div class="ttdeci">virtual bool try_wait()</div><div class="ttdoc">Try to wait on the object.</div><div class="ttdef"><b>Definition:</b> syncbase.h:61</div></div>
 <div class="ttc" id="aclassmlib_1_1syncbase_html_a96f190fef9906dbc9641ff73859a3ef7"><div class="ttname"><a href="classmlib_1_1syncbase.html#a96f190fef9906dbc9641ff73859a3ef7">mlib::syncbase::wait_alertable</a></div><div class="ttdeci">virtual DWORD wait_alertable(DWORD time_limit=INFINITE)</div><div class="ttdef"><b>Definition:</b> syncbase.cpp:98</div></div>
 <div class="ttc" id="aclassmlib_1_1syncbase_html_a05c53e6550875d2576e92767110a2086"><div class="ttname"><a href="classmlib_1_1syncbase.html#a05c53e6550875d2576e92767110a2086">mlib::syncbase::handle</a></div><div class="ttdeci">HANDLE handle() const</div><div class="ttdoc">Return OS handle of this object.</div><div class="ttdef"><b>Definition:</b> syncbase.h:35</div></div>
 <div class="ttc" id="aclassmlib_1_1syncbase_html_a99433891d3ccd92884b2e003c4c5e7ca"><div class="ttname"><a href="classmlib_1_1syncbase.html#a99433891d3ccd92884b2e003c4c5e7ca">mlib::syncbase::wait</a></div><div class="ttdeci">virtual DWORD wait(DWORD time_limit=INFINITE)</div><div class="ttdoc">Wait for the object to become signaled.</div><div class="ttdef"><b>Definition:</b> syncbase.cpp:90</div></div>
@@ -121,9 +119,10 @@ $(function() {
 <div class="ttc" id="asyncbase_8h_html_a1fe8d90527b62e3fe3987f6e371e3733"><div class="ttname"><a href="syncbase_8h.html#a1fe8d90527b62e3fe3987f6e371e3733">mlib::udelay</a></div><div class="ttdeci">void udelay(unsigned short usec)</div><div class="ttdoc">Busy waiting for a number of microseconds.</div><div class="ttdef"><b>Definition:</b> syncbase.cpp:180</div></div>
 <div class="ttc" id="aclassmlib_1_1syncbase_html_ac234da6fda029f7b5dc4da701a674110"><div class="ttname"><a href="classmlib_1_1syncbase.html#ac234da6fda029f7b5dc4da701a674110">mlib::syncbase::operator==</a></div><div class="ttdeci">int operator==(const syncbase &amp;rhs) const</div><div class="ttdoc">Equality operator.</div><div class="ttdef"><b>Definition:</b> syncbase.cpp:83</div></div>
 <div class="ttc" id="aclassmlib_1_1syncbase_html_af4b87692ea47f63cd5d0875e78d5b1ce"><div class="ttname"><a href="classmlib_1_1syncbase.html#af4b87692ea47f63cd5d0875e78d5b1ce">mlib::syncbase::~syncbase</a></div><div class="ttdeci">virtual ~syncbase()</div><div class="ttdoc">Destructor.</div><div class="ttdef"><b>Definition:</b> syncbase.cpp:52</div></div>
+<div class="ttc" id="aclassmlib_1_1syncbase_html_ae56b7e140e7c723cfdcc58849b429e58"><div class="ttname"><a href="classmlib_1_1syncbase.html#ae56b7e140e7c723cfdcc58849b429e58">mlib::syncbase::name</a></div><div class="ttdeci">virtual const std::string &amp; name() const</div><div class="ttdoc">Return object's name.</div><div class="ttdef"><b>Definition:</b> syncbase.h:38</div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jun 17 2020 21:54:25 for MLIB by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Jul 8 2020 21:54:03 for MLIB by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.18
 </small></address>
