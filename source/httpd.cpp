@@ -7,7 +7,8 @@
 #include <mlib/trace.h>
 #include <mlib/base64.h>
 
-#ifdef HAS_UTF8
+#if __has_include(<utf8/utf8.h>)
+#define HAS_UTF8
 #include <utf8/utf8.h>
 #else
 #include <io.h> //for _access
@@ -20,7 +21,7 @@ using namespace mlib;
 #define HTTPD_DEFAULT_URI "index.html"          //!< Default URL
 #define HTTPD_SERVER_NAME "MNCS_HTTPD 1.0"      //!< Default server name
 
-/// Timeout interval whaile waiting for a client response
+/// Timeout interval while waiting for a client response
 #define HTTPD_TIMEOUT     30
 
 /// Max length of a form parameter
@@ -1490,16 +1491,17 @@ const char *httpd::guess_mimetype (const char *file, bool& shtml)
 bool file_exists (char *path)
 {
   //normalize forward slashes to backslashes
-  while (*path)
+  char* p = path;
+  while (*p)
   {
-    if (*path == '/')
-      *path = '\\';
-    ++path;
+    if (*p == '/')
+      *p = '\\';
+    ++p;
   }
-#if HAS_UTF8
+#ifdef HAS_UTF8
   return utf8::access (path, 4);
 #else
-  return _access (path, 4);
+  return (_access (path, 4) != 0);
 #endif
 }
 

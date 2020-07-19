@@ -11,7 +11,8 @@
 #include <mlib/event.h>
 #include <assert.h>
 
-#ifdef HAS_UTF8
+#if __has_include(<utf/utf8.h>)
+#define HAS_UTF8
 #include <utf8/utf8.h>
 #endif
 
