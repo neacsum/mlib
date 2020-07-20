@@ -4,13 +4,13 @@
   (c) Mircea Neacsu 1999
 
 */
-#ifndef UNICODE
-#define UNICODE
-#endif
-
 #include <mlib/mutex.h>
 #include <assert.h>
+
+#if __has_include(<utf8/utf8.h>)
+#define HAS_UTF8
 #include <utf8/utf8.h>
+#endif
 
 namespace mlib {
 /*!
@@ -27,7 +27,11 @@ namespace mlib {
 mutex::mutex (const char *name) :
   syncbase (name)
 {
+#ifdef HAS_UTF8
   HANDLE h=CreateMutexW (NULL, FALSE, name?utf8::widen(name).c_str():NULL);
+#else
+  HANDLE h = CreateMutexA (NULL, FALSE, name);
+#endif
   assert (h);
   set_handle (h);
 }
