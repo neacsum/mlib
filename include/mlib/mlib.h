@@ -33,5 +33,6 @@
 #include "sqlitepp.h"
 #include "statpars.h"
 #include "stopwatch.h"
+#include "syncque.h"
 #include "trace.h"
 #include "wtimer.h"
