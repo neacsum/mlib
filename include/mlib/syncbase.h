@@ -9,7 +9,9 @@
 #include "defs.h"
 #endif
 
-#include <Winsock2.h>
+#ifndef _INC_WINDOWS
+#include <windows.h>
+#endif
 #include <string>
 
 namespace mlib {
