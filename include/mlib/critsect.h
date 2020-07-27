@@ -10,8 +10,6 @@
 #include "defs.h"
 #endif
 
-#include <Winsock2.h>
-
 namespace mlib {
 
 /*!
@@ -33,6 +31,10 @@ public:
 
 private:
   CRITICAL_SECTION section;
+
+  //critical sections cannot be copied or assigned
+  criticalsection (const criticalsection&) = delete;
+  criticalsection& operator =(const criticalsection&) = delete;
 };
 
 /*!
@@ -50,7 +52,7 @@ private:
 
   void func()
   {
-    lock inuse( section );  //Aquire critical section
+    lock inuse( section );  //Acquire critical section
 
     //... code protected by critical section
 
@@ -65,7 +67,7 @@ private:
 class lock
 {
 public:
-  ///Aquire critical section
+  ///Acquire critical section
   lock (criticalsection& cs);
 
   ///Copy constructor
@@ -73,9 +75,6 @@ public:
 
   ///Leave critical section
   ~lock ();
-
-  ///Assignment operator
-  lock& operator= (const lock& rhs);
 
 private:
   criticalsection& section;
@@ -126,15 +125,6 @@ inline
 lock::lock (const lock& t) : section (t.section) 
 { 
   section.enter (); 
-}
-
-inline
-lock& lock::operator= (const lock& rhs)
-{
-  section.leave (); 
-  section = rhs.section; 
-  section.enter ();
-  return *this;
 }
 
 inline
