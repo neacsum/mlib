@@ -1,14 +1,13 @@
 /*!
   \file syncque.h Definition of sync_queue and bounded_queue classes
 
-  (c) Mircea Neacsu 1999-2014. All rights reserved.
+  (c) Mircea Neacsu 1999-2020. All rights reserved.
 */
 #pragma once
 
 #include <queue>
 #include "semaphore.h"
 #include "critsect.h"
-#include "trace.h"
 
 namespace mlib 
 {
@@ -21,15 +20,50 @@ namespace mlib
 
   \note sync_queue is not bounded and it can grow up to the available memory.
 */
-template <class M> 
-class sync_queue : protected std::queue< M, std::deque<M> >
+template <class M, class C=std::deque<M>> 
+class sync_queue : protected std::queue<M, C>
 {
 public:
   sync_queue () {};
-  virtual void produce (const M&);
-  virtual M consume ();
-  bool empty();
-  size_t size ();
+
+  /// Append an element to queue
+  virtual void produce (const M& obj)
+  {
+    lock l (update);        //take control of the queue
+    this->push (obj);       //put a copy of the object at the end
+  con_sema.signal ();     //and signal the semaphore
+  }
+
+  /// Extract and return first element in queue
+  virtual M consume ()
+  {
+  M result;
+  update.enter ();
+    while (std::queue<M, C>::empty ())
+    {
+      update.leave ();
+      con_sema.wait ();        //wait for a producer
+      update.enter ();
+    }
+    result = this->front ();  //get the message
+    this->pop ();
+  update.leave ();
+  return result;
+  }
+
+  /// Return _true_ if queue is empty
+  bool empty()
+  {
+  lock l (update);
+    return std::queue<M, C>::empty ();
+  }
+
+  /// Return queue size 
+  size_t size ()
+  {
+  lock l (update);
+    return std::queue<M, C>::size ();
+  }
 
 protected:
   semaphore con_sema;       ///< consumers' semaphore counts down until queue is empty
@@ -42,122 +76,66 @@ protected:
   bounded_queue objects can grow only up to the set limit. If the queue is full,
   producers have to wait until space becomes available.
 */
-template <class M>
-class bounded_queue : public sync_queue<M>
+template< class M, class C = std::deque<M> >
+class bounded_queue : public sync_queue<M, C>
 {
 public:
-  bounded_queue (size_t limit);
-  void produce (const M&);
-  M consume ();
-  bool full ();
+  bounded_queue (size_t limit_) : limit (limit_)
+  {
+  pro_sema.signal ((int)limit);
+  }
 
-private:
+  /// Append an element to queue. If queue is full, waits until space
+  /// becomes available.
+  void produce (const M& obj)
+  {
+    this->update.enter ();
+    while (std::queue<M, C>::size () > limit)
+    {
+      this->update.leave ();
+    pro_sema.wait ();
+      this->update.enter ();
+    }
+    this->push (obj);
+    this->con_sema.signal ();
+    this->update.leave ();
+  }
+
+  /// Extract and return first element in queue
+  M consume ()
+  {
+  M result;
+    this->update.enter ();
+    if (std::queue<M, C>::empty ())
+  {
+    while (1)
+    {
+        this->update.leave ();
+        this->con_sema.wait ();        //wait for a producer
+        this->update.enter ();
+        if (!std::queue<M, C>::empty ())
+        break;
+    }
+  }
+    result = this->front ();  //get the message
+    this->pop ();
+  pro_sema.signal ();  //signal producers there is space available
+    this->update.leave ();
+  return result;
+  }
+
+  /// Return _true_ if queue is at capacity
+  bool full ()
+  {
+    lock l (this->update);
+    return (std::queue<M, C>.size () == limit);
+  }
+
+
+protected:
   size_t limit;
   semaphore pro_sema;   ///< producers' semaphore counts down until queue is full
 };
 
-//-------------------- sync_queue methods -------------------------------------
-/// Append an element to queue
-template <class M>
-void sync_queue<M>::produce (const M& obj)
-{
-  mlib::lock l (update);  //take control of the queue
-  push (obj);             //put a copy of the object at the end
-  con_sema.signal ();     //and signal the semaphore
-}
-
-/// Extract and return first element in queue
-template <class M> 
-M sync_queue<M>::consume ()
-{
-  M result;
-  update.enter ();
-  if (empty ())
-  {
-    while (1)
-    {
-      update.leave ();
-      con_sema.wait ();        //wait for a producer
-      update.enter ();
-      if (!empty ())
-        break;
-    }
-  }
-  result = front ();  //get the message
-  pop ();
-  update.leave ();
-  return result;
-}
-
-/// Return _true_ if queue is empty
-template <class M>
-bool sync_queue<M>::empty ()
-{
-  lock l (update);
-  return queue<M>::empty ();
-}
-
-/// Return queue size 
-template <class M>
-size_t sync_queue<M>::size ()
-{
-  lock l (update);
-  return queue<M>::size ();
-}
-
-//-------------------- bounded_queue methods ------------------------------------
-template <class M>
-bounded_queue<M>::bounded_queue (size_t limit_)
-  : limit (limit_)
-{
-  pro_sema.signal ((int)limit);
-}
-
-/// Append an element to queue. If queue is already full, waits until there is
-/// space available.
-template <class M>
-void bounded_queue<M>::produce (const M& obj)
-{
-  update.enter ();
-  while (std::queue<M>::size () > limit)
-  {
-    update.leave ();
-    pro_sema.wait ();
-    update.enter ();
-  }
-  push (obj);
-  con_sema.signal ();
-  update.leave ();
-}
-
-template <class M>
-M bounded_queue<M>::consume ()
-{
-  M result;
-  update.enter ();
-  if (std::queue<M>::empty ())
-  {
-    while (1)
-    {
-      update.leave ();
-      con_sema.wait ();        //wait for a producer
-      update.enter ();
-      if (!empty ())
-        break;
-    }
-  }
-  result = front ();  //get the message
-  pop ();
-  pro_sema.signal ();  //signal producers there is space available
-  update.leave ();
-  return result;
-}
-
-template <class M>
-bool bounded_queue<M>::full ()
-{
-  lock l (update);
-  return (std::queue<M>.size () == limit);
-}
 
 }  //end namespace
