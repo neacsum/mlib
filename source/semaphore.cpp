@@ -14,7 +14,7 @@
 
 namespace mlib {
 
-  /*!
+/*!
   \class semaphore
   \ingroup syncro
   \brief Wrapper for Windows semaphore objects.
@@ -27,8 +27,8 @@ namespace mlib {
   \param limit  maximum limit for counter
   \param name   object's name
 */
-semaphore::semaphore (int limit, const char *name) :
-  syncbase (name)
+semaphore::semaphore (int limit, const char *name)
+  : syncbase (name)
 {
 #ifdef HAS_UTF8
   HANDLE h = CreateSemaphoreW (NULL, 0, limit, name?utf8::widen(name).c_str():0);
@@ -49,10 +49,11 @@ int semaphore::signal (int cnt)
 }
 
 /// Test if semaphore is signaled
-semaphore::operator bool()
+semaphore::operator bool ()
 {
-  bool result = syncbase::operator bool();
-  if (result) signal();
+  bool result = syncbase::operator bool ();
+  if (result)
+    signal();
   return result;
 }
 
