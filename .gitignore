@@ -10,3 +10,4 @@
 *.ipch
 .vs/
 /lib
+exe/
