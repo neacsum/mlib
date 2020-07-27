@@ -29,7 +29,7 @@ namespace mlib {
 class http_connection;
 
 ///Case insensitive comparison function
-struct ciLess : public std::binary_function<std::string, std::string, bool> {
+struct ciLess : public std::function <bool (std::string, std::string)> {
   bool operator()(const std::string &lhs, const std::string &rhs) const {
     return _stricmp (lhs.c_str (), rhs.c_str ()) < 0;
   }
@@ -77,7 +77,7 @@ public:
 protected:
               http_connection (sock& socket, httpd& server);
   void        run ();
-  bool        term ();
+  void        term ();
 
   httpd&      parent;
   sockstream  ws;
@@ -169,9 +169,11 @@ private:
   str_pairs       realms;         //!< access control realms
 
   struct handle_info {
+    handle_info (uri_handler h_, void* info_);
+
     uri_handler h;
     void *nfo;
-    mlib::criticalsection in_use;
+    std::shared_ptr<mlib::criticalsection> in_use;
   };
   std::map <std::string, handle_info> handlers;
 
@@ -268,6 +270,15 @@ bool httpd::try_varlock ()
   return varlock.try_enter ();
 }
 
+inline
+httpd::handle_info::handle_info (uri_handler h_, void* info_)
+  : h (h_)
+  , nfo (info_)
+  , in_use{ std::make_shared<criticalsection> () }
+{
+}
+
 void parse_urlparams (const char* par_str, str_pairs& params);
 
-}
+
+} //end namespace

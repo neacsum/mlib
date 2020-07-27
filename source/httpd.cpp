@@ -235,10 +235,10 @@ void http_connection::run ()
   //all cleanup is done by term function
 }
 
-bool http_connection::term ()
+void http_connection::term ()
 {
   parent.close_connection (*ws.rdbuf ());
-  return thread::term ();
+  thread::term ();
 }
 
 /*
@@ -1166,11 +1166,10 @@ void httpd::remove_ohdr (const char *hdr)
   user-defined handler function passing the uri, the connection info and the
   handler specific information.
 */
-void httpd::add_handler(const char *uri, uri_handler func, void *info)
+void httpd::add_handler (const char* uri, uri_handler func, void* info)
 {
-  handle_info hi = {func, info};
-  
-  handlers[uri] = hi;
+  handle_info hi = { func, info };
+  handlers.emplace (string (uri), hi);
 }
 
 /*!
@@ -1349,7 +1348,7 @@ int httpd::invoke_handler (const char *uri, http_connection& client)
   auto idx = handlers.find (uri);
   if (idx != handlers.end())
   {
-    lock l(idx->second.in_use);
+    lock l(*idx->second.in_use);
     TRACE ("Invoking handler for %s", uri);
     ret = idx->second.h (uri, client, idx->second.nfo);
     TRACE ("Handler done (%d)", ret);

@@ -99,7 +99,7 @@ HttpServerFixture::~HttpServerFixture ()
 
 TEST_FIXTURE (HttpServerFixture, OkAnswer)
 {
-  thread client (cfunc, "HTTPclient");
+  thread client (cfunc);
   client.start ();
   client.wait ();
   CHECK_EQUAL (200, status_code);
@@ -109,7 +109,7 @@ TEST_FIXTURE (HttpServerFixture, Answer404)
 {
   uri = "no_such_thing";
 
-  thread client (cfunc, "HTTPclient");
+  thread client (cfunc);
   client.start ();
   client.wait ();
   CHECK_EQUAL (404, status_code);
@@ -119,7 +119,7 @@ TEST_FIXTURE (HttpServerFixture, Answer401)
 {
   srv.add_realm ("Control", "/");
 
-  thread client (cfunc, "HTTPclient");
+  thread client (cfunc);
   client.start ();
   client.wait ();
   CHECK_EQUAL (401, status_code);
@@ -131,7 +131,7 @@ TEST_FIXTURE (HttpServerFixture, AuthOk)
   srv.add_user ("Control", "Alice", "password");
   request = "Authorization: Basic QWxpY2U6cGFzc3dvcmQ=\r\n";
 
-  thread client (cfunc, "HTTPclient");
+  thread client (cfunc);
   client.start ();
   client.wait ();
   CHECK_EQUAL (200, status_code);
@@ -143,7 +143,7 @@ TEST_FIXTURE (HttpServerFixture, HttpBadPassword)
   srv.add_user ("Control", "Alice", "password");
   request = "Authorization: Basic QWxpY2U6d3Jvbmc=\r\n"; //wrong password
 
-  thread client (cfunc, "HTTPclient");
+  thread client (cfunc);
   client.start ();
   client.wait ();
   CHECK_EQUAL (401, status_code);
