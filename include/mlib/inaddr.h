@@ -9,16 +9,15 @@
 
 //#include <winsock2.h>   //MS
 
+#if __has_include ("defs.h")
 #include "defs.h"
+#endif
+
+#include <WinSock2.h>
 #include "errorcode.h"
 
-#ifndef _WINSOCK2API_
-#include <WinSock2.h>
-#endif
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 
 ///sockaddr wrapper
@@ -93,6 +92,4 @@ int inaddr::operator != (const inaddr& other) const
 }
 
 
-#ifdef MLIBSPACE
 }
-#endif

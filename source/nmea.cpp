@@ -1,16 +1,15 @@
 /*!
-  \file NMEA.CPP Implementation of NMEA-0183 parsing functions
+  \file nmea.cpp Implementation of NMEA-0183 parsing functions
 
   (c) Mircea Neacsu 2019
 */
 
 #include <mlib/nmea.h>
 #include <mlib/convert.h>
+#include <string.h>
+#include <stdlib.h>
 
-
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 /*! \addtogroup NMEA-0183
  @{
@@ -1173,6 +1172,4 @@ int zda (const char *buf, double *time, unsigned short *day, unsigned short *mon
 }
 
 /// @}
-#ifdef MLIBSPACE
-};
-#endif
+}

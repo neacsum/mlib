@@ -7,9 +7,7 @@
 
 #include "httpd.h"
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 /// JSON dictionary entry types
 enum js_type {
@@ -40,7 +38,7 @@ typedef struct jsonvar_t {
 
 
 /// Mark the beginning of JSON dictionary
-#define JSD_STARTDIC JSONVAR json_dict[] ={
+#define JSD_STARTDIC(dict) JSONVAR dict[] ={
 
 /// Mark the end of JSON dictionary
 #define JSD_ENDDIC {0, 0, JT_INT, 0, 0} }
@@ -90,13 +88,13 @@ typedef struct jsonvar_t {
 /// JSON objects support
 class JSONBridge {
 public:
-  JSONBridge (const char *path);
+  JSONBridge (const char *path, JSONVAR* dict);
   ~JSONBridge ();
 
   void attach_to (httpd& server);
   void lock ();
   void unlock ();
-  const char *path ();
+  const std::string& path ();
   bool set_var (const char *name, void *addr, unsigned short count = 1, unsigned short sz = 0);
   virtual void post_parse ();
   http_connection& client ();
@@ -113,7 +111,8 @@ private:
   void json_end ();
   bool parse_urlencoded ();
 
-  const char *path_;
+  std::string path_;
+  JSONVAR* dictionary;
   http_connection *client_;
   char *buffer;
   char *bufptr;
@@ -134,12 +133,10 @@ void JSONBridge::unlock (){ in_use.leave (); }
 
 /// Return the context path 
 inline
-const char* JSONBridge::path () { return path_; }
+const std::string& JSONBridge::path () { return path_; }
 
 inline
 http_connection& JSONBridge::client () { return *client_; };
 
-#ifdef MLIBSPACE
 }
-#endif
 

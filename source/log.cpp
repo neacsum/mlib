@@ -5,8 +5,8 @@
 #ifndef UNICODE
 #define UNICODE
 #endif
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
 
-#include <mlib/defs.h>
 #include <mlib/log.h>
 #include <psapi.h>
 #include <mlib/trace.h>
@@ -84,23 +84,23 @@ static void init ()
 
   atexit (dnit);
   whost[0] = 0;
-  namesz = _countof(whost);
+  namesz = _countof (whost);
 
-  if( WSAStartup( MAKEWORD( 2, 2 ), &wsd ) )
+  if (WSAStartup (MAKEWORD (2, 2), &wsd))
   {
     //failed to initialize WINSOCK - will have to live with netbios and files
-    GetComputerName (whost, &namesz);
+    GetComputerNameW (whost, &namesz);
   }
   else
   {
-    if (!GetComputerNameEx (ComputerNameDnsFullyQualified, whost, &namesz))
-      GetComputerName (whost, &namesz);      
+    if (!GetComputerNameExW (ComputerNameDnsFullyQualified, whost, &namesz))
+      GetComputerNameW (whost, &namesz);
   }
-  strcpy(local_hostname, utf8::narrow(whost).c_str());
-  proclog = (LOG*)malloc (sizeof(LOG));
+  strcpy (local_hostname, utf8::narrow (whost).c_str ());
+  proclog = (LOG*)malloc (sizeof (LOG));
   //init LOG structure
   memset (proclog, 0, sizeof (LOG));
-  proclog->pid = GetCurrentProcessId();
+  proclog->pid = GetCurrentProcessId ();
   proclog->mask = log_defaultmask;
   proclog->option = log_defaultopt;
   proclog->sock = INVALID_SOCKET;
@@ -125,7 +125,7 @@ static const char *processname (char *name)
   {
     char *p;
     wchar_t wpn[256];
-    if (!GetModuleBaseName (GetCurrentProcess(), 0, wpn, sizeof(wpn)))
+    if (!GetModuleBaseNameW (GetCurrentProcess(), 0, wpn, sizeof(wpn)))
       strcpy (pname, "unknown");
     else
     {
@@ -204,34 +204,34 @@ done:
   ;
 }
 
-static void logger_addr(LOG *plog)
+static void logger_addr (LOG* plog)
 {
   char host[MAX_PATH];
-  char *p;
-  struct hostent * phe;
+  char* p;
+  struct hostent* phe;
 
   strcpy (host, log_servhostname);
   plog->sa_logger.sin_family = AF_INET;
-  
-  p = strchr( host, ':' );
-  if( p )
+
+  p = strchr (host, ':');
+  if (p)
     *p++ = 0;
 
-  phe = gethostbyname( host );
-  if( !phe )
+  phe = gethostbyname (host);
+  if (!phe)
     goto use_default;
 
-  memcpy( &plog->sa_logger.sin_addr.s_addr, phe->h_addr, phe->h_length );
+  memcpy (&plog->sa_logger.sin_addr.s_addr, phe->h_addr, phe->h_length);
 
-  if( p )
-    plog->sa_logger.sin_port = htons( (unsigned short) strtoul( p, NULL, 0 ) );
+  if (p)
+    plog->sa_logger.sin_port = htons ((unsigned short)strtoul (p, NULL, 0));
   else
-    plog->sa_logger.sin_port = htons( LOG_PORT );
+    plog->sa_logger.sin_port = htons (LOG_PORT);
   return;
 
 use_default:
-  plog->sa_logger.sin_addr.S_un.S_addr = htonl( 0x7F000001 );
-  plog->sa_logger.sin_port = htons( LOG_PORT );
+  plog->sa_logger.sin_addr.S_un.S_addr = htonl (0x7F000001);
+  plog->sa_logger.sin_port = htons (LOG_PORT);
   plog->sa_logger.sin_family = AF_INET;
 }
 

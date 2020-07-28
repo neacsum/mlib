@@ -19,11 +19,8 @@
   (under 1 ms) but does not provide the friendly name.
 */
 #include <mlib/serenum.h>
-#include <Windows.h>
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 
 /*!
@@ -66,6 +63,4 @@ bool SerEnum_UsingCreateFile (std::vector<int>& ports)
   return true;
 }
 
-#ifdef MLIBSPACE
-};
-#endif
+}

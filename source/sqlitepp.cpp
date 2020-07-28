@@ -1,5 +1,5 @@
 /*!
-  \file SQLITEPP.CPP Implementation of Database and Query classes
+  \file sqlitepp.cpp Implementation of Database and Query classes
 
   \defgroup sqlite SQLite Interface
   \brief Object-oriented wrappers for SQLITE3 functions.
@@ -12,9 +12,7 @@
 
 using namespace std;
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 /*!
   Error facility used by Database and Query objects. Keeps track of the last
@@ -601,7 +599,6 @@ SYSTEMTIME Query::column_time (const std::string& colname)
 {
   return column_time (find_col (colname));
 }
-///@}
 
 
 //---
@@ -676,6 +673,4 @@ sqerc::sqerc (int value, sqlite3* db, short int pri) :
     f->db = db;
 }
 
-#ifdef MLIBSPACE
-};
-#endif
+}

@@ -7,9 +7,7 @@
 #include <queue>
 #include <mlib/statpars.h>
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 /*!
   \class statpars
 
@@ -37,7 +35,7 @@ values (n), sum (0), adev (0), sdev (0), var (0), skew (0), kurt (0), calc (fals
 /*!
   Constructor for calculator class.
 
-  \param nvec vector of samples.
+  \param vec vector of samples.
 */
 statpars::statpars (std::vector<double> vec) :
   values (vec.size()), nmax ((int)vec.size()), sum (0), adev (0), sdev (0), var (0), skew (0), kurt (0), calc (false)
@@ -91,6 +89,4 @@ void statpars::calculate()
   calc = true;
 }
 
-#ifdef MLIBSPACE
-};
-#endif
+}

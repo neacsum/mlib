@@ -2,6 +2,8 @@
 #include <mlib/bitstream.h>
 #include <sstream>
 
+using namespace mlib;
+
 SUITE (bitstreams)
 {
   struct stream_test
@@ -11,7 +13,7 @@ SUITE (bitstreams)
 
   TEST_FIXTURE (stream_test, four_bits_stream)
   {
-    mlib::bitstream bs{ ss, 4 };
+    bitstream bs{ ss, 4 };
     bs.mwrite (3, 4);
     bs.mwrite (4, 3);
     bs.flush ();
@@ -24,7 +26,7 @@ SUITE (bitstreams)
 
   TEST_FIXTURE (stream_test, eight_bit_stream)
   {
-    mlib::bitstream bs{ ss, 8 };
+    bitstream bs{ ss, 8 };
     //write some random bits
     bs.mwrite (3, 2);
     bs.mwrite (4, 3);
@@ -40,7 +42,7 @@ SUITE (bitstreams)
     CHECK_EQUAL ('A', bs.mread (8));
   }
 
-  class NMEAstream : public mlib::bitstream
+  class NMEAstream : public bitstream
   {
   public:
     NMEAstream (std::iostream& is) : bitstream (is, 6) {};

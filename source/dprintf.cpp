@@ -3,10 +3,11 @@
 
   (c) Mircea Neacsu 1999-2000. All rights reserved.
 */
+
+#include <mlib/dprintf.h>
 #include <windows.h>
 #include <stdio.h>
 #include <stdarg.h>
-#include <mlib/dprintf.h>
 
 /*!
   printf style function writes messages using OutputDebugString.
@@ -25,7 +26,7 @@ bool dprintf (const char *fmt, ...)
 
   va_list params;
   va_start (params, fmt);
-  sprintf (buffer, "[%x] ", GetCurrentThreadId ());
+  sprintf_s (buffer, "[%x] ", GetCurrentThreadId ());
   sz = sizeof (buffer) - strlen (buffer) - 2; //reserve space for final \0 and \n
   r = vsnprintf (buffer + strlen (buffer), sz, fmt, params);
   va_end (params);
@@ -33,7 +34,7 @@ bool dprintf (const char *fmt, ...)
     return false; // for some reason we cannot print
   if ((size_t)r > sz - 1)
     buffer[MAX_DPRINTF_CHARS - 2] = 0; // print was truncated
-  strcat (buffer, "\n");
+  strcat_s (buffer, "\n");
 
   int wsz = MultiByteToWideChar (CP_UTF8, 0, buffer, -1, 0, 0);
   if (wsz && (out = (wchar_t*)malloc (wsz*sizeof (wchar_t))))

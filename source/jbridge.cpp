@@ -12,12 +12,8 @@
 
 using namespace std;
 
-/// The JSON data dictionary
-extern mlib::JSONVAR json_dict[];
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 #define MAX_JSONRESPONSE 8192
 
@@ -68,11 +64,13 @@ static int hexbyte (char *bin, const char *str);
 */
 
 ///Creates a JSONBridge object for the given path
-JSONBridge::JSONBridge (const char *path)
+JSONBridge::JSONBridge (const char *path, JSONVAR* dict)
   : path_ (path)
+  , dictionary (dict)
   , client_ (0)
+  , buffer (new char[MAX_JSONRESPONSE])
+  , bufptr (buffer)
 {
-  buffer = new char[MAX_JSONRESPONSE];
 }
 
 JSONBridge::~JSONBridge ()
@@ -83,18 +81,21 @@ JSONBridge::~JSONBridge ()
 /// Attach JSONBridge object to a HTTP server
 void JSONBridge::attach_to (httpd& server)
 {
-  server.add_handler (path_, (uri_handler)JSONBridge::callback, this);
+  server.add_handler (path_.c_str(), (uri_handler)JSONBridge::callback, this);
 }
 
 /// Initializes the response buffer 
 bool JSONBridge::json_begin ()
 {
-  TRACE ("JSONBridge::json_begin");
-  in_use.enter ();
+  TRACE ("JSONBridge::json_begin - %s", client ().get_query ());
+  mlib::lock l(in_use);
   int idx;
   const JSONVAR *entry = find (client().get_query (), &idx);
   if (!entry)
+  {
+    TRACE ("JSONBridge::json_begin - Cannot find %s", client ().get_query ());
     return false;
+  }
   bufptr = buffer;
   *bufptr++ = '{';
   if (entry->type == JT_OBJECT)
@@ -127,7 +128,6 @@ void JSONBridge::json_end ()
        "\r\n"
     << buffer
     << endl;
-  in_use.leave ();
 }
 
 /// Serializes a variable to JSON format
@@ -194,6 +194,7 @@ bool JSONBridge::jsonify (const JSONVAR*& entry)
 
     default:
       TRACE ("Unexpected entry type %d", entry->type);
+      return false;
     }
     bufptr += strlen (bufptr);
     i++;
@@ -259,6 +260,7 @@ bool JSONBridge::strquote (const char *str)
     else
       *bufptr++ = *str++;
   }
+
   if (*str)
     return false; //buffer full
   *bufptr++ = '"';
@@ -290,9 +292,16 @@ JSONVAR* JSONBridge::find (const char *name, int *pidx)
       *pidx = 0;
   }
 
-  for (entry = json_dict; entry->name; entry++)
+  int lvl = 0;
+  for (entry = dictionary; entry->name; entry++)
   {
-    if (!strcmp (varname, entry->name))
+    //search only top level entries
+    if (entry->type == JT_OBJECT)
+      lvl++;
+    else if (entry->type == JT_ENDOBJ)
+      lvl--;
+
+    if (lvl <= 1 && !strcmp (varname, entry->name))
     {
       if (*pidx < entry->cnt)
         return entry;
@@ -407,6 +416,7 @@ int JSONBridge::callback (const char *uri, http_connection& client, JSONBridge *
   const char *query = client.get_query ();
   TRACE ("ui_callback req=%s query=%s", req, query);
   ctx->client_ = &client;
+  ctx->lock ();
   if (!_strcmpi (req, "GET"))
   {
     int ret;
@@ -430,6 +440,7 @@ int JSONBridge::callback (const char *uri, http_connection& client, JSONBridge *
     ctx->post_parse ();
 
   }
+  ctx->unlock ();
   return 1;
 }
 
@@ -483,6 +494,4 @@ int url_decode (const char *in, char *out)
   return 1;
 }
 
-#ifdef MLIBSPACE
 }
-#endif

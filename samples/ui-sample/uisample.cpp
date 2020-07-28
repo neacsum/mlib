@@ -1,5 +1,5 @@
 /*!
-  UISAMPLE.CPP - This program demonstrates how to build an HTML user interface
+  UISAMPLE.CPP - This program demonstrates how to build a HTML user interface
   using the HTTP server and the JSONBridge interface.
 
   The program starts a HTTP server on port 8080 and opens a browser window to
@@ -9,7 +9,7 @@
 
   The MIT License (MIT)
 
-  (c) Mircea Neacsu 2017
+  (c) Mircea Neacsu 2017-2020
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
@@ -34,15 +34,14 @@
 #include <mlib/wsockstream.h>
 #include <mlib/critsect.h>
 #include <mlib/thread.h>
-#include <mlib/utf8.h>
+#include <utf8/utf8.h>
+#include <utf8/winutf8.h>
 #include <mlib/basename.h>
-#include <psapi.h>
-#include <ShlObj.h>
-#include <Shlwapi.h>
+#include <mlib/rdir.h>
 #include <assert.h>
 #include <mlib/log.h>
 #include <direct.h>
-#include <nmea.h>
+//#include <nmea.h>
 #include <mlib/convert.h>
 
 #include "resource.h"
@@ -57,7 +56,7 @@ using namespace mlib;
 
 //globals
 HINSTANCE           hInst;
-char                docroot[256];
+string              docroot;
 NOTIFYICONDATA      nid;
 HWND                mainWnd;
 
@@ -84,18 +83,12 @@ char *psarr[4]
   "As seen above strings can contain embedded HTML"
 };
 
-/*
-Attach a JSON bridge to "/var" location.
+double pi = M_PI;
 
-That means every GET request to "http://server/var?xxx" will trigger a search
-for the variable xxx in the JSON dictionary and the content of that variable
-will be formatted as a JSON string and sent back to the client.
-*/
-JSONBridge  user_interface ("/var");
 httpd       ui_server;      //HTTP server for user interface
 
-//Data dictionary for user interface (JSON dictionary)
-JSD_STARTDIC
+//Data dictionary for user interface
+JSD_STARTDIC (uivars)
   JSD_OBJECT ("sample"),
     JSD (hvar, JT_SHORT, 1, 0),
     JSD (huvar, JT_USHORT, 1, 0),
@@ -111,22 +104,33 @@ JSD_STARTDIC
     JSD (iarr, JT_INT, _countof (iarr), 0),
     JSD (sarr, JT_STR, _countof (sarr), sizeof (sarr[0])),
     JSD (psarr, JT_PSTR, _countof (psarr), 0),
-    JSD_ENDOBJ,
+  JSD_ENDOBJ,
+  JSDN (pi, "varpi", JT_DBL, 1, 0), //a variable with a different 'external' name
 JSD_ENDDIC;
+
+/*
+Declare a JSON bridge to "var" location using 'uivars' dictionary.
+
+That means every GET request to "http://server/var?xxx" will trigger a search
+for the variable xxx in the 'uivars' JSON dictionary and the content of that
+variable will be formatted as a JSON string and sent back to the client.
+*/
+JSONBridge  user_interface ("var", uivars);
 
 //Assets for HTTP server
 struct assetid {
   const char *name;
   int id;
+  string fname;
 } assets[] = {
   { "index.html", IDR_INDEX_HTML },
-  { "jquery.js", IDR_JQUERY_JS },
+//  { "jquery.js", IDR_JQUERY_JS },
   { "main.css", IDR_MAIN_CSS },
   { 0, 0 }
 };
 
 //prototypes
-void write_asset_file (const char *path, const char *name, int id);
+bool write_asset_file (const std::string& path, const std::string& name, int id, std::string& fname);
 
 
 /*
@@ -159,7 +163,7 @@ LRESULT WINAPI WndProc (HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     switch (wmId)
     {
     case ID_OPENINTERFACE:
-      sprintf (cmd, "http://localhost:%d", SERVER_PORT);
+      sprintf_s (cmd, "http://localhost:%d", SERVER_PORT);
       ShellExecute (0, L"open", utf8::widen (cmd).c_str (), L"", L".", SW_SHOW);
       break;
 
@@ -232,22 +236,22 @@ int APIENTRY WinMain (HINSTANCE hInstance, HINSTANCE, LPSTR /*lpCmdLine*/, int /
   hInst = hInstance;
 
   /*Find a temp folder for all HTML assets (the docroot)*/
-  wchar_t wtemp[256];
-  GetTempPath (_countof (wtemp), wtemp);
-  strcpy (docroot, utf8::narrow (wtemp).c_str ());
-  strcat (docroot, "uisample");
+  utf8::buffer tmp(_MAX_PATH);
+  GetTempPathW (_MAX_PATH, tmp);
+  docroot = tmp;
+  docroot += "uisample";
   utf8::mkdir (docroot);
 
   /*Expand all assets in temp folder*/
   assetid *asset = assets;
   while (asset->name)
   {
-    write_asset_file (docroot, asset->name, asset->id);
+    write_asset_file (docroot, asset->name, asset->id, asset->fname);
     asset++;
   }
 
   //Configure and start UI server
-  ui_server.docroot (docroot);
+  ui_server.docroot (docroot.c_str());
   ui_server.port (SERVER_PORT);
   user_interface.attach_to (ui_server);
   ui_server.start ();
@@ -305,8 +309,8 @@ int APIENTRY WinMain (HINSTANCE hInstance, HINSTANCE, LPSTR /*lpCmdLine*/, int /
 
   nid.uVersion = NOTIFYICON_VERSION_4;
   nid.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
-  wcsncpy (nid.szTip, app_title, _countof (nid.szTip)); // Copy tooltip
-  wcsncpy (nid.szInfoTitle, app_title, _countof (nid.szInfoTitle));
+  wcsncpy_s (nid.szTip, app_title, _countof (nid.szTip)); // Copy tooltip
+  wcsncpy_s (nid.szInfoTitle, app_title, _countof (nid.szInfoTitle));
   Shell_NotifyIcon (NIM_ADD, &nid);
   
   //run message pump
@@ -326,7 +330,7 @@ int APIENTRY WinMain (HINSTANCE hInstance, HINSTANCE, LPSTR /*lpCmdLine*/, int /
         break;
     }
   }
-  catch (mlib::errc& e)
+  catch (mlib::erc& e)
   {
     TRACE ("Error %s-%d", e.facility ().name (), e.code ());
   }
@@ -338,16 +342,13 @@ int APIENTRY WinMain (HINSTANCE hInstance, HINSTANCE, LPSTR /*lpCmdLine*/, int /
   ui_server.terminate ();
 
   //Delete all assets from temp folder
-  SHFILEOPSTRUCTW rmdir;
-  memset (&rmdir, 0, sizeof (rmdir));
-  rmdir.wFunc = FO_DELETE;
-  wchar_t docrootw[256];
-  wcscpy (docrootw, utf8::widen (docroot).c_str ());
-  docrootw[wcslen(docrootw)+1] = 0;
-  rmdir.pFrom = docrootw;
-  rmdir.fFlags = FOF_SILENT | FOF_NOERRORUI | FOF_NOCONFIRMATION;
-  int ret = SHFileOperation (&rmdir);
-  TRACE ("SHFileOperation says %d", ret);
+  asset = assets;
+  while (asset->name)
+  {
+    utf8::remove (asset->fname);
+    asset++;
+  }
+  utf8::rmdir (docroot);
   return (int)msg.wParam;
 }
 
@@ -357,7 +358,12 @@ static void *mem_resource (int name, int type, DWORD& size)
   HMODULE handle = GetModuleHandle (NULL);
   HRSRC rc = FindResource (handle, MAKEINTRESOURCE (name),
                              MAKEINTRESOURCE (type));
+  if (!rc)
+    return NULL;
+
   HGLOBAL rcData = LoadResource (handle, rc);
+  if (!rcData)
+    return NULL;
   size = SizeofResource (handle, rc);
   return LockResource (rcData);
 }
@@ -374,39 +380,45 @@ static void *mem_resource (int name, int type, DWORD& size)
   \param  path  root path for all assets (with or without terminating backslash
   \param  name  asset filename (it can include a relative path)
   \param  id    asset id
+  \param  fullpath  fullpath of asset file
+  \return _true_ if successful
 */
-void write_asset_file (const char *path, const char *name, int id)
+bool write_asset_file (const std::string& path, const std::string& name, int id, std::string& fullpath)
 {
-  char tmp[256];
+  string tmp = path;
+  int rc;
 
-  //Make sure all folders on relative path exist. If not we create them now
-  const char *pdir = name;
-  while (pdir)
+  fullpath.clear ();
+  if (tmp.back () != '/' && tmp.back () != '\\'
+   && name.front() != '/' && name.front() != '\\')
   {
-    pdir = strchr (pdir, '\\');
-    if (pdir)
-    {
-      strcpy (tmp, path);
-      if (path[strlen (path) - 1] != '\\')
-        strcat (tmp, "\\");
-      strncat (tmp, name, pdir - name);
-      utf8::mkdir (tmp);
-      pdir++;
-    }
+    //Root path must be terminated with '\' (unless name starts with one)
+    tmp.push_back ('\\');
   }
 
-  //Full path name
-  strcpy (tmp, path);
-  if (path[strlen (path) - 1] != '\\')
-    strcat (tmp, "\\");
-  strcat (tmp, name);
+  //Make sure all folders on path exist. If not we create them now
+  size_t idx = name.find_last_of ("/\\");
+  if (idx != string::npos)
+    tmp += name.substr (0, idx);
+  if ((rc = r_mkdir (tmp)) && rc != EEXIST)
+    return false; //could not create path
 
   //Load resource
   DWORD size = 0;
   void* data = mem_resource (id, TEXTFILE, size);         //load resource...
+  if (!data)
+    return false;
+  if (idx != string::npos)
+    tmp += name.substr (idx + 1);
+  else
+    tmp += name;
   FILE *f;
-  TRACE ("Writing resource size %d file %s", size, tmp);
-  f = _wfopen (utf8::widen (tmp).c_str (), L"wb");        //... and write it
+  f = utf8::fopen (tmp, "wb");        //... and write it
+  if (!f)
+    return false;
+  fullpath = tmp;
+  TRACE ("Writing resource size %d file %s", size, fullpath.c_str());
   fwrite (data, sizeof (char), size, f);
   fclose (f);
+  return true;
 }

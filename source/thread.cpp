@@ -11,9 +11,7 @@
 #include <mlib/thread.h>
 
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 //----------------- current_thread member functions -------------------
 /*!
@@ -33,7 +31,6 @@ current_thread::current_thread() :
 current_thread::~current_thread()
 {
   TRACE2 ("Current thread destructor");
-  running = false;
 }
 
 //----------------- thread member functions ---------------------------
@@ -48,10 +45,10 @@ current_thread::~current_thread()
 
   When combining objects and multi-threading it is useful to define what 
   member functions are \e foreign (i.e. can be called by another execution
-  %thread) and what functions are \e native (i.e. can be called only by the same
-  execution %thread. If possible, "native" functions should be made private or
+  %thread) and what functions are \e owned (i.e. can be called only by the same
+  execution %thread. If possible, "owned" functions should be made private or
   protected. The object's constructors and destructor are inherently \e foreign 
-  while the run function is inherently \e native.
+  while the run function is inherently \e owned.
 */
 
 /*!
@@ -61,7 +58,7 @@ thread::thread (HANDLE h, DWORD i) :
   syncbase (NULL),
   shouldKill (false),
   running (true),
-  exitcode_ (0),
+  exitcode (0),
   id_ (i)
 {
   set_handle (h);
@@ -75,7 +72,7 @@ thread::thread (const char *name, bool inherit, DWORD stack_size, PSECURITY_DESC
   , shouldKill (true)
   , started (event::manual)
   , running (false)
-  , exitcode_ (0)
+  , exitcode (0)
   , stack (stack_size)
 {
   //setup SECURITY_ATTRIBUTES structure
@@ -96,12 +93,11 @@ thread::thread (const char *name, bool inherit, DWORD stack_size, PSECURITY_DESC
 
   The return value of the run function becomes the exit code of the thread.
 */
-thread::thread (std::function<int ()> func, const char *name)
-  : syncbase (name)
-  , shouldKill (true)
+thread::thread (std::function<int ()> func)
+  : shouldKill (true)
   , started (event::manual)
   , running (false)
-  , exitcode_ (0)
+  , exitcode (0)
   , stack (0)
   , thfunc (func)
 {
@@ -110,7 +106,7 @@ thread::thread (std::function<int ()> func, const char *name)
   sa.lpSecurityDescriptor = NULL;
   sa.bInheritHandle = false;
   initialize ();
-  TRACE2 ("Created thread %s[%x]", name?name:"", id());
+  TRACE2 ("Created thread [%x]", id());
 }
 
 /*!
@@ -122,20 +118,6 @@ void thread::initialize ()
   HANDLE handle = (HANDLE)_beginthreadex (&sa, stack, (unsigned int (__stdcall *)(void*))entryProc, this,
                    CREATE_SUSPENDED, (UINT*)&id_);
   assert (handle);
-#if 0
-  /* Duplicate the thread handle now so the object will keep a valid handle
-  even after the thread terminated */
-  HANDLE  newhandle;      /* new thread handle */
-  HANDLE  prochandle;     /* handle of current process */
-  prochandle = GetCurrentProcess();       /* get current process handle */
-
-  DuplicateHandle(prochandle, handle, prochandle,
-  	&newhandle, 0, TRUE, DUPLICATE_SAME_ACCESS);
-
-  assert (newhandle);
-
-  set_handle (newhandle);
-#endif
   set_handle (handle);
 
   //Let thread run the initialization code. This will signal the "created"
@@ -182,8 +164,8 @@ UINT _stdcall thread::entryProc (thread *th)
     th->run ();
   th->term ();
   TRACE2 ("Thread %s[%x] is ending", th->name().c_str(), th->id_);
-  _endthreadex (th->exitcode_);
-  return th->exitcode_;
+  _endthreadex (th->exitcode);
+  return th->exitcode;
 }
 
 /*!
@@ -192,7 +174,7 @@ UINT _stdcall thread::entryProc (thread *th)
 void thread::run()
 {
   if (thfunc)
-    exitcode_ = thfunc ();
+    exitcode = thfunc ();
 }
 
 /*!
@@ -204,6 +186,7 @@ void thread::start ()
   assert (handle ());
   assert (!running);
   started.signal ();
+  running = true;
   Sleep (0);
 }
 
@@ -227,6 +210,4 @@ void thread::resume()
   ResumeThread (handle());
 }
 
-#ifdef MLIBSPACE
-};
-#endif
+}

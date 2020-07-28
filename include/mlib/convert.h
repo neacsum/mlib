@@ -1,6 +1,6 @@
 #pragma once
 /*!
-  \file CONVERT.H Conversion functions and frequently used constants
+  \file convert.h Conversion functions and frequently used constants
 
 
   \addtogroup other Other Functions

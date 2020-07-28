@@ -6,9 +6,7 @@
 #include <mlib/rotmat.h>
 #include <math.h>
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 RotMat::RotMat ()
 {
@@ -96,6 +94,4 @@ void RotMat::multiply (double m[3][3])
       r[i][j] = t[i][j];
 }
 
-#ifdef MLIBSPACE
 }
-#endif

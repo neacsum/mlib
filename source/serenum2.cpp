@@ -5,7 +5,6 @@
 
 */
 #include <mlib/serenum.h>
-#include <Windows.h>
 #include <utf8/utf8.h>
 
 #include <SetupAPI.h>
@@ -13,9 +12,7 @@
 
 using namespace std;
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 /*!
   \ingroup serenum
@@ -80,6 +77,4 @@ bool SerEnum_UsingSetupAPI (std::vector<int>& ports, std::vector<std::string>& n
   return true;
 }
 
-#ifdef MLIBSPACE
-};
-#endif
+}

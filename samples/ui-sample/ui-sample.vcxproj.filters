@@ -38,9 +38,6 @@
     <None Include="index.html">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="jquery.js">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="main.css">
       <Filter>Resource Files</Filter>
     </None>

@@ -1,5 +1,5 @@
 /*!
-  \file SYNCBASE.H syncbase class definition.
+  \file syncbase.h syncbase class definition.
 
   (c) Mircea Neacsu 1999
 */
@@ -9,11 +9,12 @@
 #include "defs.h"
 #endif
 
+#ifndef _INC_WINDOWS
+#include <windows.h>
+#endif
 #include <string>
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 /// Base class for all named synchronization objects
 class syncbase
@@ -36,13 +37,14 @@ public:
   HANDLE handle () const { return hl->handle_; };
 
   /// Return object's name
-  const std::string& name () const { return name_; };
-
+  virtual const std::string& name () const { return name_; };
+  
+  /// Sets object's name
+  virtual void name (const char* nam);
 
 protected:
   syncbase (const char *name);        //protected constructor
   void set_handle (HANDLE h);
-  void set_name (const char *name);
 
 private:
   struct handle_life {
@@ -68,6 +70,4 @@ DWORD multiwait (bool all, int count, syncbase** array, DWORD time_limit=INFINIT
 DWORD multiwait_msg (bool all, int count, syncbase** array, DWORD time_limit=INFINITE, DWORD mask=QS_ALLINPUT);
 void udelay (unsigned short usec);
 
-#ifdef MLIBSPACE
-};  //namespace
-#endif
+}

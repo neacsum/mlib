@@ -1,5 +1,5 @@
 /*!
-  \file CONVERT.CPP Conversion functions
+  \file convert.cpp Conversion functions
 
   (c) Mircea Neacsu 2017
 */

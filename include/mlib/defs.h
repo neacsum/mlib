@@ -7,11 +7,11 @@
 
 #include <winsock2.h>
 
-#define MLIBSPACE mlib
 
 #ifndef NODEFAULTLIB
 #pragma comment (lib, "mlib.lib")
 #endif
 
-#define MLIB_LOGFAC (25<<3) //log facility claimed by MLIB
+/// log facility claimed by MLIB
+#define MLIB_LOGFAC (25<<3)
 

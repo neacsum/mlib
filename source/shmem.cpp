@@ -1,5 +1,5 @@
 /*!
-  \file SHMEM.CPP Implementation of shared memory areas with support for
+  \file shmem.cpp Implementation of shared memory areas with support for
   single-writer multiple-readers.
 
     (c) Mircea Neacsu. 2004-2017
@@ -8,18 +8,16 @@
 #define UNICODE
 #endif
 
-#define _TRACE_LEVEL 2
+//#define _TRACE_LEVEL 2
+//#define USE_SYSLOG
 
 #include <mlib/shmem.h>
 #include <mlib/trace.h>
-#include <mlib/log.h>
 
 #include <assert.h>
 #include <utf8/utf8.h>
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 /*! 
   Default constructor.
@@ -131,7 +129,6 @@ bool shmem_base::open (const char * nam, size_t sz_)
     wrex = CreateMutex (NULL, FALSE, tmp.c_str());
     if (mem_created)
     {
-      syslog (LOG_MAKEPRI(MLIB_LOGFAC, LOG_INFO), "shmem_base::open(%s) Created shared memory", name_);
       syn->wrex = wrex;
       syn->rc = syn->wc = 0;
       syn->wrid = 0;
@@ -142,7 +139,6 @@ bool shmem_base::open (const char * nam, size_t sz_)
     close ();
     return false;
   }
-  syslog (LOG_MAKEPRI (MLIB_LOGFAC, LOG_INFO), "shmem_base::open(%s) size %d done", name_, sz);
   return true;
 }
 
@@ -195,10 +191,8 @@ bool shmem_base::rdlock ()
     {
       TRACE9 ("shmem_base::rdlock - wc=%d", syn->wc);
       if (WaitForSingleObject (rdgate, rtmo_) == WAIT_TIMEOUT)
-      {
-        syslog (LOG_MAKEPRI(MLIB_LOGFAC, LOG_WARNING), "shmem_base::rdlock %s - rdgate timeout", name_);
         return false;
-      }
+
       TRACE9 ("shmem_base::rdlock - passed rdgate");
     }
     InterlockedIncrement (&syn->rc);
@@ -266,18 +260,14 @@ bool shmem_base::wrlock ()
       ReleaseMutex (wrex);
       InterlockedDecrement (&syn->wc);
       in_wrlock--;
-      return false;
     }
   }
   else if (res == WAIT_TIMEOUT)
   {
-    syslog (LOG_MAKEPRI(MLIB_LOGFAC, LOG_WARNING), "shmem_base::wrlock - failed wc=%d", syn->wc);
     assert (syn->wc > 1); 
     InterlockedDecrement (&syn->wc);
     in_wrlock--;
-    return false;
   }
-  syslog (LOG_MAKEPRI (MLIB_LOGFAC, LOG_ERR), "Unexpected wait result 0x%x", res);
   return false;
 }
 
@@ -347,7 +337,5 @@ bool shmem_base::read (void * pData)
   return false;
 }
 
-#ifdef MLIBSPACE
 }
-#endif
 

@@ -1,13 +1,10 @@
-#include <mlib/defs.h>
 #include <mlib/shmem.h>
 #include <utpp/utpp.h>
 #include <string>
 #include <mlib/thread.h>
 #include <mlib/trace.h>
 
-#ifdef MLIBSPACE
-using namespace MLIBSPACE;
-#endif
+using namespace mlib;
 using namespace std;
 
 struct S{
@@ -129,7 +126,7 @@ TEST_FIXTURE (shmem_fixture, TwoThread_shmem)
   Sleep (100);                     //let them finish
   CHECK (!t1.is_running ());      //verify they have finished
   CHECK (!t2.is_running ());
-  CHECK (t1.exitcode ());        //verify rd == wr
+  CHECK (t1.result ());        //verify rd == wr
 }
 
 
@@ -167,7 +164,7 @@ TEST_FIXTURE (shmem_fixture, SlowWriter_shmem)
   Sleep (100);                    //let them finish
   CHECK (!t1.is_running ());      //verify they have finished
   CHECK (!t2.is_running ());
-  CHECK (t1.exitcode ());        //verify thread 1 could not acquire read lock
+  CHECK (t1.result ());        //verify thread 1 could not acquire read lock
 }
 
 TEST_FIXTURE (shmem_fixture, SlowReader_shmem)
@@ -207,7 +204,7 @@ TEST_FIXTURE (shmem_fixture, SlowReader_shmem)
   Sleep (500);                    //let them finish
   CHECK (!t1.is_running ());      //verify they have finished
   CHECK (!t2.is_running ());
-  CHECK (t2.exitcode ());         //verify thread 2 could not acquire write lock
+  CHECK (t2.result ());         //verify thread 2 could not acquire write lock
   CHECK_EQUAL (1, rd.ival);       //check read area was updated only once
 }
 

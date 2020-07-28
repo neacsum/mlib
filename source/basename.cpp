@@ -1,18 +1,17 @@
 /*!
-  \file BASENAME.CPP Implementation of Unix-like basename() and dirname()
+  \file basename.cpp Implementation of Unix-like basename() and dirname()
   functions.
 
   (c) Mircea Neacsu 2017
 */
 #include <mlib/basename.h>
-#include <windows.h>
+#include <string>
 #include <utf8/utf8.h>
+
 
 using namespace std;
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 /*! 
   \param filename pointer to filename with optional path
@@ -90,6 +89,4 @@ const char *dirname (const char *filename)
   return dname.c_str();
 }
 
-#ifdef MLIBSPACE
-};
-#endif
+}

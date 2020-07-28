@@ -1,20 +1,23 @@
+/*!
+  \file tvops.h Operations on timeval structure.
+
+  (c) Mircea Neacsu 2002. All rights reserved.
+
+*/
 #pragma once
 
 #if __has_include ("defs.h")
 #include "defs.h"
 #endif
 
+#include <winsock2.h>
 #include <assert.h>
 #include <ostream>
 
+/// \addtogroup tvops
+/// @{
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
-
-/*
-      TVOPS.H - operations with timeval structures
-*/
+namespace mlib {
 
 timeval  operator +(const timeval& t1, const timeval& t2);
 timeval  operator -(const timeval& t1, const timeval& t2);
@@ -215,7 +218,6 @@ operator << (::std::ostream& os, const timeval& tv)
   return os;
 }
 
-#ifdef MLIBSPACE
+/*! @} */
 }
-#endif
 

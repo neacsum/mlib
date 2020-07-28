@@ -10,9 +10,7 @@
 #include "defs.h"
 #endif
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 /*!
   \class criticalsection
@@ -33,6 +31,10 @@ public:
 
 private:
   CRITICAL_SECTION section;
+
+  //critical sections cannot be copied or assigned
+  criticalsection (const criticalsection&) = delete;
+  criticalsection& operator =(const criticalsection&) = delete;
 };
 
 /*!
@@ -50,7 +52,7 @@ private:
 
   void func()
   {
-    lock inuse( section );  //Aquire critical section
+    lock inuse( section );  //Acquire critical section
 
     //... code protected by critical section
 
@@ -65,7 +67,7 @@ private:
 class lock
 {
 public:
-  ///Aquire critical section
+  ///Acquire critical section
   lock (criticalsection& cs);
 
   ///Copy constructor
@@ -73,9 +75,6 @@ public:
 
   ///Leave critical section
   ~lock ();
-
-  ///Assignment operator
-  lock& operator= (const lock& rhs);
 
 private:
   criticalsection& section;
@@ -129,21 +128,10 @@ lock::lock (const lock& t) : section (t.section)
 }
 
 inline
-lock& lock::operator= (const lock& rhs)
-{
-  section.leave (); 
-  section = rhs.section; 
-  section.enter ();
-  return *this;
-}
-
-inline
 lock::~lock () 
 { 
   section.leave(); 
 }
 
 
-#ifdef MLIBSPACE
-};
-#endif
+}

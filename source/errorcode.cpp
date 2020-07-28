@@ -12,9 +12,7 @@
 
 #include <mlib/trace.h>
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 
 /*!
@@ -190,6 +188,32 @@ erc::erc (int v, short int l, errfac* f) :
 {
 }
 
+/*!
+  Copy constructor removes the activity flag of the original object.
+
+  Having two erc's active at the same time is a big no-no: when one of them
+  is thrown, the stack unwinding process invokes the destructor of the other
+  one, which in turn might throw again. Throwing an exception during stack
+  unwinding will terminate your application. For more details see:
+  https://isocpp.org/wiki/faq/exceptions#dtors-shouldnt-throw
+
+  However, the whole concept of erc's is based upon destructors throwing
+  exceptions. Here we carefully navigate between a rock and a hard place.
+*/
+erc::erc (const erc& other) :
+  value (other.value),
+  priority_ (other.priority_),
+  active (other.active),
+  facility_ (other.facility_)
+{
+  TRACE ("erc copy ctor");
+  //we are the active error now, the other is deactivated
+  other.active = false;
+}
+
+/*!
+  Move constructor removes the activity flag of the original object
+*/
 erc::erc (erc&& other) :
   value (other.value),
   priority_ (other.priority_),
@@ -197,7 +221,7 @@ erc::erc (erc&& other) :
   facility_ (other.facility_)
 {
   TRACE ("erc move ctor");
-  //we become the active error, the other is deactivated
+  //we are the active error now, the other is deactivated
   other.active = false;
 }
 
@@ -212,6 +236,34 @@ erc::~erc () noexcept(false)
 }
 
 /*!
+  Principal assignment operator.
+
+  If we were active before, call the facility to log or throw.
+  Anyhow copy new values from the assigned object and take away it's active
+  flag.
+
+  \note It is rather bad practice to assign to an active erc object. Here we
+  take the view that, since the left side object was already active, we have
+  to deal with it first. 
+*/
+erc& erc::operator= (const erc& rhs)
+{
+  if (&rhs != this)
+  {
+    TRACE ("erc assignment");
+    bool rhs_active = rhs.active;
+    rhs.active = false; //prevent rhs from throwing if we throw
+    if (active && priority_)
+      facility_->raise (*this);
+    value = rhs.value;
+    priority_ = rhs.priority_;
+    facility_ = rhs.facility_;
+    active = rhs_active;
+  }
+  return *this;
+}
+
+/*!
   Move assignment operator.
   
   If we were active before, call the facility to log or throw. 
@@ -220,15 +272,18 @@ erc::~erc () noexcept(false)
 */
 erc& erc::operator= (erc&& rhs)
 {
-  TRACE ("erc move assignment");
-  bool rhs_active = rhs.active;
-  rhs.active = false; //prevent rhs from throwing if we throw
-  if (active && priority_)
-    facility_->raise (*this);
-  value = rhs.value;
-  priority_ = rhs.priority_;
-  facility_ = rhs.facility_;
-  active = rhs_active;
+  if (&rhs != this)
+  {
+    TRACE ("erc move assignment");
+    bool rhs_active = rhs.active;
+    rhs.active = false; //prevent rhs from throwing if we throw
+    if (active && priority_)
+      facility_->raise (*this);
+    value = rhs.value;
+    priority_ = rhs.priority_;
+    facility_ = rhs.facility_;
+    active = rhs_active;
+  }
   return *this;
 }
 
@@ -263,7 +318,5 @@ erc& erc::deactivate ()
   return *this;
 }
 
-#ifdef MLIBSPACE
 }
-#endif
 

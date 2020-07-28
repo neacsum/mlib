@@ -1,5 +1,5 @@
 /*!
-  \file NMEA.H Definition of NMEA-0183 parsing functions
+  \file nmea.h Definition of NMEA-0183 parsing functions
 
   (c) Mircea Neacsu 2017
 */
@@ -9,9 +9,7 @@
 #include "defs.h"
 #endif
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 bool nmea_checksum (const char *buf);
 
@@ -49,6 +47,4 @@ int ttm (const char *buf, double *utc, int *num, char *name, double *dist, doubl
 int vtg (const char *buf, double *speed, double *head);
 int zda (const char *buf, double *time, unsigned short *day, unsigned short *month, unsigned short *year);
 
-#ifdef MLIBSPACE
-};
-#endif
+}

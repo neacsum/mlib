@@ -1,5 +1,5 @@
 /*!
-  \file OPTIONS.H Command line parser class
+  \file options.h Command line parser class
 
   (c) Mircea Neacsu 2017
 */
@@ -14,9 +14,7 @@
 
 using namespace std;
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 class Options
 {
@@ -52,6 +50,4 @@ private:
   string usage_;
 };
 
-#ifdef MLIBSPACE
 }
-#endif

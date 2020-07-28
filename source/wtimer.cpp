@@ -12,9 +12,7 @@
 #include <assert.h>
 #include <utf8/utf8.h>
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 /*!
   \class wtimer
@@ -93,6 +91,4 @@ void CALLBACK wtimer::timerProc( wtimer *obj, DWORD loval, DWORD hival )
   obj->at_timer( loval, hival );
 }
 
-#ifdef MLIBSPACE
 };
-#endif

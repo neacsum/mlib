@@ -5,9 +5,7 @@
 */
 #include <mlib/base64.h>
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 using namespace std;
 
@@ -175,6 +173,4 @@ string base64enc (const string& in)
   return out;
 }
 
-#ifdef MLIBSPACE
-};
-#endif
+}

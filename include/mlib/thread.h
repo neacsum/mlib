@@ -8,52 +8,35 @@
 #include "event.h"
 #include <functional>
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 /// Wrapper for a Windows %thread
 class thread : public syncbase
 {
 public:
-                thread (std::function<int ()> func, const char *name=0);
-  virtual       ~thread   ();
-  virtual void  start     ();
+  thread (std::function<int ()> func);
+  virtual ~thread   ();
 
-  /// Return thread's id
-  DWORD         id        () const              {return id_;};
+  virtual void start ();
+  void fork();
+  void join ();
 
-  /// Return exit code 
-  UINT          exitcode  () const              {return exitcode_; };
-
-  /// Return \e true if %thread is running
-  bool          is_running() const              {return running; };
-
-  /// Return thread's priority
-  int           priority  ();
-
-  /// Change thread's priority
-  void          priority  (int pri);
-
-  /// Resume a suspended %thread
-  virtual void  resume    ();
-
-  /// Suspend a running %thread
-  virtual void  suspend   ();
+  DWORD id () const;
+  UINT result () const;
+  bool is_running () const;
+  int priority  ();
+  void priority  (int pri);
+  virtual void resume    ();
+  virtual void suspend   ();
 
 protected:
-                thread (const char *name=0, bool inherit=false, DWORD stack_size=0, PSECURITY_DESCRIPTOR sd=NULL);
+  thread (const char *name=0, bool inherit=false, DWORD stack_size=0, PSECURITY_DESCRIPTOR sd=NULL);
 
-  /// Initialization function called before run
-  virtual bool  init      ()                    {running = true; return true;};
+  virtual bool init ();
+  virtual void term ();
+  virtual void run ();
 
-  /// Finalization function called after run
-  virtual bool  term      ()                    {running = false; return true;};
-
-  /// Thread's body
-  virtual void  run       ();
-
-  UINT exitcode_;                                 ///< exit code
+  UINT exitcode;                                 ///< exit code
 
 private:
   thread (HANDLE handle, DWORD id);               ///< ctor used by current %thread.
@@ -82,8 +65,6 @@ public:
   thread::handle;
   thread::is_running;
   thread::priority;
-  thread::resume;
-  thread::suspend;
 
 protected:
   void run() {};
@@ -92,14 +73,68 @@ protected:
 
 //inlines
 
+/// Another name for start () function
+inline
+void thread::fork ()
+{
+  start ();
+}
+
+/// Another name for wait () function
+inline
+void thread::join ()
+{
+  wait (INFINITE);
+}
+
+/// Return thread's ID
+inline
+DWORD thread::id () const 
+{
+  return id_;
+};
+
+/// Return thread's exit code 
+inline
+UINT thread::result () const 
+{
+  return exitcode;
+}
+
+/// Return _true_ if %thread is running
+inline
+bool thread::is_running () const
+{
+  return running;
+}
+
 /// Return priority of a thread
 inline
-int thread::priority() {return GetThreadPriority (handle());};
+int thread::priority()
+{
+  return GetThreadPriority (handle ());
+}
 
 /// Set priority of a thread
 inline
-void thread::priority (int pri) {SetThreadPriority (handle(), pri);};
+void thread::priority (int pri)
+{
+  SetThreadPriority (handle (), pri);
+}
 
-#ifdef MLIBSPACE
+/// Initialization function called before run
+inline
+bool thread::init ()
+{
+  return true;
+}
+
+/// Finalization function called after run
+inline
+void  thread::term ()
+{
+  running = false;
 };
-#endif
+
+
+}

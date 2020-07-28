@@ -1,5 +1,11 @@
 #pragma once
 
+#if __has_include ("defs.h")
+#include "defs.h"
+#endif
+
+#include <Winsock2.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif

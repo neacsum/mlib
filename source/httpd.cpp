@@ -1,38 +1,37 @@
 /*!
-  \file HTTPD.CPP Implementation of httpd and http_connection classes
+  \file httpd.cpp Implementation of httpd and http_connection classes
 
   (c) Mircea Neacsu 2007-2017. All rights reserved.
-
 */
-#include <mlib/errorcode.h>
-#include <winsock2.h>
-#include <io.h>
-#include <fcntl.h>
-#include <string>
-#include <mlib/trace.h>
 #include <mlib/httpd.h>
+#include <mlib/trace.h>
 #include <mlib/base64.h>
+
+#if __has_include(<utf8/utf8.h>)
+#define HAS_UTF8
 #include <utf8/utf8.h>
+#else
+#include <io.h> //for _access
+#endif
 
 using namespace std;
+using namespace mlib;
 
 //Defaults
 #define HTTPD_DEFAULT_URI "index.html"          //!< Default URL
 #define HTTPD_SERVER_NAME "MNCS_HTTPD 1.0"      //!< Default server name
+
+/// Timeout interval while waiting for a client response
 #define HTTPD_TIMEOUT     30
 
-#define MAX_PAR 1024                            //<! max length of a form parameter
+/// Max length of a form parameter
+#define MAX_PAR 1024
 
 #ifdef _MSC_VER
 #pragma warning (disable:4996)
 #endif
 
-#undef INADDR_ANY
-#define INADDR_ANY (unsigned int)0
-
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 ///Table of known mime types
 static struct smime
@@ -62,6 +61,7 @@ static struct smime
   { 0, 0, false }
 };
 
+static bool file_exists (char* path);
 static int fmt2type (const char *fmt);
 static int url_decode (char *buf);
 static int match (const char *str1, const char *str2);
@@ -106,6 +106,8 @@ http_connection::http_connection (sock& socket, httpd& server)
   : thread ("http_connection")
   , parent (server)
   , ws (socket)
+  , uri (0)
+  , headers (0)
   , req_len (0)
   , body (0)
   , query (0)
@@ -113,6 +115,7 @@ http_connection::http_connection (sock& socket, httpd& server)
   , response_sent (false)
   , content_len (-1)
   , query_parsed (false)
+  , body_parsed (false)
 {
 }
 
@@ -232,10 +235,10 @@ void http_connection::run ()
   //all cleanup is done by term function
 }
 
-bool http_connection::term ()
+void http_connection::term ()
 {
   parent.close_connection (*ws.rdbuf ());
-  return thread::term ();
+  thread::term ();
 }
 
 /*
@@ -330,7 +333,7 @@ void http_connection::process_valid_request ()
   }
 
   //try to see if we can serve a file
-  char fullpath[256];
+  char fullpath[_MAX_PATH];
   if (!parent.find_alias (uri, fullpath))
   {
     strcpy (fullpath, parent.docroot());
@@ -339,7 +342,7 @@ void http_connection::process_valid_request ()
 
   if (fullpath[strlen(fullpath)-1] == '/' || fullpath[strlen(fullpath)-1] == '\\')
     strcat (fullpath, parent.default_uri ());
-  if (!_access (fullpath, 4))
+  if (file_exists(fullpath))
   {
     bool shtml = false;
     int ret;
@@ -360,6 +363,9 @@ void http_connection::process_valid_request ()
   }
 }
 
+/*!
+  Sends a 404 (page not found) response
+*/
 void http_connection::serve404 (const char* text)
 {
   static const char* std404 = "<html><head><title>Page not found</title></head>"
@@ -508,7 +514,11 @@ bool http_connection::has_bparam (const char* key)
 */
 int http_connection::serve_shtml (const std::string& full_path)
 {
-  FILE *fn = utf8::fopen (full_path, "r");
+#ifdef HAS_UTF8
+  FILE *fn = utf8::fopen (full_path, "rS");
+#else
+  FILE* fn = fopen (full_path.c_str(), "rS");
+#endif
   if (fn == NULL)
     return -2;
 
@@ -646,9 +656,9 @@ void http_connection::process_ssi (const char *req)
   \return 0 if successful or one of the following codes:
   \retval HTTPD_ERR_WRITE  - socket write failure
 
-  The buffer is preceded by the "Content-Length" header.
+  The buffer is preceded by "Content-Length" header.
 */
-int http_connection::serve_buffer(BYTE *src_buff, size_t sz)
+int http_connection::serve_buffer(const BYTE *src_buff, size_t sz)
 {
   int ret = HTTPD_OK;
 
@@ -660,7 +670,7 @@ int http_connection::serve_buffer(BYTE *src_buff, size_t sz)
   sprintf (flen, "%d", len);
   add_ohdr ("Content-Length", flen);
   respond (200);
-  BYTE *buf = src_buff;
+  const BYTE *buf = src_buff;
   unsigned int cnt = 0;
   while (cnt<len)
   {
@@ -680,6 +690,21 @@ int http_connection::serve_buffer(BYTE *src_buff, size_t sz)
 }
 
 /*!
+  Send the content of a string.
+
+  \param  str string to send
+
+  \return 0 if successful or one of the following codes:
+  \retval HTTPD_ERR_WRITE  - socket write failure
+
+  The string is preceded by "Content-Length" header.
+*/
+int http_connection::serve_buffer (const std::string& str)
+{
+  return serve_buffer ((const BYTE*)str.data (), str.size ());
+}
+
+/*!
   Send the content of a file.
 
   \param  full_path fully qualified path name (UTF8 encoded)
@@ -689,12 +714,16 @@ int http_connection::serve_buffer(BYTE *src_buff, size_t sz)
   \retval HTTPD_ERR_FOPEN  - file open failure
   \retval HTTPD_ERR_FREAD  - file read failure
 
-  The file is preceded by the "Content-Length" header.
+  The file is preceded by "Content-Length" header.
 */
 int http_connection::serve_file (const std::string& full_path)
 {
   int ret = HTTPD_OK;
+#ifdef HAS_UTF8
   FILE *fin = utf8::fopen (full_path, "rbS");
+#else
+  FILE* fin = fopen (full_path.c_str(), "rbS");
+#endif
   if (!fin)
   {
     TRACE ("File %s - open error", full_path.c_str());
@@ -714,12 +743,9 @@ int http_connection::serve_file (const std::string& full_path)
   {
     char buf[1024];
     int cnt = 1;
-    DWORD start;
     while (cnt)
     {
-      start = GetTickCount ();
       cnt = (int)fread (buf, 1, sizeof (buf), fin);
-      start = GetTickCount ();
       if (!cnt && ferror (fin))
       {
         TRACE ("File %s - file read error %d", full_path.c_str (), ferror (fin));
@@ -805,7 +831,7 @@ bool http_connection::parse_url()
   \param  value header value
 
   To have any effect, this function should be called before calling the 
-  response() function as all headers are sent at that time.
+  response() (or serve_...) function as all headers are sent at that time.
 */
 void http_connection::add_ohdr (const char *hdr, const char *value)
 {
@@ -815,8 +841,8 @@ void http_connection::add_ohdr (const char *hdr, const char *value)
 /*!
   Generate a HTTP redirect response to a new uri.
 
-  \param  uri redirected uri
-
+  \param  uri   redirected uri
+  \param  code  redirect code 
 */
 void http_connection::redirect (const char *uri, unsigned int code)
 {
@@ -825,14 +851,17 @@ void http_connection::redirect (const char *uri, unsigned int code)
 
   add_ohdr ("Location", uri);
   respond (code);
-  /* RFC7231 (https://tools.ietf.org/html/rfc7231#section-6.4) says:
-   Except for responses to a HEAD request, the representation of a 303
-   response ought to contain a short hypertext note with a hyperlink to
-   the same URI reference provided in the Location header field
-   */
-  ws << "<html><head><title>Document has moved</title></head>\r\n" \
-    "<body>Document has moved <a href=\"" << uri <<"\">here</a></body></html>" 
-    << endl;
+  if (code == 303 && strcmpi ("HEAD", get_method()))
+  {
+    /* RFC7231 (https://tools.ietf.org/html/rfc7231#section-6.4.4) says:
+     Except for responses to a HEAD request, the representation of a 303
+     response ought to contain a short hypertext note with a hyperlink to
+     the same URI reference provided in the Location header field
+     */
+    ws << "<html><head><title>Document has moved</title></head>\r\n" \
+      "<body>Document has moved <a href=\"" << uri << "\">here</a></body></html>"
+      << endl;
+  }
 }
 
 /*!
@@ -856,7 +885,7 @@ void http_connection::respond (unsigned int code, const char *reason)
 {
   static struct {
     int code;
-    char *text;
+    const char *text;
   } respcodes[] = {
     {100, "Continue"},                      {101, "Switching Protocols"},
     {200, "OK"},                            {201, "Created"},
@@ -894,6 +923,7 @@ void http_connection::respond (unsigned int code, const char *reason)
     ws << "HTTP/1.1 " << code << " " << (reason?reason:respcodes[ic].text) << "\r\n";
 
     //output server headers
+    lock l (parent.hdr_lock);
     idx = parent.out_headers.begin ();
     while (idx != parent.out_headers.end ())
     {
@@ -918,10 +948,9 @@ void http_connection::respond (unsigned int code, const char *reason)
   Returns the value of a request header.
   
   \param  hdr   header name
-
   \return header value or 0 if the request does not have this header
 */
-const char *http_connection::get_ihdr(const char *hdr)
+const char *http_connection::get_ihdr(const char *hdr) const
 {
   char tmp[256];
   strcpy (tmp, hdr);
@@ -940,19 +969,25 @@ const char *http_connection::get_ihdr(const char *hdr)
 
   \return header field value or 0 if there is no such header defined.
 */
-const char *http_connection::get_ohdr(const char *hdr)
+const char *http_connection::get_ohdr(const char *hdr) const
 {
+  lock l (parent.hdr_lock);
   auto idx = parent.out_headers.find (hdr);
   if (idx != parent.out_headers.end ())
     return idx->second.c_str ();
   
-  idx = oheaders.find (hdr);
-  if (idx != oheaders.end ())
-    return idx->second.c_str ();
+  auto idx1 = oheaders.find (hdr);
+  if (idx1 != oheaders.end ())
+    return idx1->second.c_str ();
 
   return 0;
 }
 
+/*!
+  Send first part of a multi-part response.
+  \param part_type value of the 'Content-Type' header
+  \param bound part boundary string
+*/
 void http_connection::respond_part (const char *part_type, const char *bound)
 {
   part_boundary = bound;
@@ -965,13 +1000,22 @@ void http_connection::respond_part (const char *part_type, const char *bound)
   ws.flush();
 }
 
+/*!
+  Send subsequent parts of a multi-part response.
+  \param last _true_ if this is the last part of the mulit-part response
+
+  This function should be called only after a call to respond_part() function.
+*/
 void http_connection::respond_next (bool last)
 {
   if (part_boundary.empty())
     return; //misuse
   ws << "\r\n--" << part_boundary;
   if (last)
+  {
     ws << "--";
+    part_boundary.clear ();
+  }
   ws << "\r\n";
 }
 
@@ -1005,20 +1049,19 @@ void http_connection::respond_next (bool last)
   - server name is HTTPD_SERVER_NAME
   
 */
-httpd::httpd (unsigned short port, unsigned int maxconn) :
-tcpserver (maxconn),
-port_num (port),
-root ("./"),
-defuri (HTTPD_DEFAULT_URI),
-servname (HTTPD_SERVER_NAME)
+httpd::httpd (unsigned short port, unsigned int maxconn)
+  : tcpserver (maxconn)
+  , port_num (port)
+  , root ("./")
+  , defuri (HTTPD_DEFAULT_URI)
 {
-  smime *ptr = knowntypes;
+  name (HTTPD_SERVER_NAME);
+  smime* ptr = knowntypes;
   while (ptr->suffix)
   {
     add_mime_type (ptr->suffix, ptr->type, ptr->shtml);
     ptr++;
   }
-  add_ohdr ("Server", HTTPD_SERVER_NAME);
 }
 
 /*!
@@ -1037,7 +1080,7 @@ bool httpd::init ()
   try {
     if (!is_open ())
       open (SOCK_STREAM);
-    inaddr me ((unsigned long)INADDR_ANY, port_num);
+    inaddr me (INADDR_ANY, port_num);
     bind (me);
   }
   catch (erc& x)
@@ -1063,14 +1106,17 @@ void httpd::port (unsigned short portnum)
 
 /*!
   Change server name.
-  \param name new server name string
+  \param nam new server name string
 
   This string is returned in the "Server" HTTP header.
 */
-void httpd::server_name (const char *name)
+void httpd::name (const char *nam)
 {
-  servname = name;
-  add_ohdr ("Server", name);
+  if (nam)
+    add_ohdr ("Server", nam);
+  else
+    remove_ohdr ("Server");
+  thread::name (nam);
 }
 
 /*!
@@ -1086,24 +1132,26 @@ http_connection* httpd::make_thread(sock& connection)
 
 /*!
   Add or modify a server response header.
-  \param field    Header name
+  \param hdr      Header name
   \param value    Header value
 
   Server response headers are always sent as part of the HTTP answer.
   In addition each connection object can add it's own headers.
 */
-void httpd::add_ohdr (const char *field, const char *value)
+void httpd::add_ohdr (const char *hdr, const char *value)
 {
-  out_headers [field] = value;
+  lock l (hdr_lock);
+  out_headers [hdr] = value;
 }
 
 /*!
   Remove a server response header.
-  \param field    Header name
+  \param hdr    Header name
 */
-void httpd::remove_ohdr (const char *field)
+void httpd::remove_ohdr (const char *hdr)
 {
-  auto idx = out_headers.find (field);
+  lock l (hdr_lock);
+  auto idx = out_headers.find (hdr);
   if (idx != out_headers.end ())
     out_headers.erase (idx);
 }
@@ -1118,11 +1166,10 @@ void httpd::remove_ohdr (const char *field)
   user-defined handler function passing the uri, the connection info and the
   handler specific information.
 */
-void httpd::add_handler(const char *uri, uri_handler func, void *info)
+void httpd::add_handler (const char* uri, uri_handler func, void* info)
 {
-  handle_info hi = {func, info};
-  
-  handlers[uri] = hi;
+  handle_info hi = { func, info };
+  handlers.emplace (string (uri), hi);
 }
 
 /*!
@@ -1185,6 +1232,13 @@ void httpd::add_realm (const char *realm, const char *uri)
   realms[realm] = uri;
 }
 
+/*!
+  Add a new user to a relm or modifies password for an existing user.
+  \param realm access realm
+  \param username user name
+  \param pwd user password
+  \return _true_ if successful or _false_ if realm doesn't exist
+*/
 bool httpd::add_user (const char *realm, const char *username, const char *pwd)
 {
   if (realms.find (realm) == realms.end ())
@@ -1294,6 +1348,7 @@ int httpd::invoke_handler (const char *uri, http_connection& client)
   auto idx = handlers.find (uri);
   if (idx != handlers.end())
   {
+    lock l(*idx->second.in_use);
     TRACE ("Invoking handler for %s", uri);
     ret = idx->second.h (uri, client, idx->second.nfo);
     TRACE ("Handler done (%d)", ret);
@@ -1321,10 +1376,9 @@ void httpd::add_alias (const char *uri, const char *path)
 
   After processing the alias table, any part of the original URI that was not
   mapped is appended to the resulting path. For instance if the alias table
-  contains an entry mapping 'doc' to 'documentation' and docroot is set as
-  'c:\local folder\', an URI like '/doc/project1/filename.html' will be mapped to 
-  'c:\local folder\documentation\project1\filename.html'.
-
+  contains an entry mapping "doc" to "documentation" and docroot is set as
+  "c:\local_folder\", an URI like "/doc/project1/filename.html" will be mapped to 
+  "c:\local_folder\documentation\project1\filename.html".
 */
 bool httpd::find_alias (const char *uri, char *path)
 {
@@ -1362,6 +1416,7 @@ bool httpd::find_alias (const char *uri, char *path)
 void httpd::add_var(const char *name, const char *fmt, void *addr, double multiplier)
 {
   struct var_info vi = {fmt, addr, multiplier};
+  lock l (varlock);
   variables[name] = vi;
 }
 
@@ -1371,6 +1426,7 @@ void httpd::add_var(const char *name, const char *fmt, void *addr, double multip
 */
 string httpd::get_var(const char *name)
 {
+  lock l (varlock);
   if (variables.find (name) != variables.end())
   {
     struct var_info vi = variables[name];
@@ -1428,6 +1484,24 @@ const char *httpd::guess_mimetype (const char *file, bool& shtml)
   }
   shtml = false;
   return types[0].type.c_str();
+}
+
+/// Check if file exists and can be read 
+bool file_exists (char *path)
+{
+  //normalize forward slashes to backslashes
+  char* p = path;
+  while (*p)
+  {
+    if (*p == '/')
+      *p = '\\';
+    ++p;
+  }
+#ifdef HAS_UTF8
+  return utf8::access (path, 4);
+#else
+  return (_access (path, 4) != 0);
+#endif
 }
 
 /*!
@@ -1559,6 +1633,4 @@ void parse_urlparams (const char* par_str, str_pairs& params)
   free (dup);
 }
 
-#ifdef MLIBSPACE
 }
-#endif

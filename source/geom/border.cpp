@@ -1,5 +1,5 @@
 /*!
-  \file BORDER.CPP Implementation of Border object
+  \file border.cpp Implementation of Border object
 
   (c) Mircea Neacsu 2017
 */
@@ -16,9 +16,7 @@ using namespace std;
   \brief Geometry concepts and algorithms
 */
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 /*!
   \class Border 
@@ -120,6 +118,4 @@ bool Border::inside (double x, double y)
   return (c != closing_outside);
 }
 
-#ifdef MLIBSPACE
 }
-#endif

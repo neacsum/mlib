@@ -1,6 +1,6 @@
 #pragma once
 /*!
-  \file EVENT.H event class definition.
+  \file event.h event class definition.
 
 	(c) Mircea Neacsu 1999
 
@@ -8,9 +8,7 @@
 
 #include "syncbase.h"
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 class event : public syncbase
 {
@@ -35,7 +33,5 @@ private:
   mode m;     ///< event mode (manual or automatic)
 };
 
-#ifdef MLIBSPACE
 };
-#endif
 

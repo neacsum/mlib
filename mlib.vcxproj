@@ -172,6 +172,7 @@
     <ClInclude Include="include\mlib\nmea.h" />
     <ClInclude Include="include\mlib\options.h" />
     <ClInclude Include="include\mlib\point.h" />
+    <ClInclude Include="include\mlib\poly.h" />
     <ClInclude Include="include\mlib\rdir.h" />
     <ClInclude Include="include\mlib\ringbuf.h" />
     <ClInclude Include="include\mlib\rotmat.h" />
@@ -184,6 +185,7 @@
     <ClInclude Include="include\mlib\statpars.h" />
     <ClInclude Include="include\mlib\stopwatch.h" />
     <ClInclude Include="include\mlib\syncbase.h" />
+    <ClInclude Include="include\mlib\syncque.h" />
     <ClInclude Include="include\mlib\tcpserv.h" />
     <ClInclude Include="include\mlib\thread.h" />
     <ClInclude Include="include\mlib\trace.h" />

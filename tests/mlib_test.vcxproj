@@ -34,6 +34,8 @@
     <ClCompile Include="source\tests_sock.cpp" />
     <ClCompile Include="source\tests_sqlitepp.cpp" />
     <ClCompile Include="source\tests_statpars.cpp" />
+    <ClCompile Include="source\tests_syncque.cpp" />
+    <ClCompile Include="source\tests_thread.cpp" />
     <ClCompile Include="source\tests_tvops.cpp" />
     <ClCompile Include="source\test_point.cpp" />
     <ClCompile Include="tests_bitstream.cpp" />
@@ -194,7 +196,8 @@
       <AdditionalDependencies>mlib.lib;utpp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>"$(TargetPath)"</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

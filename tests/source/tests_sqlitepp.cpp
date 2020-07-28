@@ -2,9 +2,7 @@
 #include <utpp/utpp.h>
 #include <iostream>
 
-#ifdef MLIBSPACE
-using namespace MLIBSPACE;
-#endif
+using namespace mlib;
 
 TEST (NotConnectedDbObject)
 {

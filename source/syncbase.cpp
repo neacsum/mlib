@@ -1,5 +1,5 @@
 /*!
-  \file SYNCBASE.CPP Member functions of syncbase class
+  \file syncbase.cpp Member functions of syncbase class
 
   (c) Mircea Neacsu 1999-2017
 
@@ -7,9 +7,7 @@
 #include <assert.h>
 #include <mlib/syncbase.h>
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 /*!
   \defgroup syncro  Synchronization Objects
   \brief Wrapper classes for Windows synchronization mechanisms.
@@ -120,9 +118,9 @@ void syncbase::set_handle (HANDLE h)
 }
 
 /// Change object's name
-void syncbase::set_name(const char *name)
+void syncbase::name (const char* nam)
 {
-  name_ = name?name:std::string();
+  name_ = nam ? nam : std::string ();
 }
 
 /// Check if object is signaled
@@ -192,6 +190,4 @@ void udelay (unsigned short usec)
   } while (crt.QuadPart < interval.QuadPart);
 }
 
-#ifdef MLIBSPACE
-};
-#endif
+}

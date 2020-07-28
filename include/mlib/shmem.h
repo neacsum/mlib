@@ -1,6 +1,6 @@
 #pragma once
 /*!
-    \file SHMEM.H Shared memory object with support for single-writer multiple-readers.
+    \file shmem.h Shared memory object with support for single-writer multiple-readers.
 
     (c) Mircea Neacsu 2004-2017
 */
@@ -9,11 +9,10 @@
 #include "defs.h"
 #endif
 
+#include <Winsock2.h>
 #include <stdexcept>
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 ///Base class for shared memory objects
 class shmem_base
@@ -204,6 +203,4 @@ lockw<S, B>::lockw (shmem<S, B>& mem_) : mem(mem_)
     throw std::runtime_error ("wrlock failed");
 };
 
-#ifdef MLIBSPACE
 }
-#endif

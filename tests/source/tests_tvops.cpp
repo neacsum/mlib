@@ -1,7 +1,7 @@
 #include <utpp/utpp.h>
 #include <mlib/tvops.h>
 
-using namespace MLIBSPACE;
+using namespace mlib;
 
 SUITE (tvops)
 {

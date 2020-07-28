@@ -7,9 +7,7 @@
 #include <functional>
 #include <list>
 
-#ifdef MLIBSPACE
-using namespace MLIBSPACE;
-#endif
+using namespace mlib;
 
 ///Used to count ctor/dtor calls
 struct counted_int {

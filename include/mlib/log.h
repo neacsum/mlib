@@ -1,6 +1,6 @@
 #pragma once
 /*!
-  \file LOG.H syslog related functions.
+  \file log.h syslog related functions.
 
   (c) Mircea Neacsu 2008
 
@@ -8,6 +8,11 @@
   however implementations are new.
 
 */
+#if __has_include ("defs.h")
+#include "defs.h"
+#endif
+
+#include <winsock2.h>
 
 // facility codes 0 to 24 are defined in syslog.h
 #define	LOG_USER	(1<<3)	///< facility for random user-level messages

@@ -1,5 +1,5 @@
 /*!
-  \file EVENT.CPP event class implementation.
+  \file event.cpp event class implementation.
   (c) Mircea Neacsu 1999
 
 */
@@ -8,15 +8,15 @@
 #define UNICODE
 #endif
 
-#include <mlib/defs.h>
-
 #include <mlib/event.h>
 #include <assert.h>
-#include <utf8/utf8.h>
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
+#if __has_include(<utf/utf8.h>)
+#define HAS_UTF8
+#include <utf8/utf8.h>
 #endif
+
+namespace mlib {
 
 /*!
   \class event
@@ -34,8 +34,11 @@ event::event (mode md, bool signaled, const char *name) :
   syncbase (name),
   m (md)
 {
+#ifdef HAS_UTF8
   HANDLE h = CreateEventW (NULL, m==manual, signaled, name?utf8::widen(name).c_str():0);
-
+#else
+  HANDLE h = CreateEventA (NULL, m == manual, signaled, name);
+#endif
   assert (h);
   set_handle (h);
 }
@@ -61,6 +64,4 @@ event::operator bool ()
   return result;
 }
 
-#ifdef MLIBSPACE
-};
-#endif
+}

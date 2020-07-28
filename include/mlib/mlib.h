@@ -1,9 +1,15 @@
 #pragma once
 /*!
-  \file MLIB.H Uber-include file for mlib library
+  \file mlib.h Uber-include file for mlib library
 
   (c) Mircea Neacsu 2019
 */
+
+#if __has_include ("defs.h")
+#include "defs.h"
+#endif
+
+#include <Winsock2.h>
 
 #include "base64.h"
 #include "basename.h"
@@ -27,5 +33,6 @@
 #include "sqlitepp.h"
 #include "statpars.h"
 #include "stopwatch.h"
+#include "syncque.h"
 #include "trace.h"
 #include "wtimer.h"

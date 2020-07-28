@@ -13,10 +13,9 @@
 
 #include <string>
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
+class erc;
 
 /*! 
   \anchor ERROR_PRI
@@ -59,7 +58,7 @@ public:
   unsigned int log_priority () const;
 
   /// return message to be logged
-  virtual std::string message (const mlib::erc& e) const;
+  virtual std::string message (const erc& e) const;
 
   /// get name
   const std::string& name () const;
@@ -86,11 +85,11 @@ class erc
 public:
   erc ();
   erc (int value , short int priority=ERROR_PRI_ERROR, errfac* f = 0);
-  erc (const erc& other) = default;
+  erc (const erc& other);
   erc (erc&& other);
 
   ~erc () noexcept(false);
-  erc& operator= (const erc& rhs) = default;
+  erc& operator= (const erc& rhs);
   erc& operator= (erc&& rhs);
   operator int () const;
   
@@ -174,11 +173,9 @@ std::string erc::message () const
 }
 
 
-#ifdef MLIBSPACE
 }
-#endif
-
 /// The SUCCESS indicator
-#define ERR_SUCCESS (MLIBSPACE::erc (0, ERROR_PRI_SUCCESS))
+#define ERR_SUCCESS (mlib::erc (0, ERROR_PRI_SUCCESS))
+
 
 

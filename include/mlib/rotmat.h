@@ -9,9 +9,7 @@
 #include "defs.h"
 #endif
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 ///  3D Rotation Calculator
 class RotMat
@@ -43,6 +41,4 @@ private:
   void multiply (double m[3][3]);
 };
 
-#ifdef MLIBSPACE
 }
-#endif

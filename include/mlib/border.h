@@ -1,6 +1,6 @@
 #pragma once
 /*!
-  \file BORDER.H Small class to represent simple non-intersecting polygons
+  \file border.h Small class to represent simple non-intersecting polygons
 
   (c) Mircea Neacsu 2017
 */
@@ -12,9 +12,7 @@
 
 #include <deque>
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 
 class Border
@@ -34,6 +32,4 @@ private:
   int closing_outside;
 };
 
-#ifdef MLIBSPACE
-};
-#endif
+}

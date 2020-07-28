@@ -2,8 +2,6 @@
   \file inaddr.cpp Implementation of inaddr class.
 
   (c) Mircea Neacsu 2002. All rights reserved.
-
-
 */
 
 //get rid of a deprecation warning related to inet_ntoa (MN 22-Jan-17) 
@@ -15,9 +13,7 @@
 #include <mlib/wsockstream.h>
 #include <mlib/trace.h>
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 
 #define WSALASTERROR (erc( WSAGetLastError(), ERROR_PRI_ERROR, sockerrors))
@@ -113,7 +109,7 @@ const char* inaddr::hostname ()
 */
 void inaddr::hostname (char *name, size_t sz)
 {
-  strncpy (name, hostname(), sz);
+  strncpy_s (name, sz, hostname(), _TRUNCATE);
 }
 
 /*!
@@ -160,6 +156,4 @@ const char *inaddr::ntoa ()
   return inet_ntoa (sa.sin_addr);
 }
 
-#ifdef MLIBSPACE
-};
-#endif
+}

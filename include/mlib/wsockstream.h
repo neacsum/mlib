@@ -9,18 +9,13 @@
 #include "defs.h"
 #endif
 
-#ifndef _WINSOCK2API_
-#error WINSOCK2 required
-#endif
-
+#include <WinSock2.h>
 #include <iostream>
 
 #include "errorcode.h"
 #include "inaddr.h"
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 
 ///Error facility used by all sock derived classes.
@@ -122,6 +117,7 @@ private:
   } *sl;
 };
 
+
 ///Provide functions required by streambuf interface using an underlying socket
 class sockbuf: public sock, public std::streambuf {
 public:
@@ -151,9 +147,11 @@ private:
   int     ibsize;   //input buffer size
 };
 
+/// \{
+/// \ingroup sockets
+
 /*!
   \class generic_sockstream
-  \ingroup Sockets
 
   An IO stream using a sockbuf object as the underlying streambuf.
   The streambuf object can be retrieved using rdbuf() function or the -> operator.
@@ -166,7 +164,7 @@ public:
   ///Default constructor
   generic_sockstream (): strm (new sockbuf()) {};
 
-  ///Create from an existing streambuffer
+  ///Create from an existing sockbuf
   generic_sockstream (const sockbuf& sb) : strm (new sockbuf(sb)) {};
 
   /// Create from an existing socket
@@ -210,6 +208,8 @@ typedef generic_sockstream<std::ostream> osockstream;
 ///Bidirectional socket stream
 typedef generic_sockstream<std::iostream> sockstream;
 
+/// \}
+
 /*---------------------- support classes ------------------------------------*/
 /// Keeps an instance counter for calls to WSAStartup/WSACleanup
 static struct sock_initializer
@@ -227,7 +227,5 @@ public:
   const char *msg (const erc& e);
 };
 
-#ifdef MLIBSPACE
 }
-#endif
 

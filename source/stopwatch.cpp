@@ -8,9 +8,8 @@
 #include <mlib/stopwatch.h>
 #include <assert.h>
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
+
 LARGE_INTEGER stopwatch::freq;
 
 
@@ -57,6 +56,4 @@ double stopwatch::msecEnd ()
   return (double)(tend.QuadPart - tbeg.QuadPart) / freq.QuadPart*1000.;
 }
 
-#ifdef MLIBSPACE
-};
-#endif
+}

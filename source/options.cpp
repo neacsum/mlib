@@ -1,9 +1,7 @@
-#include <mlib/options.h>
-#include <ctype.h>
 /*!
-  \file OPTIONS.CPP Implementation of command line parsing class.
+  \file options.cpp Implementation of command line parsing class.
 
-  \class MLIBSPACE::Options 
+  \class mlib::Options 
   \brief Command Line Parsing class
 
   The parser matches approximately the POSIX specifications from:
@@ -53,10 +51,10 @@
 
 ````
 */
+#include <mlib/options.h>
+#include <ctype.h>
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
   
 /*!
   Initialize parser
@@ -435,6 +433,4 @@ const string& Options::usage(char sep)
   return usage_;
 }
 
-#ifdef MLIBSPACE
 }
-#endif

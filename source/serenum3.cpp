@@ -4,13 +4,10 @@
   (c) Mircea Neacsu 2017. All rights reserved.
 */
 #include <mlib/serenum.h>
-#include <Windows.h>
 
 using namespace std;
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 /*!
   \ingroup serenum
@@ -62,6 +59,4 @@ bool SerEnum_UsingRegistry (vector<int>& ports)
   return true;
 }
 
-#ifdef MLIBSPACE
-};
-#endif
+}

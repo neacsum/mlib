@@ -5,15 +5,12 @@
 
   (c) Mircea Neacsu 2019
 */
-#pragma once
 
 #if __has_include ("defs.h")
 #include "defs.h"
 #endif
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 ///integer exponentiation function
 template <typename T>
@@ -31,6 +28,4 @@ T ipow (T base, int exp)
 };
 
 
-#ifdef MLIBSPACE
 };
-#endif

@@ -1,11 +1,15 @@
 #pragma once
 
+#if __has_include ("defs.h")
+#include "defs.h"
+#endif
+
+#include <Winsock2.h>
+
 #include <netfw.h>
 #include "errorcode.h"
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 /// Light wrapper for Windows firewall
 class firewall
@@ -30,6 +34,4 @@ private:
 
 extern errfac *fw_errptr;
 
-#ifdef MLIBSPACE
 };
-#endif

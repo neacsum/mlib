@@ -1,23 +1,22 @@
 /*!
-  \file SQLITEPP.H C++ wrapper for SQLITE3
+  \file sqlitepp.h C++ wrapper for SQLITE3
 
   (c) Mircea Neacsu 2017. All rights reserved.
 */
 #pragma once
 
-#include <string>
-#include <map>
-
 #if __has_include ("defs.h")
 #include "defs.h"
 #endif
 
+#include <string>
+#include <map>
+
+#include <Winsock2.h>
 #include "sqlite3.h"
 #include "errorcode.h"
 
-#ifdef MLIBSPACE
-namespace MLIBSPACE {
-#endif
+namespace mlib {
 
 class Query;
 
@@ -226,6 +225,4 @@ bool Query::iless::operator () (const std::string& left, const std::string& righ
 }
 
 
-#ifdef MLIBSPACE
 };
-#endif
