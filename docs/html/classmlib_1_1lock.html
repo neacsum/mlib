@@ -59,7 +59,7 @@ $(function() {
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a188da3297254d28e29d4642e3d8f1ec4"><td class="memItemLeft" align="right" valign="top"><a id="a188da3297254d28e29d4642e3d8f1ec4"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1lock.html#a188da3297254d28e29d4642e3d8f1ec4">lock</a> (<a class="el" href="classmlib_1_1criticalsection.html">criticalsection</a> &amp;cs)</td></tr>
-<tr class="memdesc:a188da3297254d28e29d4642e3d8f1ec4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Aquire critical section. <br /></td></tr>
+<tr class="memdesc:a188da3297254d28e29d4642e3d8f1ec4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Acquire critical section. <br /></td></tr>
 <tr class="separator:a188da3297254d28e29d4642e3d8f1ec4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab42a4d8f9548f10a5cc16c0676addff6"><td class="memItemLeft" align="right" valign="top"><a id="ab42a4d8f9548f10a5cc16c0676addff6"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1lock.html#ab42a4d8f9548f10a5cc16c0676addff6">lock</a> (const <a class="el" href="classmlib_1_1lock.html">lock</a> &amp;t)</td></tr>
@@ -69,10 +69,6 @@ Public Member Functions</h2></td></tr>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1lock.html#ac7e0fe00911352b387702a0a7513e83d">~lock</a> ()</td></tr>
 <tr class="memdesc:ac7e0fe00911352b387702a0a7513e83d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Leave critical section. <br /></td></tr>
 <tr class="separator:ac7e0fe00911352b387702a0a7513e83d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af3e913a4b9a1060025f13efeb69e14d1"><td class="memItemLeft" align="right" valign="top"><a id="af3e913a4b9a1060025f13efeb69e14d1"></a>
-<a class="el" href="classmlib_1_1lock.html">lock</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1lock.html#af3e913a4b9a1060025f13efeb69e14d1">operator=</a> (const <a class="el" href="classmlib_1_1lock.html">lock</a> &amp;rhs)</td></tr>
-<tr class="memdesc:af3e913a4b9a1060025f13efeb69e14d1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assignment operator. <br /></td></tr>
-<tr class="separator:af3e913a4b9a1060025f13efeb69e14d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Used in conjunction with criticalsection objects, locks simplify critical sections' management by taking advantage the automatic destruction of static objects in C++.</p>
@@ -80,7 +76,7 @@ Public Member Functions</h2></td></tr>
 <div class="line"> </div>
 <div class="line"><span class="keywordtype">void</span> func()</div>
 <div class="line">{</div>
-<div class="line">  <a class="code" href="classmlib_1_1lock.html#a188da3297254d28e29d4642e3d8f1ec4">lock</a> inuse( section );  <span class="comment">//Aquire critical section</span></div>
+<div class="line">  <a class="code" href="classmlib_1_1lock.html#a188da3297254d28e29d4642e3d8f1ec4">lock</a> inuse( section );  <span class="comment">//Acquire critical section</span></div>
 <div class="line"> </div>
 <div class="line">  <span class="comment">//... code protected by critical section</span></div>
 <div class="line"> </div>
@@ -90,10 +86,10 @@ Public Member Functions</h2></td></tr>
 <li>C:/development/mlib/include/mlib/<a class="el" href="critsect_8h_source.html">critsect.h</a></li>
 </ul>
 </div><!-- contents -->
-<div class="ttc" id="aclassmlib_1_1lock_html_a188da3297254d28e29d4642e3d8f1ec4"><div class="ttname"><a href="classmlib_1_1lock.html#a188da3297254d28e29d4642e3d8f1ec4">mlib::lock::lock</a></div><div class="ttdeci">lock(criticalsection &amp;cs)</div><div class="ttdoc">Aquire critical section.</div><div class="ttdef"><b>Definition:</b> critsect.h:120</div></div>
+<div class="ttc" id="aclassmlib_1_1lock_html_a188da3297254d28e29d4642e3d8f1ec4"><div class="ttname"><a href="classmlib_1_1lock.html#a188da3297254d28e29d4642e3d8f1ec4">mlib::lock::lock</a></div><div class="ttdeci">lock(criticalsection &amp;cs)</div><div class="ttdoc">Acquire critical section.</div><div class="ttdef"><b>Definition:</b> critsect.h:119</div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jul 8 2020 21:54:04 for MLIB by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Jul 31 2020 06:14:54 for MLIB by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.18
 </small></address>
