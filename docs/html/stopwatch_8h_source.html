@@ -53,35 +53,37 @@ $(function() {
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#include &quot;defs.h&quot;</span></div>
 <div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160; </div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#include &lt;Winsock2.h&gt;</span></div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160; </div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="keyword">namespace </span>mlib {</div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#ifndef _INC_WINDOWS</span></div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="preprocessor">#include &lt;windows.h&gt;</span></div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160; </div>
-<div class="line"><a name="l00017"></a><span class="lineno"><a class="line" href="classmlib_1_1stopwatch.html">   17</a></span>&#160;<span class="keyword">class </span><a class="code" href="classmlib_1_1stopwatch.html">stopwatch</a></div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;{</div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;  <a class="code" href="classmlib_1_1stopwatch.html#ab7da4b24789fde4b737d1bc3ddf69e60">stopwatch</a> ();</div>
-<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classmlib_1_1stopwatch.html#ac1acc8de90440a2ae9f266b9120ed316">start</a> ();</div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classmlib_1_1stopwatch.html#af6f4371db184949c6eb48892a0e57bff">stop</a> ();</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;  <span class="keywordtype">double</span> <a class="code" href="classmlib_1_1stopwatch.html#a403fa4c565d4f7ccc234abb305b8651f">msecLap</a> ();</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;  <span class="keywordtype">double</span> <a class="code" href="classmlib_1_1stopwatch.html#ab329faf46946302ea9abfff32671665d">msecEnd</a> ();</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160; </div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;  <span class="keyword">static</span> LARGE_INTEGER freq;</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;  LARGE_INTEGER tbeg, tend;</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;};</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160; </div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;}</div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="keyword">namespace </span>mlib {</div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160; </div>
+<div class="line"><a name="l00019"></a><span class="lineno"><a class="line" href="classmlib_1_1stopwatch.html">   19</a></span>&#160;<span class="keyword">class </span><a class="code" href="classmlib_1_1stopwatch.html">stopwatch</a></div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;{</div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;  <a class="code" href="classmlib_1_1stopwatch.html#ab7da4b24789fde4b737d1bc3ddf69e60">stopwatch</a> ();</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classmlib_1_1stopwatch.html#ac1acc8de90440a2ae9f266b9120ed316">start</a> ();</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classmlib_1_1stopwatch.html#af6f4371db184949c6eb48892a0e57bff">stop</a> ();</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;  <span class="keywordtype">double</span> <a class="code" href="classmlib_1_1stopwatch.html#a403fa4c565d4f7ccc234abb305b8651f">msecLap</a> ();</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;  <span class="keywordtype">double</span> <a class="code" href="classmlib_1_1stopwatch.html#ab329faf46946302ea9abfff32671665d">msecEnd</a> ();</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160; </div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;  <span class="keyword">static</span> LARGE_INTEGER freq;</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;  LARGE_INTEGER tbeg, tend;</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;};</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160; </div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;}</div>
 </div><!-- fragment --></div><!-- contents -->
 <div class="ttc" id="aclassmlib_1_1stopwatch_html_af6f4371db184949c6eb48892a0e57bff"><div class="ttname"><a href="classmlib_1_1stopwatch.html#af6f4371db184949c6eb48892a0e57bff">mlib::stopwatch::stop</a></div><div class="ttdeci">void stop()</div><div class="ttdoc">Stop the stopwatch.</div><div class="ttdef"><b>Definition:</b> stopwatch.cpp:33</div></div>
 <div class="ttc" id="aclassmlib_1_1stopwatch_html_ac1acc8de90440a2ae9f266b9120ed316"><div class="ttname"><a href="classmlib_1_1stopwatch.html#ac1acc8de90440a2ae9f266b9120ed316">mlib::stopwatch::start</a></div><div class="ttdeci">void start()</div><div class="ttdoc">Start the stopwatch.</div><div class="ttdef"><b>Definition:</b> stopwatch.cpp:26</div></div>
-<div class="ttc" id="aclassmlib_1_1stopwatch_html"><div class="ttname"><a href="classmlib_1_1stopwatch.html">mlib::stopwatch</a></div><div class="ttdoc">Simple stopwatch timer (yet another one!)</div><div class="ttdef"><b>Definition:</b> stopwatch.h:18</div></div>
+<div class="ttc" id="aclassmlib_1_1stopwatch_html"><div class="ttname"><a href="classmlib_1_1stopwatch.html">mlib::stopwatch</a></div><div class="ttdoc">Simple stopwatch timer (yet another one!)</div><div class="ttdef"><b>Definition:</b> stopwatch.h:20</div></div>
 <div class="ttc" id="aclassmlib_1_1stopwatch_html_a403fa4c565d4f7ccc234abb305b8651f"><div class="ttname"><a href="classmlib_1_1stopwatch.html#a403fa4c565d4f7ccc234abb305b8651f">mlib::stopwatch::msecLap</a></div><div class="ttdeci">double msecLap()</div><div class="ttdoc">Return number of milliseconds elapsed from start.</div><div class="ttdef"><b>Definition:</b> stopwatch.cpp:43</div></div>
 <div class="ttc" id="aclassmlib_1_1stopwatch_html_ab329faf46946302ea9abfff32671665d"><div class="ttname"><a href="classmlib_1_1stopwatch.html#ab329faf46946302ea9abfff32671665d">mlib::stopwatch::msecEnd</a></div><div class="ttdeci">double msecEnd()</div><div class="ttdoc">Return total duration in milliseconds between start and stop.</div><div class="ttdef"><b>Definition:</b> stopwatch.cpp:52</div></div>
 <div class="ttc" id="aclassmlib_1_1stopwatch_html_ab7da4b24789fde4b737d1bc3ddf69e60"><div class="ttname"><a href="classmlib_1_1stopwatch.html#ab7da4b24789fde4b737d1bc3ddf69e60">mlib::stopwatch::stopwatch</a></div><div class="ttdeci">stopwatch()</div><div class="ttdoc">Constructor.</div><div class="ttdef"><b>Definition:</b> stopwatch.cpp:17</div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jul 8 2020 21:54:03 for MLIB by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Jul 31 2020 06:14:53 for MLIB by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.18
 </small></address>
