@@ -16,4 +16,7 @@ for /f "usebackq tokens=*" %%i in (`"%VSWHERE%" -latest -products * -requires Mi
 )
 echo Visual studio installation folder is: %VSInstallDir%
 rem "%VSInstallDir%\common7\tools\vsdevcmd.bat"
-"%VSInstallDir%\common7\tools\vsmsbuildcmd.bat"
+call "%VSInstallDir%\common7\tools\vsmsbuildcmd.bat"
+
+rem Download SQLITE files
+msbuild -target:DownloadSQLite build.proj
