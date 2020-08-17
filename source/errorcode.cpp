@@ -206,7 +206,7 @@ erc::erc (const erc& other) :
   active (other.active),
   facility_ (other.facility_)
 {
-  TRACE ("erc copy ctor");
+  TRACE9 ("erc copy ctor");
   //we are the active error now, the other is deactivated
   other.active = false;
 }
@@ -220,7 +220,7 @@ erc::erc (erc&& other) :
   active (other.active),
   facility_ (other.facility_)
 {
-  TRACE ("erc move ctor");
+  TRACE9 ("erc move ctor");
   //we are the active error now, the other is deactivated
   other.active = false;
 }
@@ -250,7 +250,7 @@ erc& erc::operator= (const erc& rhs)
 {
   if (&rhs != this)
   {
-    TRACE ("erc assignment");
+    TRACE9 ("erc assignment");
     bool rhs_active = rhs.active;
     rhs.active = false; //prevent rhs from throwing if we throw
     if (active && priority_)
@@ -274,7 +274,7 @@ erc& erc::operator= (erc&& rhs)
 {
   if (&rhs != this)
   {
-    TRACE ("erc move assignment");
+    TRACE9 ("erc move assignment");
     bool rhs_active = rhs.active;
     rhs.active = false; //prevent rhs from throwing if we throw
     if (active && priority_)

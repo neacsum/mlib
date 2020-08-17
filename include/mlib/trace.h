@@ -19,7 +19,6 @@
 
 #include "dprintf.h"
 
-#ifdef _TRACE
 # undef TRACE
 # undef TRACE1
 # undef TRACE2
@@ -31,14 +30,14 @@
 # undef TRACE8
 # undef TRACE9
 
-# if defined (_TRACE_SYSLOG)
-#  include "log.h"
-#  define TRACE syslog_debug
-# else
-#   define TRACE dprintf
-# endif
-# if defined (_TRACE_LEVEL)
-#  define __TRL(A) (A >= _TRACE_LEVEL)? 0 : TRACE
+//SYSLOG_TRACE forces TRACE
+#if defined (MLIB_SYSLOG_TRACE) && !defined (MLIB_TRACE)
+#define MLIB_TRACE
+#endif
+
+# if defined (MLIB_TRACE_LEVEL)
+// only some traces enabled (those less than MLIB_TRACE_LEVEL)
+#  define __TRL(A) (A >= MLIB_TRACE_LEVEL)? 0 : TRACE
 #  define TRACE1 __TRL(1)
 #  define TRACE2 __TRL(2)
 #  define TRACE3 __TRL(3)
@@ -49,6 +48,7 @@
 #  define TRACE8 __TRL(8)
 #  define TRACE9 __TRL(9)
 # else
+// all traces are enabled
 #  define TRACE1 TRACE
 #  define TRACE2 TRACE
 #  define TRACE3 TRACE
@@ -59,26 +59,14 @@
 #  define TRACE8 TRACE
 #  define TRACE9 TRACE
 # endif
-#else
-# undef TRACE
-# undef TRACE1
-# undef TRACE2
-# undef TRACE3
-# undef TRACE4
-# undef TRACE5
-# undef TRACE6
-# undef TRACE7
-# undef TRACE8
-# undef TRACE9
 
+#ifdef MLIB_TRACE
+# if defined (MLIB_SYSLOG_TRACE)
+#  include "log.h"
+#  define TRACE syslog_debug
+# else
+#   define TRACE dprintf
+# endif
+#else
 # define TRACE 1? 0 : dprintf
-# define TRACE1 1? 0 : dprintf
-# define TRACE2 1? 0 : dprintf
-# define TRACE3 1? 0 : dprintf
-# define TRACE4 1? 0 : dprintf
-# define TRACE5 1? 0 : dprintf
-# define TRACE6 1? 0 : dprintf
-# define TRACE7 1? 0 : dprintf
-# define TRACE8 1? 0 : dprintf
-# define TRACE9 1? 0 : dprintf
 #endif

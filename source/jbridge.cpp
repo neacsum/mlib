@@ -87,13 +87,13 @@ void JSONBridge::attach_to (httpd& server)
 /// Initializes the response buffer 
 bool JSONBridge::json_begin ()
 {
-  TRACE ("JSONBridge::json_begin - %s", client ().get_query ());
+  TRACE9 ("JSONBridge::json_begin - %s", client ().get_query ());
   mlib::lock l(in_use);
   int idx;
   const JSONVAR *entry = find (client().get_query (), &idx);
   if (!entry)
   {
-    TRACE ("JSONBridge::json_begin - Cannot find %s", client ().get_query ());
+    TRACE2 ("JSONBridge::json_begin - Cannot find %s", client ().get_query ());
     return false;
   }
   bufptr = buffer;
@@ -357,7 +357,7 @@ bool JSONBridge::parse_urlencoded ()
     else
       pv = (char*)(k->addr) + jsz[k->type] * idx;
 
-    TRACE("Setting %s[%d] = %s\n", k->name, idx, val);
+    TRACE9 ("Setting %s[%d] = %s\n", k->name, idx, val);
     switch (k->type)
     {
     case JT_PSTR:
@@ -414,7 +414,7 @@ int JSONBridge::callback (const char *uri, http_connection& client, JSONBridge *
 {
   const char *req = client.get_method ();
   const char *query = client.get_query ();
-  TRACE ("ui_callback req=%s query=%s", req, query);
+  TRACE9 ("ui_callback req=%s query=%s", req, query);
   ctx->client_ = &client;
   ctx->lock ();
   if (!_strcmpi (req, "GET"))

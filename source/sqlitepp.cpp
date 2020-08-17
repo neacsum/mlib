@@ -253,7 +253,7 @@ Query& Query::operator =(const std::string& sql)
     sqlite3_finalize (stmt);
   if ((rc = sqlite3_prepare_v2 (dbase, sql.c_str(), -1, &stmt, 0)) != SQLITE_OK)
   {
-    TRACE ("= error %s", sqlite3_errmsg (dbase));
+    TRACE ("error %d - %s", rc, sqlite3_errmsg (dbase));
     throw sqerc (rc, dbase);
   }
   col_mapped = false;

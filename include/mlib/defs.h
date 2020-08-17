@@ -15,3 +15,16 @@
 /// log facility claimed by MLIB
 #define MLIB_LOGFAC (25<<3)
 
+/// send trace output to syslog
+//#define MLIB_SYSLOG_TRACE
+
+/*!
+  Active trace level. A rough description would be:
+  - 9 = a lot
+  - 8 = many informational messages
+  - 2 = only significant events
+  - 0 or undefined = errors only
+
+  Intermediate levels are left available for user programs
+*/
+//#define MLIB_TRACE_LEVEL 2

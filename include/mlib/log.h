@@ -85,9 +85,13 @@ void syslog (int facility_priority, char *fmt, ...);
 /// Generate a log message at debug level using FMT string and option arguments. 
 void syslog_debug (const char *fmt, ...);
 
+/// Default log options - combination of LOGOPT_... flags
 extern int log_defaultopt;
-extern int log_defaultmask;
+
+/// Destination host for UDP datagrams. Default is "localhost"
 extern char log_servhostname[_MAX_PATH];
+
+/// Log filename if LOGOPT_FILE flag is set
 extern char log_fname[_MAX_PATH];
 
 #ifdef __cplusplus

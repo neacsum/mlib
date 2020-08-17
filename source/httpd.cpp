@@ -127,7 +127,7 @@ http_connection::http_connection (sock& socket, httpd& server)
 void http_connection::run ()
 {
   ws->recvtimeout (HTTPD_TIMEOUT);
-  TRACE ("Connection from %s\n", ws->peer ().hostname ());
+  TRACE2 ("Connection from %s\n", ws->peer ().hostname ());
   try {
     while (1)
     {
@@ -155,7 +155,7 @@ void http_connection::run ()
 
         if (!ws.good ())
         {
-          TRACE ("Timeout!\n");
+          TRACE2 ("Timeout!\n");
           respond (408);
           return;
         }
@@ -180,7 +180,7 @@ void http_connection::run ()
 
       if (req_len == HTTPD_MAX_HEADER)
       {
-        TRACE ("Request too long!\n");
+        TRACE2 ("Request too long!\n");
         respond (413);
         return;
       }
@@ -268,7 +268,7 @@ int http_connection::do_auth ()
   if (strnicmp (ptr, "Basic ", 6))
   {
     //Other auth methods
-    TRACE ("Authorization: %s", ptr);
+    TRACE8 ("Authorization: %s", ptr);
     respond (501); //not implemented
     return -1;
   }
@@ -285,11 +285,11 @@ int http_connection::do_auth ()
   if (!parent.authenticate (realm.c_str(), buf, pwd))
   {
     //invalid credential
-    TRACE ("http_connection: Invalid credentials user %s", buf);
+    TRACE2 ("http_connection: Invalid credentials user %s", buf);
     serve401 (realm.c_str ());
     return 0;
   }
-  TRACE ("http_connection: Authenticated user %s for realm %s", buf, realm.c_str ());
+  TRACE8 ("http_connection: Authenticated user %s for realm %s", buf, realm.c_str ());
   return 1;
 }
 
@@ -320,7 +320,7 @@ void http_connection::process_valid_request ()
   //check first if there is any handler registered for this uri
   if (parent.invoke_handler (uri, *this))
   {
-    TRACE ("handler done");
+    TRACE9 ("handler done");
     return;
   }
 
@@ -354,11 +354,11 @@ void http_connection::process_valid_request ()
       ret = serve_file (fullpath);
     if (ret == -2)
       respond (403);
-    TRACE ("served %s result = %d", fullpath, ret);
+    TRACE9 ("served %s result = %d", fullpath, ret);
   }
   else
   {
-    TRACE ("not found");
+    TRACE2 ("not found");
     serve404 ();
   }
 }
@@ -665,7 +665,7 @@ int http_connection::serve_buffer(const BYTE *src_buff, size_t sz)
   //find file size
   unsigned int len;
   len = (unsigned int)sz;
-  TRACE ("http_connection::serve_buffer - size %d", len);
+  TRACE8 ("http_connection::serve_buffer - size %d", len);
   char flen[30];
   sprintf (flen, "%d", len);
   add_ohdr ("Content-Length", flen);
@@ -678,7 +678,7 @@ int http_connection::serve_buffer(const BYTE *src_buff, size_t sz)
     ws.write ((const char*)buf, out);
     if (!ws.good ())
     {
-      TRACE ("socket write failure");
+      TRACE2 ("socket write failure");
       ret = HTTPD_ERR_WRITE;
       break;
     }
@@ -726,7 +726,7 @@ int http_connection::serve_file (const std::string& full_path)
 #endif
   if (!fin)
   {
-    TRACE ("File %s - open error", full_path.c_str());
+    TRACE2 ("File %s - open error", full_path.c_str());
     return HTTPD_ERR_FOPEN;
   }
   //find file size
@@ -734,7 +734,7 @@ int http_connection::serve_file (const std::string& full_path)
   fseek (fin, 0, SEEK_END);
   len = ftell (fin);
   fseek (fin, 0, SEEK_SET);
-  TRACE ("http_connection::serve_file - File %s size %d", full_path.c_str(), len);
+  TRACE8 ("http_connection::serve_file - File %s size %d", full_path.c_str(), len);
   char flen[30];
   sprintf (flen, "%d", len);
   add_ohdr ("Content-Length", flen);
@@ -748,13 +748,13 @@ int http_connection::serve_file (const std::string& full_path)
       cnt = (int)fread (buf, 1, sizeof (buf), fin);
       if (!cnt && ferror (fin))
       {
-        TRACE ("File %s - file read error %d", full_path.c_str (), ferror (fin));
+        TRACE2 ("File %s - file read error %d", full_path.c_str (), ferror (fin));
         ret = HTTPD_ERR_FREAD;
       }
       ws.write (buf, cnt);
       if (!ws.good ())
       {
-        TRACE ("File %s - socket write failure", full_path.c_str ());
+        TRACE2 ("File %s - socket write failure", full_path.c_str ());
         ret = HTTPD_ERR_WRITE;
         break;
       }
@@ -933,7 +933,7 @@ void http_connection::respond (unsigned int code, const char *reason)
     response_sent = true;
   }
   //followed by our headers
-  //TRACE ("Sending connection headers");
+  TRACE9 ("Sending connection headers");
   idx = oheaders.begin();
   while (idx != oheaders.end())
   {
@@ -1349,9 +1349,9 @@ int httpd::invoke_handler (const char *uri, http_connection& client)
   if (idx != handlers.end())
   {
     lock l(*idx->second.in_use);
-    TRACE ("Invoking handler for %s", uri);
+    TRACE9 ("Invoking handler for %s", uri);
     ret = idx->second.h (uri, client, idx->second.nfo);
-    TRACE ("Handler done (%d)", ret);
+    TRACE9 ("Handler done (%d)", ret);
   }
 
   return ret;

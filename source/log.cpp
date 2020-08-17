@@ -125,7 +125,7 @@ static const char *processname (char *name)
   {
     char *p;
     wchar_t wpn[256];
-    if (!GetModuleBaseNameW (GetCurrentProcess(), 0, wpn, sizeof(wpn)))
+    if (!GetModuleBaseNameW (GetCurrentProcess(), 0, wpn, _countof(wpn)))
       strcpy (pname, "unknown");
     else
     {

@@ -55,7 +55,7 @@ sock::sock (SOCKET soc) :
 {
   sl->lives = 1;
   sl->handle = soc;
-  TRACE ("sock::sock (SOCKET %x)", sl->handle);
+  TRACE8 ("sock::sock (SOCKET %x)", sl->handle);
 }
 
 
@@ -76,7 +76,7 @@ sock::sock (int type, int domain, int proto) :
     delete sl;
     WSALASTERROR;
   }
-  TRACE ("sock::sock (type %d domain %d proto %d)=%x", type, domain, proto, sl->handle);
+  TRACE8 ("sock::sock (type %d domain %d proto %d)=%x", type, domain, proto, sl->handle);
 }
 
 /*!
@@ -88,7 +88,7 @@ sock::sock (const sock& sb)
 {
   sl = sb.sl;
   sl->lives++;
-  TRACE ("sock::sock (sock %x) has %d lives", sl->handle,sl->lives);
+  TRACE8 ("sock::sock (sock %x) has %d lives", sl->handle,sl->lives);
 }
 
 /*!
@@ -104,15 +104,15 @@ sock& sock::operator = (const sock& rhs)
     //close our previous socket if we had one
     if (sl->handle != INVALID_SOCKET)
     {
-      TRACE ("sock::operator= -- closesocket(%x)", sl->handle);
+      TRACE8 ("sock::operator= -- closesocket(%x)", sl->handle);
       closesocket (sl->handle);
     }
     delete sl;
-    TRACE ("sock::operator= deleting old sl");
+    TRACE8 ("sock::operator= deleting old sl");
   }
   sl = rhs.sl;
   sl->lives++;
-  TRACE ("sock::operator= -- handle=%x has %d lives", sl->handle, sl->lives);
+  TRACE8 ("sock::operator= -- handle=%x has %d lives", sl->handle, sl->lives);
   return *this;
 }
 
@@ -127,14 +127,14 @@ sock::~sock ()
   {
     if (sl->handle != INVALID_SOCKET)
     {
-      TRACE ("sock::~sock -- closesocket(%x)", sl->handle);
+      TRACE8 ("sock::~sock -- closesocket(%x)", sl->handle);
       closesocket (sl->handle);
     }
     delete sl;
-    TRACE ("sock::~sock deleting sl");
+    TRACE8 ("sock::~sock deleting sl");
   }
   else
-    TRACE ("sock::~sock -- handle=%x has %d lives)", sl->handle, sl->lives);
+    TRACE8 ("sock::~sock -- handle=%x has %d lives)", sl->handle, sl->lives);
 }
 
 /*!
@@ -144,13 +144,13 @@ sock::~sock ()
 */
 erc sock::open (int type, int domain, int proto)
 {
-  TRACE ("sock::open (type=%d, domain=%d, proto=%d)", type, domain, proto);
+  TRACE8 ("sock::open (type=%d, domain=%d, proto=%d)", type, domain, proto);
   if (sl->handle != INVALID_SOCKET)
     closesocket (sl->handle);
 
   if ((sl->handle = ::socket (domain, type, proto)) == INVALID_SOCKET)
     return WSALASTERROR;
-  TRACE ("sock::open handle=%x", sl->handle);
+  TRACE8 ("sock::open handle=%x", sl->handle);
   return ERR_SUCCESS;
 }
 
@@ -162,7 +162,7 @@ void sock::close()
 {
   if (sl->handle != INVALID_SOCKET)
   {
-    TRACE ("sock::close (%x)", sl->handle);
+    TRACE8 ("sock::close (%x)", sl->handle);
     closesocket (sl->handle);
     sl->handle = INVALID_SOCKET;
   }
@@ -203,7 +203,7 @@ inaddr sock::peer () const
 */
 erc sock::bind (const sockaddr& sa)
 {
-  TRACE ("sock::bind (%x) to %x:%d", 
+  TRACE8 ("sock::bind (%x) to %x:%d", 
     sl->handle, ntohl(((sockaddr_in&)sa).sin_addr.S_un.S_addr), 
     ntohs(((sockaddr_in&)sa).sin_port));
   if (::bind (sl->handle, &sa, sizeof(sa)) == SOCKET_ERROR)
@@ -310,7 +310,7 @@ int sock::recv (void* buf, int len, int msgf)
     int what =  WSAGetLastError();
     if (what == WSAEWOULDBLOCK)
     {
-      TRACE ("sock::recv - EWOULDBLOCK");
+      TRACE8 ("sock::recv - EWOULDBLOCK");
       return 0;
     }
     else if (what == WSAECONNABORTED || what == WSAECONNRESET || what == WSAETIMEDOUT)
@@ -340,7 +340,7 @@ int sock::recvfrom (sockaddr& sa, void* buf, int len, int msgf)
     int what =  WSAGetLastError();
     if (what == WSAEWOULDBLOCK)
     {
-      TRACE ("sock::recv - EWOULDBLOCK");
+      TRACE8 ("sock::recv - EWOULDBLOCK");
       return 0;
     }
     else if (what == WSAECONNABORTED || what == WSAECONNRESET || what == WSAETIMEDOUT)
@@ -1073,12 +1073,12 @@ std::streamsize sockbuf::showmanyc ()
 /// First instance calls WSAStartup to initialize Winsock library
 sock_initializer::sock_initializer ()
 {
-  TRACE ("sock_initializer::sock_initializer cnt=%d", sock_initializer_counter);
+  TRACE9 ("sock_initializer::sock_initializer cnt=%d", sock_initializer_counter);
   if (sock_initializer_counter++ == 0)
   {
     WSADATA wsadata; 
     int err = WSAStartup (MAKEWORD(2,0), &wsadata);
-    TRACE ("sock_initializer - WSAStartup result = %d", err);
+    TRACE8 ("sock_initializer - WSAStartup result = %d", err);
     sockerrors = new sock_facility ();
   }
 }
@@ -1089,10 +1089,10 @@ sock_initializer::~sock_initializer()
   if (--sock_initializer_counter == 0)
   {
     int err = WSACleanup ();
-    TRACE ("sock_initializer - WSACleanup result=%d", err);
+    TRACE8 ("sock_initializer - WSACleanup result=%d", err);
     delete sockerrors;
   }
-  TRACE ("sock_initializer::~sock_initializer cnt=%d", sock_initializer_counter);
+  TRACE9 ("sock_initializer::~sock_initializer cnt=%d", sock_initializer_counter);
 }
 
 /*!
@@ -1104,7 +1104,7 @@ sock_initializer::~sock_initializer()
 /// Constructor
 sock_facility::sock_facility () : errfac ("SOCKSTREAM ERROR") 
 {
-  TRACE ("sock_facility::sock_facility");
+  TRACE9 ("sock_facility::sock_facility");
 }
 
 //Create an entry in the error table

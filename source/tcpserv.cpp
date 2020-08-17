@@ -103,10 +103,10 @@ void tcpserver::run ()
   {
     if (evt.wait (idle) == WAIT_TIMEOUT)
     {
-      TRACE ("tcpserver::run - idle timeout");
+      TRACE8 ("tcpserver::run - idle timeout");
       end_req = !idle_action ();
     }
-    TRACE ("tcpserver::run - loop again end_req = %d", end_req);    
+    TRACE9 ("tcpserver::run - loop again end_req = %d", end_req);    
     if (end_req)        //bail out?
       continue;
 
@@ -115,7 +115,7 @@ void tcpserver::run ()
       /// - check if there is space in connections table
       if (limit && count >= limit)
       {
-        TRACE ("Max number of connections (%d) reached", limit);
+        TRACE2 ("Max number of connections (%d) reached", limit);
         sock s = accept ();
 #ifdef USE_SYSLOG
         syslog (LOG_MAKEPRI (MLIB_LOGFAC, LOG_NOTICE), 
@@ -139,7 +139,7 @@ void tcpserver::run ()
         delete []contab;
         contab = new_table;
         alloc += ALLOC_INCR;
-        TRACE ("tcpserver::run - increased connection table size to %d", alloc);
+        TRACE9 ("tcpserver::run - increased connection table size to %d", alloc);
       }
 
       inaddr peer;
@@ -150,7 +150,7 @@ void tcpserver::run ()
       contab[i]->socket.setevent (0, 0);
       contab[i]->socket.blocking (true);
       
-      TRACE ("tcpserver::run contab[%d] - request from %s:%d",i, peer.ntoa(), peer.port());
+      TRACE9 ("tcpserver::run contab[%d] - request from %s:%d",i, peer.ntoa(), peer.port());
 
       /// - invoke make_thread to get a servicing thread
       contab[i]->thread = make_thread (contab[i]->socket);
@@ -167,7 +167,7 @@ void tcpserver::run ()
       for (size_t i=0; i<alloc; i++)
         if (contab[i] && contab[i]->condemned)
         {
-          TRACE ("tcpserver::run - terminating condemned connection %d", i);
+          TRACE9 ("tcpserver::run - terminating condemned connection %d", i);
           termconn (contab[i]->socket, contab[i]->thread);
           delete contab[i];
           contab[i] = NULL;
@@ -177,7 +177,7 @@ void tcpserver::run ()
         }
        contab_lock.leave ();
     }
-    TRACE ("tcpserver::run %d connections active", count);
+    TRACE9 ("tcpserver::run %d connections active", count);
   }
 }
 
@@ -191,15 +191,15 @@ void tcpserver::close_connection (sock& s)
   {
     if ((contab[i] != NULL) && (s == contab[i]->socket))
     {
-#ifdef _TRACE
+#ifdef MLIB_TRACE
       if (contab[i]->socket.is_open ())
       {
         inaddr peer = contab[i]->socket.peer ();
-        TRACE ("tcpserver::close_connection closing contab[%d] to %s:%d",
+        TRACE9 ("tcpserver::close_connection closing contab[%d] to %s:%d",
           i, peer.ntoa (), peer.port ());
       }
       else
-        TRACE ("tcpserver::close_connection closing contab[%d] - socket closed", i);
+        TRACE9 ("tcpserver::close_connection closing contab[%d] - socket closed", i);
 #endif
       contab[i]->condemned = true;
       evt.signal ();
@@ -216,7 +216,7 @@ void tcpserver::close_connection (sock& s)
 */
 void tcpserver::initconn (sock& socket, thread* th)
 {
-  TRACE ("tcpserver::initconn");
+  TRACE9 ("tcpserver::initconn");
 #ifdef USE_SYSLOG
   syslog (LOG_MAKEPRI (MLIB_LOGFAC, LOG_NOTICE),
     "TCP server %s - Accepted connection with %s:%d",
@@ -272,7 +272,7 @@ thread* tcpserver::make_thread (sock& connection)
 */
 void tcpserver::termconn (sock& socket, thread *th)
 {
-  TRACE ("tcpserver::termconn");
+  TRACE9 ("tcpserver::termconn");
   if (th)
   {
     th->wait (10);
@@ -326,7 +326,7 @@ thread *tcpserver::get_connection_thread(sock &connection)
 */
 void tcpserver::terminate ()
 {
-  TRACE ("tcpserver::terminate");
+  TRACE2 ("tcpserver::terminate");
   close ();
   end_req = true;
 #ifdef USE_SYSLOG
@@ -335,10 +335,10 @@ void tcpserver::terminate ()
 #endif
   if (is_running())
   {
-    TRACE ("tcpserver::terminate - stopping running thread");
+    TRACE2 ("tcpserver::terminate - stopping running thread");
     evt.signal ();
     if (current_thread().id () == id ()) 
-      TRACE ("WARNING - terminate called from own thread");
+      TRACE2 ("WARNING - terminate called from own thread");
     else
       wait ();
   }
