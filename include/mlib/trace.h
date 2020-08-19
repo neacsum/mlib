@@ -31,13 +31,13 @@
 # undef TRACE9
 
 //SYSLOG_TRACE forces TRACE
-#if defined (MLIB_SYSLOG_TRACE) && !defined (MLIB_TRACE)
+#if MLIB_SYSLOG_TRACE && !defined (MLIB_TRACE)
 #define MLIB_TRACE
 #endif
 
 # if defined (MLIB_TRACE_LEVEL)
-// only some traces enabled (those less than MLIB_TRACE_LEVEL)
-#  define __TRL(A) (A >= MLIB_TRACE_LEVEL)? 0 : TRACE
+// only some traces enabled (up to and including MLIB_TRACE_LEVEL)
+#  define __TRL(A) (A > MLIB_TRACE_LEVEL)? 0 : TRACE
 #  define TRACE1 __TRL(1)
 #  define TRACE2 __TRL(2)
 #  define TRACE3 __TRL(3)
@@ -61,7 +61,7 @@
 # endif
 
 #ifdef MLIB_TRACE
-# if defined (MLIB_SYSLOG_TRACE)
+# if MLIB_SYSLOG_TRACE
 #  include "log.h"
 #  define TRACE syslog_debug
 # else

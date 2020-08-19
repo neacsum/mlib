@@ -8,9 +8,6 @@
 #define UNICODE
 #endif
 
-//#define _TRACE_LEVEL 2
-//#define USE_SYSLOG
-
 #include <mlib/shmem.h>
 #include <mlib/trace.h>
 

@@ -15,8 +15,8 @@
 /// log facility claimed by MLIB
 #define MLIB_LOGFAC (25<<3)
 
-/// send trace output to syslog
-//#define MLIB_SYSLOG_TRACE
+/// set to 1 to send trace output to syslog
+#define MLIB_SYSLOG_TRACE 1
 
 /*!
   Active trace level. A rough description would be:
@@ -27,4 +27,6 @@
 
   Intermediate levels are left available for user programs
 */
-//#define MLIB_TRACE_LEVEL 2
+#ifndef MLIB_TRACE_LEVEL
+#define MLIB_TRACE_LEVEL 7
+#endif

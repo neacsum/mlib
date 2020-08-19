@@ -6,18 +6,8 @@
 
 */
 
-//comment this line if you want debug messages from this module
-//#undef _TRACE
-
-//comment this line to disable server syslog messages
-//#define USE_SYSLOG
-
 #include <mlib/tcpserv.h>
 #include <mlib/trace.h>
-
-#ifdef USE_SYSLOG
-#include <mlib/log.h>
-#endif
 
 ///Allocation increment for connections table
 #define ALLOC_INCR 5
@@ -84,10 +74,7 @@ bool tcpserver::init ()
     open (SOCK_STREAM); 
   setevent (evt.handle (), FD_ACCEPT);
   listen ();
-#ifdef USE_SYSLOG
-  syslog (LOG_MAKEPRI (MLIB_LOGFAC, LOG_INFO), 
-    "TCP server %s started", thread::name().c_str());
-#endif
+  TRACE2 ("TCP server %s started", thread::name ().c_str ());
   return thread::init ();
 }
 
@@ -115,13 +102,10 @@ void tcpserver::run ()
       /// - check if there is space in connections table
       if (limit && count >= limit)
       {
-        TRACE2 ("Max number of connections (%d) reached", limit);
         sock s = accept ();
-#ifdef USE_SYSLOG
-        syslog (LOG_MAKEPRI (MLIB_LOGFAC, LOG_NOTICE), 
-          "TCP server %s - rejected connection from %s",
-          thread::name().c_str(), s.peer().ntoa ());
-#endif
+        TRACE8 ("TCP server %s - rejected connection from %s",
+          thread::name ().c_str (), s.peer ().ntoa ());
+        TRACE8 ("Max number of connections (%d) reached", limit);
         s.close ();
         continue;
       }
@@ -216,12 +200,8 @@ void tcpserver::close_connection (sock& s)
 */
 void tcpserver::initconn (sock& socket, thread* th)
 {
-  TRACE9 ("tcpserver::initconn");
-#ifdef USE_SYSLOG
-  syslog (LOG_MAKEPRI (MLIB_LOGFAC, LOG_NOTICE),
-    "TCP server %s - Accepted connection with %s:%d",
+  TRACE8 ("TCP server %s - Accepted connection with %s:%d",
     thread::name ().c_str (), socket.peer().ntoa (), socket.peer().port ());
-#endif
   if (th)
     th->start ();
 }
@@ -281,14 +261,11 @@ void tcpserver::termconn (sock& socket, thread *th)
   if (socket.handle () != INVALID_SOCKET)
   {
     try {
-      /* Throughout this sequence we might get slapped with a WSACONNRESET error
+      /* Throughout this sequence we might get slapped with a WSAECONNRESET error
       if the client has already closed the connection but we don't care: the
       catch clause will take care of it. */
-#ifdef USE_SYSLOG
-      syslog (LOG_MAKEPRI (MLIB_LOGFAC, LOG_NOTICE),
-        "TCP server %s - Closed connection with %s:%d",
+      TRACE8 ("TCP server %s - Closed connection with %s:%d",
         thread::name ().c_str (), socket.peer ().ntoa (), socket.peer ().port ());
-#endif
       /* Set linger option with a short timeout to avoid socket hanging around
         after close. */
       socket.linger (true, 1);
@@ -300,8 +277,8 @@ void tcpserver::termconn (sock& socket, thread *th)
         ;
     }
     catch (erc& x) {
-      x.deactivate ();
-      TRACE ("tcpserver::termconn caught %d", x);
+      if (x != WSAECONNRESET)
+        TRACE ("tcpserver::termconn caught %d", x);
     }
     socket.close ();
   }
@@ -326,13 +303,9 @@ thread *tcpserver::get_connection_thread(sock &connection)
 */
 void tcpserver::terminate ()
 {
-  TRACE2 ("tcpserver::terminate");
   close ();
   end_req = true;
-#ifdef USE_SYSLOG
-  syslog (LOG_MAKEPRI (MLIB_LOGFAC, LOG_NOTICE),
-    "TCP server %s stopped", thread::name ().c_str ());
-#endif
+  TRACE2 ("TCP server %s stopped", thread::name ().c_str ());
   if (is_running())
   {
     TRACE2 ("tcpserver::terminate - stopping running thread");

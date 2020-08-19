@@ -55,7 +55,7 @@ sock::sock (SOCKET soc) :
 {
   sl->lives = 1;
   sl->handle = soc;
-  TRACE8 ("sock::sock (SOCKET %x)", sl->handle);
+  TRACE9 ("sock::sock (SOCKET %x)", sl->handle);
 }
 
 
@@ -76,7 +76,7 @@ sock::sock (int type, int domain, int proto) :
     delete sl;
     WSALASTERROR;
   }
-  TRACE8 ("sock::sock (type %d domain %d proto %d)=%x", type, domain, proto, sl->handle);
+  TRACE9 ("sock::sock (type %d domain %d proto %d)=%x", type, domain, proto, sl->handle);
 }
 
 /*!
@@ -88,7 +88,7 @@ sock::sock (const sock& sb)
 {
   sl = sb.sl;
   sl->lives++;
-  TRACE8 ("sock::sock (sock %x) has %d lives", sl->handle,sl->lives);
+  TRACE9 ("sock::sock (sock %x) has %d lives", sl->handle,sl->lives);
 }
 
 /*!
@@ -108,11 +108,11 @@ sock& sock::operator = (const sock& rhs)
       closesocket (sl->handle);
     }
     delete sl;
-    TRACE8 ("sock::operator= deleting old sl");
+    TRACE9 ("sock::operator= deleting old sl");
   }
   sl = rhs.sl;
   sl->lives++;
-  TRACE8 ("sock::operator= -- handle=%x has %d lives", sl->handle, sl->lives);
+  TRACE9 ("sock::operator= -- handle=%x has %d lives", sl->handle, sl->lives);
   return *this;
 }
 
@@ -131,10 +131,10 @@ sock::~sock ()
       closesocket (sl->handle);
     }
     delete sl;
-    TRACE8 ("sock::~sock deleting sl");
+    TRACE9 ("sock::~sock deleting sl");
   }
   else
-    TRACE8 ("sock::~sock -- handle=%x has %d lives)", sl->handle, sl->lives);
+    TRACE9 ("sock::~sock -- handle=%x has %d lives)", sl->handle, sl->lives);
 }
 
 /*!
@@ -1210,9 +1210,9 @@ void sock_facility::log (const erc& e)
 {
   const char *str = msg (e);
   if (str)
-    dprintf ("%s  - %s(%d)", name(), str, e.code());
+    dprintf ("%s  - %s(%d)", name().c_str(), str, e.code());
   else
-    dprintf ("%s - %d", name(), e.code());
+    dprintf ("%s - %d", name().c_str(), e.code());
 }
 
 }
