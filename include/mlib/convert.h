@@ -75,5 +75,9 @@ inline double DMS2rad (double val) { return DMS2deg(val) * D2R; }
 
 /// Conversion from radians to degrees, minutes (DDMM.mmm)
 inline double rad2DMD (double val) { return deg2DMD (val/D2R); }
+
+/// Reduces a degrees value to [0,360) interval
+double deg_reduce (double value);
+
 ///@}
 
