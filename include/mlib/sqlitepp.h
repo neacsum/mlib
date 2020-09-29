@@ -27,14 +27,15 @@ public:
 
   ///Flags for database opening mode
   enum openflags {
-    readonly      = SQLITE_OPEN_READONLY,   ///< Read-only access
-    readwrite     = SQLITE_OPEN_READWRITE,  ///< Read/write access on existing database
+    readonly      = SQLITE_OPEN_READONLY,     ///< Read-only access
+    readwrite     = SQLITE_OPEN_READWRITE,    ///< Read/write access on existing database
     create        = SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, ///<Read/write/create access
-    uri           = SQLITE_OPEN_URI,        ///<filename is interpreted as a URI
-    nomutex       = SQLITE_OPEN_NOMUTEX,    ///<database connection opens in multi-threaded mode
-    fullmutex     = SQLITE_OPEN_FULLMUTEX,  ///<database connection opens in the serialized mode
-    sharedcache   = SQLITE_OPEN_SHAREDCACHE,///<database connection is eligible to use shared cache mode
-    privatecache  = SQLITE_OPEN_PRIVATECACHE///<database connection does not participate in shared cache mode
+    uri           = SQLITE_OPEN_URI,          ///<filename is interpreted as a URI
+    nomutex       = SQLITE_OPEN_NOMUTEX,      ///<database connection opens in multi-threaded mode
+    fullmutex     = SQLITE_OPEN_FULLMUTEX,    ///<database connection opens in the serialized mode
+    sharedcache   = SQLITE_OPEN_SHAREDCACHE,  ///<database connection is eligible to use shared cache mode
+    privatecache  = SQLITE_OPEN_PRIVATECACHE, ///<database connection does not participate in shared cache mode
+    memory        = SQLITE_OPEN_MEMORY        ///<database opened in memory
   };
 
   ///Default constructor
