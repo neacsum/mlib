@@ -4,6 +4,9 @@
 
 using namespace mlib;
 
+SUITE (sqlitepp)
+{
+
 TEST (NotConnectedDbObject)
 {
   Database db;
@@ -39,6 +42,45 @@ TEST (DbExecStatements)
   db.exec ("CREATE TABLE tab (col);"
            "INSERT INTO tab VALUES (123)");
   db.close ();
+}
+
+//Assign an existing database
+TEST (DbAssign_Existing)
+{
+  remove ("disk.db");
+  Database db_from ("disk.db");
+  db_from.exec (R"(
+    CREATE TABLE tab (col);
+    INSERT INTO tab VALUES (1);
+    INSERT INTO tab VALUES (2);
+  )");
+
+  Database db_to ("memory.db", Database::memory | Database::create);
+  db_to = db_from;
+  db_from.close ();
+  remove ("disk.db");
+
+  Query q (db_to, "SELECT * FROM tab");
+  q.step ();
+  CHECK_EQUAL (1, q.column_int (0));
+  q.step ();
+  CHECK_EQUAL (2, q.column_int (0));
+}
+
+TEST (DbAssign_Empty)
+{
+  Database db_to, db_from;
+  db_to = db_from;
+
+  CHECK (!db_to.connected ());
+}
+
+//cannot assign database if one is opened and the other is not
+TEST (DbAssign_Fail)
+{
+  Database db_to (""), db_from;
+
+  CHECK_THROW (erc, db_to = db_from );
 }
 
 struct TestDatabase {
@@ -168,5 +210,6 @@ TEST_FIXTURE (TestDatabase, InsertDuplicate)
   q = "INSERT INTO tab2 values (2, 2);";
   CHECK_EQUAL (SQLITE_CONSTRAINT, q.step ());
   CHECK_EQUAL (SQLITE_CONSTRAINT_UNIQUE, db.extended_error ());
+}
 
 }

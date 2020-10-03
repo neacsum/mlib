@@ -84,7 +84,7 @@ class erc
 {
 public:
   erc ();
-  erc (int value , short int priority=ERROR_PRI_ERROR, errfac* f = 0);
+  erc (int value, short int priority=ERROR_PRI_ERROR, errfac* f = 0);
   erc (const erc& other);
   erc (erc&& other);
 

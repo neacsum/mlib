@@ -47,6 +47,9 @@ public:
   ///Destructor
   ~Database ();
 
+  /// Assignment operator 
+  Database& operator =(const Database& rhs);
+
   ///Check if database is opened or not
   bool connected () {return (db != 0);};
 
@@ -75,7 +78,7 @@ public:
   erc make_query (Query& q, const std::string& sql);
 
   ///Return filename of a database connection
-  std::string filename (const std::string& conn = "main");
+  std::string filename (const std::string& conn = "main") const;
 
   /// Return extended result code
   int extended_error ();
@@ -83,11 +86,8 @@ public:
 private:
   /// prohibit default function 
   Database (const Database& t) = delete;
-  /// prohibit default function 
-  Database& operator =(const Database& rhs) = delete;
 
   sqlite3 *db;
-  bool handle_owned;
 };
 
 ///Wrapper for SQL prepared sentences

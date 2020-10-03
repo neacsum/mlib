@@ -31,13 +31,13 @@ protected:
 
 /*!
   Error codes returned by Database and Query objects. The constructor takes the
-  additional database parameter needed by sqlitefac to format the error message 
+  additional database parameter needed by sqlitefac to format the error message
   \ingroup sqlite
 */
 class sqerc : public erc
 {
 public:
-  sqerc (int value , sqlite3 *db, short int priority=ERROR_PRI_ERROR);
+  sqerc (int value, sqlite3* db, short int priority = ERROR_PRI_ERROR);
 };
 
 ///Error facility used by Database and Query objects
@@ -62,9 +62,8 @@ errfac *sqlite_errors = &errors;
   The default constructor is used to create an object that is not yet connected
   to a database. It has to be connected using the open() function.
 */
-Database::Database() :
-  db(0),
-  handle_owned (true)
+Database::Database()
+  : db(0)
 {
 }
 
@@ -72,9 +71,8 @@ Database::Database() :
   \param  name      database name
   \param  flags     open flags
 */
-Database::Database(const std::string& name, int flags) :
-  db(0),
-  handle_owned (true)
+Database::Database(const std::string& name, int flags)
+  : db(0)
 {
   int rc;
   if ((rc=sqlite3_open_v2 (name.c_str(), &db, flags, 0)) != SQLITE_OK)
@@ -86,8 +84,30 @@ Database::Database(const std::string& name, int flags) :
 */
 Database::~Database ()
 {
-  if (handle_owned && db)
+  if (db)
     sqlite3_close (db);
+}
+
+/*!
+  Perform a copy operation using the [SQLITE Backup API](https://sqlite.org/backup.html).
+  
+  Both databases should be opened or closed.
+*/
+Database& Database::operator=(const Database& rhs)
+{
+  if (db == rhs.db)
+    return *this;
+
+  if (db && rhs.db)
+  {
+    auto bkp = sqlite3_backup_init (db, "main", rhs.db, "main");
+    sqlite3_backup_step (bkp, -1);
+    sqlite3_backup_finish (bkp);
+  }
+  else
+    throw sqerc (SQLITE_ERROR, db); //one db is not opened
+
+  return *this;
 }
 
 /*!
@@ -95,7 +115,7 @@ Database::~Database ()
   connection with that name or if the database is a temporary or in-memory
   database.
 */
-string Database::filename (const string& conn)
+string Database::filename (const string& conn) const
 {
   const char *pfn = 0;
   if (db)
@@ -127,9 +147,8 @@ erc Database::open (const string &name, int flags)
 {
   int rc;
 
-  if (handle_owned && db)
+  if (db)
     sqlite3_close (db);
-  handle_owned = true;
   if ((rc=sqlite3_open_v2 (name.c_str(), &db, flags, 0)) != SQLITE_OK)
     return sqerc (rc, db);
   else 
@@ -138,10 +157,9 @@ erc Database::open (const string &name, int flags)
 
 void Database::close ()
 {
-  if (handle_owned && db)
+  if (db)
     sqlite3_close (db);
   db = 0;
-  handle_owned = true;
 }
 
 erc Database::exec (const string& sql)
