@@ -35,7 +35,7 @@ public:
     fullmutex     = SQLITE_OPEN_FULLMUTEX,    ///<database connection opens in the serialized mode
     sharedcache   = SQLITE_OPEN_SHAREDCACHE,  ///<database connection is eligible to use shared cache mode
     privatecache  = SQLITE_OPEN_PRIVATECACHE, ///<database connection does not participate in shared cache mode
-    memory        = SQLITE_OPEN_MEMORY        ///<database opened in memory
+    memory        = SQLITE_OPEN_MEMORY | SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE  ///<database opened in memory
   };
 
   ///Default constructor

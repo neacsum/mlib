@@ -55,7 +55,7 @@ TEST (DbAssign_Existing)
     INSERT INTO tab VALUES (2);
   )");
 
-  Database db_to ("memory.db", Database::memory | Database::create);
+  Database db_to ("memory.db", Database::memory);
   db_to = db_from;
   db_from.close ();
   remove ("disk.db");
@@ -81,6 +81,26 @@ TEST (DbAssign_Fail)
   Database db_to (""), db_from;
 
   CHECK_THROW (erc, db_to = db_from );
+}
+
+//cannot copy database if a query is active
+TEST (DbAssign_Busy)
+{
+  Database db_to ("to.db", Database::memory);
+  db_to.exec (R"(
+    CREATE TABLE tab (col);
+    INSERT INTO tab VALUES (1);
+    INSERT INTO tab VALUES (2);
+  )");
+  Database db_from ("from.db", Database::memory);
+  Query q (db_to, "SELECT * FROM tab");
+  q.step ();
+
+  CHECK_THROW (erc, db_to = db_from);
+
+  q.finalize (); // now db is free, we can copy
+  db_to = db_from;
+
 }
 
 struct TestDatabase {

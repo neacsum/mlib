@@ -101,7 +101,11 @@ Database& Database::operator=(const Database& rhs)
   if (db && rhs.db)
   {
     auto bkp = sqlite3_backup_init (db, "main", rhs.db, "main");
-    sqlite3_backup_step (bkp, -1);
+    if (!bkp)
+      throw sqerc (SQLITE_ERROR, db);
+    int rc;
+    if ((rc = sqlite3_backup_step (bkp, -1)) != SQLITE_DONE)
+      throw sqerc (rc, db);
     sqlite3_backup_finish (bkp);
   }
   else
