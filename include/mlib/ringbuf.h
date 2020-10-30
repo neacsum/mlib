@@ -7,6 +7,7 @@
 
 #include <memory>
 #include <vector>
+#include <assert.h>
 
 #if __has_include ("defs.h")
 #include "defs.h"
@@ -20,88 +21,97 @@ template <class T>
 class ring_buffer 
 {
 public:
+
   /// Iterator through the circular buffer
-  class iterator
+  template <bool C_>
+  class iterator_type
   {
   public:
     //Following typedefs must exist to allow instantiation of std::iterator_traits
-    typedef ptrdiff_t difference_type;
-    typedef typename T value_type;
-    typedef typename T& reference;
-    typedef typename T* pointer;
-    typedef std::bidirectional_iterator_tag iterator_category;
+    using difference_type = std::ptrdiff_t;
+    using value_type = T;
+    using reference = typename std::conditional_t< C_, T const&, T& >;
+    using pointer = typename std::conditional_t< C_, T const*, T* >;
+    using iterator_category = std::bidirectional_iterator_tag;
 
     ///Default constructor
-    iterator () : ring(nullptr), pos(0) {}
+    iterator_type<C_> () : ring (nullptr), pos (0) {}
 
     ///Dereference operator
     reference operator *()
     {
+      if (pos == (size_t)(-1))
+        throw std::range_error ("Ring buffer iterator at end!");
       return ring->buf[pos];
     }
 
     ///Dereference operator (const version)
     const reference operator *() const
     {
+      if (pos == (size_t)(-1))
+        throw std::range_error ("Ring buffer iterator at end!");
       return ring->buf[pos];
     }
 
     ///Object pointer
     pointer operator ->()
     {
+      if (pos == (size_t)(-1))
+        throw std::range_error ("Ring buffer iterator at end!");
       return &ring->buf[pos];
     }
 
     ///Object pointer (const version)
     const pointer operator ->() const
     {
+      if (pos == (size_t)(-1))
+        throw std::range_error ("Ring buffer iterator at end!");
       return &ring->buf[pos];
     }
 
     ///Increment operator (postfix)
-    iterator operator ++ (int)
+    iterator_type<C_> operator ++ (int)
     {
-      iterator tmp = *this;
-      inc_func ();
+      iterator_type<C_> tmp = *this;
+      add (1);
       return tmp;
     }
 
     ///Increment operator (prefix)
-    iterator& operator ++ ()
+    iterator_type<C_>& operator ++ ()
     {
-      inc_func ();
+      add (1);
       return *this;
     }
 
     ///Decrement operator (postfix)
-    iterator operator -- (int)
+    iterator_type<C_> operator -- (int)
     {
-      iterator tmp = *this;
-      dec_func ();
+      iterator_type<C_> tmp = *this;
+      sub (1);
       return tmp;
     }
 
     ///Decrement operator (prefix)
-    iterator& operator -- ()
+    iterator_type<C_>& operator -- ()
     {
-      dec_func ();
+      sub (1);
       return *this;
     }
 
     ///Equality comparison
-    bool operator == (const iterator& it) const
+    bool operator == (const iterator_type<C_>& it) const
     {
       return (ring == it.ring) && (pos == it.pos);
     }
 
     ///Inequality comparison
-    bool operator != (const iterator& it) const
+    bool operator != (const iterator_type<C_>& it) const
     {
       return !operator == (it);
     }
-
     ///Assignment operator
-    iterator& operator = (const iterator& rhs)
+    iterator_type<C_>& operator = (const iterator_type<C_>& rhs)
     {
       if (this != &rhs)
       {
@@ -112,40 +122,40 @@ public:
     }
 
     ///Addition operator
-    iterator operator +(size_t inc) const
+    iterator_type<C_> operator +(size_t inc) const
     {
-      iterator tmp = *this;
-      add_func (tmp, inc);
+      iterator_type<C_> tmp = *this;
+      tmp.add (inc);
       return tmp;
     }
 
     ///Addition assignment operator
-    iterator& operator +=(size_t inc)
+    iterator_type<C_>& operator +=(size_t inc)
     {
-      add_func (*this, inc);
+      add (inc);
       return *this;
     }
 
     ///Subtraction operator
-    iterator operator -(size_t dec) const
+    iterator_type<C_> operator -(size_t dec) const
     {
-      iterator tmp = *this;
-      sub_func (tmp, dec);
+      iterator_type<C_> tmp = *this;
+      tmp.sub (dec);
       return tmp;
     }
 
     ///Subtraction assignment operator
-    iterator& operator -=(size_t dec)
+    iterator_type<C_>& operator -=(size_t dec)
     {
-      sub_func (*this, dec);
+      sub (dec);
       return *this;
     }
 
     ///Difference operator
-    ptrdiff_t operator -(const iterator& other) const
+    ptrdiff_t operator -(const iterator_type<C_>& other) const
     {
       assert (ring == other.ring);
-      size_t p1 = (pos != -1)? pos : (ring->back_idx == ring->front_idx)? ring->sz : ring->back_idx;
+      size_t p1 = (pos != -1) ? pos : (ring->back_idx == ring->front_idx) ? ring->sz : ring->back_idx;
       size_t p2 = (other.pos != -1) ? other.pos : (ring->back_idx == ring->front_idx) ? ring->sz : ring->back_idx;
       if (p1 >= p2)
         return p1 - p2;
@@ -154,59 +164,49 @@ public:
     }
 
   private:
-    iterator (const ring_buffer* ring_, size_t pos_)
+    iterator_type<C_> (const ring_buffer* ring_, size_t pos_)
       : ring (ring_)
       , pos (pos_)
     {
     }
 
-    void inc_func ()
+    // addition and increment helper function
+    void add (size_t inc)
     {
-      if (ring->cap && pos != -1)
-        pos = (pos + 1) % ring->cap;
-      if (pos == ring->back_idx)
+      if (!ring->cap || pos == -1 || !inc)
+        return;
+
+      inc %= ring->cap;
+      pos = (pos + inc) % ring->cap;
+      if ((pos >= ring->back_idx) && 
+          ((ring->back_idx >= ring->front_idx) || (pos < ring->front_idx)))
         pos = -1;
     }
 
-    void dec_func ()
+    // subtraction and decrement helper function
+    void sub (size_t dec)
     {
-      if (ring->cap)
-      {
-        if (pos == -1)
-          pos = (ring->back_idx + ring->cap - 1) % ring->cap;
-        else if (pos != ring->front_idx)
-          pos = (pos + ring->cap - 1) % ring->cap;
-      }
-    }
+      if (!ring->cap || pos == ring->front_idx || !dec)
+        return;
+      if (pos == (size_t)(-1))
+        pos = ring->back_idx;
 
-    void add_func (iterator& it, size_t inc) const
-    {
-      if (ring->cap && pos != -1)
-      {
-        size_t np = it.pos + (inc % ring->cap);
-        if (np >= ring->cap && np >= ring->back_idx + ring->cap)
-          it.pos = -1;
-        else
-          it.pos = np % ring->cap;
-      }
-    }
+      pos = pos - (dec % ring->cap);
+      if (pos < 0)
+        pos += ring->cap;
 
-    void sub_func (iterator& it, size_t dec) const
-    {
-      if (ring->cap)
-      {
-        size_t np = (it.pos == -1 ? ring->back_idx : it.pos) - (dec % ring->cap) + ring->cap;
-        if (np < ring->front_idx)
-          it.pos = ring->front_idx;
-        else
-          it.pos = np % ring->cap;
-      }
+      if (pos >= ring->back_idx && pos < ring->front_idx)
+        pos = ring->front_idx;
     }
 
     const ring_buffer* ring;
     size_t pos;
     friend class ring_buffer;
+
   };
+
+  typedef iterator_type<false> iterator;
+  typedef iterator_type<true> const_iterator;
 
   ///Constructor
   ring_buffer (size_t size) 
@@ -335,10 +335,22 @@ public:
     return iterator (this, front_idx);
   }
 
+  ///Return a const iterator pointing to first (oldest) element in buffer
+  const_iterator cbegin () const
+  {
+    return const_iterator (this, front_idx);
+  }
+
   ///Return an iterator pointing past the last (newest) element in buffer
   iterator end () const
   {
     return iterator (this, (size_t)(-1));
+  }
+
+  ///Return a const iterator pointing past the last (newest) element in buffer
+  const_iterator cend () const
+  {
+    return const_iterator (this, (size_t)(-1));
   }
 
   ///Remove oldest element from buffer

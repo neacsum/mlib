@@ -8,6 +8,7 @@
 #include <list>
 
 using namespace mlib;
+using namespace std;
 
 ///Used to count ctor/dtor calls
 struct counted_int {
@@ -50,7 +51,7 @@ SUITE (RingBuffer)
     counted_int::counter = 0;
     {
       // VERIFY: ring_buffer constructor with a size argument calls 
-      // object's default constructor once for each object in container.
+      // Calls object's default constructor once for each object in container.
       ring_buffer <counted_int> testbuf (10);
       CHECK_EQUAL (10, counted_int::counter);
     }
@@ -250,6 +251,10 @@ SUITE (RingBuffer)
     // VERIFY: pointer to last object becomes end after increment
     CHECK (++last == testbuf.end ());
 
+    // VERIFY: dereferencing end pointer throws exception
+    CHECK_THROW (std::range_error, *last == 0);
+
+
     last--;
 
     // VERIFY: postfix decrement brings pointer to last object pushed
@@ -284,8 +289,24 @@ SUITE (RingBuffer)
     CHECK_EQUAL (102, v);
 
     // VERIFY: addition stops at end
-    it2 = it1 + (testbuf.size () - 1);
+    it2 = it1 + 5;
     CHECK (it2 == std::end (testbuf));
+  }
+
+  TEST (addition2)
+  {
+    ring_buffer<int> t (10);
+    for (int i = 0; i < 5; i++)
+      t.push_back (100 + i);
+
+    for (int i = 0; i < 10; i++)
+    {
+      auto ptr = t.begin () + 4;
+      cout << "i=" << i << " *ptr=" << *ptr << endl;
+      t.push_back (200+i);
+      t.pop_front ();
+    }
+    cout << endl;
   }
 
   TEST (subtraction)
@@ -302,6 +323,24 @@ SUITE (RingBuffer)
     int v = *(testbuf.end () - 2);
     CHECK_EQUAL (101, v);
   }
+
+  TEST (subtraction2)
+  {
+    ring_buffer<int> t (10);
+    for (int i = 0; i < 5; i++)
+      t.push_back (100 + i);
+
+    for (int i = 0; i < 10; i++)
+    {
+      auto ptr = t.end () - 2;
+      cout << "i=" << i << " *ptr=" << *ptr << endl;
+      t.push_back (200 + i);
+      t.pop_front ();
+    }
+    cout << endl;
+
+  }
+
 
   TEST (resize)
   {
@@ -418,21 +457,8 @@ SUITE (RingBuffer)
       testbuf.pop_front ();
     }
   }
-/*
-  TEST (sort)
-  {
-    ring_buffer<int> testbuf ({ 103, 101, 102 });
-    std::vector<int> expected ({ 101, 102, 103 });
-
-    std::sort (testbuf.begin (), testbuf.end ());
-    CHECK (expected == (std::vector<int>)testbuf);
-  }
-*/
-}
 
 // Usage and performance samples
-SUITE (ringbuf_samples)
-{
 
   //Using ring buffer with a standard algorithm
   TEST (find_algorithm)
@@ -526,7 +552,7 @@ SUITE (ringbuf_samples)
       ring_buffer<kvstruct> test_container (sz);
 
       t.Start ();
-      for (auto kv : random_vector)
+      for (auto& kv : random_vector)
         test_container.push_back (kv);
       int ms = t.GetTimeInMs ();
       std::cout << "ring_buffer push_back of " << sz << " elements in " << ms << "ms\n";
@@ -537,7 +563,7 @@ SUITE (ringbuf_samples)
       std::vector<kvstruct> test_container;
 
       t.Start ();
-      for (auto kv : random_vector)
+      for (auto const& kv : random_vector)
         test_container.push_back (kv);
       ms = t.GetTimeInMs ();
       std::cout << "vector push_back of " << sz << " elements in " << ms << "ms\n";
@@ -548,7 +574,7 @@ SUITE (ringbuf_samples)
       test_container.reserve (sz);
 
       t.Start ();
-      for (auto kv : random_vector)
+      for (auto const& kv : random_vector)
         test_container.push_back (kv);
       ms = t.GetTimeInMs ();
       std::cout << "vector with reserve push_back of " << sz << " elements in " << ms << "ms\n";
@@ -558,7 +584,7 @@ SUITE (ringbuf_samples)
       std::list<kvstruct> test_container;
 
       t.Start ();
-      for (auto kv : random_vector)
+      for (auto& kv : random_vector)
         test_container.push_back (kv);
       ms = t.GetTimeInMs ();
       std::cout << "list push_back of " << sz << " elements in " << ms << "ms\n";
@@ -568,7 +594,7 @@ SUITE (ringbuf_samples)
       ring_buffer<kvstruct> test_container (sz);
       std::vector<kvstruct> test_vector;
 
-      for (auto kv : random_vector)
+      for (auto& kv : random_vector)
         test_container.push_back (kv);
 
       t.Start ();
