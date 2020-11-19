@@ -1,7 +1,7 @@
 <Project DefaultTargets="lib;tests">
     <PropertyGroup>
-      <SQLiteVersion>3320300</SQLiteVersion>
-      <SQLiteName>sqlite-amalgamation-3320300</SQLiteName>
+      <SQLiteVersion>33330000</SQLiteVersion>
+      <SQLiteName>sqlite-amalgamation-3330000</SQLiteName>
       <SQLiteUrl>https://www.sqlite.org/2020/$(SQLiteName).zip</SQLiteUrl>
     </PropertyGroup>
 
