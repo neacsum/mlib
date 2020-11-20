@@ -76,7 +76,7 @@ Database::Database(const std::string& name, int flags)
 {
   int rc;
   if ((rc=sqlite3_open_v2 (name.c_str(), &db, flags, 0)) != SQLITE_OK)
-    throw sqerc (rc, db);
+    sqlite_errors->raise (sqerc (rc, db));
 }
 
 /*!
@@ -102,14 +102,14 @@ Database& Database::operator=(const Database& rhs)
   {
     auto bkp = sqlite3_backup_init (db, "main", rhs.db, "main");
     if (!bkp)
-      throw sqerc (SQLITE_ERROR, db);
+      sqlite_errors->raise (sqerc (SQLITE_ERROR, db));
     int rc;
     if ((rc = sqlite3_backup_step (bkp, -1)) != SQLITE_DONE)
-      throw sqerc (rc, db);
+      sqlite_errors->raise (sqerc (rc, db));
     sqlite3_backup_finish (bkp);
   }
   else
-    throw sqerc (SQLITE_ERROR, db); //one db is not opened
+    sqlite_errors->raise (sqerc (SQLITE_ERROR, db)); //one db is not opened
 
   return *this;
 }
@@ -240,7 +240,7 @@ Query::Query(Database &db, const std::string& sql) :
 {
   int rc;
   if ((rc = sqlite3_prepare_v2 (dbase, sql.c_str(), -1, &stmt, 0)) != SQLITE_OK)
-    throw sqerc (rc, dbase);
+    sqlite_errors->raise (sqerc (rc, db));
 }
 
 /*!
@@ -270,13 +270,13 @@ Query& Query::operator =(const std::string& sql)
 {
   int rc;
   if (!dbase)
-    throw sqerc (SQLITE_MISUSE, 0);
+    sqlite_errors->raise (sqerc (SQLITE_MISUSE, 0));
   if (stmt)
     sqlite3_finalize (stmt);
   if ((rc = sqlite3_prepare_v2 (dbase, sql.c_str(), -1, &stmt, 0)) != SQLITE_OK)
   {
     TRACE ("error %d - %s", rc, sqlite3_errmsg (dbase));
-    throw sqerc (rc, dbase);
+    sqlite_errors->raise (sqerc (rc, dbase));
   }
   col_mapped = false;
   return *this;
@@ -644,7 +644,7 @@ int Query::find_col (const std::string& colname)
     map_columns ();
 
   if (index.find (colname) == index.end ())
-    throw sqerc(SQLITE_RANGE, 0);
+    sqlite_errors->raise (sqerc(SQLITE_RANGE, 0));
 
   return index[colname];
 }

@@ -74,7 +74,7 @@ sock::sock (int type, int domain, int proto) :
   if ((sl->handle = ::socket (domain, type, proto)) == INVALID_SOCKET) 
   {
     delete sl;
-    WSALASTERROR;
+    sockerrors->raise (WSALASTERROR);
   }
   TRACE9 ("sock::sock (type %d domain %d proto %d)=%x", type, domain, proto, sl->handle);
 }
@@ -181,7 +181,7 @@ inaddr sock::name () const
   sockaddr sa;
   int len = sizeof(sa);
   if (getsockname (sl->handle, &sa, &len) == SOCKET_ERROR)
-    WSALASTERROR;
+    sockerrors->raise WSALASTERROR;
   return sa;
 }
 
@@ -194,7 +194,7 @@ inaddr sock::peer () const
   sockaddr sa;
   int len = sizeof(sa);
   if (getpeername (sl->handle, &sa, &len) == SOCKET_ERROR)
-    WSALASTERROR;
+    sockerrors->raise (WSALASTERROR);
   return sa;
 }
 
@@ -277,7 +277,7 @@ sock sock::accept (sockaddr& sa)
   SOCKET soc;
   int len = sizeof(sa);
   if ((soc = ::accept (sl->handle, &sa, &len)) == INVALID_SOCKET)
-    WSALASTERROR;
+    sockerrors->raise (WSALASTERROR);
   return soc;
 }
 
@@ -289,7 +289,7 @@ sock sock::accept ()
 {
   SOCKET soc;
   if ((soc = ::accept (sl->handle, 0, 0)) == INVALID_SOCKET)
-    WSALASTERROR;
+    sockerrors->raise (WSALASTERROR);
   return soc;
 }
 
@@ -315,7 +315,7 @@ int sock::recv (void* buf, int len, int msgf)
     }
     else if (what == WSAECONNABORTED || what == WSAECONNRESET || what == WSAETIMEDOUT)
       return EOF;
-    WSALASTERROR;
+    sockerrors->raise (WSALASTERROR);
   }
   return (rval==0) ? EOF: rval;
 }
@@ -345,7 +345,7 @@ int sock::recvfrom (sockaddr& sa, void* buf, int len, int msgf)
     }
     else if (what == WSAECONNABORTED || what == WSAECONNRESET || what == WSAETIMEDOUT)
       return EOF;
-    WSALASTERROR;
+    sockerrors->raise (WSALASTERROR);
   }
   return (rval==0) ? EOF: rval;
 }
@@ -373,7 +373,7 @@ int sock::send (const void* buf, int len, int msgf)
         return 0;
       else if (what == WSAECONNABORTED || what == WSAECONNRESET)
         return EOF;
-      WSALASTERROR;
+      sockerrors->raise (WSALASTERROR);
     }
     len -= wval;
     wlen += wval;
@@ -406,7 +406,7 @@ int sock::sendto (const sockaddr& sa, const void* buf, int len, int msgf)
         return 0;
       else if (what == WSAECONNABORTED || what == WSAECONNRESET)
         return EOF;
-      WSALASTERROR;
+      sockerrors->raise (WSALASTERROR);
     }
     len -= wval;
     wlen += wval;
@@ -490,7 +490,7 @@ bool sock::is_readready (int wp_sec, int wp_usec) const
   int ret = select (FD_SETSIZE, &fds, 0, 0, (wp_sec < 0) ? 0: &tv);
   if (ret == SOCKET_ERROR) 
   {
-    WSALASTERROR;
+    sockerrors->raise (WSALASTERROR);
     return false;
   }
   return (ret != 0);
@@ -517,7 +517,7 @@ bool sock::is_writeready (int wp_sec, int wp_usec) const
   int ret = select (FD_SETSIZE, 0, &fds, 0, (wp_sec < 0) ? 0: &tv);
   if (ret == SOCKET_ERROR) 
   {
-    WSALASTERROR;
+    sockerrors->raise (WSALASTERROR);
     return false;
   }
   return (ret != 0);
@@ -538,7 +538,7 @@ bool sock::is_exceptionpending (int wp_sec, int wp_usec) const
   int ret = select (FD_SETSIZE, 0, 0, &fds, (wp_sec < 0) ? 0: &tv);
   if (ret == SOCKET_ERROR) 
   {
-    WSALASTERROR;
+    sockerrors->raise (WSALASTERROR);
     return false;
   }
   return (ret != 0);
@@ -551,7 +551,7 @@ unsigned int sock::nread ()
 {
   unsigned long sz;
   if (ioctlsocket (sl->handle, FIONREAD, &sz) == SOCKET_ERROR)
-    WSALASTERROR;
+    sockerrors->raise (WSALASTERROR);
   return sz;
 }
 
@@ -581,7 +581,7 @@ int sock::getopt (int op, void* buf, int len, int level) const
 {
   int	rlen = len;
   if (::getsockopt (sl->handle, level, op, (char*) buf, &rlen) == SOCKET_ERROR)
-    WSALASTERROR;
+    sockerrors->raise (WSALASTERROR);
   return rlen;
 }
 
@@ -595,7 +595,7 @@ int sock::getopt (int op, void* buf, int len, int level) const
 void sock::setopt (int op, void* buf, int len, int level) const
 {
   if (::setsockopt (sl->handle, level, op, (char*) buf, len) == SOCKET_ERROR)
-    WSALASTERROR;
+    sockerrors->raise (WSALASTERROR);
 }
 
 /*!
@@ -762,7 +762,7 @@ void sock::blocking (bool on_off)
 {
   unsigned long mode = on_off?0:1;
   if (ioctlsocket (sl->handle, FIONBIO, &mode) == SOCKET_ERROR)
-    WSALASTERROR;
+    sockerrors->raise (WSALASTERROR);
 }
 
 /*!
@@ -794,7 +794,7 @@ long sock::enumevents ()
 {
   WSANETWORKEVENTS netev;
   if (WSAEnumNetworkEvents (sl->handle, NULL, &netev) == SOCKET_ERROR)
-    WSALASTERROR;
+    sockerrors->raise (WSALASTERROR);
   return netev.lNetworkEvents;
 }
 
@@ -928,7 +928,7 @@ sockbuf::~sockbuf ()
 /*!
   Return 0 if all chars flushed or -1 if error
 */
-int sockbuf::sync() 
+int sockbuf::sync ()
 {
   if (pptr () <= pbase ()) 
     return 0;                                     //unbuffered or empty buffer
@@ -950,7 +950,7 @@ int sockbuf::sync()
   If \p buf is NULL, switches to automatic buffering mode with separate buffers
   for input and output.
 */
-std::streambuf* sockbuf::setbuf( char *buf, int sz )
+std::streambuf* sockbuf::setbuf (char* buf, int sz)
 {
   overflow(EOF);                                  //flush current output buffer
   
@@ -990,14 +990,14 @@ int sockbuf::underflow ()
   if (gptr () < egptr ()) 
     return *(unsigned char*)gptr ();              //return available char from buffer
   
-  if (eback())
+  if (eback ())
   {
     //buffered mode
     int rval = recv (eback (), ibsize);
     if (rval != EOF) 
     {
-      setg (eback(), eback(), eback() + rval);
-      return rval?*(unsigned char*)gptr ():EOF;
+      setg (eback (), eback (), eback () + rval);
+      return rval ? *(unsigned char*)gptr () : EOF;
     }
     return EOF;
   }

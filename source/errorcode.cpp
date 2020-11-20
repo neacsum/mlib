@@ -127,7 +127,7 @@ void errfac::raise (const erc& e)
   if (e.priority_ >= throw_level)
   {
     // Make sure this erc is not thrown again
-    e.active = false;
+    e.active = 0;
     throw e;
   }
 }
@@ -172,7 +172,7 @@ void errfac::Default (errfac *facility)
 erc::erc() :
   value (0),
   priority_ (ERROR_PRI_SUCCESS),
-  active (false),
+  active (0),
   facility_ (errfac::Default ())
 {
 }
@@ -184,7 +184,7 @@ erc::erc (int v, short int l, errfac* f) :
   value (v),
   priority_ (l),
   facility_ (f? f : errfac::Default ()),
-  active (true)
+  active (1)
 {
 }
 
@@ -208,7 +208,7 @@ erc::erc (const erc& other) :
 {
   TRACE9 ("erc copy ctor");
   //we are the active error now, the other is deactivated
-  other.active = false;
+  other.active = 0;
 }
 
 /*!
@@ -222,7 +222,7 @@ erc::erc (erc&& other) :
 {
   TRACE9 ("erc move ctor");
   //we are the active error now, the other is deactivated
-  other.active = false;
+  other.active = 0;
 }
 
 /*! 
@@ -251,8 +251,8 @@ erc& erc::operator= (const erc& rhs)
   if (&rhs != this)
   {
     TRACE9 ("erc assignment");
-    bool rhs_active = rhs.active;
-    rhs.active = false; //prevent rhs from throwing if we throw
+    int rhs_active = rhs.active;
+    rhs.active = 0; //prevent rhs from throwing if we throw
     if (active && priority_)
       facility_->raise (*this);
     value = rhs.value;
@@ -276,7 +276,7 @@ erc& erc::operator= (erc&& rhs)
   {
     TRACE9 ("erc move assignment");
     bool rhs_active = rhs.active;
-    rhs.active = false; //prevent rhs from throwing if we throw
+    rhs.active = 0; //prevent rhs from throwing if we throw
     if (active && priority_)
       facility_->raise (*this);
     value = rhs.value;
@@ -294,7 +294,7 @@ erc& erc::operator= (erc&& rhs)
 */
 erc::operator int () const
 {
-  active = false;
+  active = 0;
   return value;
 }
 
@@ -303,7 +303,7 @@ erc::operator int () const
 */
 erc& erc::reactivate ()
 {
-  active = true;
+  active = 1;
   return *this;
 }
 
@@ -314,7 +314,7 @@ erc& erc::reactivate ()
 */
 erc& erc::deactivate ()
 {
-  active = false;
+  active = 0;
   return *this;
 }
 

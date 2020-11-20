@@ -17,7 +17,8 @@ BSTR ConvertStringToBSTR(const char* in);
 errfac fw_errors("Firewall error");
 errfac *fw_errptr = &fw_errors;
 
-#define FWERROR(A) erc((A),ERROR_PRI_ERROR, fw_errptr)
+#define FWERC(A) erc((A),ERROR_PRI_ERROR, fw_errptr)
+#define FWERROR(A) fw_errptr->raise (FWERC(A))
 
 
 firewall::firewall(void) :
@@ -37,7 +38,7 @@ firewall::firewall(void) :
   if(FAILED(hr))
   {
     TRACE ("firewall::firewall - COInitializeEx err %x", hr);
-    throw FWERROR (hr);
+    FWERROR (hr);
   }
 
   // Create an instance of the firewall settings manager.
@@ -63,7 +64,7 @@ firewall::firewall(void) :
     TRACE ("firewall::firewall - get_LocalPolicy err %d", -hr);
     fwmgr->Release ();
     fwmgr = NULL;
-    throw FWERROR (hr);
+    FWERROR (hr);
   }
 
   // Retrieve the firewall profile currently in effect.
@@ -76,7 +77,7 @@ firewall::firewall(void) :
     fwpolicy = 0;
     fwmgr->Release ();
     fwmgr = 0;
-    throw FWERROR (hr);
+    FWERROR (hr);
   }
 }
 
@@ -109,7 +110,7 @@ bool firewall::is_enabled ()
     if(FAILED(hr))
     {
       TRACE ("firewall::is_enabled - get_FirewallEnabled err %d", -hr);
-      throw FWERROR (hr);
+      FWERROR (hr);
     }
     TRACE ("firewall::is_enabled done (%d)", enabled);
   }
@@ -131,7 +132,7 @@ bool firewall::is_port_enabled (int portnum, bool tcp)
   hr = fwprofile->get_GloballyOpenPorts(&allports);
 
   if(FAILED(hr))
-    throw FWERROR (hr);
+    FWERROR (hr);
 
   // Attempt to retrieve the globally open port.
   hr = allports->Item(portnum, protocol, &port);
@@ -144,7 +145,7 @@ bool firewall::is_port_enabled (int portnum, bool tcp)
     {
       port->Release ();
       allports->Release ();
-      throw FWERROR(hr);
+      FWERROR(hr);
     }
 
     port->Release();
@@ -169,7 +170,7 @@ bool firewall::has_port(int portnum, bool tcp)
   hr = fwprofile->get_GloballyOpenPorts(&allports);
 
   if(FAILED(hr))
-    throw FWERROR (hr);
+    FWERROR (hr);
 
   // Attempt to retrieve the globally open port.
   hr = allports->Item(portnum, protocol, &port);
@@ -180,7 +181,7 @@ bool firewall::has_port(int portnum, bool tcp)
   else if (FAILED(hr))
   {
     allports->Release ();
-    throw FWERROR (hr);
+    FWERROR (hr);
   }
   else
     port->Release ();
@@ -202,7 +203,7 @@ bool firewall::has_app(const char *appname)
   hr = fwprofile->get_AuthorizedApplications(&allapps);
 
   if(FAILED(hr))
-    throw FWERROR (hr);
+    FWERROR (hr);
 
   // Attempt to retrieve the application.
   BSTR bname = ConvertStringToBSTR(appname);
@@ -213,7 +214,7 @@ bool firewall::has_app(const char *appname)
   {
     allapps->Release ();
     ::SysFreeString(bname);
-    throw FWERROR (hr);
+    FWERROR (hr);
   }
   else
     app->Release ();
@@ -237,7 +238,7 @@ erc firewall::add_port(int portnum, bool tcp, const char *name)
   hr = fwprofile->get_GloballyOpenPorts(&allports);
 
   if(FAILED(hr))
-    throw FWERROR (hr);
+    FWERROR (hr);
 
   //create a new open port
   hr = CoCreateInstance( 
@@ -250,7 +251,7 @@ erc firewall::add_port(int portnum, bool tcp, const char *name)
   if (FAILED(hr))
   {
     allports->Release ();
-    return FWERROR(hr);
+    FWERROR(hr);
   }
 
   //set port name
@@ -265,7 +266,7 @@ erc firewall::add_port(int portnum, bool tcp, const char *name)
   allports->Release ();
   ::SysFreeString(bname);
   if (FAILED(hr))
-    return FWERROR(hr);
+    return FWERC(hr);
 
   return ERROR_SUCCESS;
 }
@@ -284,7 +285,7 @@ erc firewall::add_app(const char *appname, const char *filename)
 
 
   if(FAILED(hr))
-    throw FWERROR (hr);
+    FWERROR (hr);
 
   //create a new open port
   hr = CoCreateInstance( 
@@ -297,7 +298,7 @@ erc firewall::add_app(const char *appname, const char *filename)
   if (FAILED(hr))
   {
     allapps->Release ();
-    return FWERROR(hr);
+    FWERROR(hr);
   }
 
   //set app name and image name
@@ -314,7 +315,7 @@ erc firewall::add_app(const char *appname, const char *filename)
   ::SysFreeString(bfile);
 
   if (FAILED(hr))
-    return FWERROR(hr);
+    return FWERC(hr);
 
   return ERROR_SUCCESS;
 }
@@ -334,7 +335,7 @@ erc firewall::set_port (int portnum, bool tcp, bool enable)
   hr = fwprofile->get_GloballyOpenPorts(&allports);
 
   if(FAILED(hr))
-    throw FWERROR (hr);
+    FWERROR (hr);
 
   // Attempt to retrieve the globally open port.
   hr = allports->Item(portnum, protocol, &port);
@@ -347,17 +348,17 @@ erc firewall::set_port (int portnum, bool tcp, bool enable)
           __uuidof(INetFwOpenPort), 
           (void**)&port);
     if (FAILED(hr))
-      return FWERROR(hr);
+      return FWERC(hr);
     hr = allports->Add (port);
     if (FAILED(hr))
-      return FWERROR(hr);
+      return FWERC(hr);
   }
   else if (FAILED(hr))
-    return FWERROR(hr);
+    return FWERC(hr);
   
   hr = port->put_Enabled(enabled?VARIANT_TRUE:VARIANT_FALSE);
   if (FAILED(hr))
-      return FWERROR(hr);
+      return FWERC(hr);
   port->Release();
   allports->Release();
 

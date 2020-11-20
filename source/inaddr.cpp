@@ -56,7 +56,7 @@ inaddr::inaddr (const char *hostname, unsigned short port)
   {
     HOSTENT *he;
     if (NULL == (he = gethostbyname (hostname)))
-      WSALASTERROR;
+      sockerrors->raise (WSALASTERROR);
     else
       memcpy (&sa.sin_addr, he->h_addr_list[0], he->h_length);
   }
@@ -96,7 +96,7 @@ const char* inaddr::hostname ()
                                                 //Make a char string from dotted address
     else
     {
-      WSALASTERROR;
+      sockerrors->raise (WSALASTERROR);
       return "0.0.0.0";
     }
   }

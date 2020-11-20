@@ -67,7 +67,6 @@ public:
   /// get default facility
   static errfac* Default ();
 
-protected:
   virtual void raise (const erc& e);
   virtual void log (const erc& e);
 
