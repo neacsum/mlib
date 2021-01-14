@@ -60,11 +60,11 @@ Functions</h2></td></tr>
 <tr class="memitem:a5409d90676a87e4bded9f38c2adc8c43"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="base64_8h.html#a5409d90676a87e4bded9f38c2adc8c43">mlib::base64enc</a> (const void *in, char *out, size_t ilen)</td></tr>
 <tr class="memdesc:a5409d90676a87e4bded9f38c2adc8c43"><td class="mdescLeft">&#160;</td><td class="mdescRight">Encode input bytes to Base64 producing a null-terminated string.  <a href="base64_8h.html#a5409d90676a87e4bded9f38c2adc8c43">More...</a><br /></td></tr>
 <tr class="separator:a5409d90676a87e4bded9f38c2adc8c43"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac42fdb799e3514bdb7c8def3ca4f7aef"><td class="memItemLeft" align="right" valign="top"><a id="ac42fdb799e3514bdb7c8def3ca4f7aef"></a>
-std::string&#160;</td><td class="memItemRight" valign="bottom"><b>mlib::base64enc</b> (const std::string &amp;in)</td></tr>
+<tr class="memitem:ac42fdb799e3514bdb7c8def3ca4f7aef"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="base64_8h.html#ac42fdb799e3514bdb7c8def3ca4f7aef">mlib::base64enc</a> (const std::string &amp;in)</td></tr>
+<tr class="memdesc:ac42fdb799e3514bdb7c8def3ca4f7aef"><td class="mdescLeft">&#160;</td><td class="mdescRight">String-aware overload.  <a href="base64_8h.html#ac42fdb799e3514bdb7c8def3ca4f7aef">More...</a><br /></td></tr>
 <tr class="separator:ac42fdb799e3514bdb7c8def3ca4f7aef"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a51778429bdd73f990739664cb347c5ff"><td class="memItemLeft" align="right" valign="top"><a id="a51778429bdd73f990739664cb347c5ff"></a>
-std::string&#160;</td><td class="memItemRight" valign="bottom"><b>mlib::base64dec</b> (const std::string &amp;in)</td></tr>
+<tr class="memitem:a51778429bdd73f990739664cb347c5ff"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="base64_8h.html#a51778429bdd73f990739664cb347c5ff">mlib::base64dec</a> (const std::string &amp;in)</td></tr>
+<tr class="memdesc:a51778429bdd73f990739664cb347c5ff"><td class="mdescLeft">&#160;</td><td class="mdescRight">String-aware overload.  <a href="base64_8h.html#a51778429bdd73f990739664cb347c5ff">More...</a><br /></td></tr>
 <tr class="separator:a51778429bdd73f990739664cb347c5ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -72,7 +72,7 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><b>mlib::base64de
 <p>(c) Mircea Neacsu 2017 </p>
 </div><h2 class="groupheader">Function Documentation</h2>
 <a id="ab4cc64fc5e8f1490f832f50751d66cd4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab4cc64fc5e8f1490f832f50751d66cd4">&#9670;&nbsp;</a></span>base64dec()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ab4cc64fc5e8f1490f832f50751d66cd4">&#9670;&nbsp;</a></span>base64dec() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -108,8 +108,58 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><b>mlib::base64de
 
 </div>
 </div>
+<a id="a51778429bdd73f990739664cb347c5ff"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a51778429bdd73f990739664cb347c5ff">&#9670;&nbsp;</a></span>base64dec() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string mlib::base64dec </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>in</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">in</td><td>input string </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>decoded string </dd></dl>
+
+</div>
+</div>
+<a id="ac42fdb799e3514bdb7c8def3ca4f7aef"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac42fdb799e3514bdb7c8def3ca4f7aef">&#9670;&nbsp;</a></span>base64enc() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string mlib::base64enc </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>in</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">in</td><td>input string </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>decoded string </dd></dl>
+
+</div>
+</div>
 <a id="a5409d90676a87e4bded9f38c2adc8c43"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5409d90676a87e4bded9f38c2adc8c43">&#9670;&nbsp;</a></span>base64enc()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a5409d90676a87e4bded9f38c2adc8c43">&#9670;&nbsp;</a></span>base64enc() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -155,7 +205,7 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><b>mlib::base64de
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Jul 31 2020 06:14:53 for MLIB by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Nov 25 2020 16:35:17 for MLIB by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.18
 </small></address>

@@ -24,7 +24,7 @@ namespace mlib {
           - ENOENT if path was not found
           - EEXIST if path already exists
 */
-int r_mkdir (const string& dir)
+int r_mkdir (const std::string& dir)
 {
   assert (!dir.empty());
 
@@ -64,7 +64,7 @@ int r_mkdir (const string& dir)
   \return - 0 if new directory was removed
           - ENOTEMPTY if directory is not empty
 */
-int r_rmdir (const string& dir)
+int r_rmdir (const std::string& dir)
 {
   assert (!dir.empty());
 

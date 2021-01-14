@@ -54,11 +54,11 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:adc5f2ef4a7e75c0605bd7830f75bd6c9"><td class="memItemLeft" align="right" valign="top"><a id="adc5f2ef4a7e75c0605bd7830f75bd6c9"></a>
-int&#160;</td><td class="memItemRight" valign="bottom"><b>mlib::r_mkdir</b> (const std::string &amp;dir)</td></tr>
+<tr class="memitem:adc5f2ef4a7e75c0605bd7830f75bd6c9"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rdir_8h.html#adc5f2ef4a7e75c0605bd7830f75bd6c9">mlib::r_mkdir</a> (const std::string &amp;dir)</td></tr>
+<tr class="memdesc:adc5f2ef4a7e75c0605bd7830f75bd6c9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Recursively create a new directory.  <a href="rdir_8h.html#adc5f2ef4a7e75c0605bd7830f75bd6c9">More...</a><br /></td></tr>
 <tr class="separator:adc5f2ef4a7e75c0605bd7830f75bd6c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a490c03f4beebf4185fe5fa57209b3344"><td class="memItemLeft" align="right" valign="top"><a id="a490c03f4beebf4185fe5fa57209b3344"></a>
-int&#160;</td><td class="memItemRight" valign="bottom"><b>mlib::r_rmdir</b> (const std::string &amp;dir)</td></tr>
+<tr class="memitem:a490c03f4beebf4185fe5fa57209b3344"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="rdir_8h.html#a490c03f4beebf4185fe5fa57209b3344">mlib::r_rmdir</a> (const std::string &amp;dir)</td></tr>
+<tr class="memdesc:a490c03f4beebf4185fe5fa57209b3344"><td class="mdescLeft">&#160;</td><td class="mdescRight">Recursively remove a directory.  <a href="rdir_8h.html#a490c03f4beebf4185fe5fa57209b3344">More...</a><br /></td></tr>
 <tr class="separator:a490c03f4beebf4185fe5fa57209b3344"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -66,10 +66,68 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>mlib::r_rmdir</b> (con
 <li>Recursive directory functions</li>
 </ul>
 <p>(c) Mircea Neacsu 2019 </p>
-</div></div><!-- contents -->
+</div><h2 class="groupheader">Function Documentation</h2>
+<a id="adc5f2ef4a7e75c0605bd7830f75bd6c9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adc5f2ef4a7e75c0605bd7830f75bd6c9">&#9670;&nbsp;</a></span>r_mkdir()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int mlib::r_mkdir </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>dir</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">dir</td><td>path for new directory (UTF-8 encoded)</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>- 0 if new directory was created<ul>
+<li>ENOENT if path was not found</li>
+<li>EEXIST if path already exists </li>
+</ul>
+</dd></dl>
+
+</div>
+</div>
+<a id="a490c03f4beebf4185fe5fa57209b3344"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a490c03f4beebf4185fe5fa57209b3344">&#9670;&nbsp;</a></span>r_rmdir()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int mlib::r_rmdir </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>dir</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">dir</td><td>path for directory to remove (UTF-8 encoded)</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>- 0 if new directory was removed<ul>
+<li>ENOTEMPTY if directory is not empty </li>
+</ul>
+</dd></dl>
+
+</div>
+</div>
+</div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Jul 31 2020 06:14:53 for MLIB by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Nov 25 2020 16:35:17 for MLIB by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.18
 </small></address>

@@ -88,7 +88,8 @@ double abs (const Point<T>& p)
   return p.magnitude ();
 }
 
-
+/// Serializes a point to an output stream as a comma-separated pair of values
+/// in brackets
 template <class T>
 std::ostream& operator << (std::ostream& s, const Point<T>& p)
 {

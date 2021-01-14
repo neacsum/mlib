@@ -269,7 +269,7 @@ bool JSONBridge::strquote (const char *str)
 }
 /*!
   Search a variable in JSON dictionary. The variable name can be a construct
-  '<name>_<index>' for an indexed variable.
+  `<name>_<index>` for an indexed variable.
 */
 JSONVAR* JSONBridge::find (const char *name, int *pidx)
 {

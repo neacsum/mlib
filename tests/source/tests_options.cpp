@@ -48,7 +48,7 @@ TEST (Usage)
   Options o (optlist);
 
   CHECK_EQUAL (0, o.parse (1, cmd));
-  cout << o.usage () << endl;
+  cout << o.usage ('\n') << endl;
 }
 
 TEST (UnknownOpt)
@@ -368,7 +368,6 @@ TEST (SampleOptionsCode)
   }
   else
     CHECK ("Missing option");
-
 }
 }
 

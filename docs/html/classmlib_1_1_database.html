@@ -67,7 +67,9 @@ Public Types</h2></td></tr>
 &#160;&#160;<a class="el" href="classmlib_1_1_database.html#a344770d20835d632f778d3b935a5f7e8a6557c623b813a0e901564c252aad00fc">nomutex</a> = SQLITE_OPEN_NOMUTEX, 
 <a class="el" href="classmlib_1_1_database.html#a344770d20835d632f778d3b935a5f7e8afe0e161544442a6d3e4fc8b3c3e25028">fullmutex</a> = SQLITE_OPEN_FULLMUTEX, 
 <a class="el" href="classmlib_1_1_database.html#a344770d20835d632f778d3b935a5f7e8a133a790727552324b491e92070225147">sharedcache</a> = SQLITE_OPEN_SHAREDCACHE, 
-<a class="el" href="classmlib_1_1_database.html#a344770d20835d632f778d3b935a5f7e8a37b89208c397bf5e54886ee5fa74a864">privatecache</a> = SQLITE_OPEN_PRIVATECACHE
+<a class="el" href="classmlib_1_1_database.html#a344770d20835d632f778d3b935a5f7e8a37b89208c397bf5e54886ee5fa74a864">privatecache</a> = SQLITE_OPEN_PRIVATECACHE, 
+<br />
+&#160;&#160;<a class="el" href="classmlib_1_1_database.html#a344770d20835d632f778d3b935a5f7e8aa40280506c64a7d2e06530322de9d9bb">memory</a> = SQLITE_OPEN_MEMORY | SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE
 <br />
  }</td></tr>
 <tr class="memdesc:a344770d20835d632f778d3b935a5f7e8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Flags for database opening mode.  <a href="classmlib_1_1_database.html#a344770d20835d632f778d3b935a5f7e8">More...</a><br /></td></tr>
@@ -84,6 +86,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a29ff78d5303aca049b77dcdd671f2123"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_database.html#a29ff78d5303aca049b77dcdd671f2123">~Database</a> ()</td></tr>
 <tr class="memdesc:a29ff78d5303aca049b77dcdd671f2123"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor.  <a href="classmlib_1_1_database.html#a29ff78d5303aca049b77dcdd671f2123">More...</a><br /></td></tr>
 <tr class="separator:a29ff78d5303aca049b77dcdd671f2123"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac4293a5836c6ab120a9ab94934d45335"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classmlib_1_1_database.html">Database</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_database.html#ac4293a5836c6ab120a9ab94934d45335">operator=</a> (const <a class="el" href="classmlib_1_1_database.html">Database</a> &amp;rhs)</td></tr>
+<tr class="memdesc:ac4293a5836c6ab120a9ab94934d45335"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assignment operator.  <a href="classmlib_1_1_database.html#ac4293a5836c6ab120a9ab94934d45335">More...</a><br /></td></tr>
+<tr class="separator:ac4293a5836c6ab120a9ab94934d45335"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a58a65ef1e978dfbe82df99210ff5ea6c"><td class="memItemLeft" align="right" valign="top"><a id="a58a65ef1e978dfbe82df99210ff5ea6c"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_database.html#a58a65ef1e978dfbe82df99210ff5ea6c">connected</a> ()</td></tr>
 <tr class="memdesc:a58a65ef1e978dfbe82df99210ff5ea6c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if database is opened or not. <br /></td></tr>
@@ -117,9 +122,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="memitem:a6c04011535b11e017ee3d3152bd88573"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classmlib_1_1erc.html">erc</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_database.html#a6c04011535b11e017ee3d3152bd88573">make_query</a> (<a class="el" href="classmlib_1_1_query.html">Query</a> &amp;q, const std::string &amp;sql)</td></tr>
 <tr class="memdesc:a6c04011535b11e017ee3d3152bd88573"><td class="mdescLeft">&#160;</td><td class="mdescRight">Change or set the prepared statement of a <a class="el" href="classmlib_1_1_query.html" title="Wrapper for SQL prepared sentences.">Query</a> object.  <a href="classmlib_1_1_database.html#a6c04011535b11e017ee3d3152bd88573">More...</a><br /></td></tr>
 <tr class="separator:a6c04011535b11e017ee3d3152bd88573"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4c57854c4f8950e1f8b08750ec3dd995"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_database.html#a4c57854c4f8950e1f8b08750ec3dd995">filename</a> (const std::string &amp;conn=&quot;main&quot;)</td></tr>
-<tr class="memdesc:a4c57854c4f8950e1f8b08750ec3dd995"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return filename of a database connection.  <a href="classmlib_1_1_database.html#a4c57854c4f8950e1f8b08750ec3dd995">More...</a><br /></td></tr>
-<tr class="separator:a4c57854c4f8950e1f8b08750ec3dd995"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8d5451603964d4a6d85da3a5984596a0"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_database.html#a8d5451603964d4a6d85da3a5984596a0">filename</a> (const std::string &amp;conn=&quot;main&quot;) const</td></tr>
+<tr class="memdesc:a8d5451603964d4a6d85da3a5984596a0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return filename of a database connection.  <a href="classmlib_1_1_database.html#a8d5451603964d4a6d85da3a5984596a0">More...</a><br /></td></tr>
+<tr class="separator:a8d5451603964d4a6d85da3a5984596a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a105a0dc1d2cad3cdebf436c7693b4df9"><td class="memItemLeft" align="right" valign="top"><a id="a105a0dc1d2cad3cdebf436c7693b4df9"></a>
 int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_database.html#a105a0dc1d2cad3cdebf436c7693b4df9">extended_error</a> ()</td></tr>
 <tr class="memdesc:a105a0dc1d2cad3cdebf436c7693b4df9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return extended result code. <br /></td></tr>
@@ -155,6 +160,8 @@ int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class
 <tr><td class="fieldname"><a id="a344770d20835d632f778d3b935a5f7e8a133a790727552324b491e92070225147"></a>sharedcache&#160;</td><td class="fielddoc"><p>database connection is eligible to use shared cache mode </p>
 </td></tr>
 <tr><td class="fieldname"><a id="a344770d20835d632f778d3b935a5f7e8a37b89208c397bf5e54886ee5fa74a864"></a>privatecache&#160;</td><td class="fielddoc"><p>database connection does not participate in shared cache mode </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a344770d20835d632f778d3b935a5f7e8aa40280506c64a7d2e06530322de9d9bb"></a>memory&#160;</td><td class="fielddoc"><p>database opened in memory </p>
 </td></tr>
 </table>
 
@@ -234,8 +241,8 @@ int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a4c57854c4f8950e1f8b08750ec3dd995"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4c57854c4f8950e1f8b08750ec3dd995">&#9670;&nbsp;</a></span>filename()</h2>
+<a id="a8d5451603964d4a6d85da3a5984596a0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8d5451603964d4a6d85da3a5984596a0">&#9670;&nbsp;</a></span>filename()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -245,7 +252,7 @@ int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class
           <td>(</td>
           <td class="paramtype">const std::string &amp;&#160;</td>
           <td class="paramname"><em>conn</em> = <code>&quot;main&quot;</code></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -337,6 +344,26 @@ int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class
 
 </div>
 </div>
+<a id="ac4293a5836c6ab120a9ab94934d45335"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac4293a5836c6ab120a9ab94934d45335">&#9670;&nbsp;</a></span>operator=()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classmlib_1_1_database.html">Database</a> &amp; mlib::Database::operator= </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classmlib_1_1_database.html">Database</a> &amp;&#160;</td>
+          <td class="paramname"><em>rhs</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Perform a copy operation using the <a href="https://sqlite.org/backup.html">SQLITE Backup API</a>.</p>
+<p>Both databases should be opened or closed. </p>
+
+</div>
+</div>
 <hr/>The documentation for this class was generated from the following files:<ul>
 <li>C:/development/mlib/include/mlib/<a class="el" href="sqlitepp_8h_source.html">sqlitepp.h</a></li>
 <li>C:/development/mlib/source/<a class="el" href="sqlitepp_8cpp.html">sqlitepp.cpp</a></li>
@@ -344,7 +371,7 @@ int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Jul 31 2020 06:14:53 for MLIB by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Nov 25 2020 16:35:17 for MLIB by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.18
 </small></address>

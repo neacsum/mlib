@@ -97,24 +97,28 @@ $(function() {
 <div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160; </div>
 <div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;<span class="keywordtype">void</span> <a class="code" href="log_8h.html#a7bdffa79fa774cf3cce43da5f6bae3eb">syslog_debug</a> (<span class="keyword">const</span> <span class="keywordtype">char</span> *fmt, ...);</div>
 <div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160; </div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">int</span> log_defaultopt;</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">int</span> log_defaultmask;</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">char</span> log_servhostname[_MAX_PATH];</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">char</span> log_fname[_MAX_PATH];</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160; </div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;<span class="preprocessor">#ifdef __cplusplus</span></div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;}</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">int</span> <a class="code" href="log_8h.html#a7c008b999ff654432d92f58b6c044b85">log_defaultopt</a>;</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160; </div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">char</span> <a class="code" href="log_8h.html#ac5724766dc0eab7d2a9b5c67bace605f">log_servhostname</a>[_MAX_PATH];</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160; </div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;<span class="keyword">extern</span> <span class="keywordtype">char</span> <a class="code" href="log_8h.html#a19623831d1f7d3b18bcfdb3fb2c8744f">log_fname</a>[_MAX_PATH];</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160; </div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;<span class="preprocessor">#ifdef __cplusplus</span></div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;}</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;<span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
 <div class="ttc" id="alog_8h_html_a7bdffa79fa774cf3cce43da5f6bae3eb"><div class="ttname"><a href="log_8h.html#a7bdffa79fa774cf3cce43da5f6bae3eb">syslog_debug</a></div><div class="ttdeci">void syslog_debug(const char *fmt,...)</div><div class="ttdoc">Generate a log message at debug level using FMT string and option arguments.</div><div class="ttdef"><b>Definition:</b> log.cpp:329</div></div>
 <div class="ttc" id="agroup__syslog_html_ga6f1f3704c08cc51ad17680056d67bdf4"><div class="ttname"><a href="group__syslog.html#ga6f1f3704c08cc51ad17680056d67bdf4">openlog</a></div><div class="ttdeci">void openlog(const char *ident, int option, int facility)</div><div class="ttdoc">Open connection to logger.</div><div class="ttdef"><b>Definition:</b> log.cpp:166</div></div>
+<div class="ttc" id="alog_8h_html_a19623831d1f7d3b18bcfdb3fb2c8744f"><div class="ttname"><a href="log_8h.html#a19623831d1f7d3b18bcfdb3fb2c8744f">log_fname</a></div><div class="ttdeci">char log_fname[_MAX_PATH]</div><div class="ttdoc">Log filename if LOGOPT_FILE flag is set.</div><div class="ttdef"><b>Definition:</b> log.cpp:49</div></div>
+<div class="ttc" id="alog_8h_html_a7c008b999ff654432d92f58b6c044b85"><div class="ttname"><a href="log_8h.html#a7c008b999ff654432d92f58b6c044b85">log_defaultopt</a></div><div class="ttdeci">int log_defaultopt</div><div class="ttdoc">Default log options - combination of LOGOPT_... flags.</div><div class="ttdef"><b>Definition:</b> log.cpp:46</div></div>
+<div class="ttc" id="alog_8h_html_ac5724766dc0eab7d2a9b5c67bace605f"><div class="ttname"><a href="log_8h.html#ac5724766dc0eab7d2a9b5c67bace605f">log_servhostname</a></div><div class="ttdeci">char log_servhostname[_MAX_PATH]</div><div class="ttdoc">Destination host for UDP datagrams. Default is &quot;localhost&quot;.</div><div class="ttdef"><b>Definition:</b> log.cpp:48</div></div>
 <div class="ttc" id="agroup__syslog_html_ga79f76e80518dce884dab21fa3f18a1f4"><div class="ttname"><a href="group__syslog.html#ga79f76e80518dce884dab21fa3f18a1f4">setlogmask</a></div><div class="ttdeci">int setlogmask(int mask)</div><div class="ttdoc">Set the log mask level.</div><div class="ttdef"><b>Definition:</b> log.cpp:411</div></div>
 <div class="ttc" id="agroup__syslog_html_ga0fd9642bc9066d5c4012cbbca8993bd8"><div class="ttname"><a href="group__syslog.html#ga0fd9642bc9066d5c4012cbbca8993bd8">closelog</a></div><div class="ttdeci">void closelog(void)</div><div class="ttdoc">Close connection to logger.</div><div class="ttdef"><b>Definition:</b> log.cpp:244</div></div>
 <div class="ttc" id="agroup__syslog_html_gaec437cc017de835e256a121cccfc62c0"><div class="ttname"><a href="group__syslog.html#gaec437cc017de835e256a121cccfc62c0">setlogopt</a></div><div class="ttdeci">int setlogopt(int opt)</div><div class="ttdoc">Set option flags.</div><div class="ttdef"><b>Definition:</b> log.cpp:437</div></div>
 <div class="ttc" id="agroup__syslog_html_gad9738ced32624b84aac71be08bd347b0"><div class="ttname"><a href="group__syslog.html#gad9738ced32624b84aac71be08bd347b0">syslog</a></div><div class="ttdeci">void syslog(int facility_priority, char *fmt,...)</div><div class="ttdoc">Generate a log message using FMT string and option arguments.</div><div class="ttdef"><b>Definition:</b> log.cpp:289</div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Jul 31 2020 06:14:53 for MLIB by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Nov 25 2020 16:35:16 for MLIB by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.18
 </small></address>

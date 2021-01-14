@@ -104,7 +104,7 @@ size_t base64dec (const char *in, void *out)
   \param in     input string
   \return       decoded string
 */
-string base64dec (const string& in)
+std::string base64dec (const std::string& in)
 {
   size_t sz = base64dec (in.c_str(), nullptr);
   std::string out (sz, '\0');
@@ -164,7 +164,7 @@ size_t base64enc (const void* in, char* out, size_t ilen)
   \param in     input string
   \return       decoded string
 */
-string base64enc (const string& in)
+std::string base64enc (const std::string& in)
 {
   size_t sz = base64enc (in.data(), nullptr, in.size());
   std::string out (sz, '\0');

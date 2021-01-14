@@ -86,11 +86,11 @@ Options::Options (const char* const *list)
   Example:
   ` "l?list option_argument" `
 
-  In this example the option syntax part is \c"l?list" and the argument description
-  is \c"option_argument"
+  In this example the option syntax part is \c "l?list" and the argument description
+  is \c "option_argument"
 
   The option syntax string has the following syntax:
-  `[short_form][arg_char][long_form]`
+  `[<short_form>]<arg_char>[<long_form>]`
 
   \e short_form is a letter giving the short form of the option ('l' in the example
   above).

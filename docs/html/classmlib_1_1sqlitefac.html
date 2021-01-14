@@ -75,14 +75,6 @@ Protected Member Functions</h2></td></tr>
 <tr class="memitem:ac567cc9a6bb2f875ddefc77e4fc00347"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1sqlitefac.html#ac567cc9a6bb2f875ddefc77e4fc00347">message</a> (const <a class="el" href="classmlib_1_1erc.html">erc</a> &amp;e) const</td></tr>
 <tr class="memdesc:ac567cc9a6bb2f875ddefc77e4fc00347"><td class="mdescLeft">&#160;</td><td class="mdescRight">If there is a handle to the database that produced the error, calls <a href="http://sqlite.org/c3ref/errcode.html">sqlite3_errmsg</a> to obtain the error message.  <a href="classmlib_1_1sqlitefac.html#ac567cc9a6bb2f875ddefc77e4fc00347">More...</a><br /></td></tr>
 <tr class="separator:ac567cc9a6bb2f875ddefc77e4fc00347"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="inherit_header pro_methods_classmlib_1_1errfac"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_classmlib_1_1errfac')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="classmlib_1_1errfac.html">mlib::errfac</a></td></tr>
-<tr class="memitem:ace2cfec5097e30fca63d147693939d51 inherit pro_methods_classmlib_1_1errfac"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1errfac.html#ace2cfec5097e30fca63d147693939d51">raise</a> (const <a class="el" href="classmlib_1_1erc.html">erc</a> &amp;e)</td></tr>
-<tr class="memdesc:ace2cfec5097e30fca63d147693939d51 inherit pro_methods_classmlib_1_1errfac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if error must be logged or thrown.  <a href="classmlib_1_1errfac.html#ace2cfec5097e30fca63d147693939d51">More...</a><br /></td></tr>
-<tr class="separator:ace2cfec5097e30fca63d147693939d51 inherit pro_methods_classmlib_1_1errfac"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2fabef1cb2b68c00fa6f2b39af6f7f3c inherit pro_methods_classmlib_1_1errfac"><td class="memItemLeft" align="right" valign="top"><a id="a2fabef1cb2b68c00fa6f2b39af6f7f3c"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1errfac.html#a2fabef1cb2b68c00fa6f2b39af6f7f3c">log</a> (const <a class="el" href="classmlib_1_1erc.html">erc</a> &amp;e)</td></tr>
-<tr class="memdesc:a2fabef1cb2b68c00fa6f2b39af6f7f3c inherit pro_methods_classmlib_1_1errfac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Logging action. Default is to use dprintf. <br /></td></tr>
-<tr class="separator:a2fabef1cb2b68c00fa6f2b39af6f7f3c inherit pro_methods_classmlib_1_1errfac"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
@@ -109,6 +101,13 @@ unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 const std::string &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1errfac.html#a24b514fd7f551c7b4be06d63c774bd47">name</a> () const</td></tr>
 <tr class="memdesc:a24b514fd7f551c7b4be06d63c774bd47 inherit pub_methods_classmlib_1_1errfac"><td class="mdescLeft">&#160;</td><td class="mdescRight">get name <br /></td></tr>
 <tr class="separator:a24b514fd7f551c7b4be06d63c774bd47 inherit pub_methods_classmlib_1_1errfac"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ace2cfec5097e30fca63d147693939d51 inherit pub_methods_classmlib_1_1errfac"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1errfac.html#ace2cfec5097e30fca63d147693939d51">raise</a> (const <a class="el" href="classmlib_1_1erc.html">erc</a> &amp;e)</td></tr>
+<tr class="memdesc:ace2cfec5097e30fca63d147693939d51 inherit pub_methods_classmlib_1_1errfac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if error must be logged or thrown.  <a href="classmlib_1_1errfac.html#ace2cfec5097e30fca63d147693939d51">More...</a><br /></td></tr>
+<tr class="separator:ace2cfec5097e30fca63d147693939d51 inherit pub_methods_classmlib_1_1errfac"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2fabef1cb2b68c00fa6f2b39af6f7f3c inherit pub_methods_classmlib_1_1errfac"><td class="memItemLeft" align="right" valign="top"><a id="a2fabef1cb2b68c00fa6f2b39af6f7f3c"></a>
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1errfac.html#a2fabef1cb2b68c00fa6f2b39af6f7f3c">log</a> (const <a class="el" href="classmlib_1_1erc.html">erc</a> &amp;e)</td></tr>
+<tr class="memdesc:a2fabef1cb2b68c00fa6f2b39af6f7f3c inherit pub_methods_classmlib_1_1errfac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Logging action. Default is to use dprintf. <br /></td></tr>
+<tr class="separator:a2fabef1cb2b68c00fa6f2b39af6f7f3c inherit pub_methods_classmlib_1_1errfac"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_static_methods_classmlib_1_1errfac"><td colspan="2" onclick="javascript:toggleInherit('pub_static_methods_classmlib_1_1errfac')"><img src="closed.png" alt="-"/>&#160;Static Public Member Functions inherited from <a class="el" href="classmlib_1_1errfac.html">mlib::errfac</a></td></tr>
 <tr class="memitem:aa65bd42f7ff920b4f58ca49f94c12a09 inherit pub_static_methods_classmlib_1_1errfac"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1errfac.html#aa65bd42f7ff920b4f58ca49f94c12a09">Default</a> (<a class="el" href="classmlib_1_1errfac.html">errfac</a> *f)</td></tr>
 <tr class="memdesc:aa65bd42f7ff920b4f58ca49f94c12a09 inherit pub_static_methods_classmlib_1_1errfac"><td class="mdescLeft">&#160;</td><td class="mdescRight">set default facility  <a href="classmlib_1_1errfac.html#aa65bd42f7ff920b4f58ca49f94c12a09">More...</a><br /></td></tr>
@@ -162,7 +161,7 @@ static <a class="el" href="classmlib_1_1errfac.html">errfac</a> *&#160;</td><td 
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Jul 31 2020 06:14:54 for MLIB by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Nov 25 2020 16:35:17 for MLIB by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.18
 </small></address>
