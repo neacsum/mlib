@@ -74,14 +74,14 @@ public:
     iterator_type<C_> operator ++ (int)
     {
       iterator_type<C_> tmp = *this;
-      pos = ring->inc_func (pos);
+      pos = ring->increment (pos);
       return tmp;
     }
 
     ///Increment operator (prefix)
     iterator_type<C_>& operator ++ ()
     {
-      pos = ring->inc_func (pos);
+      pos = ring->increment (pos);
       return *this;
     }
 
@@ -89,14 +89,14 @@ public:
     iterator_type<C_> operator -- (int)
     {
       iterator_type<C_> tmp = *this;
-      pos = ring->dec_func (pos);
+      pos = ring->decrement (pos);
       return tmp;
     }
 
     ///Decrement operator (prefix)
     iterator_type<C_>& operator -- ()
     {
-      pos = ring->dec_func (pos);
+      pos = ring->decrement (pos);
       return *this;
     }
 
@@ -127,14 +127,14 @@ public:
     iterator_type<C_> operator +(size_t inc) const
     {
       iterator_type<C_> tmp = *this;
-      tmp.pos = ring->add_func (pos, inc);
+      tmp.pos = ring->add (pos, inc);
       return tmp;
     }
 
     ///Addition assignment operator
     iterator_type<C_>& operator +=(size_t inc)
     {
-      pos = ring->add_func (pos, inc);
+      pos = ring->add (pos, inc);
       return *this;
     }
 
@@ -142,14 +142,14 @@ public:
     iterator_type<C_> operator -(size_t dec) const
     {
       iterator_type<C_> tmp = *this;
-      tmp.pos = ring->sub_func (pos, dec);
+      tmp.pos = ring->subtract (pos, dec);
       return tmp;
     }
 
     ///Subtraction assignment operator
     iterator_type<C_>& operator -=(size_t dec)
     {
-      pos = ring->sub_func (pos, dec);
+      pos = ring->subtract (pos, dec);
       return *this;
     }
 
@@ -424,7 +424,7 @@ public:
 private:
 
   /// increment an iterator index
-  size_t inc_func (size_t pos) const
+  size_t increment (size_t pos) const
   {
     if (cap && pos != (size_t)-1)
       pos = (pos + 1) % cap;
@@ -434,7 +434,7 @@ private:
   }
 
   /// decrement an iterator index
-  size_t dec_func (size_t pos) const
+  size_t decrement (size_t pos) const
   {
     if (cap)
     {
@@ -448,7 +448,7 @@ private:
 
 
   /// add a value an iterator index
-  size_t add_func (size_t oldpos, size_t delta) const
+  size_t add (size_t oldpos, size_t delta) const
   {
     if (cap && oldpos != -1)
     {
@@ -463,7 +463,7 @@ private:
   }
 
   /// subtract a value from an iterator index
-  size_t sub_func (size_t oldpos, size_t delta) const
+  size_t subtract (size_t oldpos, size_t delta) const
   {
     if (cap)
     {
