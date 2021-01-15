@@ -21,7 +21,6 @@ template <class T>
 class ring_buffer 
 {
 public:
-
   /// Iterator through the circular buffer
   template <bool C_>
   class iterator_type
@@ -36,6 +35,8 @@ public:
 
     ///Default constructor
     iterator_type<C_> () : ring (nullptr), pos (0) {}
+
+    //Implicit forms of copy constructor, destructor and assignment operator are OK
 
     ///Dereference operator
     reference operator *()
@@ -73,14 +74,14 @@ public:
     iterator_type<C_> operator ++ (int)
     {
       iterator_type<C_> tmp = *this;
-      add (1);
+      pos = ring->inc_func (pos);
       return tmp;
     }
 
     ///Increment operator (prefix)
     iterator_type<C_>& operator ++ ()
     {
-      add (1);
+      pos = ring->inc_func (pos);
       return *this;
     }
 
@@ -88,14 +89,14 @@ public:
     iterator_type<C_> operator -- (int)
     {
       iterator_type<C_> tmp = *this;
-      sub (1);
+      pos = ring->dec_func (pos);
       return tmp;
     }
 
     ///Decrement operator (prefix)
     iterator_type<C_>& operator -- ()
     {
-      sub (1);
+      pos = ring->dec_func (pos);
       return *this;
     }
 
@@ -110,6 +111,7 @@ public:
     {
       return !operator == (it);
     }
+
     ///Assignment operator
     iterator_type<C_>& operator = (const iterator_type<C_>& rhs)
     {
@@ -125,14 +127,14 @@ public:
     iterator_type<C_> operator +(size_t inc) const
     {
       iterator_type<C_> tmp = *this;
-      tmp.add (inc);
+      tmp.pos = ring->add_func (pos, inc);
       return tmp;
     }
 
     ///Addition assignment operator
     iterator_type<C_>& operator +=(size_t inc)
     {
-      add (inc);
+      pos = ring->add_func (pos, inc);
       return *this;
     }
 
@@ -140,14 +142,14 @@ public:
     iterator_type<C_> operator -(size_t dec) const
     {
       iterator_type<C_> tmp = *this;
-      tmp.sub (dec);
+      tmp.pos = ring->sub_func (pos, dec);
       return tmp;
     }
 
     ///Subtraction assignment operator
     iterator_type<C_>& operator -=(size_t dec)
     {
-      sub (dec);
+      pos = ring->sub_func (pos, dec);
       return *this;
     }
 
@@ -155,7 +157,7 @@ public:
     ptrdiff_t operator -(const iterator_type<C_>& other) const
     {
       assert (ring == other.ring);
-      size_t p1 = (pos != -1) ? pos : (ring->back_idx == ring->front_idx) ? ring->sz : ring->back_idx;
+      size_t p1 = (pos != -1)? pos : (ring->back_idx == ring->front_idx)? ring->sz : ring->back_idx;
       size_t p2 = (other.pos != -1) ? other.pos : (ring->back_idx == ring->front_idx) ? ring->sz : ring->back_idx;
       if (p1 >= p2)
         return p1 - p2;
@@ -170,39 +172,9 @@ public:
     {
     }
 
-    // addition and increment helper function
-    void add (size_t inc)
-    {
-      if (!ring->cap || pos == -1 || !inc)
-        return;
-
-      inc %= ring->cap;
-      pos = (pos + inc) % ring->cap;
-      if ((pos >= ring->back_idx) && 
-          ((ring->back_idx >= ring->front_idx) || (pos < ring->front_idx)))
-        pos = -1;
-    }
-
-    // subtraction and decrement helper function
-    void sub (size_t dec)
-    {
-      if (!ring->cap || pos == ring->front_idx || !dec)
-        return;
-      if (pos == (size_t)(-1))
-        pos = ring->back_idx;
-
-      pos = pos - (dec % ring->cap);
-      if (pos < 0)
-        pos += ring->cap;
-
-      if (pos >= ring->back_idx && pos < ring->front_idx)
-        pos = ring->front_idx;
-    }
-
     const ring_buffer* ring;
     size_t pos;
     friend class ring_buffer;
-
   };
 
   typedef iterator_type<false> iterator;
@@ -330,25 +302,37 @@ public:
   }
 
   ///Return an iterator pointing to first (oldest) element in buffer
-  iterator begin () const
+  iterator begin ()
   {
     return iterator (this, front_idx);
   }
 
   ///Return a const iterator pointing to first (oldest) element in buffer
-  const_iterator cbegin () const
+  const_iterator begin () const
+  {
+    return const_iterator (this, front_idx);
+  }
+
+  ///Return a const iterator pointing to first (oldest) element in buffer
+  const_iterator cbegin ()
   {
     return const_iterator (this, front_idx);
   }
 
   ///Return an iterator pointing past the last (newest) element in buffer
-  iterator end () const
+  iterator end ()
   {
     return iterator (this, (size_t)(-1));
   }
 
   ///Return a const iterator pointing past the last (newest) element in buffer
-  const_iterator cend () const
+  const_iterator end () const
+  {
+    return const_iterator (this, (size_t)(-1));
+  }
+
+  ///Return an iterator pointing past the last (newest) element in buffer
+  const_iterator cend ()
   {
     return const_iterator (this, (size_t)(-1));
   }
@@ -369,8 +353,20 @@ public:
     return buf[front_idx];
   }
 
+  /// Return a reference to first (oldest) element in buffer.
+  const T& front () const
+  {
+    return buf[front_idx];
+  }
+
   /// Return reference to last (newest) element in buffer.
   T& back ()
+  {
+    return buf[(back_idx + cap - 1) % cap];
+  }
+
+  /// Return reference to last (newest) element in buffer.
+  const T& back () const
   {
     return buf[(back_idx + cap - 1) % cap];
   }
@@ -389,13 +385,13 @@ public:
   }
 
   ///Return true if buffer is full
-  bool full (void)
+  bool full (void) const
   {
     return (sz == cap);
   }
 
   ///Return maximum buffer size
-  size_t capacity (void)
+  size_t capacity (void) const
   {
     return cap;
   };
@@ -426,6 +422,61 @@ public:
   }
 
 private:
+
+  /// increment an iterator index
+  size_t inc_func (size_t pos) const
+  {
+    if (cap && pos != (size_t)-1)
+      pos = (pos + 1) % cap;
+    if (pos == back_idx)
+      pos = (size_t)-1;
+    return pos;
+  }
+
+  /// decrement an iterator index
+  size_t dec_func (size_t pos) const
+  {
+    if (cap)
+    {
+      if (pos == (size_t)-1)
+        pos = (back_idx + cap - 1) % cap;
+      else if (pos != front_idx)
+        pos = (pos + cap - 1) % cap;
+    }
+    return pos;
+  }
+
+
+  /// add a value an iterator index
+  size_t add_func (size_t oldpos, size_t delta) const
+  {
+    if (cap && oldpos != -1)
+    {
+      size_t np = oldpos + (delta % cap);
+      if (np >= cap && np >= back_idx + cap)
+        np = (size_t)(-1);
+      else
+        np %= cap;
+      return np;
+    }
+    return oldpos;
+  }
+
+  /// subtract a value from an iterator index
+  size_t sub_func (size_t oldpos, size_t delta) const
+  {
+    if (cap)
+    {
+      size_t np = (oldpos == (size_t)-1 ? back_idx : oldpos) - (delta % cap) + cap;
+      if (np < front_idx)
+        np = front_idx;
+      else
+        np %= cap;
+      return np;
+    }
+    return oldpos;
+  }
+
   std::unique_ptr<T[]> buf;
   size_t front_idx, back_idx, cap, sz;
 

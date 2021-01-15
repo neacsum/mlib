@@ -217,6 +217,21 @@ SUITE (RingBuffer)
     // VERIFY: end points one after the object pushed
     CHECK_EQUAL (100, *--eptr);
   }
+  TEST (const_buffer)
+  {
+    ring_buffer<int> b1 (10);
+    for (int i = 1; i <= 10; i++)
+      b1.push_back (i);
+
+    const ring_buffer<int> b2 (b1);
+    auto p1 = b1.cbegin ();
+    auto p2 = b2.begin ();
+
+    while (p1 != b1.cend ())
+    {
+      CHECK (*p1++ == *p2++);
+    }
+  }
 
   TEST (begin)
   {
