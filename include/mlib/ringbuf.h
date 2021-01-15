@@ -1,12 +1,15 @@
 /*!
   \file ringbuf.h Simple circular (ring) buffer class
 
-  (c) Mircea Neacsu 2018
+  (c) Mircea Neacsu 2018-2021. Licensed under MIT License.
+  This is part of MLIB project. See README file for full license terms.
+  (https://github.com/neacsum/mlib#readme)
 */
 #pragma once
 
 #include <memory>
 #include <vector>
+#include <stdexcept>
 #include <assert.h>
 
 #if __has_include ("defs.h")
