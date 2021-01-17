@@ -14,10 +14,10 @@
 #include <assert.h>
 #include <ostream>
 
+namespace mlib {
+
 /// \addtogroup tvops
 /// @{
-
-namespace mlib {
 
 timeval  operator +(const timeval& t1, const timeval& t2);
 timeval  operator -(const timeval& t1, const timeval& t2);
@@ -218,6 +218,7 @@ operator << (::std::ostream& os, const timeval& tv)
   return os;
 }
 
-}
 /// @}
+
+}
 

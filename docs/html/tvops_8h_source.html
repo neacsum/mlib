@@ -57,19 +57,19 @@ $(function() {
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor">#include &lt;assert.h&gt;</span></div>
 <div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="preprocessor">#include &lt;ostream&gt;</span></div>
 <div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160; </div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160; </div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="keyword">namespace </span>mlib {</div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="keyword">namespace </span>mlib {</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160; </div>
 <div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160; </div>
-<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;timeval  operator +(<span class="keyword">const</span> timeval&amp; t1, <span class="keyword">const</span> timeval&amp; t2);</div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;timeval  operator -(<span class="keyword">const</span> timeval&amp; t1, <span class="keyword">const</span> timeval&amp; t2);</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;timeval&amp; operator +=(timeval&amp; lhs, <span class="keyword">const</span> timeval&amp; rhs);</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;timeval&amp; operator -=(timeval&amp; lhs, <span class="keyword">const</span> timeval&amp; rhs);</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;timeval  operator *(<span class="keyword">const</span> timeval&amp; op1, <span class="keywordtype">int</span> op2);</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;timeval  operator *(<span class="keywordtype">int</span> op1, <span class="keyword">const</span> timeval&amp; op2);</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;timeval  operator /(<span class="keyword">const</span> timeval&amp; op1, <span class="keywordtype">int</span> op2);</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="keywordtype">int</span>      operator &lt;(<span class="keyword">const</span> timeval&amp; t1, <span class="keyword">const</span> timeval&amp; t2);</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="keywordtype">int</span>      operator ==(<span class="keyword">const</span> timeval&amp; t1, <span class="keyword">const</span> timeval&amp; t2);</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="keywordtype">int</span>      operator !=(<span class="keyword">const</span> timeval&amp; t1, <span class="keyword">const</span> timeval&amp; t2);</div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;timeval  <a class="code" href="group__tvops.html#ga0f5252087ba58a4e0a2c46a2bc85be23">operator +</a>(<span class="keyword">const</span> timeval&amp; t1, <span class="keyword">const</span> timeval&amp; t2);</div>
+<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;timeval  <a class="code" href="group__tvops.html#ga974812a18f8bbba45a2cf9a7090a2746">operator -</a>(<span class="keyword">const</span> timeval&amp; t1, <span class="keyword">const</span> timeval&amp; t2);</div>
+<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;timeval&amp; <a class="code" href="group__tvops.html#ga6a4c00218f422f26c52fad9f75bf766d">operator +=</a>(timeval&amp; lhs, <span class="keyword">const</span> timeval&amp; rhs);</div>
+<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;timeval&amp; <a class="code" href="group__tvops.html#gafb390d08250646590904b32c41738b49">operator -=</a>(timeval&amp; lhs, <span class="keyword">const</span> timeval&amp; rhs);</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;timeval  <a class="code" href="group__tvops.html#ga49fc81167454267df8befe75c6e95a03">operator *</a>(<span class="keyword">const</span> timeval&amp; op1, <span class="keywordtype">int</span> op2);</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;timeval  <a class="code" href="group__tvops.html#ga49fc81167454267df8befe75c6e95a03">operator *</a>(<span class="keywordtype">int</span> op1, <span class="keyword">const</span> timeval&amp; op2);</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;timeval  <a class="code" href="group__tvops.html#ga8ee85630ae5363cd2e3fe4976c220648">operator /</a>(<span class="keyword">const</span> timeval&amp; op1, <span class="keywordtype">int</span> op2);</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="keywordtype">int</span>      <a class="code" href="group__tvops.html#ga11a4cc82d495de77f363b5afcdc54586">operator &lt;</a>(<span class="keyword">const</span> timeval&amp; t1, <span class="keyword">const</span> timeval&amp; t2);</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="keywordtype">int</span>      <a class="code" href="group__tvops.html#gaf8b8a502ea67c91d9132f7e9756cd9a7">operator ==</a>(<span class="keyword">const</span> timeval&amp; t1, <span class="keyword">const</span> timeval&amp; t2);</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="keywordtype">int</span>      <a class="code" href="group__tvops.html#gacebc923d06737623bd7b07185dcf305e">operator !=</a>(<span class="keyword">const</span> timeval&amp; t1, <span class="keyword">const</span> timeval&amp; t2);</div>
 <div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160; </div>
 <div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="preprocessor">#if 0</span></div>
 <div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="comment">//conversion to/from milliseconds since midnight</span></div>
@@ -78,11 +78,11 @@ $(function() {
 <div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160; </div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="comment">//conversion to/from microseconds</span></div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;LONGLONG <a class="code" href="tvops_8h.html#a3144bbe6d0e9039416d24e3bb071ab48">usec64</a> (<span class="keyword">const</span> timeval&amp; tv);</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;timeval <a class="code" href="tvops_8h.html#ae11e48cbbabd6624fd9a4a0594505b56">fromusec</a> (LONGLONG us);</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;LONGLONG <a class="code" href="group__tvops.html#ga3144bbe6d0e9039416d24e3bb071ab48">usec64</a> (<span class="keyword">const</span> timeval&amp; tv);</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;timeval <a class="code" href="group__tvops.html#gae11e48cbbabd6624fd9a4a0594505b56">fromusec</a> (LONGLONG us);</div>
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160; </div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="comment">//conversion to seconds</span></div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="keywordtype">double</span> <a class="code" href="tvops_8h.html#a0c401fe72eafa43bc415cd1614ba656d">secd</a> (<span class="keyword">const</span> timeval&amp; tv);</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="keywordtype">double</span> <a class="code" href="group__tvops.html#ga0c401fe72eafa43bc415cd1614ba656d">secd</a> (<span class="keyword">const</span> timeval&amp; tv);</div>
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160; </div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;timeval <a class="code" href="group__tvops.html#gaa6d1e7bbb58d01cc31470eb445bffeeb">fromsystime</a> (<span class="keyword">const</span> SYSTEMTIME&amp; st);</div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="keywordtype">void</span> <a class="code" href="group__tvops.html#ga1315651d93c12e11b3121d229e274031">tosystime</a> (<span class="keyword">const</span> timeval&amp; tv, SYSTEMTIME* st);</div>
@@ -91,12 +91,12 @@ $(function() {
 <div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160; </div>
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="keywordtype">void</span> <a class="code" href="group__tvops.html#gaaecd65e98ac73dc18391c7dedc86ae9a">normalize</a> (timeval&amp; tv);</div>
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160; </div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;timeval <a class="code" href="tvops_8h.html#a7874a8718eb4ea9ad8dc0e1a1f999b1c">fromdouble</a> (<span class="keywordtype">double</span> d);</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;timeval <a class="code" href="group__tvops.html#ga7874a8718eb4ea9ad8dc0e1a1f999b1c">fromdouble</a> (<span class="keywordtype">double</span> d);</div>
 <div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160; </div>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;<span class="comment">// Inline implementations ----------------------------------------------------</span></div>
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160; </div>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="keyword">inline</span> timeval </div>
-<div class="line"><a name="l00059"></a><span class="lineno"><a class="line" href="tvops_8h.html#a0f5252087ba58a4e0a2c46a2bc85be23">   59</a></span>&#160;operator +(<span class="keyword">const</span> timeval&amp; t1, <span class="keyword">const</span> timeval&amp; t2)</div>
+<div class="line"><a name="l00059"></a><span class="lineno"><a class="line" href="group__tvops.html#ga0f5252087ba58a4e0a2c46a2bc85be23">   59</a></span>&#160;<a class="code" href="group__tvops.html#ga0f5252087ba58a4e0a2c46a2bc85be23">operator +</a>(<span class="keyword">const</span> timeval&amp; t1, <span class="keyword">const</span> timeval&amp; t2)</div>
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;{</div>
 <div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;  timeval ans;</div>
 <div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;  ans.tv_usec = t1.tv_usec + t2.tv_usec;</div>
@@ -106,7 +106,7 @@ $(function() {
 <div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;}</div>
 <div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160; </div>
 <div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="keyword">inline</span> timeval</div>
-<div class="line"><a name="l00070"></a><span class="lineno"><a class="line" href="tvops_8h.html#a974812a18f8bbba45a2cf9a7090a2746">   70</a></span>&#160;operator -(<span class="keyword">const</span> timeval&amp; t1, <span class="keyword">const</span> timeval&amp; t2)</div>
+<div class="line"><a name="l00070"></a><span class="lineno"><a class="line" href="group__tvops.html#ga974812a18f8bbba45a2cf9a7090a2746">   70</a></span>&#160;<a class="code" href="group__tvops.html#ga974812a18f8bbba45a2cf9a7090a2746">operator -</a>(<span class="keyword">const</span> timeval&amp; t1, <span class="keyword">const</span> timeval&amp; t2)</div>
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;{</div>
 <div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;  timeval ans;</div>
 <div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;  </div>
@@ -117,7 +117,7 @@ $(function() {
 <div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;}</div>
 <div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160; </div>
 <div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;<span class="keyword">inline</span> timeval&amp;</div>
-<div class="line"><a name="l00082"></a><span class="lineno"><a class="line" href="tvops_8h.html#a6a4c00218f422f26c52fad9f75bf766d">   82</a></span>&#160;operator += (timeval&amp; lhs, <span class="keyword">const</span> timeval&amp; rhs)</div>
+<div class="line"><a name="l00082"></a><span class="lineno"><a class="line" href="group__tvops.html#ga6a4c00218f422f26c52fad9f75bf766d">   82</a></span>&#160;<a class="code" href="group__tvops.html#ga6a4c00218f422f26c52fad9f75bf766d">operator += </a>(timeval&amp; lhs, <span class="keyword">const</span> timeval&amp; rhs)</div>
 <div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;{</div>
 <div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;  lhs.tv_usec += rhs.tv_usec;</div>
 <div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;  lhs.tv_sec += rhs.tv_sec;</div>
@@ -126,7 +126,7 @@ $(function() {
 <div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;}</div>
 <div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160; </div>
 <div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;<span class="keyword">inline</span> timeval&amp;</div>
-<div class="line"><a name="l00092"></a><span class="lineno"><a class="line" href="tvops_8h.html#afb390d08250646590904b32c41738b49">   92</a></span>&#160;operator -= (timeval&amp; lhs, <span class="keyword">const</span> timeval&amp; rhs)</div>
+<div class="line"><a name="l00092"></a><span class="lineno"><a class="line" href="group__tvops.html#gafb390d08250646590904b32c41738b49">   92</a></span>&#160;<a class="code" href="group__tvops.html#gafb390d08250646590904b32c41738b49">operator -= </a>(timeval&amp; lhs, <span class="keyword">const</span> timeval&amp; rhs)</div>
 <div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;{</div>
 <div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;  lhs.tv_usec -= rhs.tv_usec;</div>
 <div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;  lhs.tv_sec -= rhs.tv_sec;</div>
@@ -135,19 +135,19 @@ $(function() {
 <div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;}</div>
 <div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160; </div>
 <div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">double</span> </div>
-<div class="line"><a name="l00102"></a><span class="lineno"><a class="line" href="tvops_8h.html#a0c401fe72eafa43bc415cd1614ba656d">  102</a></span>&#160;<a class="code" href="tvops_8h.html#a0c401fe72eafa43bc415cd1614ba656d">secd</a> (<span class="keyword">const</span> timeval&amp; tv)</div>
+<div class="line"><a name="l00102"></a><span class="lineno"><a class="line" href="group__tvops.html#ga0c401fe72eafa43bc415cd1614ba656d">  102</a></span>&#160;<a class="code" href="group__tvops.html#ga0c401fe72eafa43bc415cd1614ba656d">secd</a> (<span class="keyword">const</span> timeval&amp; tv)</div>
 <div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;{</div>
 <div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;  <span class="keywordflow">return</span> tv.tv_sec + (double)tv.tv_usec/1000000;</div>
 <div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;}</div>
 <div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160; </div>
 <div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;<span class="keyword">inline</span> LONGLONG </div>
-<div class="line"><a name="l00109"></a><span class="lineno"><a class="line" href="tvops_8h.html#a3144bbe6d0e9039416d24e3bb071ab48">  109</a></span>&#160;<a class="code" href="tvops_8h.html#a3144bbe6d0e9039416d24e3bb071ab48">usec64</a> (<span class="keyword">const</span> timeval&amp; tv)</div>
+<div class="line"><a name="l00109"></a><span class="lineno"><a class="line" href="group__tvops.html#ga3144bbe6d0e9039416d24e3bb071ab48">  109</a></span>&#160;<a class="code" href="group__tvops.html#ga3144bbe6d0e9039416d24e3bb071ab48">usec64</a> (<span class="keyword">const</span> timeval&amp; tv)</div>
 <div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;{</div>
 <div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;  <span class="keywordflow">return</span> (LONGLONG)tv.tv_sec * 1000000L + (LONGLONG)tv.tv_usec;</div>
 <div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;}</div>
 <div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160; </div>
 <div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;<span class="keyword">inline</span> timeval</div>
-<div class="line"><a name="l00116"></a><span class="lineno"><a class="line" href="tvops_8h.html#ae11e48cbbabd6624fd9a4a0594505b56">  116</a></span>&#160;<a class="code" href="tvops_8h.html#ae11e48cbbabd6624fd9a4a0594505b56">fromusec</a> (LONGLONG us)</div>
+<div class="line"><a name="l00116"></a><span class="lineno"><a class="line" href="group__tvops.html#gae11e48cbbabd6624fd9a4a0594505b56">  116</a></span>&#160;<a class="code" href="group__tvops.html#gae11e48cbbabd6624fd9a4a0594505b56">fromusec</a> (LONGLONG us)</div>
 <div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;{</div>
 <div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;  timeval tv;</div>
 <div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;  tv.tv_sec = (int)(us / 1000000L);</div>
@@ -156,7 +156,7 @@ $(function() {
 <div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;}</div>
 <div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160; </div>
 <div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;<span class="keyword">inline</span> timeval</div>
-<div class="line"><a name="l00126"></a><span class="lineno"><a class="line" href="tvops_8h.html#a7874a8718eb4ea9ad8dc0e1a1f999b1c">  126</a></span>&#160;<a class="code" href="tvops_8h.html#a7874a8718eb4ea9ad8dc0e1a1f999b1c">fromdouble</a> (<span class="keywordtype">double</span> d)</div>
+<div class="line"><a name="l00126"></a><span class="lineno"><a class="line" href="group__tvops.html#ga7874a8718eb4ea9ad8dc0e1a1f999b1c">  126</a></span>&#160;<a class="code" href="group__tvops.html#ga7874a8718eb4ea9ad8dc0e1a1f999b1c">fromdouble</a> (<span class="keywordtype">double</span> d)</div>
 <div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;{</div>
 <div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;  timeval tv;</div>
 <div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;  tv.tv_sec = (long)d;</div>
@@ -165,7 +165,7 @@ $(function() {
 <div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;}</div>
 <div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160; </div>
 <div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;<span class="keyword">inline</span> timeval </div>
-<div class="line"><a name="l00136"></a><span class="lineno"><a class="line" href="tvops_8h.html#a8f4a49dfacc1c246c102076f4bfe4cab">  136</a></span>&#160;operator *(<span class="keyword">const</span> timeval&amp; op1, <span class="keywordtype">int</span> op2)</div>
+<div class="line"><a name="l00136"></a><span class="lineno"><a class="line" href="group__tvops.html#ga8f4a49dfacc1c246c102076f4bfe4cab">  136</a></span>&#160;<a class="code" href="group__tvops.html#ga49fc81167454267df8befe75c6e95a03">operator *</a>(<span class="keyword">const</span> timeval&amp; op1, <span class="keywordtype">int</span> op2)</div>
 <div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;{</div>
 <div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;  timeval tv;</div>
 <div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160; </div>
@@ -176,13 +176,13 @@ $(function() {
 <div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;}</div>
 <div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160; </div>
 <div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;<span class="keyword">inline</span> timeval</div>
-<div class="line"><a name="l00148"></a><span class="lineno"><a class="line" href="tvops_8h.html#a49fc81167454267df8befe75c6e95a03">  148</a></span>&#160;operator *(<span class="keywordtype">int</span> op1, <span class="keyword">const</span> timeval&amp; op2)</div>
+<div class="line"><a name="l00148"></a><span class="lineno"><a class="line" href="group__tvops.html#ga49fc81167454267df8befe75c6e95a03">  148</a></span>&#160;<a class="code" href="group__tvops.html#ga49fc81167454267df8befe75c6e95a03">operator *</a>(<span class="keywordtype">int</span> op1, <span class="keyword">const</span> timeval&amp; op2)</div>
 <div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;{</div>
 <div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;  <span class="keywordflow">return</span> op2*op1;</div>
 <div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;}</div>
 <div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160; </div>
 <div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;<span class="keyword">inline</span> timeval</div>
-<div class="line"><a name="l00155"></a><span class="lineno"><a class="line" href="tvops_8h.html#a8ee85630ae5363cd2e3fe4976c220648">  155</a></span>&#160;operator /(<span class="keyword">const</span> timeval&amp; op1, <span class="keywordtype">int</span> op2)</div>
+<div class="line"><a name="l00155"></a><span class="lineno"><a class="line" href="group__tvops.html#ga8ee85630ae5363cd2e3fe4976c220648">  155</a></span>&#160;<a class="code" href="group__tvops.html#ga8ee85630ae5363cd2e3fe4976c220648">operator /</a>(<span class="keyword">const</span> timeval&amp; op1, <span class="keywordtype">int</span> op2)</div>
 <div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;{</div>
 <div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;  timeval tv;</div>
 <div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;  tv.tv_usec = op1.tv_usec / op2;</div>
@@ -191,8 +191,8 @@ $(function() {
 <div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;  <span class="keywordflow">return</span> tv;</div>
 <div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;}</div>
 <div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160; </div>
-<div class="line"><a name="l00165"></a><span class="lineno"><a class="line" href="tvops_8h.html#a11a4cc82d495de77f363b5afcdc54586">  165</a></span>&#160;<span class="keyword">inline</span> <span class="keywordtype">int</span> </div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;operator &lt;(<span class="keyword">const</span> timeval&amp; t1, <span class="keyword">const</span> timeval&amp; t2)</div>
+<div class="line"><a name="l00165"></a><span class="lineno"><a class="line" href="group__tvops.html#ga11a4cc82d495de77f363b5afcdc54586">  165</a></span>&#160;<span class="keyword">inline</span> <span class="keywordtype">int</span> </div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;<a class="code" href="group__tvops.html#ga11a4cc82d495de77f363b5afcdc54586">operator &lt;</a>(<span class="keyword">const</span> timeval&amp; t1, <span class="keyword">const</span> timeval&amp; t2)</div>
 <div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;{</div>
 <div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;  <span class="keywordflow">if</span> (t1.tv_sec != t2.tv_sec)</div>
 <div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;    <span class="keywordflow">return</span> (t1.tv_sec &lt; t2.tv_sec);</div>
@@ -201,7 +201,7 @@ $(function() {
 <div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;}</div>
 <div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160; </div>
 <div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">int</span></div>
-<div class="line"><a name="l00176"></a><span class="lineno"><a class="line" href="tvops_8h.html#a2bff4fde086df825c07c9937594591b4">  176</a></span>&#160;operator &gt;(<span class="keyword">const</span> timeval&amp; t1, <span class="keyword">const</span> timeval&amp; t2)</div>
+<div class="line"><a name="l00176"></a><span class="lineno"><a class="line" href="group__tvops.html#ga2bff4fde086df825c07c9937594591b4">  176</a></span>&#160;<a class="code" href="group__tvops.html#ga2bff4fde086df825c07c9937594591b4">operator &gt;</a>(<span class="keyword">const</span> timeval&amp; t1, <span class="keyword">const</span> timeval&amp; t2)</div>
 <div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;{</div>
 <div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;  <span class="keywordflow">if</span> (t1.tv_sec != t2.tv_sec)</div>
 <div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;    <span class="keywordflow">return</span> (t1.tv_sec &gt; t2.tv_sec);</div>
@@ -210,7 +210,7 @@ $(function() {
 <div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;}</div>
 <div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160; </div>
 <div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">int</span> </div>
-<div class="line"><a name="l00186"></a><span class="lineno"><a class="line" href="tvops_8h.html#af8b8a502ea67c91d9132f7e9756cd9a7">  186</a></span>&#160;operator ==(<span class="keyword">const</span> timeval&amp; t1, <span class="keyword">const</span> timeval&amp; t2)</div>
+<div class="line"><a name="l00186"></a><span class="lineno"><a class="line" href="group__tvops.html#gaf8b8a502ea67c91d9132f7e9756cd9a7">  186</a></span>&#160;<a class="code" href="group__tvops.html#gaf8b8a502ea67c91d9132f7e9756cd9a7">operator ==</a>(<span class="keyword">const</span> timeval&amp; t1, <span class="keyword">const</span> timeval&amp; t2)</div>
 <div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;{</div>
 <div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;  <span class="keywordflow">if</span> (t1.tv_sec == t2.tv_sec)</div>
 <div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;    <span class="keywordflow">return</span>  (t1.tv_usec == t2.tv_usec);</div>
@@ -218,19 +218,19 @@ $(function() {
 <div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;}</div>
 <div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160; </div>
 <div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">int</span></div>
-<div class="line"><a name="l00195"></a><span class="lineno"><a class="line" href="tvops_8h.html#acebc923d06737623bd7b07185dcf305e">  195</a></span>&#160;operator !=(<span class="keyword">const</span> timeval&amp; t1, <span class="keyword">const</span> timeval&amp; t2)</div>
+<div class="line"><a name="l00195"></a><span class="lineno"><a class="line" href="group__tvops.html#gacebc923d06737623bd7b07185dcf305e">  195</a></span>&#160;<a class="code" href="group__tvops.html#gacebc923d06737623bd7b07185dcf305e">operator !=</a>(<span class="keyword">const</span> timeval&amp; t1, <span class="keyword">const</span> timeval&amp; t2)</div>
 <div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;{</div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;  <span class="keywordflow">return</span> !<a class="code" href="tvops_8h.html#af8b8a502ea67c91d9132f7e9756cd9a7">operator==</a>(t1, t2);</div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;  <span class="keywordflow">return</span> !<a class="code" href="group__tvops.html#gaf8b8a502ea67c91d9132f7e9756cd9a7">operator==</a>(t1, t2);</div>
 <div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;}</div>
 <div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160; </div>
 <div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;<span class="keyword">inline</span> <span class="keywordtype">int</span></div>
-<div class="line"><a name="l00202"></a><span class="lineno"><a class="line" href="tvops_8h.html#ad3ac7043dd85c0f6584643192e7fdea7">  202</a></span>&#160;operator &gt;=(<span class="keyword">const</span> timeval&amp; t1, <span class="keyword">const</span> timeval&amp; t2)</div>
+<div class="line"><a name="l00202"></a><span class="lineno"><a class="line" href="group__tvops.html#gad3ac7043dd85c0f6584643192e7fdea7">  202</a></span>&#160;<a class="code" href="group__tvops.html#gad3ac7043dd85c0f6584643192e7fdea7">operator &gt;=</a>(<span class="keyword">const</span> timeval&amp; t1, <span class="keyword">const</span> timeval&amp; t2)</div>
 <div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;{</div>
 <div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;  <span class="keywordflow">return</span> (t1 &gt; t2) || (t1 == t2);</div>
 <div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;}</div>
 <div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160; </div>
-<div class="line"><a name="l00208"></a><span class="lineno"><a class="line" href="tvops_8h.html#a4a5e556c8cf1147052619c8e46b655f8">  208</a></span>&#160;<span class="keyword">inline</span> <span class="keywordtype">int</span></div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;operator &lt;=(<span class="keyword">const</span> timeval&amp; t1, <span class="keyword">const</span> timeval&amp; t2)</div>
+<div class="line"><a name="l00208"></a><span class="lineno"><a class="line" href="group__tvops.html#ga4a5e556c8cf1147052619c8e46b655f8">  208</a></span>&#160;<span class="keyword">inline</span> <span class="keywordtype">int</span></div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;<a class="code" href="group__tvops.html#ga4a5e556c8cf1147052619c8e46b655f8">operator &lt;=</a>(<span class="keyword">const</span> timeval&amp; t1, <span class="keyword">const</span> timeval&amp; t2)</div>
 <div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;{</div>
 <div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;  <span class="keywordflow">return</span> (t1 &lt; t2) || (t1 == t2);</div>
 <div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;}</div>
@@ -242,21 +242,33 @@ $(function() {
 <div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;  <span class="keywordflow">return</span> os;</div>
 <div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;}</div>
 <div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160; </div>
-<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;}</div>
-<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160; </div>
+<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160; </div>
+<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;}</div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160; </div>
 </div><!-- fragment --></div><!-- contents -->
 <div class="ttc" id="agroup__tvops_html_gaaaa4cb8bc206e0c71ecc4aa58b9678f1"><div class="ttname"><a href="group__tvops.html#gaaaa4cb8bc206e0c71ecc4aa58b9678f1">mlib::tolocaltime</a></div><div class="ttdeci">void tolocaltime(const timeval &amp;tv, SYSTEMTIME *st)</div><div class="ttdoc">Convert to local time (in a SYSTEMTIME structure)</div><div class="ttdef"><b>Definition:</b> tvops.cpp:65</div></div>
-<div class="ttc" id="atvops_8h_html_af8b8a502ea67c91d9132f7e9756cd9a7"><div class="ttname"><a href="tvops_8h.html#af8b8a502ea67c91d9132f7e9756cd9a7">mlib::operator==</a></div><div class="ttdeci">int operator==(const timeval &amp;t1, const timeval &amp;t2)</div><div class="ttdoc">Equality operator.</div><div class="ttdef"><b>Definition:</b> tvops.h:186</div></div>
+<div class="ttc" id="agroup__tvops_html_gad3ac7043dd85c0f6584643192e7fdea7"><div class="ttname"><a href="group__tvops.html#gad3ac7043dd85c0f6584643192e7fdea7">mlib::operator&gt;=</a></div><div class="ttdeci">int operator&gt;=(const timeval &amp;t1, const timeval &amp;t2)</div><div class="ttdoc">&quot;Greater or equal&quot; operator</div><div class="ttdef"><b>Definition:</b> tvops.h:202</div></div>
+<div class="ttc" id="agroup__tvops_html_ga0c401fe72eafa43bc415cd1614ba656d"><div class="ttname"><a href="group__tvops.html#ga0c401fe72eafa43bc415cd1614ba656d">mlib::secd</a></div><div class="ttdeci">double secd(const timeval &amp;tv)</div><div class="ttdoc">Conversion to floating-point seconds.</div><div class="ttdef"><b>Definition:</b> tvops.h:102</div></div>
+<div class="ttc" id="agroup__tvops_html_ga49fc81167454267df8befe75c6e95a03"><div class="ttname"><a href="group__tvops.html#ga49fc81167454267df8befe75c6e95a03">mlib::operator*</a></div><div class="ttdeci">timeval operator*(int op1, const timeval &amp;op2)</div><div class="ttdoc">Multiplication by an integer.</div><div class="ttdef"><b>Definition:</b> tvops.h:148</div></div>
+<div class="ttc" id="agroup__tvops_html_ga6a4c00218f422f26c52fad9f75bf766d"><div class="ttname"><a href="group__tvops.html#ga6a4c00218f422f26c52fad9f75bf766d">mlib::operator+=</a></div><div class="ttdeci">timeval &amp; operator+=(timeval &amp;lhs, const timeval &amp;rhs)</div><div class="ttdoc">Addition assignment operator.</div><div class="ttdef"><b>Definition:</b> tvops.h:82</div></div>
 <div class="ttc" id="agroup__tvops_html_gaaecd65e98ac73dc18391c7dedc86ae9a"><div class="ttname"><a href="group__tvops.html#gaaecd65e98ac73dc18391c7dedc86ae9a">mlib::normalize</a></div><div class="ttdeci">void normalize(timeval &amp;tv)</div><div class="ttdoc">Following an arithmetic operation, brings timeval structure to a canonical form where tv_usec is less...</div><div class="ttdef"><b>Definition:</b> tvops.cpp:80</div></div>
-<div class="ttc" id="atvops_8h_html_a0c401fe72eafa43bc415cd1614ba656d"><div class="ttname"><a href="tvops_8h.html#a0c401fe72eafa43bc415cd1614ba656d">mlib::secd</a></div><div class="ttdeci">double secd(const timeval &amp;tv)</div><div class="ttdoc">Conversion to floating-point seconds.</div><div class="ttdef"><b>Definition:</b> tvops.h:102</div></div>
+<div class="ttc" id="agroup__tvops_html_gaf8b8a502ea67c91d9132f7e9756cd9a7"><div class="ttname"><a href="group__tvops.html#gaf8b8a502ea67c91d9132f7e9756cd9a7">mlib::operator==</a></div><div class="ttdeci">int operator==(const timeval &amp;t1, const timeval &amp;t2)</div><div class="ttdoc">Equality operator.</div><div class="ttdef"><b>Definition:</b> tvops.h:186</div></div>
 <div class="ttc" id="agroup__tvops_html_gaa6d1e7bbb58d01cc31470eb445bffeeb"><div class="ttname"><a href="group__tvops.html#gaa6d1e7bbb58d01cc31470eb445bffeeb">mlib::fromsystime</a></div><div class="ttdeci">timeval fromsystime(const SYSTEMTIME &amp;st)</div><div class="ttdoc">Convert from UTC system time to Unix time scale (UTC form 01/01/70)</div><div class="ttdef"><b>Definition:</b> tvops.cpp:21</div></div>
-<div class="ttc" id="atvops_8h_html_a3144bbe6d0e9039416d24e3bb071ab48"><div class="ttname"><a href="tvops_8h.html#a3144bbe6d0e9039416d24e3bb071ab48">mlib::usec64</a></div><div class="ttdeci">LONGLONG usec64(const timeval &amp;tv)</div><div class="ttdoc">Conversion to 64-bit microseconds.</div><div class="ttdef"><b>Definition:</b> tvops.h:109</div></div>
-<div class="ttc" id="atvops_8h_html_ae11e48cbbabd6624fd9a4a0594505b56"><div class="ttname"><a href="tvops_8h.html#ae11e48cbbabd6624fd9a4a0594505b56">mlib::fromusec</a></div><div class="ttdeci">timeval fromusec(LONGLONG us)</div><div class="ttdoc">Conversion from 64-bit microseconds.</div><div class="ttdef"><b>Definition:</b> tvops.h:116</div></div>
-<div class="ttc" id="atvops_8h_html_a7874a8718eb4ea9ad8dc0e1a1f999b1c"><div class="ttname"><a href="tvops_8h.html#a7874a8718eb4ea9ad8dc0e1a1f999b1c">mlib::fromdouble</a></div><div class="ttdeci">timeval fromdouble(double d)</div><div class="ttdoc">Conversion from floating-point seconds.</div><div class="ttdef"><b>Definition:</b> tvops.h:126</div></div>
+<div class="ttc" id="agroup__tvops_html_ga8ee85630ae5363cd2e3fe4976c220648"><div class="ttname"><a href="group__tvops.html#ga8ee85630ae5363cd2e3fe4976c220648">mlib::operator/</a></div><div class="ttdeci">timeval operator/(const timeval &amp;op1, int op2)</div><div class="ttdoc">Division by an integer.</div><div class="ttdef"><b>Definition:</b> tvops.h:155</div></div>
+<div class="ttc" id="agroup__tvops_html_ga974812a18f8bbba45a2cf9a7090a2746"><div class="ttname"><a href="group__tvops.html#ga974812a18f8bbba45a2cf9a7090a2746">mlib::operator-</a></div><div class="ttdeci">timeval operator-(const timeval &amp;t1, const timeval &amp;t2)</div><div class="ttdoc">Subtraction operator.</div><div class="ttdef"><b>Definition:</b> tvops.h:70</div></div>
+<div class="ttc" id="agroup__tvops_html_gae11e48cbbabd6624fd9a4a0594505b56"><div class="ttname"><a href="group__tvops.html#gae11e48cbbabd6624fd9a4a0594505b56">mlib::fromusec</a></div><div class="ttdeci">timeval fromusec(LONGLONG us)</div><div class="ttdoc">Conversion from 64-bit microseconds.</div><div class="ttdef"><b>Definition:</b> tvops.h:116</div></div>
+<div class="ttc" id="agroup__tvops_html_gafb390d08250646590904b32c41738b49"><div class="ttname"><a href="group__tvops.html#gafb390d08250646590904b32c41738b49">mlib::operator-=</a></div><div class="ttdeci">timeval &amp; operator-=(timeval &amp;lhs, const timeval &amp;rhs)</div><div class="ttdoc">Subtraction assignment.</div><div class="ttdef"><b>Definition:</b> tvops.h:92</div></div>
+<div class="ttc" id="agroup__tvops_html_ga2bff4fde086df825c07c9937594591b4"><div class="ttname"><a href="group__tvops.html#ga2bff4fde086df825c07c9937594591b4">mlib::operator&gt;</a></div><div class="ttdeci">int operator&gt;(const timeval &amp;t1, const timeval &amp;t2)</div><div class="ttdoc">&quot;Greater than&quot; operator</div><div class="ttdef"><b>Definition:</b> tvops.h:176</div></div>
+<div class="ttc" id="agroup__tvops_html_ga4a5e556c8cf1147052619c8e46b655f8"><div class="ttname"><a href="group__tvops.html#ga4a5e556c8cf1147052619c8e46b655f8">mlib::operator&lt;=</a></div><div class="ttdeci">int operator&lt;=(const timeval &amp;t1, const timeval &amp;t2)</div><div class="ttdoc">&quot;Less or equal&quot; operator</div><div class="ttdef"><b>Definition:</b> tvops.h:209</div></div>
+<div class="ttc" id="agroup__tvops_html_ga0f5252087ba58a4e0a2c46a2bc85be23"><div class="ttname"><a href="group__tvops.html#ga0f5252087ba58a4e0a2c46a2bc85be23">mlib::operator+</a></div><div class="ttdeci">timeval operator+(const timeval &amp;t1, const timeval &amp;t2)</div><div class="ttdoc">Addition operator.</div><div class="ttdef"><b>Definition:</b> tvops.h:59</div></div>
+<div class="ttc" id="agroup__tvops_html_ga7874a8718eb4ea9ad8dc0e1a1f999b1c"><div class="ttname"><a href="group__tvops.html#ga7874a8718eb4ea9ad8dc0e1a1f999b1c">mlib::fromdouble</a></div><div class="ttdeci">timeval fromdouble(double d)</div><div class="ttdoc">Conversion from floating-point seconds.</div><div class="ttdef"><b>Definition:</b> tvops.h:126</div></div>
+<div class="ttc" id="agroup__tvops_html_gacebc923d06737623bd7b07185dcf305e"><div class="ttname"><a href="group__tvops.html#gacebc923d06737623bd7b07185dcf305e">mlib::operator!=</a></div><div class="ttdeci">int operator!=(const timeval &amp;t1, const timeval &amp;t2)</div><div class="ttdoc">Inequality operator.</div><div class="ttdef"><b>Definition:</b> tvops.h:195</div></div>
+<div class="ttc" id="agroup__tvops_html_ga11a4cc82d495de77f363b5afcdc54586"><div class="ttname"><a href="group__tvops.html#ga11a4cc82d495de77f363b5afcdc54586">mlib::operator&lt;</a></div><div class="ttdeci">int operator&lt;(const timeval &amp;t1, const timeval &amp;t2)</div><div class="ttdoc">&quot;Less than&quot; operator</div><div class="ttdef"><b>Definition:</b> tvops.h:166</div></div>
+<div class="ttc" id="agroup__tvops_html_ga3144bbe6d0e9039416d24e3bb071ab48"><div class="ttname"><a href="group__tvops.html#ga3144bbe6d0e9039416d24e3bb071ab48">mlib::usec64</a></div><div class="ttdeci">LONGLONG usec64(const timeval &amp;tv)</div><div class="ttdoc">Conversion to 64-bit microseconds.</div><div class="ttdef"><b>Definition:</b> tvops.h:109</div></div>
 <div class="ttc" id="agroup__tvops_html_ga1315651d93c12e11b3121d229e274031"><div class="ttname"><a href="group__tvops.html#ga1315651d93c12e11b3121d229e274031">mlib::tosystime</a></div><div class="ttdeci">void tosystime(const timeval &amp;tv, SYSTEMTIME *st)</div><div class="ttdoc">Convert from timeval format to SYSTEMTIME format.</div><div class="ttdef"><b>Definition:</b> tvops.cpp:34</div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat Jan 16 2021 21:31:05 for MLIB by &#160;<a href="http://www.doxygen.org/index.html">
+Generated by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.18
 </small></address>
