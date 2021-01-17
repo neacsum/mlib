@@ -218,6 +218,6 @@ operator << (::std::ostream& os, const timeval& tv)
   return os;
 }
 
-/*! @} */
 }
+/// @}
 

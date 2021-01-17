@@ -44,6 +44,7 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
+<a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="classmlib_1_1ring__buffer-members.html">List of all members</a>  </div>
   <div class="headertitle">
@@ -58,9 +59,18 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1ring__buffer_1_1iterator.html">iterator</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Iterator through the circular buffer.  <a href="classmlib_1_1ring__buffer_1_1iterator.html#details">More...</a><br /></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1ring__buffer_1_1iterator__type.html">iterator_type</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Iterator through the circular buffer.  <a href="classmlib_1_1ring__buffer_1_1iterator__type.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
+Public Types</h2></td></tr>
+<tr class="memitem:aa0f6ee584a8cd3e10883cc022024127e"><td class="memItemLeft" align="right" valign="top"><a id="aa0f6ee584a8cd3e10883cc022024127e"></a>
+typedef <a class="el" href="classmlib_1_1ring__buffer_1_1iterator__type.html">iterator_type</a>&lt; false &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>iterator</b></td></tr>
+<tr class="separator:aa0f6ee584a8cd3e10883cc022024127e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a419b6f6ea0ffa21589378fbae231b304"><td class="memItemLeft" align="right" valign="top"><a id="a419b6f6ea0ffa21589378fbae231b304"></a>
+typedef <a class="el" href="classmlib_1_1ring__buffer_1_1iterator__type.html">iterator_type</a>&lt; true &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>const_iterator</b></td></tr>
+<tr class="separator:a419b6f6ea0ffa21589378fbae231b304"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -100,14 +110,30 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1ring__buffer.html#a2d00fbeefbf0b42c2fad1f3a87166cfe">push_back</a> (const T &amp;item)</td></tr>
 <tr class="memdesc:a2d00fbeefbf0b42c2fad1f3a87166cfe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inserts new element in buffer. <br /></td></tr>
 <tr class="separator:a2d00fbeefbf0b42c2fad1f3a87166cfe"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a545e72bbd05d94e78188f87115c23852"><td class="memItemLeft" align="right" valign="top"><a id="a545e72bbd05d94e78188f87115c23852"></a>
-<a class="el" href="classmlib_1_1ring__buffer_1_1iterator.html">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1ring__buffer.html#a545e72bbd05d94e78188f87115c23852">begin</a> () const</td></tr>
-<tr class="memdesc:a545e72bbd05d94e78188f87115c23852"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return an iterator pointing to first (oldest) element in buffer. <br /></td></tr>
-<tr class="separator:a545e72bbd05d94e78188f87115c23852"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5cc8cb7decb94691a5767685bf125d95"><td class="memItemLeft" align="right" valign="top"><a id="a5cc8cb7decb94691a5767685bf125d95"></a>
-<a class="el" href="classmlib_1_1ring__buffer_1_1iterator.html">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1ring__buffer.html#a5cc8cb7decb94691a5767685bf125d95">end</a> () const</td></tr>
-<tr class="memdesc:a5cc8cb7decb94691a5767685bf125d95"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return an iterator pointing past the last (newest) element in buffer. <br /></td></tr>
-<tr class="separator:a5cc8cb7decb94691a5767685bf125d95"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae5d60364267451639f4d18d6205b28e2"><td class="memItemLeft" align="right" valign="top"><a id="ae5d60364267451639f4d18d6205b28e2"></a>
+<a class="el" href="classmlib_1_1ring__buffer_1_1iterator__type.html">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1ring__buffer.html#ae5d60364267451639f4d18d6205b28e2">begin</a> ()</td></tr>
+<tr class="memdesc:ae5d60364267451639f4d18d6205b28e2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return an iterator pointing to first (oldest) element in buffer. <br /></td></tr>
+<tr class="separator:ae5d60364267451639f4d18d6205b28e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8cf76cbb4e6b6c34eacb78de15d3e660"><td class="memItemLeft" align="right" valign="top"><a id="a8cf76cbb4e6b6c34eacb78de15d3e660"></a>
+<a class="el" href="classmlib_1_1ring__buffer_1_1iterator__type.html">const_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1ring__buffer.html#a8cf76cbb4e6b6c34eacb78de15d3e660">begin</a> () const</td></tr>
+<tr class="memdesc:a8cf76cbb4e6b6c34eacb78de15d3e660"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a const iterator pointing to first (oldest) element in buffer. <br /></td></tr>
+<tr class="separator:a8cf76cbb4e6b6c34eacb78de15d3e660"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aafc16286f1d76b05c7dcd9c5a1a5c2d3"><td class="memItemLeft" align="right" valign="top"><a id="aafc16286f1d76b05c7dcd9c5a1a5c2d3"></a>
+<a class="el" href="classmlib_1_1ring__buffer_1_1iterator__type.html">const_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1ring__buffer.html#aafc16286f1d76b05c7dcd9c5a1a5c2d3">cbegin</a> ()</td></tr>
+<tr class="memdesc:aafc16286f1d76b05c7dcd9c5a1a5c2d3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a const iterator pointing to first (oldest) element in buffer. <br /></td></tr>
+<tr class="separator:aafc16286f1d76b05c7dcd9c5a1a5c2d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab4024af4f054a09616ecbd79aebce79a"><td class="memItemLeft" align="right" valign="top"><a id="ab4024af4f054a09616ecbd79aebce79a"></a>
+<a class="el" href="classmlib_1_1ring__buffer_1_1iterator__type.html">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1ring__buffer.html#ab4024af4f054a09616ecbd79aebce79a">end</a> ()</td></tr>
+<tr class="memdesc:ab4024af4f054a09616ecbd79aebce79a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return an iterator pointing past the last (newest) element in buffer. <br /></td></tr>
+<tr class="separator:ab4024af4f054a09616ecbd79aebce79a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abc633fd5eac9d8485ad39dc0453d1ca5"><td class="memItemLeft" align="right" valign="top"><a id="abc633fd5eac9d8485ad39dc0453d1ca5"></a>
+<a class="el" href="classmlib_1_1ring__buffer_1_1iterator__type.html">const_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1ring__buffer.html#abc633fd5eac9d8485ad39dc0453d1ca5">end</a> () const</td></tr>
+<tr class="memdesc:abc633fd5eac9d8485ad39dc0453d1ca5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a const iterator pointing past the last (newest) element in buffer. <br /></td></tr>
+<tr class="separator:abc633fd5eac9d8485ad39dc0453d1ca5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae59843bca7ae81a15d44bf5a7be42cde"><td class="memItemLeft" align="right" valign="top"><a id="ae59843bca7ae81a15d44bf5a7be42cde"></a>
+<a class="el" href="classmlib_1_1ring__buffer_1_1iterator__type.html">const_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1ring__buffer.html#ae59843bca7ae81a15d44bf5a7be42cde">cend</a> ()</td></tr>
+<tr class="memdesc:ae59843bca7ae81a15d44bf5a7be42cde"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return an iterator pointing past the last (newest) element in buffer. <br /></td></tr>
+<tr class="separator:ae59843bca7ae81a15d44bf5a7be42cde"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0be1c0f29f34ce0d7e3c2f381d7ee5f6"><td class="memItemLeft" align="right" valign="top"><a id="a0be1c0f29f34ce0d7e3c2f381d7ee5f6"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1ring__buffer.html#a0be1c0f29f34ce0d7e3c2f381d7ee5f6">pop_front</a> ()</td></tr>
 <tr class="memdesc:a0be1c0f29f34ce0d7e3c2f381d7ee5f6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Remove oldest element from buffer. <br /></td></tr>
@@ -116,10 +142,18 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 T &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1ring__buffer.html#a501c4cb294b02e65b3cd623070974c28">front</a> ()</td></tr>
 <tr class="memdesc:a501c4cb294b02e65b3cd623070974c28"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a reference to first (oldest) element in buffer. <br /></td></tr>
 <tr class="separator:a501c4cb294b02e65b3cd623070974c28"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a30d850448f1b50cffa006f04c52e27be"><td class="memItemLeft" align="right" valign="top"><a id="a30d850448f1b50cffa006f04c52e27be"></a>
+const T &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1ring__buffer.html#a30d850448f1b50cffa006f04c52e27be">front</a> () const</td></tr>
+<tr class="memdesc:a30d850448f1b50cffa006f04c52e27be"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a reference to first (oldest) element in buffer. <br /></td></tr>
+<tr class="separator:a30d850448f1b50cffa006f04c52e27be"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a42254299dab25744eadeeab8c61cc4ad"><td class="memItemLeft" align="right" valign="top"><a id="a42254299dab25744eadeeab8c61cc4ad"></a>
 T &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1ring__buffer.html#a42254299dab25744eadeeab8c61cc4ad">back</a> ()</td></tr>
 <tr class="memdesc:a42254299dab25744eadeeab8c61cc4ad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return reference to last (newest) element in buffer. <br /></td></tr>
 <tr class="separator:a42254299dab25744eadeeab8c61cc4ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0800876107ffbf48f7aebc4a3506c557"><td class="memItemLeft" align="right" valign="top"><a id="a0800876107ffbf48f7aebc4a3506c557"></a>
+const T &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1ring__buffer.html#a0800876107ffbf48f7aebc4a3506c557">back</a> () const</td></tr>
+<tr class="memdesc:a0800876107ffbf48f7aebc4a3506c557"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return reference to last (newest) element in buffer. <br /></td></tr>
+<tr class="separator:a0800876107ffbf48f7aebc4a3506c557"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1aa4915ef722ed227f0ea96b59aab86a"><td class="memItemLeft" align="right" valign="top"><a id="a1aa4915ef722ed227f0ea96b59aab86a"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1ring__buffer.html#a1aa4915ef722ed227f0ea96b59aab86a">clear</a> (void)</td></tr>
 <tr class="memdesc:a1aa4915ef722ed227f0ea96b59aab86a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Remove all elements from buffer. <br /></td></tr>
@@ -128,14 +162,14 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1ring__buffer.html#a62ef16fef953e37b26074a8182b31e52">empty</a> (void)</td></tr>
 <tr class="memdesc:a62ef16fef953e37b26074a8182b31e52"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return true if buffer is empty. <br /></td></tr>
 <tr class="separator:a62ef16fef953e37b26074a8182b31e52"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a09e66ce53afde10767142b861995e678"><td class="memItemLeft" align="right" valign="top"><a id="a09e66ce53afde10767142b861995e678"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1ring__buffer.html#a09e66ce53afde10767142b861995e678">full</a> (void)</td></tr>
-<tr class="memdesc:a09e66ce53afde10767142b861995e678"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return true if buffer is full. <br /></td></tr>
-<tr class="separator:a09e66ce53afde10767142b861995e678"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a24fecf430506c3ba61e149c18422b095"><td class="memItemLeft" align="right" valign="top"><a id="a24fecf430506c3ba61e149c18422b095"></a>
-size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1ring__buffer.html#a24fecf430506c3ba61e149c18422b095">capacity</a> (void)</td></tr>
-<tr class="memdesc:a24fecf430506c3ba61e149c18422b095"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return maximum buffer size. <br /></td></tr>
-<tr class="separator:a24fecf430506c3ba61e149c18422b095"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7a49ee15bafb42050ab552814a5fac66"><td class="memItemLeft" align="right" valign="top"><a id="a7a49ee15bafb42050ab552814a5fac66"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1ring__buffer.html#a7a49ee15bafb42050ab552814a5fac66">full</a> (void) const</td></tr>
+<tr class="memdesc:a7a49ee15bafb42050ab552814a5fac66"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return true if buffer is full. <br /></td></tr>
+<tr class="separator:a7a49ee15bafb42050ab552814a5fac66"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a978e66b5d58820fa8e7a212828e0729b"><td class="memItemLeft" align="right" valign="top"><a id="a978e66b5d58820fa8e7a212828e0729b"></a>
+size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1ring__buffer.html#a978e66b5d58820fa8e7a212828e0729b">capacity</a> (void) const</td></tr>
+<tr class="memdesc:a978e66b5d58820fa8e7a212828e0729b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return maximum buffer size. <br /></td></tr>
+<tr class="separator:a978e66b5d58820fa8e7a212828e0729b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a93aebea424add19eb7ab308ba2160be2"><td class="memItemLeft" align="right" valign="top"><a id="a93aebea424add19eb7ab308ba2160be2"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1ring__buffer.html#a93aebea424add19eb7ab308ba2160be2">resize</a> (size_t new_cap)</td></tr>
 <tr class="memdesc:a93aebea424add19eb7ab308ba2160be2"><td class="mdescLeft">&#160;</td><td class="mdescRight">(Re)allocate buffer with a different capacity <br /></td></tr>
@@ -151,7 +185,7 @@ size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cl
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Nov 25 2020 16:35:17 for MLIB by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Sat Jan 16 2021 21:31:06 for MLIB by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.18
 </small></address>
