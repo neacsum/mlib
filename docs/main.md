@@ -76,7 +76,7 @@ SOFTWARE.
 - \ref mlib::statpars "statpars" - Statistical parameters
 - \ref mlib::stopwatch "stopwatch" - Another stopwatch timer
 - \ref tvops "tvops" - Operations with timeval structures
-
+- \ref biosuuid() - Retrieve BIOS UUID value
  
 
 
