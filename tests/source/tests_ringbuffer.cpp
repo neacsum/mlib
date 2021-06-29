@@ -244,7 +244,7 @@ SUITE (RingBuffer)
     // VERIFY: begin points to first object pushed
     CHECK_EQUAL (100, *iter);
 
-    iter == --testbuf.begin ();
+    iter = --testbuf.begin ();
 
     // VERIFY: begin iterator doesn't change when decremented
     CHECK (iter == testbuf.begin ());
