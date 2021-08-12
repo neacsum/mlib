@@ -58,10 +58,10 @@ public:
 
   ///Check if socket is opened
   virtual bool      is_open () const  { return sl->handle != INVALID_SOCKET; }
-  int               recv (void* buf, int maxlen, int msgf=0);
-  int               recvfrom (sockaddr& sa,void* buf, int maxlen, int msgf=0);
-  int               send (const void* buf, int len, int msgf=0);
-  int               sendto (const sockaddr& sa,const void* buf, int len, int msgf=0);
+  size_t            recv (void* buf, size_t maxlen, int msgf=0);
+  size_t            recvfrom (sockaddr& sa,void* buf, size_t maxlen, int msgf=0);
+  size_t            send (const void* buf, size_t len, int msgf=0);
+  size_t            sendto (const sockaddr& sa,const void* buf, size_t len, int msgf=0);
   int               sendtimeout (int wp_sec);
   int               sendtimeout () const;
   int               recvtimeout (int wp_sec);

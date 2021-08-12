@@ -302,9 +302,9 @@ sock sock::accept ()
   \return Number of characters received or EOF if connection closed by peer.
 
 */
-int sock::recv (void* buf, int len, int msgf)
+size_t sock::recv (void* buf, size_t len, int msgf)
 {
-  int rval = ::recv (sl->handle, (char*) buf, len, msgf);
+  int rval = ::recv (sl->handle, (char*) buf, (int)len, msgf);
   if (rval == SOCKET_ERROR)
   {
     int what =  WSAGetLastError();
@@ -330,12 +330,12 @@ int sock::recv (void* buf, int len, int msgf)
   \return Number of characters received or EOF if connection closed by peer.
 
 */
-int sock::recvfrom (sockaddr& sa, void* buf, int len, int msgf)
+size_t sock::recvfrom (sockaddr& sa, void* buf, size_t len, int msgf)
 {
   int rval;
   int sa_len = sizeof(sa);
   
-  if ((rval = ::recvfrom (sl->handle, (char*) buf, len, msgf, &sa, &sa_len)) == SOCKET_ERROR)
+  if ((rval = ::recvfrom (sl->handle, (char*) buf, (int)len, msgf, &sa, &sa_len)) == SOCKET_ERROR)
   {
     int what =  WSAGetLastError();
     if (what == WSAEWOULDBLOCK)
@@ -347,7 +347,7 @@ int sock::recvfrom (sockaddr& sa, void* buf, int len, int msgf)
       return EOF;
     sockerrors->raise (WSALASTERROR);
   }
-  return (rval==0) ? EOF: rval;
+  return (rval==0) ? (size_t)EOF: rval;
 }
 
 /*!
@@ -359,14 +359,14 @@ int sock::recvfrom (sockaddr& sa, void* buf, int len, int msgf)
   The function returns the number of characters actually sent or EOF if 
   connection was closed by peer.
 */
-int sock::send (const void* buf, int len, int msgf)
+size_t sock::send (const void* buf, size_t len, int msgf)
 {
-  int wlen=0;
+  size_t wlen=0;
   const char *cp = (const char *)buf;
   while (len>0) 
   {
     int wval;
-    if ((wval = ::send (sl->handle, cp, len, msgf)) == SOCKET_ERROR)
+    if ((wval = ::send (sl->handle, cp, (int)len, msgf)) == SOCKET_ERROR)
     {
       int what =  WSAGetLastError();
       if (what == WSAETIMEDOUT)
@@ -392,14 +392,14 @@ int sock::send (const void* buf, int len, int msgf)
   The function returns the number of characters actually sent or EOF if 
   connection was closed by peer.
 */
-int sock::sendto (const sockaddr& sa, const void* buf, int len, int msgf)
+size_t sock::sendto (const sockaddr& sa, const void* buf, size_t len, int msgf)
 {
   int wlen=0;
   const char *cp = (const char *)buf;
   while (len>0) 
   {
     int wval;
-    if ((wval = ::sendto (sl->handle, cp, len, msgf, &sa, sizeof(sa))) == SOCKET_ERROR) 
+    if ((wval = ::sendto (sl->handle, cp, (int)len, msgf, &sa, sizeof(sa))) == SOCKET_ERROR) 
     {
       int what =  WSAGetLastError();
       if (what == WSAETIMEDOUT)
@@ -934,8 +934,8 @@ int sockbuf::sync ()
     return 0;                                     //unbuffered or empty buffer
   if (!(x_flags & _S_NO_WRITES)) 
   {
-    int wlen   = (int)(pptr () - pbase ());
-    int wval   = send (pbase (), wlen);
+    size_t wlen   = pptr () - pbase ();
+    size_t wval   = send (pbase (), wlen);
     setp (pbase (), epptr ());
     if (wval == wlen)
       return 0;
@@ -993,8 +993,8 @@ int sockbuf::underflow ()
   if (eback ())
   {
     //buffered mode
-    int rval = recv (eback (), ibsize);
-    if (rval != EOF) 
+    size_t rval = recv (eback (), ibsize);
+    if (rval != (size_t)EOF) 
     {
       setg (eback (), eback (), eback () + rval);
       return rval ? *(unsigned char*)gptr () : EOF;
@@ -1005,8 +1005,8 @@ int sockbuf::underflow ()
   {
     //unbuffered mode
     unsigned char ch;
-    int rval = recv (&ch, 1);
-    if (rval == EOF || rval == 0)
+    size_t rval = recv (&ch, 1);
+    if (rval == (size_t)EOF || rval == 0)
       return EOF;
     return ch;
   }
@@ -1037,8 +1037,8 @@ int sockbuf::overflow (int c)
   {
     //unbuffered mode
     unsigned char ch = (unsigned char)c;
-    int rval = send (&ch, 1);
-    if (rval == EOF || rval == 0)
+    size_t rval = send (&ch, 1);
+    if (rval == (size_t)EOF || rval == 0)
       return EOF;
   }
   return c;

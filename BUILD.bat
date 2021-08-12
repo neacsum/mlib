@@ -7,3 +7,5 @@ rem
 call mklinks.bat
 call setup.bat
 msbuild build.proj
+echo Press any key to exit . . .
+pause >nul
