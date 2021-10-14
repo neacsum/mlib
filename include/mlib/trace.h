@@ -32,8 +32,13 @@
 
 //SYSLOG_TRACE forces TRACE
 #if MLIB_SYSLOG_TRACE && !defined (MLIB_TRACE)
-#define MLIB_TRACE
+#define MLIB_TRACE MLIB_SYSLOG_TRACE
 #endif
+
+#if defined(_TRACE) && !defined (MLIB_TRACE)
+#define MLIB_TRACE _TRACE
+#endif
+
 
 # if defined (MLIB_TRACE_LEVEL)
 // only some traces enabled (up to and including MLIB_TRACE_LEVEL)
