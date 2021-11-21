@@ -1,0 +1,10 @@
+{
+    "name": "mlib",
+    "git": "git@github.org:neacsum/mlib.git",
+    "depends": [
+        {
+            "name": "utpp",
+            "git": "git@github.com:neacsum/utpp.git"
+        }
+    ]
+}
