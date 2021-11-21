@@ -6,6 +6,4 @@ rem
 
 call mklinks.bat
 call setup.bat
-msbuild build.proj
-echo Press any key to exit . . .
-pause >nul
+if "%~1"=="" (msbuild build.proj) else (msbuild -target:%1 build.proj)

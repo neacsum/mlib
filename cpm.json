@@ -1,6 +1,9 @@
 {
     "name": "mlib",
     "git": "git@github.org:neacsum/mlib.git",
+    "build": [
+        {"cmd": "build.bat", "args": ["lib"]}
+    ], 
     "depends": [
         {
             "name": "utpp",
