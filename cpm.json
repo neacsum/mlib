@@ -7,7 +7,7 @@
     "depends": [
         {
             "name": "utf8",
-            "git": "git@github.com:neacsum/utf.git"
+            "git": "git@github.com:neacsum/utf8.git"
         },
         {
             "name": "utpp",
