@@ -25,7 +25,7 @@ T ipow (T base, int exp)
     base *= base;
   }
   return result;
-};
+}
 
 
-};
+}
