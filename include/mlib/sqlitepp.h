@@ -63,7 +63,10 @@ public:
   __int64 last_rowid ();
 
   ///Return number of records changed by last query 
-  int changes ();
+  __int64 changes ();
+
+  ///Return total number of changes since database was opened
+  __int64 total_changes ();
 
   ///Open database connection
   erc open (const std::string& name, int flags=create);
@@ -193,13 +196,19 @@ extern errfac *sqlite_errors;
 inline
 __int64 Database::last_rowid () 
 {
-  return sqlite3_last_insert_rowid(db);
+  return sqlite3_last_insert_rowid (db);
 }
 
 inline
-int Database::changes () 
+__int64 Database::changes () 
 {
-  return sqlite3_changes(db);
+  return sqlite3_changes64 (db);
+}
+
+inline
+inline __int64 mlib::Database::total_changes ()
+{
+  return sqlite3_total_changes64 (db);
 }
 
 inline

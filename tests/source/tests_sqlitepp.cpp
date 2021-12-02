@@ -232,4 +232,16 @@ TEST_FIXTURE (TestDatabase, InsertDuplicate)
   CHECK_EQUAL (SQLITE_CONSTRAINT_UNIQUE, db.extended_error ());
 }
 
+TEST_FIXTURE (TestDatabase, ChangesCount)
+{
+  db.exec (R"(
+    INSERT INTO tab VALUES (1);
+    INSERT INTO tab VALUES (2);
+  )");
+  auto chg = db.changes ();
+  CHECK_EQUAL (1, chg);
+  auto total = db.total_changes ();
+  CHECK_EQUAL (2, total);
+}
+
 }
