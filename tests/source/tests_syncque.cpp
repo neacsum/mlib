@@ -20,7 +20,7 @@ SUITE (syncque)
 struct {
   int limit;
   int n_primes;
-} checks[] = {        // times for 8 consumers
+} checks[] = {        // times for 8 consumers (on my "Captain Slow" machine)
   {  500000,  41538}, //   4 sec
   { 1000000,  78498}, //  18 sec
   { 5000000, 348513}, // 435 sec (243 in release mode)
@@ -41,13 +41,13 @@ static bool IsPrime (int n)
 
 TEST (primes_queue)
 {
-  sync_queue<int> nums;
+  async_queue<int> nums;
   struct result {
     int prime;
     int worker;
   };
 
-  sync_queue<result> primes;
+  async_queue<result> primes;
 
   thread* consumers[NTHREADS];
   for (int thnum = 0; thnum < NTHREADS; thnum++)
@@ -105,7 +105,7 @@ TEST (primes_queue)
     cout << "Consumer " << i << " found " << found_by[i] << " primes." << endl;
 }
 
-TEST (bonded_primes)
+TEST (bounded_primes)
 {
   bounded_queue<int> nums(20);
   struct result {
@@ -113,7 +113,7 @@ TEST (bonded_primes)
     int worker;
   };
 
-  sync_queue<result> primes;
+  async_queue<result> primes;
 
   thread* consumers[NTHREADS];
   for (int thnum = 0; thnum < NTHREADS; thnum++)

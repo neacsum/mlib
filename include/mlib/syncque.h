@@ -1,5 +1,5 @@
 /*!
-  \file syncque.h Definition of sync_queue and bounded_queue classes
+  \file syncque.h Definition of async_queue and bounded_queue classes
 
   (c) Mircea Neacsu 1999-2020. All rights reserved.
 */
@@ -13,32 +13,32 @@ namespace mlib
 {
 
 /*!
-  A template class that implements "synchronized queues".
+  A template class that implements "asynchronous queues".
   These are producer/consumer queues which can hold "messages" and deliver
   them in FIFO order. Attempting to consume from an empty queue will block
   the calling thread until a message arrives.
 
-  \note sync_queue is not bounded and it can grow up to the available memory.
+  \note async_queue is not bounded and it can grow up to the available memory.
 */
 template <class M, class C=std::deque<M>> 
-class sync_queue : protected std::queue<M, C>
+class async_queue : protected std::queue<M, C>
 {
 public:
-  sync_queue () {};
+  async_queue () {};
 
   /// Append an element to queue
   virtual void produce (const M& obj)
   {
     lock l (update);        //take control of the queue
     this->push (obj);       //put a copy of the object at the end
-  con_sema.signal ();     //and signal the semaphore
+    con_sema.signal ();     //and signal the semaphore
   }
 
   /// Extract and return first element in queue
   virtual M consume ()
   {
-  M result;
-  update.enter ();
+    M result;
+    update.enter ();
     while (std::queue<M, C>::empty ())
     {
       update.leave ();
@@ -47,21 +47,21 @@ public:
     }
     result = this->front ();  //get the message
     this->pop ();
-  update.leave ();
-  return result;
+    update.leave ();
+    return result;
   }
 
   /// Return _true_ if queue is empty
   bool empty()
   {
-  lock l (update);
+    lock l (update);
     return std::queue<M, C>::empty ();
   }
 
   /// Return queue size 
   size_t size ()
   {
-  lock l (update);
+    lock l (update);
     return std::queue<M, C>::size ();
   }
 
@@ -71,18 +71,18 @@ protected:
 };
 
 /*!
-  A synchronized queue with a limited size.
+  A producer/consumer queue with a limited size.
 
   bounded_queue objects can grow only up to the set limit. If the queue is full,
   producers have to wait until space becomes available.
 */
 template< class M, class C = std::deque<M> >
-class bounded_queue : public sync_queue<M, C>
+class bounded_queue : public async_queue<M, C>
 {
 public:
   bounded_queue (size_t limit_) : limit (limit_)
   {
-  pro_sema.signal ((int)limit);
+    pro_sema.signal ((int)limit);
   }
 
   /// Append an element to queue. If queue is full, waits until space
@@ -93,7 +93,7 @@ public:
     while (std::queue<M, C>::size () > limit)
     {
       this->update.leave ();
-    pro_sema.wait ();
+      pro_sema.wait ();
       this->update.enter ();
     }
     this->push (obj);
@@ -104,24 +104,24 @@ public:
   /// Extract and return first element in queue
   M consume ()
   {
-  M result;
+    M result;
     this->update.enter ();
     if (std::queue<M, C>::empty ())
-  {
-    while (1)
     {
+      while (1)
+      {
         this->update.leave ();
         this->con_sema.wait ();        //wait for a producer
         this->update.enter ();
         if (!std::queue<M, C>::empty ())
-        break;
+          break;
+      }
     }
-  }
     result = this->front ();  //get the message
     this->pop ();
-  pro_sema.signal ();  //signal producers there is space available
+    pro_sema.signal ();  //signal producers there is space available
     this->update.leave ();
-  return result;
+    return result;
   }
 
   /// Return _true_ if queue is at capacity
