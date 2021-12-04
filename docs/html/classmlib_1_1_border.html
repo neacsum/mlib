@@ -74,7 +74,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>close</b> (double x, 
 <tr class="separator:a3b6e379b67396b0f39cfab5bbf1c7a7e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>The polygon is represented by its vertexes and it is always assumed that there is a segment joining the last point with the first point. A <a class="el" href="classmlib_1_1_border.html" title="Representation of a simple, non-intersecting polygon that partitions the 2D space in two regions.">Border</a> object can be stored in a text file where each line represents a vertex. The last vertex defines what is considered the "inside" of the polygon: if the point lays inside the polygon, it is an "island" border. If the last point is outside the polygon, it is a "hole" border. </p>
+<div class="textblock"><p>Representation of a simple, non-intersecting polygon that partitions the 2D space in two regions. </p>
+<p>The polygon is represented by its vertexes and it is always assumed that there is a segment joining the last point with the first point. A <a class="el" href="classmlib_1_1_border.html" title="Representation of a simple, non-intersecting polygon that partitions the 2D space in two regions.">Border</a> object can be stored in a text file where each line represents a vertex. The last vertex defines what is considered the "inside" of the polygon: if the point lays inside the polygon, it is an "island" border. If the last point is outside the polygon, it is a "hole" border. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="a3b6e379b67396b0f39cfab5bbf1c7a7e"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a3b6e379b67396b0f39cfab5bbf1c7a7e">&#9670;&nbsp;</a></span>inside()</h2>
@@ -101,6 +102,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>close</b> (double x, 
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Check if a point is inside the border. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">x</td><td>- X coordinate of the point </td></tr>

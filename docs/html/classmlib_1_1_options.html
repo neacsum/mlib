@@ -92,7 +92,8 @@ const string &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>appname
 <tr class="separator:a9ab9990985eb6763f39b49a6d61b49a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>The parser matches approximately the POSIX specifications from: <a href="http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap12.html">http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap12.html</a> and GNU Standard for Command line Interface at <a href="http://www.gnu.org/prep/standards/html_node/Command_002dLine-Interfaces.html">http://www.gnu.org/prep/standards/html_node/Command_002dLine-Interfaces.html</a></p>
+<div class="textblock"><p>Command Line Parsing class. </p>
+<p>The parser matches approximately the POSIX specifications from: <a href="http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap12.html">http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap12.html</a> and GNU Standard for Command line Interface at <a href="http://www.gnu.org/prep/standards/html_node/Command_002dLine-Interfaces.html">http://www.gnu.org/prep/standards/html_node/Command_002dLine-Interfaces.html</a></p>
 <h2>Usage Instructions</h2>
 <ol type="1">
 <li>Construct an options parsing object with it's list of valid options.</li>
@@ -147,6 +148,8 @@ const string &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>appname
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Initializes parser and sets the list of valid options. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">list</td><td>array of option definitions strings</td></tr>
@@ -183,6 +186,8 @@ const string &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>appname
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Return a specific option from the command. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">option</td><td>the requested option </td></tr>
@@ -212,6 +217,8 @@ const string &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>appname
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Check if command line has an option. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">option</td><td>short form of the option </td></tr>
@@ -236,6 +243,8 @@ const string &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>appname
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Check if command line has an option. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">option</td><td>long or short form of the option </td></tr>
@@ -270,6 +279,8 @@ const string &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>appname
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Return next option in the command. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">opt</td><td>option </td></tr>
@@ -316,6 +327,8 @@ const string &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>appname
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Parse a command line. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">argc</td><td>number of arguments </td></tr>
@@ -347,6 +360,8 @@ const string &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>appname
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Set list of valid options. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">list</td><td>- array of option definition strings</td></tr>
@@ -385,6 +400,8 @@ const string &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>appname
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Generate a nicely formatted usage string. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">sep</td><td>separator to be inserted between option descriptions </td></tr>

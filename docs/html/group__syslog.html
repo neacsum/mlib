@@ -67,6 +67,7 @@ Functions</h2></td></tr>
 <tr class="separator:gaec437cc017de835e256a121cccfc62c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<p>Emulation of Unix syslog functionality. </p>
 <p>For the most part the functions are compatible with standard BSD syslog functions. The only significant addition is the set_log_ini_param function that allows control of syslog options from an INI file. </p>
 <h2 class="groupheader">Function Documentation</h2>
 <a id="ga0fd9642bc9066d5c4012cbbca8993bd8"></a>
@@ -83,6 +84,8 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Close connection to logger. </p>
 <p>closelog also resets the identification string for syslog messages back to the default, if openlog was called with a non-NULL argument to ident. The default identification string is the program name. </p>
 
 </div>
@@ -118,6 +121,8 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Open connection to logger. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">ident</td><td>string prepended to every message, typically set to the program name.</td></tr>
@@ -147,6 +152,8 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Set the log mask level. </p>
 <p>The <a class="el" href="group__syslog.html#ga79f76e80518dce884dab21fa3f18a1f4" title="Set the log mask level.">setlogmask()</a> function sets this logmask for the current process, and returns the previous mask. If the mask argument is 0, the current logmask is not modified.</p>
 <p>A process has a log priority mask that determines which calls to syslog may be logged. All other calls will be ignored. Logging is enabled for the priorities that have the corresponding bit set in mask.</p>
 <p>setlogmask sets a mask (the "logmask") that determines which future syslog calls shall be ignored. You can use setlogmask to specify that messages of particular priorities shall be ignored in the future.</p>
@@ -180,6 +187,8 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Set option flags. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">opt</td><td>can be any combination of LOGOPT_... values.</td></tr>
@@ -224,6 +233,8 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Generate a log message using FMT string and option arguments. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">facility_priority</td><td>combined facility and priority value. See below. </td></tr>

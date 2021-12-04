@@ -47,7 +47,7 @@ $(function() {
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="classmlib_1_1_database-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">mlib::Database Class Reference<div class="ingroups"><a class="el" href="group__sqlite.html">SQLite Interface</a></div></div>  </div>
+<div class="title">mlib::Database Class Reference<div class="ingroups"><a class="el" href="group__sqlite.html">SQLite C++ Wrappers</a></div></div>  </div>
 </div><!--header-->
 <div class="contents">
 
@@ -104,10 +104,14 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 __int64&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_database.html#af4b55b256bf06cd055c06614ba401621">last_rowid</a> ()</td></tr>
 <tr class="memdesc:af4b55b256bf06cd055c06614ba401621"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return rowid of last successful insert. <br /></td></tr>
 <tr class="separator:af4b55b256bf06cd055c06614ba401621"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3bf4edab361db3bd9ecf6c94a5fcc124"><td class="memItemLeft" align="right" valign="top"><a id="a3bf4edab361db3bd9ecf6c94a5fcc124"></a>
-int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_database.html#a3bf4edab361db3bd9ecf6c94a5fcc124">changes</a> ()</td></tr>
-<tr class="memdesc:a3bf4edab361db3bd9ecf6c94a5fcc124"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return number of records changed by last query. <br /></td></tr>
-<tr class="separator:a3bf4edab361db3bd9ecf6c94a5fcc124"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2d537db70853249d4c6ae3f66bc8946d"><td class="memItemLeft" align="right" valign="top"><a id="a2d537db70853249d4c6ae3f66bc8946d"></a>
+__int64&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_database.html#a2d537db70853249d4c6ae3f66bc8946d">changes</a> ()</td></tr>
+<tr class="memdesc:a2d537db70853249d4c6ae3f66bc8946d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return number of records changed by last query. <br /></td></tr>
+<tr class="separator:a2d537db70853249d4c6ae3f66bc8946d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaa9c360369d143389c4719f0e6dbecc1"><td class="memItemLeft" align="right" valign="top"><a id="aaa9c360369d143389c4719f0e6dbecc1"></a>
+__int64&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_database.html#aaa9c360369d143389c4719f0e6dbecc1">total_changes</a> ()</td></tr>
+<tr class="memdesc:aaa9c360369d143389c4719f0e6dbecc1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return total number of changes since database was opened. <br /></td></tr>
+<tr class="separator:aaa9c360369d143389c4719f0e6dbecc1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae84c9ab737394bb6abf4ace94bec96d8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classmlib_1_1erc.html">erc</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_database.html#ae84c9ab737394bb6abf4ace94bec96d8">open</a> (const std::string &amp;name, int flags=<a class="el" href="classmlib_1_1_database.html#a344770d20835d632f778d3b935a5f7e8a07c37863857d1a65411b7ed90e1697d9">create</a>)</td></tr>
 <tr class="memdesc:ae84c9ab737394bb6abf4ace94bec96d8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Open database connection.  <a href="classmlib_1_1_database.html#ae84c9ab737394bb6abf4ace94bec96d8">More...</a><br /></td></tr>
 <tr class="separator:ae84c9ab737394bb6abf4ace94bec96d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -131,7 +135,8 @@ int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class
 <tr class="separator:a105a0dc1d2cad3cdebf436c7693b4df9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>The <a class="el" href="classmlib_1_1_database.html" title="Wrapper for database connection handle.">Database</a> class is a wrapper around the <a href="http://sqlite.org/c3ref/sqlite3.html">sqlite3</a> handle returned by sqlite_open_v2 function. </p>
+<div class="textblock"><p>Wrapper for database connection handle. </p>
+<p>The <a class="el" href="classmlib_1_1_database.html" title="Wrapper for database connection handle.">Database</a> class is a wrapper around the <a href="http://sqlite.org/c3ref/sqlite3.html">sqlite3</a> handle returned by sqlite_open_v2 function. </p>
 </div><h2 class="groupheader">Member Enumeration Documentation</h2>
 <a id="a344770d20835d632f778d3b935a5f7e8"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a344770d20835d632f778d3b935a5f7e8">&#9670;&nbsp;</a></span>openflags</h2>
@@ -144,6 +149,8 @@ int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Flags for database opening mode. </p>
 <table class="fieldtable">
 <tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a344770d20835d632f778d3b935a5f7e8af1f8fbe6d8d698860616b52f8896c793"></a>readonly&#160;</td><td class="fielddoc"><p>Read-only access. </p>
 </td></tr>
@@ -182,6 +189,8 @@ int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Default constructor. </p>
 <p>The default constructor is used to create an object that is not yet connected to a database.</p>
 <p>It has to be connected using the <a class="el" href="classmlib_1_1_database.html#ae84c9ab737394bb6abf4ace94bec96d8" title="Open database connection.">open()</a> function. </p>
 
@@ -212,6 +221,8 @@ int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Open a database specified by name. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">name</td><td>database name </td></tr>
@@ -236,6 +247,8 @@ int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Destructor. </p>
 <p>If the wrapper owns the database handle, it closes it. </p>
 
 </div>
@@ -256,6 +269,8 @@ int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Return filename of a database connection. </p>
 <p>Return an empty string if database is not opened or there is no database connection with that name or if the database is a temporary or in-memory database. </p>
 
 </div>
@@ -274,6 +289,8 @@ int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Return true if database connection is read-only. </p>
 <p>Returns FALSE only for connected read-write databases.</p>
 <p>If database is not connected or it is read-only, returns TRUE. </p>
 
@@ -304,6 +321,8 @@ int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Change or set the prepared statement of a <a class="el" href="classmlib_1_1_query.html" title="Wrapper for SQL prepared sentences.">Query</a> object. </p>
 <p>If the query is associated with a prepared statement, the previous one is finalized before creating a new query. </p>
 
 </div>
@@ -333,6 +352,8 @@ int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Open database connection. </p>
 <p>If the object is associated with another connection, the previous connection is closed and a new one is opened.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -359,6 +380,8 @@ int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Assignment operator. </p>
 <p>Perform a copy operation using the <a href="https://sqlite.org/backup.html">SQLITE Backup API</a>.</p>
 <p>Both databases should be opened or closed. </p>
 

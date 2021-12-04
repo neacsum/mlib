@@ -109,7 +109,8 @@ double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cl
 <tr class="separator:ae9a6b50433fcda5bfdf3a19249d19f53"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Use one of the <a class="el" href="classmlib_1_1statpars.html#ab4f4daa3b68b29b217ee06eca197cdcc" title="Add a value to the calculator.">add()</a> functions to add new values to the calculator. Then you can call one of the functions that return a statistical parameter (average, variance, etc.). When one of these functions is called, all the other parameters are also computed. The computation is valid until a new value is added to the calculator.</p>
+<div class="textblock"><p>Calculator for statistical parameters of a distribution. </p>
+<p>Use one of the <a class="el" href="classmlib_1_1statpars.html#ab4f4daa3b68b29b217ee06eca197cdcc" title="Add a value to the calculator.">add()</a> functions to add new values to the calculator. Then you can call one of the functions that return a statistical parameter (average, variance, etc.). When one of these functions is called, all the other parameters are also computed. The computation is valid until a new value is added to the calculator.</p>
 <p>If the calculator object was constructed with a limited number of samples, only the last "n" samples are used to compute the statistical parameters. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a350951d753b097303b9cfcc522facf74"></a>
@@ -127,6 +128,8 @@ double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cl
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Constructor for calculator class. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">n</td><td>number of samples. If not 0, only the last n samples are used for computations. </td></tr>
@@ -151,6 +154,8 @@ double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cl
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Constructor for calculator class. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">vec</td><td>vector of samples. </td></tr>

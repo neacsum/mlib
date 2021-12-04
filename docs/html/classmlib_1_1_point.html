@@ -151,6 +151,7 @@ T&#160;</td><td class="memItemRight" valign="bottom"><b>y</b></td></tr>
 <div class="textblock"><h3>template&lt;typename T&gt;<br />
 class mlib::Point&lt; T &gt;</h3>
 
+<p>Generic 2D point. </p>
 <p>Template class which builds a 2D point from a pair of coordinates. It has functions to compute distance between two points, azimuth from north, as well as basic operators (comparison, I/O). </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="af471a946a104dd7b73451f46076f2cc7"></a>
@@ -180,6 +181,8 @@ template&lt;class T &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Return inside angle P1-this-P2. </p>
 <p>0 &lt;= angle &lt; M_PI degenerated angles (p1 == this or p2 == this) are 0 </p>
 
 </div>
@@ -201,6 +204,8 @@ template&lt;class T &gt; </div>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Return azimuth from North of line this-P2. </p>
 <p>0&lt;= azimuth &lt; 2*M_PI </p>
 
 </div>

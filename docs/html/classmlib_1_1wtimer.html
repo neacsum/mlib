@@ -153,7 +153,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="separator:a4302a7986b6f5d7cc3f0b2c28496c990 inherit pro_methods_classmlib_1_1syncbase"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>A waitable timer object is set to signaled when the specified due time arrives. There are two types of waitable timers that can be created: manual and automatic (called synchronization timers in Windows documentation). Automatic timers are reset to their non-signaled state when a thread completes a wait operation on the object (similar to automatic events).</p>
+<div class="textblock"><p>Waitable timer. </p>
+<p>A waitable timer object is set to signaled when the specified due time arrives. There are two types of waitable timers that can be created: manual and automatic (called synchronization timers in Windows documentation). Automatic timers are reset to their non-signaled state when a thread completes a wait operation on the object (similar to automatic events).</p>
 <p>Manual timers remain signaled until restarted.</p>
 <p>A timer of either type can also be a periodic timer.</p>
 <p>When signaled, waitable timers can call the <a class="el" href="classmlib_1_1wtimer.html#a3905fb776c731d18fba5bff070643573" title="Function called for timers that use the APC feature.">at_timer</a> function as an APC (Asynchronous Procedure Call) to be executed in the context of the thread that created the timer. To use this feature you need to derive another class that reimplements the <a class="el" href="classmlib_1_1wtimer.html#a3905fb776c731d18fba5bff070643573" title="Function called for timers that use the APC feature.">at_timer</a> function. </p>
@@ -226,6 +227,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Set the timer at an absolute time. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">utctime</td><td>UTC time when object should become signaled </td></tr>
@@ -261,6 +264,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Set the start time of the timer and it's period. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">interval</td><td>time in milliseconds from now when object should be signaled </td></tr>

@@ -48,7 +48,7 @@ $(function() {
 <a href="#friends">Friends</a> &#124;
 <a href="classmlib_1_1_query-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">mlib::Query Class Reference<div class="ingroups"><a class="el" href="group__sqlite.html">SQLite Interface</a></div></div>  </div>
+<div class="title">mlib::Query Class Reference<div class="ingroups"><a class="el" href="group__sqlite.html">SQLite C++ Wrappers</a></div></div>  </div>
 </div><!--header-->
 <div class="contents">
 
@@ -64,7 +64,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a7ee97cc5ed429ef7a420c4549e9fd6f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default constructor. <br /></td></tr>
 <tr class="separator:a7ee97cc5ed429ef7a420c4549e9fd6f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abbf4ddcb778885223d11bc35030e5b1c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_query.html#abbf4ddcb778885223d11bc35030e5b1c">Query</a> (<a class="el" href="classmlib_1_1_database.html">Database</a> &amp;db)</td></tr>
-<tr class="memdesc:abbf4ddcb778885223d11bc35030e5b1c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Object without SQL statement.  <a href="classmlib_1_1_query.html#abbf4ddcb778885223d11bc35030e5b1c">More...</a><br /></td></tr>
+<tr class="memdesc:abbf4ddcb778885223d11bc35030e5b1c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Statement attached to a database but without any SQL.  <a href="classmlib_1_1_query.html#abbf4ddcb778885223d11bc35030e5b1c">More...</a><br /></td></tr>
 <tr class="separator:abbf4ddcb778885223d11bc35030e5b1c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae0ac3f9772f421243172e9cd43574af8"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_query.html#ae0ac3f9772f421243172e9cd43574af8">Query</a> (<a class="el" href="classmlib_1_1_database.html">Database</a> &amp;db, const std::string &amp;<a class="el" href="classmlib_1_1_query.html#aec30b70916c6ccb20e730f791e4fa025">sql</a>)</td></tr>
 <tr class="memdesc:ae0ac3f9772f421243172e9cd43574af8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Build a prepared statement from SQL text.  <a href="classmlib_1_1_query.html#ae0ac3f9772f421243172e9cd43574af8">More...</a><br /></td></tr>
@@ -77,18 +77,14 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:acb4ff3a27365317354c69b9fae0b6ea0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assign SQL text to a query.  <a href="classmlib_1_1_query.html#acb4ff3a27365317354c69b9fae0b6ea0">More...</a><br /></td></tr>
 <tr class="separator:acb4ff3a27365317354c69b9fae0b6ea0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aec30b70916c6ccb20e730f791e4fa025"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_query.html#aec30b70916c6ccb20e730f791e4fa025">sql</a> () const</td></tr>
-<tr class="memdesc:aec30b70916c6ccb20e730f791e4fa025"><td class="mdescLeft">&#160;</td><td class="mdescRight">retrieve SQL text  <a href="classmlib_1_1_query.html#aec30b70916c6ccb20e730f791e4fa025">More...</a><br /></td></tr>
+<tr class="memdesc:aec30b70916c6ccb20e730f791e4fa025"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieve SQL text.  <a href="classmlib_1_1_query.html#aec30b70916c6ccb20e730f791e4fa025">More...</a><br /></td></tr>
 <tr class="separator:aec30b70916c6ccb20e730f791e4fa025"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3d0be57b8bd7f466bbece68da4223d92"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_query.html#a3d0be57b8bd7f466bbece68da4223d92">operator std::string</a> () const</td></tr>
+<tr class="memdesc:a3d0be57b8bd7f466bbece68da4223d92"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieve SQL text.  <a href="classmlib_1_1_query.html#a3d0be57b8bd7f466bbece68da4223d92">More...</a><br /></td></tr>
+<tr class="separator:a3d0be57b8bd7f466bbece68da4223d92"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad2e176db273b9a8a26583b80d9db2cbd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classmlib_1_1erc.html">erc</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_query.html#ad2e176db273b9a8a26583b80d9db2cbd">step</a> ()</td></tr>
 <tr class="memdesc:ad2e176db273b9a8a26583b80d9db2cbd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate the statement.  <a href="classmlib_1_1_query.html#ad2e176db273b9a8a26583b80d9db2cbd">More...</a><br /></td></tr>
 <tr class="separator:ad2e176db273b9a8a26583b80d9db2cbd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a524754ae0d799eebbb7f1246971e2ffc"><td class="memItemLeft" align="right" valign="top"><a id="a524754ae0d799eebbb7f1246971e2ffc"></a>
-SYSTEMTIME&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_query.html#a524754ae0d799eebbb7f1246971e2ffc">column_time</a> (int nc)</td></tr>
-<tr class="memdesc:a524754ae0d799eebbb7f1246971e2ffc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a SYSTEMTIME structure with the column content. <br /></td></tr>
-<tr class="separator:a524754ae0d799eebbb7f1246971e2ffc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2b2ab5fa61b3fae7f0de608f6aed94ef"><td class="memItemLeft" align="right" valign="top">SYSTEMTIME&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_query.html#a2b2ab5fa61b3fae7f0de608f6aed94ef">column_time</a> (const std::string &amp;name)</td></tr>
-<tr class="memdesc:a2b2ab5fa61b3fae7f0de608f6aed94ef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a SYSTEMTIME structure with the column content.  <a href="classmlib_1_1_query.html#a2b2ab5fa61b3fae7f0de608f6aed94ef">More...</a><br /></td></tr>
-<tr class="separator:a2b2ab5fa61b3fae7f0de608f6aed94ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9304aa6f21b149696d0cc11a98ee6761"><td class="memItemLeft" align="right" valign="top"><a id="a9304aa6f21b149696d0cc11a98ee6761"></a>
 int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_query.html#a9304aa6f21b149696d0cc11a98ee6761">columns</a> ()</td></tr>
 <tr class="memdesc:a9304aa6f21b149696d0cc11a98ee6761"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return number of columns in the result set. <br /></td></tr>
@@ -103,7 +99,7 @@ int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class
 <tr><td colspan="2"><div class="groupHeader">Bind functions</div></td></tr>
 <tr><td colspan="2"><div class="groupText"><p>SQL statement can have parameters specified by number (? or ?nnn) or by name (:aaa or @aaa or $aaa) where 'nnn' is a number and 'aaa' is an alphanumeric identifier.</p>
 <p>Bind functions assign values to these parameters.</p>
-<p>If the parameter with that name or number is not found the functions throw an erc with code SQLITE_RANGE. </p>
+<p>If the parameter with that name or number is not found the functions throw an <a class="el" href="classmlib_1_1erc.html">erc</a> with code <code>SQLITE_RANGE</code>. </p>
 </div></td></tr>
 <tr class="memitem:afbe9e5903682a7427ea6b928f35a2d1b"><td class="memItemLeft" align="right" valign="top"><a id="afbe9e5903682a7427ea6b928f35a2d1b"></a>
 <a class="el" href="classmlib_1_1_query.html">Query</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_query.html#afbe9e5903682a7427ea6b928f35a2d1b">bind</a> (int par, const std::string &amp;val)</td></tr>
@@ -144,10 +140,10 @@ int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class
 <tr class="memdesc:a1a5f4cdfdfdcff5f577dcd79b3d109d7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bind a parameter specified by name to an arbitrary memory area (BLOB)  <a href="classmlib_1_1_query.html#a1a5f4cdfdfdcff5f577dcd79b3d109d7">More...</a><br /></td></tr>
 <tr class="separator:a1a5f4cdfdfdcff5f577dcd79b3d109d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab4727e9519278f619eb272ec70c38e77"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classmlib_1_1_query.html">Query</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_query.html#ab4727e9519278f619eb272ec70c38e77">bind</a> (int par, const SYSTEMTIME &amp;st)</td></tr>
-<tr class="memdesc:ab4727e9519278f619eb272ec70c38e77"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bind a parameter specified by number to a SYSTEMTIME value.  <a href="classmlib_1_1_query.html#ab4727e9519278f619eb272ec70c38e77">More...</a><br /></td></tr>
+<tr class="memdesc:ab4727e9519278f619eb272ec70c38e77"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bind a parameter specified by number to a <code>SYSTEMTIME</code> value.  <a href="classmlib_1_1_query.html#ab4727e9519278f619eb272ec70c38e77">More...</a><br /></td></tr>
 <tr class="separator:ab4727e9519278f619eb272ec70c38e77"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad3e016e1040b4a540918d3c9796e6f5d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classmlib_1_1_query.html">Query</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_query.html#ad3e016e1040b4a540918d3c9796e6f5d">bind</a> (const std::string &amp;parname, const SYSTEMTIME &amp;st)</td></tr>
-<tr class="memdesc:ad3e016e1040b4a540918d3c9796e6f5d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bind a parameter specified by name to a SYSTEMTIME value.  <a href="classmlib_1_1_query.html#ad3e016e1040b4a540918d3c9796e6f5d">More...</a><br /></td></tr>
+<tr class="memdesc:ad3e016e1040b4a540918d3c9796e6f5d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bind a parameter specified by name to a <code>SYSTEMTIME</code> value.  <a href="classmlib_1_1_query.html#ad3e016e1040b4a540918d3c9796e6f5d">More...</a><br /></td></tr>
 <tr class="separator:ad3e016e1040b4a540918d3c9796e6f5d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3d4ff83cf47c9614be9222ea8c26dea2"><td class="memItemLeft" align="right" valign="top"><a id="a3d4ff83cf47c9614be9222ea8c26dea2"></a>
 <a class="el" href="classmlib_1_1_query.html">Query</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_query.html#a3d4ff83cf47c9614be9222ea8c26dea2">clear_bindings</a> ()</td></tr>
@@ -156,61 +152,84 @@ int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class
 <tr><td colspan="2"><div class="groupHeader">Result functions</div></td></tr>
 <tr><td colspan="2"><div class="groupText"><p>All result functions return the value of a column specified by name or number (starting from 0).</p>
 <p>Data type of the result is determined by the result function called (column_int returns an integer, column_double returns a double, etc.).</p>
-<p>If a column with that name cannot be found, the functions throw an erc with code SQLITE_RANGE.</p>
+<p>If a column with that name cannot be found, the functions throw an <a class="el" href="classmlib_1_1erc.html">erc</a> with code <code>SQLITE_RANGE</code>.</p>
 <p>For a detailed discussion of the conversions applied see <a href="http://sqlite.org/c3ref/column_blob.html">SQLITE documentation</a> </p>
 </div></td></tr>
-<tr class="memitem:a0442289c8c2faa465393937709e0b767"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_query.html#a0442289c8c2faa465393937709e0b767">column_int</a> (int nc)</td></tr>
-<tr class="memdesc:a0442289c8c2faa465393937709e0b767"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a pointer to a NULL-terminated text with the column content.  <a href="classmlib_1_1_query.html#a0442289c8c2faa465393937709e0b767">More...</a><br /></td></tr>
-<tr class="separator:a0442289c8c2faa465393937709e0b767"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad71dab151d633d91301034fac703325c"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_query.html#ad71dab151d633d91301034fac703325c">column_str</a> (int nc)</td></tr>
-<tr class="memdesc:ad71dab151d633d91301034fac703325c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a pointer to a NULL-terminated text with the column content.  <a href="classmlib_1_1_query.html#ad71dab151d633d91301034fac703325c">More...</a><br /></td></tr>
-<tr class="separator:ad71dab151d633d91301034fac703325c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4b7cc95a76d42a94a962252603be7bb7"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_query.html#a4b7cc95a76d42a94a962252603be7bb7">column_text</a> (int nc)</td></tr>
-<tr class="memdesc:a4b7cc95a76d42a94a962252603be7bb7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a pointer to a NULL-terminated text with the column content.  <a href="classmlib_1_1_query.html#a4b7cc95a76d42a94a962252603be7bb7">More...</a><br /></td></tr>
-<tr class="separator:a4b7cc95a76d42a94a962252603be7bb7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a829780d29023a1c3eac2799e1b61e0e7"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_query.html#a829780d29023a1c3eac2799e1b61e0e7">column_double</a> (int nc)</td></tr>
-<tr class="memdesc:a829780d29023a1c3eac2799e1b61e0e7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a pointer to a NULL-terminated text with the column content.  <a href="classmlib_1_1_query.html#a829780d29023a1c3eac2799e1b61e0e7">More...</a><br /></td></tr>
-<tr class="separator:a829780d29023a1c3eac2799e1b61e0e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9f84ddaa5d025b32cb0bdfafdd5530f3"><td class="memItemLeft" align="right" valign="top">__int64&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_query.html#a9f84ddaa5d025b32cb0bdfafdd5530f3">column_int64</a> (int nc)</td></tr>
-<tr class="memdesc:a9f84ddaa5d025b32cb0bdfafdd5530f3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a pointer to a NULL-terminated text with the column content.  <a href="classmlib_1_1_query.html#a9f84ddaa5d025b32cb0bdfafdd5530f3">More...</a><br /></td></tr>
-<tr class="separator:a9f84ddaa5d025b32cb0bdfafdd5530f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a16303ed0e787365eb1d1ede53a2129c7"><td class="memItemLeft" align="right" valign="top">const void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_query.html#a16303ed0e787365eb1d1ede53a2129c7">column_blob</a> (int nc)</td></tr>
-<tr class="memdesc:a16303ed0e787365eb1d1ede53a2129c7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a pointer to a BLOB with the column content.  <a href="classmlib_1_1_query.html#a16303ed0e787365eb1d1ede53a2129c7">More...</a><br /></td></tr>
-<tr class="separator:a16303ed0e787365eb1d1ede53a2129c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0d45bb826f7a3b85644a9eff74c8de79"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_query.html#a0d45bb826f7a3b85644a9eff74c8de79">column_int</a> (const std::string &amp;colname)</td></tr>
-<tr class="memdesc:a0d45bb826f7a3b85644a9eff74c8de79"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a pointer to a NULL-terminated text with the column content.  <a href="classmlib_1_1_query.html#a0d45bb826f7a3b85644a9eff74c8de79">More...</a><br /></td></tr>
-<tr class="separator:a0d45bb826f7a3b85644a9eff74c8de79"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9b2aee2711d15fbf82ee228c566deae3"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_query.html#a9b2aee2711d15fbf82ee228c566deae3">column_str</a> (const std::string &amp;colname)</td></tr>
-<tr class="memdesc:a9b2aee2711d15fbf82ee228c566deae3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a pointer to a NULL-terminated text with the column content.  <a href="classmlib_1_1_query.html#a9b2aee2711d15fbf82ee228c566deae3">More...</a><br /></td></tr>
-<tr class="separator:a9b2aee2711d15fbf82ee228c566deae3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abc420cefe02f9719e2581a5b7fc847a6"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_query.html#abc420cefe02f9719e2581a5b7fc847a6">column_text</a> (const std::string &amp;colname)</td></tr>
-<tr class="memdesc:abc420cefe02f9719e2581a5b7fc847a6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a pointer to a NULL-terminated text with the column content.  <a href="classmlib_1_1_query.html#abc420cefe02f9719e2581a5b7fc847a6">More...</a><br /></td></tr>
-<tr class="separator:abc420cefe02f9719e2581a5b7fc847a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a835155ac7c1c6e0459d669eae25d6471"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_query.html#a835155ac7c1c6e0459d669eae25d6471">column_double</a> (const std::string &amp;colname)</td></tr>
-<tr class="memdesc:a835155ac7c1c6e0459d669eae25d6471"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a pointer to a NULL-terminated text with the column content.  <a href="classmlib_1_1_query.html#a835155ac7c1c6e0459d669eae25d6471">More...</a><br /></td></tr>
-<tr class="separator:a835155ac7c1c6e0459d669eae25d6471"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a24ff4789d2d306a6a4d6765a1959c800"><td class="memItemLeft" align="right" valign="top">__int64&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_query.html#a24ff4789d2d306a6a4d6765a1959c800">column_int64</a> (const std::string &amp;name)</td></tr>
-<tr class="memdesc:a24ff4789d2d306a6a4d6765a1959c800"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a pointer to a NULL-terminated text with the column content.  <a href="classmlib_1_1_query.html#a24ff4789d2d306a6a4d6765a1959c800">More...</a><br /></td></tr>
-<tr class="separator:a24ff4789d2d306a6a4d6765a1959c800"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a57c690dc4acee06e5e79d3a64d3107e4"><td class="memItemLeft" align="right" valign="top">const void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_query.html#a57c690dc4acee06e5e79d3a64d3107e4">column_blob</a> (const std::string &amp;name)</td></tr>
-<tr class="memdesc:a57c690dc4acee06e5e79d3a64d3107e4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a pointer to a BLOB with the column content.  <a href="classmlib_1_1_query.html#a57c690dc4acee06e5e79d3a64d3107e4">More...</a><br /></td></tr>
-<tr class="separator:a57c690dc4acee06e5e79d3a64d3107e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a14a042e12cd4f873a1604710831a7165"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_query.html#a14a042e12cd4f873a1604710831a7165">column_int</a> (int nc) const</td></tr>
+<tr class="memdesc:a14a042e12cd4f873a1604710831a7165"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return column value converted to an integer.  <a href="classmlib_1_1_query.html#a14a042e12cd4f873a1604710831a7165">More...</a><br /></td></tr>
+<tr class="separator:a14a042e12cd4f873a1604710831a7165"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a04ff611d36df4fbe549113e60970746a"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_query.html#a04ff611d36df4fbe549113e60970746a">column_int</a> (const std::string &amp;colname) const</td></tr>
+<tr class="memdesc:a04ff611d36df4fbe549113e60970746a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return column value converted to an integer.  <a href="classmlib_1_1_query.html#a04ff611d36df4fbe549113e60970746a">More...</a><br /></td></tr>
+<tr class="separator:a04ff611d36df4fbe549113e60970746a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a43f70733482df265f72e270ddcd69929"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_query.html#a43f70733482df265f72e270ddcd69929">column_str</a> (int nc) const</td></tr>
+<tr class="memdesc:a43f70733482df265f72e270ddcd69929"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return column value as an UTF-8 encoded string.  <a href="classmlib_1_1_query.html#a43f70733482df265f72e270ddcd69929">More...</a><br /></td></tr>
+<tr class="separator:a43f70733482df265f72e270ddcd69929"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a033f4f9b638a36cea5f15a720f467763"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_query.html#a033f4f9b638a36cea5f15a720f467763">column_str</a> (const std::string &amp;colname) const</td></tr>
+<tr class="memdesc:a033f4f9b638a36cea5f15a720f467763"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return column value as an UTF-8 encoded string.  <a href="classmlib_1_1_query.html#a033f4f9b638a36cea5f15a720f467763">More...</a><br /></td></tr>
+<tr class="separator:a033f4f9b638a36cea5f15a720f467763"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6dc1fbb9738f77c5e774ad2258d401c8"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_query.html#a6dc1fbb9738f77c5e774ad2258d401c8">column_text</a> (int nc) const</td></tr>
+<tr class="memdesc:a6dc1fbb9738f77c5e774ad2258d401c8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a pointer to a NULL-terminated text with the column content.  <a href="classmlib_1_1_query.html#a6dc1fbb9738f77c5e774ad2258d401c8">More...</a><br /></td></tr>
+<tr class="separator:a6dc1fbb9738f77c5e774ad2258d401c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0aab724208a7f837a6dd58f6ff397319"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_query.html#a0aab724208a7f837a6dd58f6ff397319">column_text</a> (const std::string &amp;colname) const</td></tr>
+<tr class="memdesc:a0aab724208a7f837a6dd58f6ff397319"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a pointer to a NULL-terminated text with the column content.  <a href="classmlib_1_1_query.html#a0aab724208a7f837a6dd58f6ff397319">More...</a><br /></td></tr>
+<tr class="separator:a0aab724208a7f837a6dd58f6ff397319"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac2af35a6180c5c24816c147b38094705"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_query.html#ac2af35a6180c5c24816c147b38094705">column_double</a> (int nc) const</td></tr>
+<tr class="memdesc:ac2af35a6180c5c24816c147b38094705"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return floating point value of the column.  <a href="classmlib_1_1_query.html#ac2af35a6180c5c24816c147b38094705">More...</a><br /></td></tr>
+<tr class="separator:ac2af35a6180c5c24816c147b38094705"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a10eca6bcdc9300a70b3c6cd95ccf4682"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_query.html#a10eca6bcdc9300a70b3c6cd95ccf4682">column_double</a> (const std::string &amp;colname) const</td></tr>
+<tr class="memdesc:a10eca6bcdc9300a70b3c6cd95ccf4682"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return floating point value of the column.  <a href="classmlib_1_1_query.html#a10eca6bcdc9300a70b3c6cd95ccf4682">More...</a><br /></td></tr>
+<tr class="separator:a10eca6bcdc9300a70b3c6cd95ccf4682"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a85866535302815c2357b470fbdf6f632"><td class="memItemLeft" align="right" valign="top">__int64&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_query.html#a85866535302815c2357b470fbdf6f632">column_int64</a> (int nc) const</td></tr>
+<tr class="memdesc:a85866535302815c2357b470fbdf6f632"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return column value converted to a 64-bit integer.  <a href="classmlib_1_1_query.html#a85866535302815c2357b470fbdf6f632">More...</a><br /></td></tr>
+<tr class="separator:a85866535302815c2357b470fbdf6f632"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ace10b184f6c5652000f951a57c85bc33"><td class="memItemLeft" align="right" valign="top">__int64&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_query.html#ace10b184f6c5652000f951a57c85bc33">column_int64</a> (const std::string &amp;name) const</td></tr>
+<tr class="memdesc:ace10b184f6c5652000f951a57c85bc33"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return column value converted to a 64-bit integer.  <a href="classmlib_1_1_query.html#ace10b184f6c5652000f951a57c85bc33">More...</a><br /></td></tr>
+<tr class="separator:ace10b184f6c5652000f951a57c85bc33"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa6958e42529d05538f8d272592c16555"><td class="memItemLeft" align="right" valign="top">const void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_query.html#aa6958e42529d05538f8d272592c16555">column_blob</a> (int nc) const</td></tr>
+<tr class="memdesc:aa6958e42529d05538f8d272592c16555"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a pointer to a BLOB with the column content.  <a href="classmlib_1_1_query.html#aa6958e42529d05538f8d272592c16555">More...</a><br /></td></tr>
+<tr class="separator:aa6958e42529d05538f8d272592c16555"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8d0ed9a2eb4726cdfecf0e32960b479c"><td class="memItemLeft" align="right" valign="top">const void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_query.html#a8d0ed9a2eb4726cdfecf0e32960b479c">column_blob</a> (const std::string &amp;name) const</td></tr>
+<tr class="memdesc:a8d0ed9a2eb4726cdfecf0e32960b479c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a pointer to a BLOB with the column content. (int) const  <a href="classmlib_1_1_query.html#a8d0ed9a2eb4726cdfecf0e32960b479c">More...</a><br /></td></tr>
+<tr class="separator:a8d0ed9a2eb4726cdfecf0e32960b479c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a905a65c02709333ba359ab004fa2d245"><td class="memItemLeft" align="right" valign="top"><a id="a905a65c02709333ba359ab004fa2d245"></a>
+SYSTEMTIME&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_query.html#a905a65c02709333ba359ab004fa2d245">column_time</a> (int nc) const</td></tr>
+<tr class="memdesc:a905a65c02709333ba359ab004fa2d245"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a SYSTEMTIME structure with the column content. <br /></td></tr>
+<tr class="separator:a905a65c02709333ba359ab004fa2d245"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a78ea41e784736c198bb10f1c37bc9db5"><td class="memItemLeft" align="right" valign="top">SYSTEMTIME&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_query.html#a78ea41e784736c198bb10f1c37bc9db5">column_time</a> (const std::string &amp;name) const</td></tr>
+<tr class="memdesc:a78ea41e784736c198bb10f1c37bc9db5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a SYSTEMTIME structure with the column content.  <a href="classmlib_1_1_query.html#a78ea41e784736c198bb10f1c37bc9db5">More...</a><br /></td></tr>
+<tr class="separator:a78ea41e784736c198bb10f1c37bc9db5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Other column functions</div></td></tr>
 <tr><td colspan="2"><div class="groupText"><p><br  />
  </p>
 </div></td></tr>
-<tr class="memitem:aa7b0d73fe531e917923b68945bb2c61e"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_query.html#aa7b0d73fe531e917923b68945bb2c61e">column_type</a> (int nc)</td></tr>
-<tr class="memdesc:aa7b0d73fe531e917923b68945bb2c61e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return data type for a column specified by name or number.  <a href="classmlib_1_1_query.html#aa7b0d73fe531e917923b68945bb2c61e">More...</a><br /></td></tr>
-<tr class="separator:aa7b0d73fe531e917923b68945bb2c61e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae6ca8be45a2be60cebd199d93ef7ea5d"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_query.html#ae6ca8be45a2be60cebd199d93ef7ea5d">column_type</a> (const std::string &amp;colname)</td></tr>
-<tr class="memdesc:ae6ca8be45a2be60cebd199d93ef7ea5d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return data type for a column specified by name or number.  <a href="classmlib_1_1_query.html#ae6ca8be45a2be60cebd199d93ef7ea5d">More...</a><br /></td></tr>
-<tr class="separator:ae6ca8be45a2be60cebd199d93ef7ea5d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8c52f7da428b412819c9273171ad984d"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_query.html#a8c52f7da428b412819c9273171ad984d">column_size</a> (int nc)</td></tr>
-<tr class="memdesc:a8c52f7da428b412819c9273171ad984d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return number of bytes in a column that contains a BLOB or a string.  <a href="classmlib_1_1_query.html#a8c52f7da428b412819c9273171ad984d">More...</a><br /></td></tr>
-<tr class="separator:a8c52f7da428b412819c9273171ad984d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adbac32b675bbb23eb7fee2a7040feed9"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_query.html#adbac32b675bbb23eb7fee2a7040feed9">column_size</a> (const std::string &amp;colname)</td></tr>
-<tr class="memdesc:adbac32b675bbb23eb7fee2a7040feed9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return number of bytes in a column that contains a BLOB or a string.  <a href="classmlib_1_1_query.html#adbac32b675bbb23eb7fee2a7040feed9">More...</a><br /></td></tr>
-<tr class="separator:adbac32b675bbb23eb7fee2a7040feed9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a291400a7b75387cadc091b2796be9e4c"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_query.html#a291400a7b75387cadc091b2796be9e4c">column_type</a> (int nc) const</td></tr>
+<tr class="memdesc:a291400a7b75387cadc091b2796be9e4c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return data type for a column specified by name or number.  <a href="classmlib_1_1_query.html#a291400a7b75387cadc091b2796be9e4c">More...</a><br /></td></tr>
+<tr class="separator:a291400a7b75387cadc091b2796be9e4c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeb4c7cb991e1237c042c1d2c0242efc6"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_query.html#aeb4c7cb991e1237c042c1d2c0242efc6">column_type</a> (const std::string &amp;colname) const</td></tr>
+<tr class="memdesc:aeb4c7cb991e1237c042c1d2c0242efc6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return data type for a column specified by name or number.  <a href="classmlib_1_1_query.html#aeb4c7cb991e1237c042c1d2c0242efc6">More...</a><br /></td></tr>
+<tr class="separator:aeb4c7cb991e1237c042c1d2c0242efc6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa5390845f173112466fd14f71fb324ea"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_query.html#aa5390845f173112466fd14f71fb324ea">column_size</a> (int nc) const</td></tr>
+<tr class="memdesc:aa5390845f173112466fd14f71fb324ea"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return number of bytes in a column that contains a BLOB or a string.  <a href="classmlib_1_1_query.html#aa5390845f173112466fd14f71fb324ea">More...</a><br /></td></tr>
+<tr class="separator:aa5390845f173112466fd14f71fb324ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa046d124bfc326b1581b3706c3d67873"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_query.html#aa046d124bfc326b1581b3706c3d67873">column_size</a> (const std::string &amp;colname) const</td></tr>
+<tr class="memdesc:aa046d124bfc326b1581b3706c3d67873"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return number of bytes in a column that contains a BLOB or a string. (int) const  <a href="classmlib_1_1_query.html#aa046d124bfc326b1581b3706c3d67873">More...</a><br /></td></tr>
+<tr class="separator:aa046d124bfc326b1581b3706c3d67873"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a21197415531fe00458af8806f3839dd7"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_query.html#a21197415531fe00458af8806f3839dd7">decl_type</a> (int nc) const</td></tr>
+<tr class="separator:a21197415531fe00458af8806f3839dd7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a299ae3af338cf9a17795c04208db0331"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_query.html#a299ae3af338cf9a17795c04208db0331">decl_type</a> (const std::string &amp;colname) const</td></tr>
+<tr class="separator:a299ae3af338cf9a17795c04208db0331"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abce027452948e77237e51a40221730e5"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_query.html#abce027452948e77237e51a40221730e5">table_name</a> (int nc) const</td></tr>
+<tr class="memdesc:abce027452948e77237e51a40221730e5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return originating table name.  <a href="classmlib_1_1_query.html#abce027452948e77237e51a40221730e5">More...</a><br /></td></tr>
+<tr class="separator:abce027452948e77237e51a40221730e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae0aef20f35f72c99a6d0355bc2bf5dc5"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_query.html#ae0aef20f35f72c99a6d0355bc2bf5dc5">table_name</a> (const std::string &amp;colname) const</td></tr>
+<tr class="memdesc:ae0aef20f35f72c99a6d0355bc2bf5dc5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return originating table name.  <a href="classmlib_1_1_query.html#ae0aef20f35f72c99a6d0355bc2bf5dc5">More...</a><br /></td></tr>
+<tr class="separator:ae0aef20f35f72c99a6d0355bc2bf5dc5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af1804e036bf3cc4c5e97d8ad2e9ab341"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_query.html#af1804e036bf3cc4c5e97d8ad2e9ab341">database_name</a> (int nc) const</td></tr>
+<tr class="memdesc:af1804e036bf3cc4c5e97d8ad2e9ab341"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return originating schema name.  <a href="classmlib_1_1_query.html#af1804e036bf3cc4c5e97d8ad2e9ab341">More...</a><br /></td></tr>
+<tr class="separator:af1804e036bf3cc4c5e97d8ad2e9ab341"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af9dff4f8a839df1c35bcf13b15f6c764"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_query.html#af9dff4f8a839df1c35bcf13b15f6c764">database_name</a> (const std::string &amp;colname) const</td></tr>
+<tr class="memdesc:af9dff4f8a839df1c35bcf13b15f6c764"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return originating schema name.  <a href="classmlib_1_1_query.html#af9dff4f8a839df1c35bcf13b15f6c764">More...</a><br /></td></tr>
+<tr class="separator:af9dff4f8a839df1c35bcf13b15f6c764"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
 Friends</h2></td></tr>
@@ -219,7 +238,8 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>Database</b></td></t
 <tr class="separator:a6efef52d7a939622bbc934ff6b90ffe0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>The <a class="el" href="classmlib_1_1_query.html" title="Wrapper for SQL prepared sentences.">Query</a> class is a wrapper around a prepared <a href="http://sqlite.org/c3ref/stmt.html">sqlite3</a> statement. There are no copy constructors as the status of a prepared statement cannot be fully reproduced.</p>
+<div class="textblock"><p>Wrapper for SQL prepared sentences. </p>
+<p>The <a class="el" href="classmlib_1_1_query.html" title="Wrapper for SQL prepared sentences.">Query</a> class is a wrapper around a prepared <a href="http://sqlite.org/c3ref/stmt.html">sqlite3</a> statement. There are no copy constructors as the status of a prepared statement cannot be fully reproduced.</p>
 <p>The class provides a number of overloaded <code>bind</code> functions that can be used to bind parameters specified either by name or by number (first parameter is 1) to values of different types.</p>
 <p>All bind functions return a reference to the object allowing them to be syntactically chained as in the following example: </p><div class="fragment"><div class="line"><a class="code" href="classmlib_1_1_query.html#a7ee97cc5ed429ef7a420c4549e9fd6f0">Query</a>  (db, <span class="stringliteral">&quot;INSERT INTO table (col1, col2) VALUES (:param1, :param2);&quot;</span>)</div>
 <div class="line">  .bind (<span class="stringliteral">&quot;:param1&quot;</span>, value1)</div>
@@ -242,6 +262,8 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>Database</b></td></t
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Statement attached to a database but without any SQL. </p>
 <p>The object is linked to a database but doesn't have yet a prepared statement associated with it.</p>
 <p>This is convenient for statements that will latter receive their SQL through the assignment operator. </p>
 
@@ -272,6 +294,8 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>Database</b></td></t
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Build a prepared statement from SQL text. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">db</td><td>database connection </td></tr>
@@ -308,7 +332,9 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>Database</b></td></t
         </tr>
       </table>
 </div><div class="memdoc">
-<p>The value is written in a format compatible with SQLITE strftime function </p>
+
+<p>Bind a parameter specified by name to a <code>SYSTEMTIME</code> value. </p>
+<p>The value is written in a format compatible with SQLITE <code>strftime</code> function </p>
 
 </div>
 </div>
@@ -343,6 +369,8 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>Database</b></td></t
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Bind a parameter specified by name to an arbitrary memory area (BLOB) </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">parname</td><td>parameter name </td></tr>
@@ -380,7 +408,9 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>Database</b></td></t
         </tr>
       </table>
 </div><div class="memdoc">
-<p>The value is written in a format compatible with SQLITE strftime function </p>
+
+<p>Bind a parameter specified by number to a <code>SYSTEMTIME</code> value. </p>
+<p>The value is written in a format compatible with SQLITE <code>strftime</code> function </p>
 
 </div>
 </div>
@@ -415,6 +445,8 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>Database</b></td></t
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Bind a parameter specified by number to an arbitrary memory area (BLOB) </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">par</td><td>parameter index (starting from 1) </td></tr>
@@ -427,8 +459,8 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>Database</b></td></t
 
 </div>
 </div>
-<a id="a57c690dc4acee06e5e79d3a64d3107e4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a57c690dc4acee06e5e79d3a64d3107e4">&#9670;&nbsp;</a></span>column_blob() <span class="overload">[1/2]</span></h2>
+<a id="a8d0ed9a2eb4726cdfecf0e32960b479c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8d0ed9a2eb4726cdfecf0e32960b479c">&#9670;&nbsp;</a></span>column_blob() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -438,16 +470,18 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>Database</b></td></t
           <td>(</td>
           <td class="paramtype">const std::string &amp;&#160;</td>
           <td class="paramname"><em>colname</em></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>The memory for the BLOB is freed automatically. Call <a class="el" href="classmlib_1_1_query.html#a8c52f7da428b412819c9273171ad984d" title="Return number of bytes in a column that contains a BLOB or a string.">column_size()</a> function <em>after</em> calling this function to determine the size of the object returned. </p>
+
+<p>Return a pointer to a BLOB with the column content. (int) const </p>
+<p>The memory for the BLOB is freed automatically. Call <a class="el" href="classmlib_1_1_query.html#aa5390845f173112466fd14f71fb324ea" title="Return number of bytes in a column that contains a BLOB or a string.">column_size()</a> function <b>after</b> calling this function to determine the size of the object returned. (int) const </p>
 
 </div>
 </div>
-<a id="a16303ed0e787365eb1d1ede53a2129c7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a16303ed0e787365eb1d1ede53a2129c7">&#9670;&nbsp;</a></span>column_blob() <span class="overload">[2/2]</span></h2>
+<a id="aa6958e42529d05538f8d272592c16555"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa6958e42529d05538f8d272592c16555">&#9670;&nbsp;</a></span>column_blob() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -457,16 +491,18 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>Database</b></td></t
           <td>(</td>
           <td class="paramtype">int&#160;</td>
           <td class="paramname"><em>nc</em></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>The memory for the BLOB is freed automatically. Call <a class="el" href="classmlib_1_1_query.html#a8c52f7da428b412819c9273171ad984d" title="Return number of bytes in a column that contains a BLOB or a string.">column_size()</a> function <em>after</em> calling this function to determine the size of the object returned. </p>
+
+<p>Return a pointer to a BLOB with the column content. </p>
+<p>The memory for the BLOB is freed automatically. Call <a class="el" href="classmlib_1_1_query.html#aa5390845f173112466fd14f71fb324ea" title="Return number of bytes in a column that contains a BLOB or a string.">column_size()</a> function <b>after</b> calling this function to determine the size of the object returned. </p>
 
 </div>
 </div>
-<a id="a835155ac7c1c6e0459d669eae25d6471"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a835155ac7c1c6e0459d669eae25d6471">&#9670;&nbsp;</a></span>column_double() <span class="overload">[1/2]</span></h2>
+<a id="a10eca6bcdc9300a70b3c6cd95ccf4682"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a10eca6bcdc9300a70b3c6cd95ccf4682">&#9670;&nbsp;</a></span>column_double() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -476,16 +512,22 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>Database</b></td></t
           <td>(</td>
           <td class="paramtype">const std::string &amp;&#160;</td>
           <td class="paramname"><em>colname</em></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>The memory for the string is freed automatically. </p>
+
+<p>Return floating point value of the column. </p>
+<p>The following rules apply:</p><ul>
+<li><code>NULL</code> value is converted to 0.0</li>
+<li><code>INTEGER</code> value is promoted to double</li>
+<li><code>TEXT</code> or BLOB value is converted to number. Longest possible prefix of the value that can be interpreted as a real number is extracted and the remainder ignored. Any leading spaces are ignored. </li>
+</ul>
 
 </div>
 </div>
-<a id="a829780d29023a1c3eac2799e1b61e0e7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a829780d29023a1c3eac2799e1b61e0e7">&#9670;&nbsp;</a></span>column_double() <span class="overload">[2/2]</span></h2>
+<a id="ac2af35a6180c5c24816c147b38094705"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac2af35a6180c5c24816c147b38094705">&#9670;&nbsp;</a></span>column_double() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -495,16 +537,22 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>Database</b></td></t
           <td>(</td>
           <td class="paramtype">int&#160;</td>
           <td class="paramname"><em>nc</em></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>The memory for the string is freed automatically. </p>
+
+<p>Return floating point value of the column. </p>
+<p>The following rules apply:</p><ul>
+<li><code>NULL</code> value is converted to 0.0</li>
+<li><code>INTEGER</code> value is promoted to double</li>
+<li><code>TEXT</code> or BLOB value is converted to number. Longest possible prefix of the value that can be interpreted as a real number is extracted and the remainder ignored. Any leading spaces are ignored. </li>
+</ul>
 
 </div>
 </div>
-<a id="a0d45bb826f7a3b85644a9eff74c8de79"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0d45bb826f7a3b85644a9eff74c8de79">&#9670;&nbsp;</a></span>column_int() <span class="overload">[1/2]</span></h2>
+<a id="a04ff611d36df4fbe549113e60970746a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a04ff611d36df4fbe549113e60970746a">&#9670;&nbsp;</a></span>column_int() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -514,16 +562,22 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>Database</b></td></t
           <td>(</td>
           <td class="paramtype">const std::string &amp;&#160;</td>
           <td class="paramname"><em>colname</em></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>The memory for the string is freed automatically. </p>
+
+<p>Return column value converted to an integer. </p>
+<p>The following rules apply:</p><ul>
+<li><code>NULL</code> value is converted to 0</li>
+<li><code>REAL</code> value is rounded to nearest integer</li>
+<li><code>TEXT</code> or BLOB value is converted to number. Longest possible prefix of the value that can be interpreted as an integer number is extracted and the remainder ignored. Any leading spaces are ignored. </li>
+</ul>
 
 </div>
 </div>
-<a id="a0442289c8c2faa465393937709e0b767"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0442289c8c2faa465393937709e0b767">&#9670;&nbsp;</a></span>column_int() <span class="overload">[2/2]</span></h2>
+<a id="a14a042e12cd4f873a1604710831a7165"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a14a042e12cd4f873a1604710831a7165">&#9670;&nbsp;</a></span>column_int() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -533,16 +587,22 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>Database</b></td></t
           <td>(</td>
           <td class="paramtype">int&#160;</td>
           <td class="paramname"><em>nc</em></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>The memory for the string is freed automatically. </p>
+
+<p>Return column value converted to an integer. </p>
+<p>The following rules apply:</p><ul>
+<li><code>NULL</code> value is converted to 0</li>
+<li><code>REAL</code> value is rounded to nearest integer</li>
+<li><code>TEXT</code> or BLOB value is converted to number. Longest possible prefix of the value that can be interpreted as an integer number is extracted and the remainder ignored. Any leading spaces are ignored. </li>
+</ul>
 
 </div>
 </div>
-<a id="a24ff4789d2d306a6a4d6765a1959c800"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a24ff4789d2d306a6a4d6765a1959c800">&#9670;&nbsp;</a></span>column_int64() <span class="overload">[1/2]</span></h2>
+<a id="ace10b184f6c5652000f951a57c85bc33"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ace10b184f6c5652000f951a57c85bc33">&#9670;&nbsp;</a></span>column_int64() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -551,17 +611,23 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>Database</b></td></t
           <td class="memname">__int64 mlib::Query::column_int64 </td>
           <td>(</td>
           <td class="paramtype">const std::string &amp;&#160;</td>
-          <td class="paramname"><em>name</em></td><td>)</td>
-          <td></td>
+          <td class="paramname"><em>colname</em></td><td>)</td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>The memory for the string is freed automatically. </p>
+
+<p>Return column value converted to a 64-bit integer. </p>
+<p>The following rules apply:</p><ul>
+<li><code>NULL</code> value is converted to 0</li>
+<li><code>REAL</code> value is rounded to nearest integer</li>
+<li><code>TEXT</code> or <code>BLOB</code> value is converted to number. Longest possible prefix of the value that can be interpreted as an integer number is extracted and the remainder ignored. Any leading spaces are ignored. </li>
+</ul>
 
 </div>
 </div>
-<a id="a9f84ddaa5d025b32cb0bdfafdd5530f3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9f84ddaa5d025b32cb0bdfafdd5530f3">&#9670;&nbsp;</a></span>column_int64() <span class="overload">[2/2]</span></h2>
+<a id="a85866535302815c2357b470fbdf6f632"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a85866535302815c2357b470fbdf6f632">&#9670;&nbsp;</a></span>column_int64() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -571,16 +637,22 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>Database</b></td></t
           <td>(</td>
           <td class="paramtype">int&#160;</td>
           <td class="paramname"><em>nc</em></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>The memory for the string is freed automatically. </p>
+
+<p>Return column value converted to a 64-bit integer. </p>
+<p>The following rules apply:</p><ul>
+<li><code>NULL</code> value is converted to 0</li>
+<li><code>REAL</code> value is rounded to nearest integer</li>
+<li><code>TEXT</code> or <code>BLOB</code> value is converted to number. Longest possible prefix of the value that can be interpreted as an integer number is extracted and the remainder ignored. Any leading spaces are ignored. </li>
+</ul>
 
 </div>
 </div>
-<a id="adbac32b675bbb23eb7fee2a7040feed9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#adbac32b675bbb23eb7fee2a7040feed9">&#9670;&nbsp;</a></span>column_size() <span class="overload">[1/2]</span></h2>
+<a id="aa046d124bfc326b1581b3706c3d67873"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa046d124bfc326b1581b3706c3d67873">&#9670;&nbsp;</a></span>column_size() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -590,16 +662,18 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>Database</b></td></t
           <td>(</td>
           <td class="paramtype">const std::string &amp;&#160;</td>
           <td class="paramname"><em>colname</em></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>If the result is NULL the function returns 0. For a numerical column, the function returns the size of the string representation of the value. </p>
+
+<p>Return number of bytes in a column that contains a BLOB or a string. (int) const </p>
+<p>If the result is NULL the function returns 0. For a numerical column, the function returns the size of the string representation of the value. (int) const </p>
 
 </div>
 </div>
-<a id="a8c52f7da428b412819c9273171ad984d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8c52f7da428b412819c9273171ad984d">&#9670;&nbsp;</a></span>column_size() <span class="overload">[2/2]</span></h2>
+<a id="aa5390845f173112466fd14f71fb324ea"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa5390845f173112466fd14f71fb324ea">&#9670;&nbsp;</a></span>column_size() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -609,16 +683,18 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>Database</b></td></t
           <td>(</td>
           <td class="paramtype">int&#160;</td>
           <td class="paramname"><em>nc</em></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Return number of bytes in a column that contains a BLOB or a string. </p>
 <p>If the result is NULL the function returns 0. For a numerical column, the function returns the size of the string representation of the value. </p>
 
 </div>
 </div>
-<a id="a9b2aee2711d15fbf82ee228c566deae3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9b2aee2711d15fbf82ee228c566deae3">&#9670;&nbsp;</a></span>column_str() <span class="overload">[1/2]</span></h2>
+<a id="a033f4f9b638a36cea5f15a720f467763"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a033f4f9b638a36cea5f15a720f467763">&#9670;&nbsp;</a></span>column_str() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -628,16 +704,18 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>Database</b></td></t
           <td>(</td>
           <td class="paramtype">const std::string &amp;&#160;</td>
           <td class="paramname"><em>colname</em></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>The memory for the string is freed automatically. </p>
+
+<p>Return column value as an UTF-8 encoded string. </p>
+<p>If the column is <code>NULL</code>, the result is an empty string. </p>
 
 </div>
 </div>
-<a id="ad71dab151d633d91301034fac703325c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad71dab151d633d91301034fac703325c">&#9670;&nbsp;</a></span>column_str() <span class="overload">[2/2]</span></h2>
+<a id="a43f70733482df265f72e270ddcd69929"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a43f70733482df265f72e270ddcd69929">&#9670;&nbsp;</a></span>column_str() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -647,16 +725,18 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>Database</b></td></t
           <td>(</td>
           <td class="paramtype">int&#160;</td>
           <td class="paramname"><em>nc</em></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>The memory for the string is freed automatically. </p>
+
+<p>Return column value as an UTF-8 encoded string. </p>
+<p>If the column is <code>NULL</code>, the result is an empty string. </p>
 
 </div>
 </div>
-<a id="abc420cefe02f9719e2581a5b7fc847a6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abc420cefe02f9719e2581a5b7fc847a6">&#9670;&nbsp;</a></span>column_text() <span class="overload">[1/2]</span></h2>
+<a id="a0aab724208a7f837a6dd58f6ff397319"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0aab724208a7f837a6dd58f6ff397319">&#9670;&nbsp;</a></span>column_text() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -666,16 +746,19 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>Database</b></td></t
           <td>(</td>
           <td class="paramtype">const std::string &amp;&#160;</td>
           <td class="paramname"><em>colname</em></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>The memory for the string is freed automatically. </p>
+
+<p>Return a pointer to a NULL-terminated text with the column content. </p>
+<p>The memory for the string is freed automatically.</p>
+<p>If the column value is <code>NULL</code> the result is a <code>NULL</code> pointer </p>
 
 </div>
 </div>
-<a id="a4b7cc95a76d42a94a962252603be7bb7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4b7cc95a76d42a94a962252603be7bb7">&#9670;&nbsp;</a></span>column_text() <span class="overload">[2/2]</span></h2>
+<a id="a6dc1fbb9738f77c5e774ad2258d401c8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6dc1fbb9738f77c5e774ad2258d401c8">&#9670;&nbsp;</a></span>column_text() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -685,16 +768,19 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>Database</b></td></t
           <td>(</td>
           <td class="paramtype">int&#160;</td>
           <td class="paramname"><em>nc</em></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>The memory for the string is freed automatically. </p>
+
+<p>Return a pointer to a NULL-terminated text with the column content. </p>
+<p>The memory for the string is freed automatically.</p>
+<p>If the column value is <code>NULL</code> the result is a <code>NULL</code> pointer </p>
 
 </div>
 </div>
-<a id="a2b2ab5fa61b3fae7f0de608f6aed94ef"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2b2ab5fa61b3fae7f0de608f6aed94ef">&#9670;&nbsp;</a></span>column_time()</h2>
+<a id="a78ea41e784736c198bb10f1c37bc9db5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a78ea41e784736c198bb10f1c37bc9db5">&#9670;&nbsp;</a></span>column_time()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -704,15 +790,17 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>Database</b></td></t
           <td>(</td>
           <td class="paramtype">const std::string &amp;&#160;</td>
           <td class="paramname"><em>colname</em></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
+<p>Return a SYSTEMTIME structure with the column content. </p>
+
 </div>
 </div>
-<a id="ae6ca8be45a2be60cebd199d93ef7ea5d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae6ca8be45a2be60cebd199d93ef7ea5d">&#9670;&nbsp;</a></span>column_type() <span class="overload">[1/2]</span></h2>
+<a id="aeb4c7cb991e1237c042c1d2c0242efc6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aeb4c7cb991e1237c042c1d2c0242efc6">&#9670;&nbsp;</a></span>column_type() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -722,10 +810,12 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>Database</b></td></t
           <td>(</td>
           <td class="paramtype">const std::string &amp;&#160;</td>
           <td class="paramname"><em>colname</em></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Return data type for a column specified by name or number. </p>
 <dl class="retval"><dt>Return values</dt><dd>
   <table class="retval">
     <tr><td class="paramname">SQLITE_INTEGER</td><td>64-bit signed integer </td></tr>
@@ -739,8 +829,8 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>Database</b></td></t
 
 </div>
 </div>
-<a id="aa7b0d73fe531e917923b68945bb2c61e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa7b0d73fe531e917923b68945bb2c61e">&#9670;&nbsp;</a></span>column_type() <span class="overload">[2/2]</span></h2>
+<a id="a291400a7b75387cadc091b2796be9e4c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a291400a7b75387cadc091b2796be9e4c">&#9670;&nbsp;</a></span>column_type() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -750,10 +840,12 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>Database</b></td></t
           <td>(</td>
           <td class="paramtype">int&#160;</td>
           <td class="paramname"><em>nc</em></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Return data type for a column specified by name or number. </p>
 <dl class="retval"><dt>Return values</dt><dd>
   <table class="retval">
     <tr><td class="paramname">SQLITE_INTEGER</td><td>64-bit signed integer </td></tr>
@@ -765,6 +857,136 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>Database</b></td></t
   </dd>
 </dl>
 
+</div>
+</div>
+<a id="af9dff4f8a839df1c35bcf13b15f6c764"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af9dff4f8a839df1c35bcf13b15f6c764">&#9670;&nbsp;</a></span>database_name() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string mlib::Query::database_name </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>colname</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Return originating schema name. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">colname</td><td>- column name</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>If the query is a SELECT statement and <code>colname</code> is a table column (not an expression or subquery) the function returns the name of the schema where the column originated from. Otherwise the function returns an empty string.</p>
+<p>The returned string is always UTF-8 encoded.</p>
+<p>Example: </p><div class="fragment"><div class="line">Database db (<span class="stringliteral">&quot;&quot;</span>);                         <span class="comment">// create temporary database</span></div>
+<div class="line">db.exec (<span class="stringliteral">&quot;CREATE TABLE tbl(c1 TEXT)&quot;</span>);    <span class="comment">// schema</span></div>
+<div class="line">db.exec (<span class="stringliteral">&quot;ATTACH \&quot;:memory:\&quot; AS db2&quot;</span>);</div>
+<div class="line">db.exec (<span class="stringliteral">&quot;CREATE TABLE db2.tbl2(c2 TEXT)&quot;</span>);</div>
+<div class="line"><a class="code" href="classmlib_1_1_query.html#a7ee97cc5ed429ef7a420c4549e9fd6f0">Query</a> q (db, <span class="stringliteral">&quot;SELECT c1, c2 FROM tbl JOIN tbl2&quot;</span>);  <span class="comment">// SELECT query</span></div>
+<div class="line"><span class="keyword">auto</span> s = q.database_name (<span class="stringliteral">&quot;c1&quot;</span>);          <span class="comment">// s == &quot;main&quot;</span></div>
+<div class="line">s = q.database_name (<span class="stringliteral">&quot;c2&quot;</span>);               <span class="comment">// s == &quot;db2&quot;</span></div>
+</div><!-- fragment --><p>SQLITE must be compiled with the SQLITE_ENABLE_COLUMN_METADATA for this function to be available. </p>
+
+</div>
+</div>
+<a id="af1804e036bf3cc4c5e97d8ad2e9ab341"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af1804e036bf3cc4c5e97d8ad2e9ab341">&#9670;&nbsp;</a></span>database_name() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string mlib::Query::database_name </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>nc</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Return originating schema name. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">nc</td><td>- column number</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>If the query is a SELECT statement and <code>nc</code> is a table column (not an expression or subquery) the function returns the name of the schema where the column originated from. Otherwise the function returns an empty string.</p>
+<p>The returned string is always UTF-8 encoded.</p>
+<p>Example: </p><div class="fragment"><div class="line">Database db (<span class="stringliteral">&quot;&quot;</span>);                         <span class="comment">// create temporary database</span></div>
+<div class="line">db.exec (<span class="stringliteral">&quot;CREATE TABLE tbl(c1 TEXT)&quot;</span>);    <span class="comment">// schema</span></div>
+<div class="line">db.exec (<span class="stringliteral">&quot;ATTACH \&quot;:memory:\&quot; AS db2&quot;</span>);</div>
+<div class="line">db.exec (<span class="stringliteral">&quot;CREATE TABLE db2.tbl2(c2 TEXT)&quot;</span>);</div>
+<div class="line"><a class="code" href="classmlib_1_1_query.html#a7ee97cc5ed429ef7a420c4549e9fd6f0">Query</a> q (db, <span class="stringliteral">&quot;SELECT c1, c2 FROM tbl JOIN tbl2&quot;</span>);  <span class="comment">// SELECT query</span></div>
+<div class="line"><span class="keyword">auto</span> s = q.database_name (0);             <span class="comment">// s == &quot;main&quot;</span></div>
+<div class="line">s = q.database_name (1);                  <span class="comment">// s == &quot;db2&quot;</span></div>
+</div><!-- fragment --><p>SQLITE must be compiled with the SQLITE_ENABLE_COLUMN_METADATA for this function to be available. </p>
+
+</div>
+</div>
+<a id="a299ae3af338cf9a17795c04208db0331"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a299ae3af338cf9a17795c04208db0331">&#9670;&nbsp;</a></span>decl_type() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string mlib::Query::decl_type </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>colname</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">colname</td><td>- column name If the query is a SELECT statement and <code>colname</code> is a table column (not an expression or subquery) the function returns the declared type of the table column. Otherwise the function returns an empty string.</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>The returned string is always UTF-8 encoded.</p>
+<p>Example: </p><div class="fragment"><div class="line">Database db(<span class="stringliteral">&quot;&quot;</span>);                          <span class="comment">// create temporary database</span></div>
+<div class="line">db.exec (<span class="stringliteral">&quot;CREATE TABLE t1(c1 VARIANT)&quot;</span>);  <span class="comment">// schema</span></div>
+<div class="line"><a class="code" href="classmlib_1_1_query.html#a7ee97cc5ed429ef7a420c4549e9fd6f0">Query</a> q (db, <span class="stringliteral">&quot;SELECT c1 FROM t1&quot;</span>);        <span class="comment">// SELECT query</span></div>
+<div class="line"><span class="keyword">auto</span> s = q.decl_type(<span class="stringliteral">&quot;c1&quot;</span>);               <span class="comment">// s == &quot;VARIANT&quot;</span></div>
+</div><!-- fragment --> 
+</div>
+</div>
+<a id="a21197415531fe00458af8806f3839dd7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a21197415531fe00458af8806f3839dd7">&#9670;&nbsp;</a></span>decl_type() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string mlib::Query::decl_type </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>nc</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">nc</td><td>- column number If the query is a SELECT statement and <code>nc</code> is a table column (not an expression or subquery) the function returns the declared type of the table column. Otherwise the function returns an empty string.</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>The returned string is always UTF-8 encoded.</p>
+<p>Example: </p><div class="fragment"><div class="line">Database db(<span class="stringliteral">&quot;&quot;</span>);                          <span class="comment">// create in-memory database</span></div>
+<div class="line">db.exec (<span class="stringliteral">&quot;CREATE TABLE t1(c1 VARIANT)&quot;</span>);  <span class="comment">// schema</span></div>
+<div class="line"><a class="code" href="classmlib_1_1_query.html#a7ee97cc5ed429ef7a420c4549e9fd6f0">Query</a> q (db, <span class="stringliteral">&quot;SELECT c1 FROM t1&quot;</span>);        <span class="comment">// SELECT query</span></div>
+<div class="line"><span class="keyword">auto</span> s = q.decl_type(0);                  <span class="comment">// s == &quot;VARIANT&quot;</span></div>
+</div><!-- fragment --> 
 </div>
 </div>
 <a id="a9d762cc2f632327002226ab537e8b7f2"></a>
@@ -781,7 +1003,37 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>Database</b></td></t
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Statements are automatically finalized when <a class="el" href="classmlib_1_1_query.html" title="Wrapper for SQL prepared sentences.">Query</a> objects are destructed or assigned a new SQL text. </p>
 <p>Occasionally user might need to manually finalize a query (for instance if he needs to close a database connection). </p>
+
+</div>
+</div>
+<a id="a3d0be57b8bd7f466bbece68da4223d92"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3d0be57b8bd7f466bbece68da4223d92">&#9670;&nbsp;</a></span>operator std::string()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">mlib::Query::operator std::string </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Retrieve SQL text. </p>
+<p>This is just syntactic sugar over <a class="el" href="classmlib_1_1_query.html#aec30b70916c6ccb20e730f791e4fa025" title="Retrieve SQL text.">Query::sql()</a> function. </p>
 
 </div>
 </div>
@@ -800,6 +1052,8 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>Database</b></td></t
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Assign SQL text to a query. </p>
 <p>The object must have the database reference set before calling this function.</p>
 <p>If a previous statement was attached to the object, it is finalized before the new statement is prepared. </p>
 
@@ -819,6 +1073,8 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>Database</b></td></t
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Retrieve SQL text. </p>
 <p>If the object is not connected with a prepared statement returns an empty string. </p>
 
 </div>
@@ -837,8 +1093,74 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>Database</b></td></t
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Evaluate the statement. </p>
 <p>When a new row of results is available the function returns SQLITE_ROW.</p>
-<p>When there are no more result the function returns SQLITE_DONE. Both codes are wrapped in ercs with priority level ERROR_PRI_INFO that normally doesn't throw an exception. Any other error is return at the normal priority level ERROR_PRI_ERROR. </p>
+<p>When there are no more result the function returns SQLITE_DONE. Both codes are wrapped in <a class="el" href="classmlib_1_1erc.html">erc</a> objects with priority level <code>ERROR_PRI_INFO</code> that normally don't throw an exception. Any other error is return at the normal priority level <code>ERROR_PRI_ERROR</code>. </p>
+
+</div>
+</div>
+<a id="ae0aef20f35f72c99a6d0355bc2bf5dc5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae0aef20f35f72c99a6d0355bc2bf5dc5">&#9670;&nbsp;</a></span>table_name() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string mlib::Query::table_name </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>colname</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Return originating table name. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">colname</td><td>- column name If the query is a SELECT statement and <code>colname</code> is a table column (not an expression or subquery) the function returns the name of the table where the column originated from. Otherwise the function returns an empty string.</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>The returned string is always UTF-8 encoded.</p>
+<p>Example: </p><div class="fragment"><div class="line">Database db (<span class="stringliteral">&quot;&quot;</span>);                         <span class="comment">// create temporary database</span></div>
+<div class="line">db.exec (<span class="stringliteral">&quot;CREATE TABLE tbl(c1 TEXT)&quot;</span>);    <span class="comment">// schema</span></div>
+<div class="line"><a class="code" href="classmlib_1_1_query.html#a7ee97cc5ed429ef7a420c4549e9fd6f0">Query</a> q (db, <span class="stringliteral">&quot;SELECT c1 FROM tbl&quot;</span>);       <span class="comment">// SELECT query</span></div>
+<div class="line"><span class="keyword">auto</span> s = q.table_name (<span class="stringliteral">&quot;c1&quot;</span>);             <span class="comment">// s == &quot;tbl&quot;</span></div>
+</div><!-- fragment --><p>SQLITE must be compiled with the SQLITE_ENABLE_COLUMN_METADATA for this function to be available. </p>
+
+</div>
+</div>
+<a id="abce027452948e77237e51a40221730e5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abce027452948e77237e51a40221730e5">&#9670;&nbsp;</a></span>table_name() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string mlib::Query::table_name </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>nc</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Return originating table name. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">nc</td><td>- column number If the query is a SELECT statement and <code>nc</code> is a table column (not an expression or subquery) the function returns the name of the table where the column originated from. Otherwise the function returns an empty string.</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>The returned string is always UTF-8 encoded.</p>
+<p>Example: </p><div class="fragment"><div class="line">Database db (<span class="stringliteral">&quot;&quot;</span>);                         <span class="comment">// create temporary database</span></div>
+<div class="line">db.exec (<span class="stringliteral">&quot;CREATE TABLE tbl(c1 TEXT)&quot;</span>);    <span class="comment">// schema</span></div>
+<div class="line"><a class="code" href="classmlib_1_1_query.html#a7ee97cc5ed429ef7a420c4549e9fd6f0">Query</a> q (db, <span class="stringliteral">&quot;SELECT c1 FROM tbl&quot;</span>);       <span class="comment">// SELECT query</span></div>
+<div class="line"><span class="keyword">auto</span> s = q.table_name (0);                <span class="comment">// s == &quot;tbl&quot;</span></div>
+</div><!-- fragment --><p>SQLITE must be compiled with the SQLITE_ENABLE_COLUMN_METADATA for this function to be available. </p>
 
 </div>
 </div>
@@ -847,7 +1169,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>Database</b></td></t
 <li>C:/development/mlib/source/<a class="el" href="sqlitepp_8cpp.html">sqlitepp.cpp</a></li>
 </ul>
 </div><!-- contents -->
-<div class="ttc" id="aclassmlib_1_1_query_html_a7ee97cc5ed429ef7a420c4549e9fd6f0"><div class="ttname"><a href="classmlib_1_1_query.html#a7ee97cc5ed429ef7a420c4549e9fd6f0">mlib::Query::Query</a></div><div class="ttdeci">Query()</div><div class="ttdoc">Default constructor.</div><div class="ttdef"><b>Definition:</b> sqlitepp.h:206</div></div>
+<div class="ttc" id="aclassmlib_1_1_query_html_a7ee97cc5ed429ef7a420c4549e9fd6f0"><div class="ttname"><a href="classmlib_1_1_query.html#a7ee97cc5ed429ef7a420c4549e9fd6f0">mlib::Query::Query</a></div><div class="ttdeci">Query()</div><div class="ttdoc">Default constructor.</div><div class="ttdef"><b>Definition:</b> sqlitepp.h:235</div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">

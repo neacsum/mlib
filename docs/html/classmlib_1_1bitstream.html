@@ -97,7 +97,8 @@ std::iostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>s</b><
 <tr class="separator:a36f76944c928380d1a5f62a35194357a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>This class allows reading and writing of bit fields from or to a byte stream. It allows for different byte encodings using the protected encode/decode functions.</p>
+<div class="textblock"><p>Read and write bit fields. </p>
+<p>This class allows reading and writing of bit fields from or to a byte stream. It allows for different byte encodings using the protected encode/decode functions.</p>
 <dl class="section remark"><dt>Remarks</dt><dd>Maximum field width is limited to 32 bits. </dd></dl>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a4ea7010adb5ff980a19f71c3527d1e78"></a>
@@ -169,6 +170,8 @@ std::iostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>s</b><
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Decode bit field from a byte. </p>
 <p>The default implementation unpacks the bit field from the LSB of byte.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -213,6 +216,8 @@ std::iostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>s</b><
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Encode bit field in a byte. </p>
 <p>The default implementation packs the bit field in the LSB of byte.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -249,6 +254,8 @@ std::iostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>s</b><
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Read a variable number of bits. </p>
 <p>Invokes <a class="el" href="classmlib_1_1bitstream.html#ae84dfade80785c9b3d141d88ebd9fca7" title="Read the next bit.">read</a> function repeatedly to read all bits.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -288,6 +295,8 @@ std::iostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>s</b><
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Write a variable number of bits. </p>
 <p>Invokes <a class="el" href="classmlib_1_1bitstream.html#a579883eaa05c295675001cf334e39f39" title="Write a bit to stream.">write</a> function repeatedly to write each bit.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -314,6 +323,8 @@ std::iostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>s</b><
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Read the next bit. </p>
 <p>Read a single bit from stream.</p>
 <p>If there are no more bits available in current byte tries to get a new byte and decodes it using <a class="el" href="classmlib_1_1bitstream.html#a70b6ba0b477565d98d22e7b7e8d21a36" title="Decode bit field from a byte.">decode</a> function.</p>
 <dl class="section return"><dt>Returns</dt><dd>Bit value</dd></dl>
@@ -336,6 +347,8 @@ std::iostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>s</b><
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Write a bit to stream. </p>
 <p>If it has accumulated enough bits calls <a class="el" href="classmlib_1_1bitstream.html#a9ccb991ba43925e8cae55ff2cff105cf" title="Encode bit field in a byte.">encode</a> function to encode them and writes a new byte to underlining stream.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">

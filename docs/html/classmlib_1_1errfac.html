@@ -119,7 +119,8 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>erc</b></td></tr>
 <tr class="separator:aaacdce2356471912413b98e9bcf8389a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>To facilitate handling of ercs, each erc has associated a "facility". Instead of throwing an exception directly the erc calls the facility's <a class="el" href="classmlib_1_1errfac.html#ace2cfec5097e30fca63d147693939d51" title="Check if error must be logged or thrown.">raise</a> function. In turn, it is this function that decides what should happen with the erc based on facility's log level and throw level.</p>
+<div class="textblock"><p>An error facility routes a group of errors handled in a similar manner. </p>
+<p>To facilitate handling of ercs, each erc has associated a "facility". Instead of throwing an exception directly the erc calls the facility's <a class="el" href="classmlib_1_1errfac.html#ace2cfec5097e30fca63d147693939d51" title="Check if error must be logged or thrown.">raise</a> function. In turn, it is this function that decides what should happen with the erc based on facility's log level and throw level.</p>
 <p>There is also a default facility that is used when the erc doesn't have an explicit facility. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="aa65bd42f7ff920b4f58ca49f94c12a09"></a>
@@ -145,6 +146,8 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>erc</b></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>set default facility </p>
 <p>Change the default error facility.</p>
 <p>If called with a NULL argument reverts to generic error facility </p>
 
@@ -165,6 +168,8 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>erc</b></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>set log priority </p>
 <p>Logging priority must be between ERROR_PRI_SUCCESS and ERROR_PRI_EMERG <a class="el" href="errorcode_8h.html#ERROR_PRI">see Error Priorities</a>. </p>
 
 </div>
@@ -192,6 +197,8 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>erc</b></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>return message to be logged </p>
 <p>Default message the facility name followed by the error code value. </p>
 
 <p>Reimplemented in <a class="el" href="classmlib_1_1sqlitefac.html#ac567cc9a6bb2f875ddefc77e4fc00347">mlib::sqlitefac</a>.</p>
@@ -221,6 +228,8 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>erc</b></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Check if error must be logged or thrown. </p>
 <p>This function is called by an active error (in destructor of erc objects or assignment operator).</p>
 <p>The typical action chain is: erc destructor -&gt; <a class="el" href="classmlib_1_1errfac.html#ace2cfec5097e30fca63d147693939d51" title="Check if error must be logged or thrown.">errfac::raise</a> -&gt; erc is thrown </p>
 
@@ -241,6 +250,8 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>erc</b></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>set throw priority </p>
 <p>Throw priority must be between ERROR_PRI_SUCCESS and ERROR_PRI_EMERG <a class="el" href="errorcode_8h.html#ERROR_PRI">see Error Priorities</a>. </p>
 
 </div>

@@ -122,7 +122,8 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>errfac</b></td></tr>
 <tr class="separator:a72979edc13b0732722ea1793a4708995"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>If not tested and their level is above facility's logging level they will be logged ( <a class="el" href="classmlib_1_1errfac.html#a2fabef1cb2b68c00fa6f2b39af6f7f3c" title="Logging action. Default is to use dprintf.">errfac::log()</a> ). If the level is above facility's throwing level they will be thrown as exceptions. </p>
+<div class="textblock"><p>objects returned as a function result or thrown directly. </p>
+<p>If not tested and their level is above facility's logging level they will be logged ( <a class="el" href="classmlib_1_1errfac.html#a2fabef1cb2b68c00fa6f2b39af6f7f3c" title="Logging action. Default is to use dprintf.">errfac::log()</a> ). If the level is above facility's throwing level they will be thrown as exceptions. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="ad53189ed92df58baecf1b58124312d6e"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ad53189ed92df58baecf1b58124312d6e">&#9670;&nbsp;</a></span>erc()</h2>
@@ -139,6 +140,8 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>errfac</b></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Copy constructor removes the activity flag of the original object. </p>
 <p>Having two erc's active at the same time is a big no-no: when one of them is thrown, the stack unwinding process invokes the destructor of the other one, which in turn might throw again. Throwing an exception during stack unwinding will terminate your application. For more details see: <a href="https://isocpp.org/wiki/faq/exceptions#dtors-shouldnt-throw">https://isocpp.org/wiki/faq/exceptions#dtors-shouldnt-throw</a></p>
 <p>However, the whole concept of erc's is based upon destructors throwing exceptions. Here we carefully navigate between a rock and a hard place. </p>
 
@@ -166,6 +169,8 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>errfac</b></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Dtor. </p>
 <p>If we are active, call our facility to see if we get logged or thrown. </p>
 
 </div>
@@ -193,6 +198,8 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>errfac</b></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Return numerical value. </p>
 <p>As opposed to the integer conversion operator, this function doesn't change the activity flag. </p>
 
 </div>
@@ -211,6 +218,8 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>errfac</b></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Marks error code as inactive. </p>
 <p>Useful in catch clauses when we don't really care what the code value is. </p>
 
 </div>
@@ -229,6 +238,8 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>errfac</b></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Integer conversion operator. </p>
 <p>Assume the error has been dealt with and reset the active flag. </p>
 
 </div>
@@ -248,6 +259,8 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>errfac</b></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Principal assignment operator. </p>
 <p>If we were active before, call the facility to log or throw. Anyhow copy new values from the assigned object and take away it's active flag.</p>
 <dl class="section note"><dt>Note</dt><dd>It is rather bad practice to assign to an active erc object. Here we take the view that, since the left side object was already active, we have to deal with it first. </dd></dl>
 
@@ -268,6 +281,8 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>errfac</b></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Move assignment operator. </p>
 <p>If we were active before, call the facility to log or throw. Anyhow copy new values from the assigned object and take away it's active flag. </p>
 
 </div>

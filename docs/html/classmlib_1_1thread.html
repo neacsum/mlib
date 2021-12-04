@@ -210,7 +210,8 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>current_thread</b></
 <tr class="separator:a3f16ecc155973bc0496aae1634e0d4a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>This class is abstract and the user has to derive another object and implement the <a class="el" href="classmlib_1_1thread.html#a7364e7fb5e90830d68e820f8de910181" title="Default run function.">run()</a> function. Thread objects are created in a "suspended animation" state. To start them use the <a class="el" href="classmlib_1_1thread.html#ae14ce5ccdb7ec7a41fe6e8d8ce385867" title="Begin execution of a newly created thread.">start()</a> function.</p>
+<div class="textblock"><p>Wrapper for a Windows thread. </p>
+<p>This class is abstract and the user has to derive another object and implement the <a class="el" href="classmlib_1_1thread.html#a7364e7fb5e90830d68e820f8de910181" title="Default run function.">run()</a> function. Thread objects are created in a "suspended animation" state. To start them use the <a class="el" href="classmlib_1_1thread.html#ae14ce5ccdb7ec7a41fe6e8d8ce385867" title="Begin execution of a newly created thread.">start()</a> function.</p>
 <p>When combining objects and multi-threading it is useful to define what member functions are <em>foreign</em> (i.e. can be called by another execution thread) and what functions are <em>owned</em> (i.e. can be called only by the same execution thread. If possible, "owned" functions should be made private or protected. The object's constructors and destructor are inherently <em>foreign</em> while the run function is inherently <em>owned</em>. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a9e670c51c075b7fe83cb7bd6c57f9f69"></a>
@@ -228,6 +229,8 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>current_thread</b></
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Make a thread from a function. </p>
 <p>Uses a polymorphic function wrapper that can be a lambda expression, a bind expression or any other type of function object as a run function of the newly created thread. When the thread is started (using the <a class="el" href="classmlib_1_1thread.html#ae14ce5ccdb7ec7a41fe6e8d8ce385867" title="Begin execution of a newly created thread.">start()</a> function), the run function is called.</p>
 <p>The return value of the run function becomes the exit code of the thread. </p>
 
@@ -255,6 +258,8 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>current_thread</b></
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Destructor. </p>
 <p>Normally the thread should have ended earlier ( !isRunning ) Anyhow we will use now brute force (TerminateThread) to end it. </p>
 
 </div>
@@ -282,6 +287,8 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>current_thread</b></
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Default run function. </p>
 <p>Calls user supplied function if there is one </p>
 
 <p>Reimplemented in <a class="el" href="classmlib_1_1http__connection.html#aab57ff5ac7425f2a838c32a8a098453e">mlib::http_connection</a>, <a class="el" href="classmlib_1_1current__thread.html#aa004a12d6b41fe9947b80a4f9b2aa4b4">mlib::current_thread</a>, and <a class="el" href="classmlib_1_1tcpserver.html#ab605e3fc1e27da5503bb8c09d8debbf4">mlib::tcpserver</a>.</p>

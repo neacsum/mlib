@@ -300,7 +300,8 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>httpd</b></td></tr>
 <tr class="separator:ae4ded9b6be54cdc08b705a36eb047f1c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>This is the thread created by the httpd server object in response to a new connection request.</p>
+<div class="textblock"><p>Representation of a HTTP client connection request. </p>
+<p>This is the thread created by the httpd server object in response to a new connection request.</p>
 <p>After construction, the thread is started automatically by the server and it begins listening to its connection socket and process HTTP requests. When the HTTP client closes the connection the thread is stopped and destructed.</p>
 <p>Users can create derived classes but the parent server must also be a class derived from httpd with an overridden <a class="el" href="classmlib_1_1httpd.html#a42dff0bbdf913f525aba3dcca4ef68b7" title="Create an new http_connection object for a new incoming connection.">httpd::make_thread</a> function.</p>
 <p>The request processing cycle starts with the receiving a client request, validating, processing it and sending back the reply. The processing part implies either calling a user handler function if one was registered for the URI or serving a file.</p>
@@ -339,6 +340,8 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>httpd</b></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Protected constructor used by httpd class to create a new connection thread. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">socket</td><td>connecting socket </td></tr>
@@ -376,6 +379,8 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>httpd</b></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Add or modify a response header. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">hdr</td><td>header name </td></tr>
@@ -402,6 +407,8 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>httpd</b></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Returns the value of a request header. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">hdr</td><td>header name </td></tr>
@@ -427,6 +434,8 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>httpd</b></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Returns the value of a response header. </p>
 <p>The header can belong either to server or to connection.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -453,6 +462,8 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>httpd</b></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Return the value of a query parameter or the empty string if the query doesn't have the parameter. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">key</td><td>query parameter to look for </td></tr>
@@ -490,6 +501,8 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>httpd</b></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Generate a HTTP redirect response to a new uri. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">uri</td><td>redirected uri </td></tr>
@@ -525,6 +538,8 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>httpd</b></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Send the beginning of HTTP response. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">code</td><td>HTTP response code </td></tr>
@@ -556,6 +571,8 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>httpd</b></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Send subsequent parts of a multi-part response. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">last</td><td><em>true</em> if this is the last part of the mulit-part response</td></tr>
@@ -591,6 +608,8 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>httpd</b></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Send first part of a multi-part response. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">part_type</td><td>value of the 'Content-Type' header </td></tr>
@@ -623,6 +642,8 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>httpd</b></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Thread run loop. </p>
 <p>The loop collects the client request, parses, validates and processes it. </p>
 
 <p>Reimplemented from <a class="el" href="classmlib_1_1thread.html#a7364e7fb5e90830d68e820f8de910181">mlib::thread</a>.</p>
@@ -654,6 +675,8 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>httpd</b></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Send the content of a buffer. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">src_buff</td><td>buffer to send </td></tr>
@@ -687,6 +710,8 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>httpd</b></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Send the content of a string. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">str</td><td>string to send</td></tr>
@@ -719,6 +744,8 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>httpd</b></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Send the content of a file. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">full_path</td><td>fully qualified path name (UTF8 encoded)</td></tr>
@@ -753,6 +780,8 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>httpd</b></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Send the content of a file, processing any SSI directives. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">full_path</td><td>fully qualified file name (UTF8 encoded)</td></tr>

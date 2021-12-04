@@ -58,6 +58,7 @@ Functions</h2></td></tr>
 <tr class="separator:ga539847706cd1524ad28b2935f89189c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<p>Functions for retrieving available serial ports. </p>
 <p>These functions are heavily inspired from <a href="http://www.naughter.com/enumser.html">CEnumerateSerial</a> code.</p>
 <p>From the original code I've removed methods that don't seem to be working (ComDBOpen) or that take a ridiculous amount of time to execute (GetDefaultCommConfig).</p>
 <p>In the end I was left with three methods: using CreateFile, using SetupAPI and using the registry. The CreateFile method has no particular advantage except that it is conceptually very simple. The setup API is a bit slower (about 15 ms per port on my machine) but it returns also the friendly port name. The registry method is blazing fast (under 1 ms) but does not provide the friendly name. </p>
