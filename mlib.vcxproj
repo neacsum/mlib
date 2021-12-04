@@ -222,7 +222,12 @@
     <ClCompile Include="source\serenum2.cpp" />
     <ClCompile Include="source\serenum3.cpp" />
     <ClCompile Include="source\shmem.cpp" />
-    <ClCompile Include="source\sqlite3.c" />
+    <ClCompile Include="source\sqlite3.c">
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">SQLITE_CUSTOM_INCLUDE=mlib/defs.h;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">SQLITE_CUSTOM_INCLUDE=mlib/defs.h;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">SQLITE_CUSTOM_INCLUDE=mlib/defs.h;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">SQLITE_CUSTOM_INCLUDE=mlib/defs.h;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
     <ClCompile Include="source\sqlitepp.cpp" />
     <ClCompile Include="source\statpars.cpp" />
     <ClCompile Include="source\stopwatch.cpp" />

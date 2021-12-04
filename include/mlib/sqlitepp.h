@@ -102,7 +102,7 @@ public:
   ///Default constructor
   Query ();
 
-  ///Object without SQL statement
+  ///Statement attached to a database but without any SQL
   Query (Database& db);
 
   ///Build a prepared statement from SQL text
@@ -116,8 +116,11 @@ public:
   ///Assign SQL text to a query
   Query& operator =(const std::string& sql);
 
-  ///retrieve SQL text
+  ///Retrieve SQL text
   std::string sql() const;
+
+  ///Retrieve SQL text
+  operator std::string () const;
 
   ///Evaluate the statement
   erc           step ();
@@ -137,27 +140,45 @@ public:
 
   Query&        clear_bindings ();
 
-  int           column_int (int nc);
-  std::string   column_str (int nc);
-  const char*   column_text(int nc);
-  double        column_double (int nc);
-  __int64       column_int64 (int nc);
-  const void*   column_blob (int nc);
-  SYSTEMTIME    column_time (int nc);
+  int           column_int (int nc) const;
+  int           column_int (const std::string& colname) const;
 
-  int           column_int (const std::string& colname);
-  std::string   column_str (const std::string& colname);
-  const char*   column_text(const std::string& colname);
-  double        column_double (const std::string& colname);
-  __int64       column_int64 (const std::string& name);
-  const void*   column_blob (const std::string& name);
-  SYSTEMTIME    column_time (const std::string& name);
+  std::string   column_str (int nc) const;
+  std::string   column_str (const std::string& colname) const;
 
-  int           column_type (int nc);
-  int           column_type (const std::string& colname);
+  const char*   column_text (int nc) const;
+  const char*   column_text (const std::string& colname) const;
 
-  int           column_size (int nc);
-  int           column_size (const std::string& colname);
+  double        column_double (int nc) const;
+  double        column_double (const std::string& colname) const;
+
+  __int64       column_int64 (int nc) const;
+  __int64       column_int64 (const std::string& name) const;
+
+  const void*   column_blob (int nc) const;
+  const void*   column_blob (const std::string& name) const;
+
+  SYSTEMTIME    column_time (int nc) const;
+  SYSTEMTIME    column_time (const std::string& name) const;
+
+  int           column_type (int nc) const;
+  int           column_type (const std::string& colname) const;
+
+  int           column_size (int nc) const;
+  int           column_size (const std::string& colname) const;
+
+#ifndef SQLITE_OMIT_DECLTYPE
+  std::string   decl_type (int nc) const;
+  std::string   decl_type (const std::string& colname) const;
+#endif
+
+#ifdef SQLITE_ENABLE_COLUMN_METADATA
+  std::string   table_name (int nc) const;
+  std::string   table_name (const std::string& colname) const;
+
+  std::string   database_name (int nc) const;
+  std::string   database_name (const std::string& colname) const;
+#endif
 
   /// Return number of columns in the result set
   int           columns ();
@@ -169,16 +190,16 @@ public:
 
 private:
   /// prohibit default function 
-  Query (const Query& t);
+  Query (const Query& t) = delete;
   /// prohibit default function 
-  Query& operator= (const Query& rhs);
+  Query& operator= (const Query& rhs) = delete;
 
-  void          map_columns ();
-  int           find_col (const std::string& colname);
+  void          map_columns () const;
+  int           find_col (const std::string& colname) const;
   erc           check_errors (int rc);
 
   sqlite3_stmt* stmt;
-  sqlite3*      dbase;    
+  sqlite3*      dbase;
 
   /*! SQLITE is case insensitive in column names. Make column_xxx functions also
   case insensitive */
@@ -186,8 +207,8 @@ private:
     bool operator () (const std::string& left, const std::string& right) const;
   };
 
-  std::map <std::string, int, Query::iless> index;
-  bool col_mapped;
+  std::map <std::string, int, Query::iless> mutable index;
+  bool mutable col_mapped;
 };
 
 extern errfac *sqlite_errors;
@@ -205,7 +226,6 @@ __int64 Database::changes ()
   return sqlite3_changes64 (db);
 }
 
-inline
 inline __int64 mlib::Database::total_changes ()
 {
   return sqlite3_total_changes64 (db);
@@ -234,5 +254,13 @@ bool Query::iless::operator () (const std::string& left, const std::string& righ
   return _stricmp(left.c_str(), right.c_str())<0;
 }
 
+/*!
+  This is just syntactic sugar over Query::sql() function
+*/
+inline
+Query::operator std::string () const
+{
+  return sql ();
+}
 
 };

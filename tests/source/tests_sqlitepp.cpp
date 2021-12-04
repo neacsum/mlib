@@ -199,6 +199,19 @@ TEST_FIXTURE (TestDatabase, NonExistingParameter)
   CHECK_THROW_EQUAL (erc, SQLITE_RANGE, q.bind (":no_such_par", 123));
 }
 
+// test for Query::sql function and string conversion operator
+TEST_FIXTURE (TestDatabase, Get_SQL_Text)
+{
+  std::string s{ "SELECT (:par)" };
+  Query q1 (db, s);
+  std::string s1 = q1.sql ();
+  CHECK_EQUAL (s, s1);
+
+  std::string s2 = q1;
+  CHECK_EQUAL (s, s2);
+
+}
+
 TEST_FIXTURE (TestDatabase, InsertBlob)
 {
   struct x {
@@ -243,5 +256,66 @@ TEST_FIXTURE (TestDatabase, ChangesCount)
   auto total = db.total_changes ();
   CHECK_EQUAL (2, total);
 }
+
+#ifndef SQLITE_OMIT_DECLTYPE
+TEST (decl_type)
+{
+  Database db ("");                         // create temporary database
+  db.exec ("CREATE TABLE t1(c1 VARIANT)");  // schema
+  Query q (db, "SELECT c1 FROM t1");        // SELECT query
+  auto s = q.decl_type ("c1");              // s == "VARIANT"
+
+  CHECK_EQUAL ("VARIANT", s);
+}
+#endif
+
+#ifdef SQLITE_ENABLE_COLUMN_METADATA
+TEST (table_name1)
+{
+  Database db ("");                         // create temporary database
+  db.exec ("CREATE TABLE tbl(c1 TEXT)");    // schema
+  Query q (db, "SELECT c1 FROM tbl");       // SELECT query
+  auto s = q.table_name ("c1");             // s == "tbl"
+
+  CHECK_EQUAL ("tbl", s);
+}
+
+TEST (table_name2)
+{
+  Database db ("");                         // create temporary database
+  db.exec ("CREATE TABLE tbl(c1 TEXT)");    // schema
+  Query q (db, "SELECT c1 FROM tbl");       // SELECT query
+  auto s = q.table_name (0);                // s == "tbl"
+
+  CHECK_EQUAL ("tbl", s);
+}
+
+TEST (database_name)
+{
+  Database db ("");                         // create temporary database
+  db.exec ("CREATE TABLE tbl(c1 TEXT)");    // schema
+  db.exec ("ATTACH \":memory:\" AS db2");
+  db.exec ("CREATE TABLE db2.tbl2(c2 TEXT)");
+  Query q (db, "SELECT c1, c2 FROM tbl JOIN tbl2");       // SELECT query
+  auto s = q.database_name (0);          // s == "main"
+  CHECK_EQUAL ("main", s);
+  s = q.database_name (1);               // s == "db2"
+  CHECK_EQUAL ("db2", s);
+}
+
+TEST (database_name2)
+{
+  Database db ("");                         // create temporary database
+  db.exec ("CREATE TABLE tbl(c1 TEXT)");    // schema
+  db.exec ("ATTACH \":memory:\" AS db2");
+  db.exec ("CREATE TABLE db2.tbl2(c2 TEXT)");
+  Query q (db, "SELECT c1, c2 FROM tbl JOIN tbl2");  // SELECT query
+  auto s = q.database_name ("c1");          // s == "main"
+  CHECK_EQUAL ("main", s);
+  s = q.database_name ("c2");               // s == "db2"
+  CHECK_EQUAL ("db2", s);
+}
+#endif
+
 
 }

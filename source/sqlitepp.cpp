@@ -1,9 +1,21 @@
 /*!
   \file sqlitepp.cpp Implementation of Database and Query classes
 
-  \defgroup sqlite SQLite Interface
+  \defgroup sqlite SQLite C++ Wrappers
   \brief Object-oriented wrappers for SQLITE3 functions.
 
+  This is a thin wrapper for SQLITE API. The API is wrapped in two objects,
+  Database and Query. 
+  
+  <h3>Compile-time Options</h3>
+  Some of the functions in these wrappers depend on optional support in the
+  SQLITE code. Consequently, the amalgamation has to be compiled with matching
+  options. This is accomplished by including the `mlib/defs.h` file as a custom
+  header.
+
+  The amalgamation is compiled with the flag `/D "SQLITE_CUSTOM_INCLUDE=mlib/defs.h"`
+  on the command line. Any desired compile-time options can hence be set in the
+  `mlib/defs.h` file. 
 */
 #include <stdio.h>
 #include <mlib/sqlitepp.h>
@@ -17,7 +29,7 @@ namespace mlib {
 /*!
   Error facility used by Database and Query objects. Keeps track of the last
   database connection that has thrown the error and formats the error message
-  using sqlite3_errmessg function.
+  using sqlite3_errmsg function.
   \ingroup sqlite
 */
 class sqlitefac : public errfac
@@ -297,8 +309,8 @@ std::string Query::sql () const
 /*!
   When a new row of results is available the function returns SQLITE_ROW. When
   there are no more result the function returns SQLITE_DONE. Both codes are 
-  wrapped in ercs with priority level ERROR_PRI_INFO that normally doesn't throw
-  an exception. Any other error is return at the normal priority level ERROR_PRI_ERROR.
+  wrapped in \ref erc objects with priority level `ERROR_PRI_INFO` that normally don't throw
+  an exception. Any other error is return at the normal priority level `ERROR_PRI_ERROR`.
  */ 
 erc Query::step()
 {
@@ -334,7 +346,7 @@ void Query::finalize ()
     identifier. Bind functions assign values to these parameters.
 
     If the parameter with that name or number is not found the functions throw 
-    an erc with code SQLITE_RANGE.
+    an \ref erc with code `SQLITE_RANGE`.
 */
 ///@{  
 
@@ -428,8 +440,8 @@ Query& Query::bind (const std::string& parname, void *val, int len)
 }
 
 /*!
-  Bind a parameter specified by name to a SYSTEMTIME value.
-  The value is written in a format compatible with SQLITE strftime function
+  Bind a parameter specified by name to a `SYSTEMTIME` value.
+  The value is written in a format compatible with SQLITE `strftime` function
 */
 Query& Query::bind (const std::string& parname, const SYSTEMTIME& val)
 {
@@ -438,8 +450,8 @@ Query& Query::bind (const std::string& parname, const SYSTEMTIME& val)
 }
 
 /*!
-  Bind a parameter specified by number to a SYSTEMTIME value.
-  The value is written in a format compatible with SQLITE strftime function
+  Bind a parameter specified by number to a `SYSTEMTIME` value.
+  The value is written in a format compatible with SQLITE `strftime` function
 */
 Query& Query::bind (int par, const SYSTEMTIME& val)
 {
@@ -478,13 +490,13 @@ Query& Query::clear_bindings()
   \retval SQLITE_BLOB     BLOB
   \retval SQLITE_NULL     NULL
 */
-int Query::column_type (int nc)
+int Query::column_type (int nc) const
 {
   return sqlite3_column_type (stmt, nc);
 }
 
-/// \copydoc Query::column_type(int)
-int Query::column_type (const std::string& colname)
+/// \copydoc Query::column_type
+int Query::column_type (const std::string& colname) const
 {
   return column_type (find_col (colname));
 }
@@ -494,16 +506,171 @@ int Query::column_type (const std::string& colname)
   the result is NULL the function returns 0. For a numerical column, the function
   returns the size of the string representation of the value.
 */
-int Query::column_size (int nc)
+int Query::column_size (int nc) const
 {
   return sqlite3_column_bytes (stmt, nc);
 }
 
-/// \copydoc Query::column_size(int)
-int Query::column_size (const std::string& colname)
+/// \copydoc Query::column_size (int) const
+int Query::column_size (const std::string& colname) const
 {
   return column_size (find_col (colname));
 }
+
+/*!
+  \param nc - column number
+  If the query is a SELECT statement and `nc` is a table column (not an
+  expression or subquery) the function returns  the declared type of the table
+  column. Otherwise the function returns an empty string.
+  
+  The returned string is always UTF-8 encoded.
+  
+  Example:
+\code
+  Database db("");                          // create in-memory database
+  db.exec ("CREATE TABLE t1(c1 VARIANT)");  // schema
+  Query q (db, "SELECT c1 FROM t1");        // SELECT query
+  auto s = q.decl_type(0);                  // s == "VARIANT"
+\endcode
+*/
+std::string Query::decl_type (int nc) const
+{
+  return sqlite3_column_decltype (stmt, nc);
+}
+
+/*!
+  \param colname - column name
+  If the query is a SELECT statement and `colname` is a table column (not an
+  expression or subquery) the function returns  the declared type of the table
+  column. Otherwise the function returns an empty string.
+
+  The returned string is always UTF-8 encoded.
+
+  Example:
+\code
+  Database db("");                          // create temporary database
+  db.exec ("CREATE TABLE t1(c1 VARIANT)");  // schema
+  Query q (db, "SELECT c1 FROM t1");        // SELECT query
+  auto s = q.decl_type("c1");               // s == "VARIANT"
+\endcode
+*/
+std::string Query::decl_type (const std::string& colname) const
+{
+  return sqlite3_column_decltype (stmt, find_col(colname));
+}
+
+#ifdef SQLITE_ENABLE_COLUMN_METADATA
+/*!
+  Return originating table name.
+
+  \param nc - column number
+  If the query is a SELECT statement and \p nc is a table column (not an
+  expression or subquery) the function returns  the name of the table where
+  the column originated from. Otherwise the function returns an empty string.
+
+  The returned string is always UTF-8 encoded.
+
+  Example:
+\code
+  Database db ("");                         // create temporary database
+  db.exec ("CREATE TABLE tbl(c1 TEXT)");    // schema
+  Query q (db, "SELECT c1 FROM tbl");       // SELECT query
+  auto s = q.table_name (0);                // s == "tbl"
+\endcode
+
+  SQLITE must be compiled with the SQLITE_ENABLE_COLUMN_METADATA for this
+  function to be available.
+*/
+std::string Query::table_name (int nc) const
+{
+  return sqlite3_column_table_name (stmt, nc);
+}
+
+/*!
+  Return originating table name.
+
+  \param colname - column name
+  If the query is a SELECT statement and \p colname is a table column (not an
+  expression or subquery) the function returns  the name of the table where
+  the column originated from. Otherwise the function returns an empty string.
+
+  The returned string is always UTF-8 encoded.
+
+  Example:
+\code
+  Database db ("");                         // create temporary database
+  db.exec ("CREATE TABLE tbl(c1 TEXT)");    // schema
+  Query q (db, "SELECT c1 FROM tbl");       // SELECT query
+  auto s = q.table_name ("c1");             // s == "tbl"
+\endcode
+
+  SQLITE must be compiled with the SQLITE_ENABLE_COLUMN_METADATA for this
+  function to be available.
+*/
+std::string Query::table_name (const std::string& colname) const
+{
+  return sqlite3_column_table_name (stmt, find_col(colname));
+}
+
+/*!
+  Return originating schema name
+
+  \param nc - column number
+
+  If the query is a SELECT statement and \p nc is a table column (not an
+  expression or subquery) the function returns  the name of the schema where
+  the column originated from. Otherwise the function returns an empty string.
+
+  The returned string is always UTF-8 encoded.
+
+  Example:
+\code
+  Database db ("");                         // create temporary database
+  db.exec ("CREATE TABLE tbl(c1 TEXT)");    // schema
+  db.exec ("ATTACH \":memory:\" AS db2");
+  db.exec ("CREATE TABLE db2.tbl2(c2 TEXT)");
+  Query q (db, "SELECT c1, c2 FROM tbl JOIN tbl2");  // SELECT query
+  auto s = q.database_name (0);             // s == "main"
+  s = q.database_name (1);                  // s == "db2"
+\endcode
+
+  SQLITE must be compiled with the SQLITE_ENABLE_COLUMN_METADATA for this
+  function to be available.
+*/
+std::string Query::database_name (int nc) const
+{
+  return sqlite3_column_database_name (stmt, nc);
+}
+
+/*!
+  Return originating schema name.
+  \param colname - column name
+
+  If the query is a SELECT statement and \p colname is a table column (not an
+  expression or subquery) the function returns  the name of the schema where
+  the column originated from. Otherwise the function returns an empty string.
+
+  The returned string is always UTF-8 encoded.
+
+  Example:
+\code
+  Database db ("");                         // create temporary database
+  db.exec ("CREATE TABLE tbl(c1 TEXT)");    // schema
+  db.exec ("ATTACH \":memory:\" AS db2");
+  db.exec ("CREATE TABLE db2.tbl2(c2 TEXT)");
+  Query q (db, "SELECT c1, c2 FROM tbl JOIN tbl2");  // SELECT query
+  auto s = q.database_name ("c1");          // s == "main"
+  s = q.database_name ("c2");               // s == "db2"
+\endcode
+
+  SQLITE must be compiled with the SQLITE_ENABLE_COLUMN_METADATA for this
+  function to be available.
+*/
+std::string Query::database_name (const std::string& colname) const
+{
+  return sqlite3_column_database_name (stmt, find_col (colname));
+}
+#endif
 
 ///@}
 
@@ -514,25 +681,42 @@ int Query::column_size (const std::string& colname)
   (starting from 0). Data type of the result is determined by the result function
   called (column_int returns an integer, column_double returns a double, etc.).
 
-  If a column with that name cannot be found, the functions throw an erc with code
-  SQLITE_RANGE.
+  If a column with that name cannot be found, the functions throw an \ref erc
+  with code `SQLITE_RANGE`.
 
   For a detailed discussion of the conversions applied see
   <a href="http://sqlite.org/c3ref/column_blob.html">SQLITE documentation</a>
 */
 ///@{  
 
-int Query::column_int (int nc)
+
+/*!
+  Return column value converted to an integer
+
+  The following rules apply:
+  - `NULL` value is converted to 0
+  - `REAL` value is rounded to nearest integer 
+  - `TEXT` or BLOB value is converted to number. Longest possible prefix of the
+     value that can be interpreted as an integer number is extracted and the
+     remainder ignored. Any leading spaces are ignored.
+*/
+int Query::column_int (int nc) const
 {
   return sqlite3_column_int (stmt, nc);
 }
 
-int Query::column_int (const std::string& colname)
+/// \copydoc column_int
+int Query::column_int (const std::string& colname) const
 {
   return column_int (find_col (colname));
 }
 
-string Query::column_str(int nc)
+/*!
+  Return column value as an UTF-8 encoded string.
+
+  If the column is `NULL`, the result is an empty string.
+*/
+string Query::column_str(int nc) const
 {
   char *str = (char*)sqlite3_column_text(stmt, nc);
   if (str)
@@ -541,7 +725,8 @@ string Query::column_str(int nc)
     return string ();
 }
 
-string Query::column_str (const std::string& colname)
+/// \copydoc column_str
+string Query::column_str (const std::string& colname) const
 {
   return column_str (find_col (colname));
 }
@@ -549,82 +734,108 @@ string Query::column_str (const std::string& colname)
 /*!
   Return a pointer to a NULL-terminated text with the column content. 
   The memory for the string is freed automatically.
+
+  If the column value is `NULL` the result is a `NULL` pointer
 */
-const char *Query::column_text (int nc)
+const char *Query::column_text (int nc) const
 {
   return (const char*)sqlite3_column_text (stmt, nc);
 }
 
-const char *Query::column_text (const std::string& colname)
+/// \copydoc column_text
+const char *Query::column_text (const std::string& colname) const
 {
   return column_text (find_col (colname));
 }
 
-double Query::column_double (int nc)
+/*!
+  Return floating point value of the column.
+
+  The following rules apply:
+  - `NULL` value is converted to 0.0
+  - `INTEGER` value is promoted to double
+  - `TEXT` or BLOB value is converted to number. Longest possible prefix of the
+     value that can be interpreted as a real number is extracted and the 
+     remainder ignored. Any leading spaces are ignored.
+*/
+double Query::column_double (int nc) const
 {
   return sqlite3_column_double (stmt, nc);
 }
 
-double Query::column_double (const std::string& colname)
+/// \copydoc column_double
+double Query::column_double (const std::string& colname) const
 {
   return column_double (find_col (colname));
 }
 
-__int64 Query::column_int64 (int nc)
+/*!
+  Return column value converted to a 64-bit integer
+
+  The following rules apply:
+  - `NULL` value is converted to 0
+  - `REAL` value is rounded to nearest integer
+  - `TEXT` or `BLOB` value is converted to number. Longest possible prefix of the
+     value that can be interpreted as an integer number is extracted and the
+     remainder ignored. Any leading spaces are ignored.
+*/
+__int64 Query::column_int64 (int nc) const
 {
   return sqlite3_column_int64 (stmt, nc);
 }
 
-__int64 Query::column_int64 (const std::string& colname)
+/// \copydoc column_int64
+__int64 Query::column_int64 (const std::string& colname) const
 {
   return column_int64 (find_col (colname));
 }
 
 /*!
   Return a pointer to a BLOB with the column content. The memory for the BLOB
-  is freed automatically. Call column_size() function \e after calling this function
+  is freed automatically. Call column_size() function **after** calling this function
   to determine the size of the object returned.
 */
-const void* Query::column_blob (int nc)
+const void* Query::column_blob (int nc) const
 {
   return sqlite3_column_blob (stmt, nc);
 }
 
-/// \copydoc Query::column_blob(int)
-const void* Query::column_blob (const std::string& colname)
+/// \copydoc column_blob (int) const
+const void* Query::column_blob (const std::string& colname) const
 {
   return column_blob (find_col (colname));
 }
-///@}
 
 /*!
   Return a SYSTEMTIME structure with the column content.
 */
-SYSTEMTIME Query::column_time (int nc)
+SYSTEMTIME Query::column_time (int nc) const
 {
   SYSTEMTIME st;
   float sec;
-  memset (&st, 0, sizeof(st));
-  const char *pstr = (const char *)sqlite3_column_text (stmt, nc);
+  memset (&st, 0, sizeof (st));
+  const char* pstr = (const char*)sqlite3_column_text (stmt, nc);
   if (pstr)
   {
-    sscanf (pstr, "%hd-%hd-%hd %hd:%hd:%f", 
+    sscanf (pstr, "%hd-%hd-%hd %hd:%hd:%f",
       &st.wYear, &st.wMonth, &st.wDay, &st.wHour, &st.wMinute, &sec);
     st.wSecond = (int)sec;
-    st.wMilliseconds = (int)((sec - st.wSecond)*1000.);
+    st.wMilliseconds = (int)((sec - st.wSecond) * 1000.);
   }
   return st;
 }
 
-/// \copydoc Query::column_time(int)
-SYSTEMTIME Query::column_time (const std::string& colname)
+/// \copydoc column_time
+SYSTEMTIME Query::column_time (const std::string& colname) const
 {
   return column_time (find_col (colname));
 }
 
+///@}
+
 
 //---
-void Query::map_columns()
+void Query::map_columns() const
 {
   if (col_mapped)
     return;
@@ -638,7 +849,7 @@ void Query::map_columns()
   col_mapped = true;
 }
 
-int Query::find_col (const std::string& colname)
+int Query::find_col (const std::string& colname) const
 {
   if (!col_mapped)
     map_columns ();
