@@ -9,9 +9,128 @@
 using namespace mlib;
 using namespace std;
 
+SUITE (sync_queue) {
 
-SUITE (syncque)
+TEST (ballroom)
 {
+  const int pairs = 10;
+  event ball_start (event::manual);
+  LONG finished = 0;
+
+  sync_queue<int> pairing;
+
+  thread* producer[pairs];
+  thread* consumer[pairs];
+  criticalsection use_cout;
+
+  for (int i = 0; i < pairs; i++)
+  {
+    producer[i] = new thread ([&, i]()->int {
+      ball_start.wait ();
+      pairing.produce (i);
+      return 0;
+      });
+    consumer[i] = new thread ([&, i]()->int {
+      ball_start.wait ();
+      int v;
+      pairing.consume (v);
+      {
+        lock l (use_cout);
+        cout << "Dancing " << i << " - " << v << endl;
+      }
+      InterlockedIncrement (&finished);
+      return 0;
+      });
+    producer[i]->start ();
+    consumer[i]->start ();
+  }
+  ball_start.signal ();
+  Sleep (1000);
+  for (int i = 0; i < pairs; i++)
+  {
+    delete producer[i];
+    delete consumer[i];
+  }
+  CHECK_EQUAL (pairs, finished);
+}
+
+}
+
+SUITE (async_queue)
+{
+
+// verify consuming with a timeout limit
+TEST (water_drops)
+{
+  const int drops = 10;
+  const int drop_interval = 100;
+  const int wait_time = 50;
+  int missed = 0;
+  async_queue<int> faucet;
+  thread producer ([&]()->int {
+    for (int i = 0; i < drops; i++)
+    {
+      faucet.produce (i+1);
+      Sleep (drop_interval);
+    }
+    faucet.produce (-1);
+    return 0;
+  });
+
+  thread consumer ([&]()->int {
+    int v=1;
+    while (v >= 0)
+    {
+      if (!faucet.consume (v, wait_time))
+        missed++;
+    }
+    return 0;
+  });
+
+  consumer.start ();
+  producer.start ();
+  consumer.wait ();
+  cout << "Water drops - consumer missed " << missed << " waits" << endl;
+  CHECK (missed > 0);
+}
+
+// verify timeout while producing
+TEST (silo_filling)
+{
+  const int bushels = 10;
+  const int empty_interval = 100;
+  const int fill_rate = 50;
+  int missed = 0;
+
+  async_queue<int> silo(5);
+
+  thread producer ([&]()->int {
+    for (int i = 0; i < bushels; i++)
+    {
+      while (!silo.produce (i + 1, fill_rate))
+        missed++;
+    }
+    silo.produce (-1);
+    return 0;
+    });
+
+  thread consumer ([&]()->int {
+    int v = 1;
+    while (v >= 0)
+    {
+      silo.consume (v);
+      Sleep (empty_interval);
+    }
+    return 0;
+    });
+
+  consumer.start ();
+  producer.start ();
+  consumer.wait ();
+  cout << "Silo - producer missed " << missed << " bushels" << endl;
+  CHECK (missed > 0);
+}
+
 
 /*
   Various upper limits and the number of primes less than that limit.
@@ -54,14 +173,13 @@ TEST (primes_queue)
   {
     auto checker = [&nums, &primes, thnum]()->int {
       int n = 1;
-      while (n = nums.consume ())
+      while (nums.consume (n, 100) && n != 0)
       {
         if (IsPrime (n))
           primes.produce ({ n,thnum });
       }
       return 0;
     };
-
     consumers[thnum] = new thread (checker);
     consumers[thnum]->start ();
   }
@@ -80,7 +198,7 @@ TEST (primes_queue)
   producer.start ();
   producer.wait ();
   t_prod.stop ();
-  cout << "sync_queue finished producing" << " in " << fixed
+  cout << "Unbounded queue finished producing" << " in " << fixed
     << setprecision (2) << t_prod.msecEnd ()/1000. << "sec" << endl;
 
   for (int i = 0; i < NTHREADS; i++)
@@ -97,17 +215,21 @@ TEST (primes_queue)
 
   while (!primes.empty ())
   {
-    result r = primes.consume ();
+    result r;
+    primes.consume (r);
     found_by[r.worker]++;
   }
 
   for (int i = 0; i < NTHREADS; i++)
+  {
     cout << "Consumer " << i << " found " << found_by[i] << " primes." << endl;
+    delete consumers[i];
+  }
 }
 
 TEST (bounded_primes)
 {
-  bounded_queue<int> nums(20);
+  async_queue<int> nums(20);
   struct result {
     int prime;
     int worker;
@@ -119,9 +241,12 @@ TEST (bounded_primes)
   for (int thnum = 0; thnum < NTHREADS; thnum++)
   {
     auto checker = [&nums, &primes, thnum]()->int {
-      int n = 1;
-      while (n = nums.consume ())
+      int n;
+      while (1)
       {
+        nums.consume (n);
+        if (!n)
+          break;
         if (IsPrime (n))
           primes.produce ({ n,thnum });
       }
@@ -147,7 +272,7 @@ TEST (bounded_primes)
   producer.start ();
   producer.wait ();
   t_prod.stop ();
-  cout << "bounded_queue finished producing" << " in " 
+  cout << "Bounded queue finished producing" << " in " 
     << fixed << setprecision(2) << t_prod.msecEnd ()/1000. << "sec" << endl;
 
   for (int i = 0; i < NTHREADS; i++)
@@ -165,11 +290,15 @@ TEST (bounded_primes)
 
   while (!primes.empty ())
   {
-    result r = primes.consume ();
+    result r;
+    primes.consume (r);
     found_by[r.worker]++;
   }
 
   for (int i = 0; i < NTHREADS; i++)
+  {
     cout << "Consumer " << i << " found " << found_by[i] << " primes." << endl;
+    delete consumers[i];
+  }
 }
 }

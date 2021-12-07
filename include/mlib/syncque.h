@@ -1,16 +1,76 @@
 /*!
-  \file syncque.h Definition of async_queue and bounded_queue classes
+  \file syncque.h Definition of sync_queue and async_queue classes
 
-  (c) Mircea Neacsu 1999-2020. All rights reserved.
+  (c) Mircea Neacsu 1999-2021. All rights reserved.
 */
 #pragma once
 
 #include <queue>
 #include "semaphore.h"
 #include "critsect.h"
+#include "stopwatch.h"
 
 namespace mlib 
 {
+/*!
+  A template class that implements a "synchronous queue", in effect a mailbox
+  that can store one "message", created by a producer thread, until consumed
+  by a consumer thread.
+
+  If the mailbox is full (a message already there), the producer is blocked
+  until previous message is consumed. If the mailbox is empty, a consumer is
+  blocked until a new message arrives.
+
+  This is strictly equivalent with an async_queue with size 1 however it doesn't
+  have the underlining std::queue structure and avoids all the back and forth
+  copying of messages.
+*/
+template <class M>
+class sync_queue
+{
+public:
+
+  ///Create a synchronous queue
+  sync_queue () : message(nullptr) {}
+
+  /// Put new element in queue
+  void produce (const M& obj)
+  {
+    update.enter ();
+    while (message)
+    {
+      update.leave ();
+      prod_sema.wait ();
+      update.enter ();
+    }
+    cons_sema.signal ();
+    message = &obj;
+    update.leave ();
+  }
+
+  void consume (M& obj)
+  {
+    update.enter ();
+    while (!message)
+    {
+      update.leave ();
+      cons_sema.wait ();
+      update.enter ();
+    }
+    prod_sema.signal ();
+    obj = *message;
+    message = nullptr;
+    update.leave ();
+  }
+
+private:
+
+  criticalsection update;   ///< critical section protects queue's integrity
+  semaphore prod_sema;      ///< producers' semaphore counts waiting producers
+  semaphore cons_sema;      ///< consumers' semaphore counts waiting consumers
+  const M* message; 
+};
+
 
 /*!
   A template class that implements "asynchronous queues".
@@ -18,37 +78,101 @@ namespace mlib
   them in FIFO order. Attempting to consume from an empty queue will block
   the calling thread until a message arrives.
 
-  \note async_queue is not bounded and it can grow up to the available memory.
+  \note The default size of async_queue is `INFINITE` and it can grow up to the
+  available memory.
 */
 template <class M, class C=std::deque<M>> 
 class async_queue : protected std::queue<M, C>
 {
 public:
-  async_queue () {};
-
-  /// Append an element to queue
-  virtual void produce (const M& obj)
+  /// Crates a queue with the given maximum size
+  async_queue (int limit_ = INFINITE) 
+    : limit (limit_)
   {
-    lock l (update);        //take control of the queue
-    this->push (obj);       //put a copy of the object at the end
-    con_sema.signal ();     //and signal the semaphore
+    if (limit > 0 && limit < INFINITE)
+      prod_sema.signal (limit);
   }
 
-  /// Extract and return first element in queue
-  virtual M consume ()
+  /// Append an element to queue
+  /// \return _true_ if the element was appended or _false_ if a timeout occurred.
+  virtual bool produce (const M& obj, DWORD timeout = INFINITE)
   {
-    M result;
-    update.enter ();
-    while (std::queue<M, C>::empty ())
+    if (limit < INFINITE)
     {
-      update.leave ();
-      con_sema.wait ();        //wait for a producer
+      // Bounded queue. See if there is enough space to produce
+      stopwatch t; //need a stopwatch to count cumulated wait time
+      if (timeout != INFINITE)
+        t.start ();
       update.enter ();
+      while (std::queue<M, C>::size () >= limit)
+      {
+        update.leave ();
+        if (timeout != INFINITE)
+        {
+          int t_wait = timeout - (int)t.msecLap ();
+          if (t_wait < 0 || prod_sema.wait (t_wait) == WAIT_TIMEOUT)
+            return false;
+        }
+        else
+          prod_sema.wait ();
+        update.enter ();
+      }
+      push (obj);
+      cons_sema.signal ();
+      update.leave ();
     }
-    result = this->front ();  //get the message
-    this->pop ();
+    else
+    {
+      // Unbounded queue. Producer will always be successful
+      lock l (update);        //take control of the queue
+      push (obj);             //put a copy of the object at the end
+      cons_sema.signal ();     //and signal the semaphore
+    }
+    return true;
+  }
+
+  /// Extract the first element in queue
+  /// Return _true_ if an element was extracted or _false_ if a timeout occurred.
+  virtual bool consume (M& result, int timeout = INFINITE)
+  {
+    if (timeout != INFINITE)
+    {
+      stopwatch t;
+      int t_wait;
+      t.start ();
+      update.enter ();
+      while (std::queue<M, C>::empty ())
+      {
+        update.leave ();
+        t_wait = timeout - (int)t.msecLap ();
+        // give up or wait for a producer
+        if (t_wait <= 0 || cons_sema.wait (t_wait) == WAIT_TIMEOUT )
+          return false;
+        update.enter ();
+      }
+    }
+    else
+    {
+      update.enter ();
+      if (std::queue<M, C>::empty ())
+      {
+        while (1)
+        {
+          update.leave ();
+          cons_sema.wait ();        //wait for a producer
+          update.enter ();
+          if (!std::queue<M, C>::empty ())
+            break;
+        }
+      }
+    }
+    result = front ();  //get the message
+    pop ();
+    if (limit != INFINITE)
+      prod_sema.signal ();  //signal producers there is space available
+
     update.leave ();
-    return result;
+    return true;
   }
 
   /// Return _true_ if queue is empty
@@ -56,6 +180,13 @@ public:
   {
     lock l (update);
     return std::queue<M, C>::empty ();
+  }
+
+  /// Return _true_ if queue is at capacity
+  bool full ()
+  {
+    lock l (this->update);
+    return (std::queue<M, C>.size () == limit);
   }
 
   /// Return queue size 
@@ -66,76 +197,12 @@ public:
   }
 
 protected:
-  semaphore con_sema;       ///< consumers' semaphore counts down until queue is empty
+  int limit;
+  semaphore prod_sema;      ///< producers' semaphore counts down until queue is full
+  semaphore cons_sema;      ///< consumers' semaphore counts down until queue is empty
   criticalsection update;   ///< critical section protects queue's integrity
 };
 
-/*!
-  A producer/consumer queue with a limited size.
-
-  bounded_queue objects can grow only up to the set limit. If the queue is full,
-  producers have to wait until space becomes available.
-*/
-template< class M, class C = std::deque<M> >
-class bounded_queue : public async_queue<M, C>
-{
-public:
-  bounded_queue (size_t limit_) : limit (limit_)
-  {
-    pro_sema.signal ((int)limit);
-  }
-
-  /// Append an element to queue. If queue is full, waits until space
-  /// becomes available.
-  void produce (const M& obj)
-  {
-    this->update.enter ();
-    while (std::queue<M, C>::size () > limit)
-    {
-      this->update.leave ();
-      pro_sema.wait ();
-      this->update.enter ();
-    }
-    this->push (obj);
-    this->con_sema.signal ();
-    this->update.leave ();
-  }
-
-  /// Extract and return first element in queue
-  M consume ()
-  {
-    M result;
-    this->update.enter ();
-    if (std::queue<M, C>::empty ())
-    {
-      while (1)
-      {
-        this->update.leave ();
-        this->con_sema.wait ();        //wait for a producer
-        this->update.enter ();
-        if (!std::queue<M, C>::empty ())
-          break;
-      }
-    }
-    result = this->front ();  //get the message
-    this->pop ();
-    pro_sema.signal ();  //signal producers there is space available
-    this->update.leave ();
-    return result;
-  }
-
-  /// Return _true_ if queue is at capacity
-  bool full ()
-  {
-    lock l (this->update);
-    return (std::queue<M, C>.size () == limit);
-  }
-
-
-protected:
-  size_t limit;
-  semaphore pro_sema;   ///< producers' semaphore counts down until queue is full
-};
 
 
 }  //end namespace
