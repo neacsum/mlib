@@ -52,137 +52,199 @@ $(function() {
 <div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#include &lt;queue&gt;</span></div>
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="semaphore_8h.html">semaphore.h</a>&quot;</span></div>
 <div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="critsect_8h.html">critsect.h</a>&quot;</span></div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160; </div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="keyword">namespace </span>mlib </div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;{</div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160; </div>
-<div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> M, <span class="keyword">class</span> C=std::deque&lt;M&gt;&gt; </div>
-<div class="line"><a name="l00024"></a><span class="lineno"><a class="line" href="classmlib_1_1sync__queue.html">   24</a></span>&#160;<span class="keyword">class </span><a class="code" href="classmlib_1_1sync__queue.html">sync_queue</a> : <span class="keyword">protected</span> std::queue&lt;M, C&gt;</div>
-<div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;{</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;  <a class="code" href="classmlib_1_1sync__queue.html">sync_queue</a> () {};</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160; </div>
-<div class="line"><a name="l00030"></a><span class="lineno"><a class="line" href="classmlib_1_1sync__queue.html#a6f98e887ada519951e7bd7db2be48501">   30</a></span>&#160;  <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classmlib_1_1sync__queue.html#a6f98e887ada519951e7bd7db2be48501">produce</a> (<span class="keyword">const</span> M&amp; obj)</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;  {</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    <a class="code" href="classmlib_1_1lock.html">lock</a> l (<a class="code" href="classmlib_1_1sync__queue.html#aab7b034c42205f5ad2643604f5516ce1">update</a>);        <span class="comment">//take control of the queue</span></div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    this-&gt;push (obj);       <span class="comment">//put a copy of the object at the end</span></div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;  <a class="code" href="classmlib_1_1sync__queue.html#a6d88649e6ac700ce2b49ff9dfbd32b85">con_sema</a>.<a class="code" href="classmlib_1_1semaphore.html#a7e6461c4b43a5d92c40456e4a5a12051">signal</a> ();     <span class="comment">//and signal the semaphore</span></div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;  }</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160; </div>
-<div class="line"><a name="l00038"></a><span class="lineno"><a class="line" href="classmlib_1_1sync__queue.html#a77199fa160a9af05ff8e37a9692b553b">   38</a></span>&#160;  <span class="keyword">virtual</span> M <a class="code" href="classmlib_1_1sync__queue.html#a77199fa160a9af05ff8e37a9692b553b">consume</a> ()</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;  {</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;  M result;</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;  <a class="code" href="classmlib_1_1sync__queue.html#aab7b034c42205f5ad2643604f5516ce1">update</a>.<a class="code" href="classmlib_1_1criticalsection.html#add3158ebb8f15fa377fcf5f126d2c02e">enter</a> ();</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    <span class="keywordflow">while</span> (std::queue&lt;M, C&gt;::empty ())</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    {</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;      <a class="code" href="classmlib_1_1sync__queue.html#aab7b034c42205f5ad2643604f5516ce1">update</a>.<a class="code" href="classmlib_1_1criticalsection.html#af2c0f5ddba94dd9f80d5609547b96c42">leave</a> ();</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;      <a class="code" href="classmlib_1_1sync__queue.html#a6d88649e6ac700ce2b49ff9dfbd32b85">con_sema</a>.<a class="code" href="classmlib_1_1syncbase.html#a99433891d3ccd92884b2e003c4c5e7ca">wait</a> ();        <span class="comment">//wait for a producer</span></div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;      <a class="code" href="classmlib_1_1sync__queue.html#aab7b034c42205f5ad2643604f5516ce1">update</a>.<a class="code" href="classmlib_1_1criticalsection.html#add3158ebb8f15fa377fcf5f126d2c02e">enter</a> ();</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    }</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    result = this-&gt;front ();  <span class="comment">//get the message</span></div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    this-&gt;pop ();</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;  <a class="code" href="classmlib_1_1sync__queue.html#aab7b034c42205f5ad2643604f5516ce1">update</a>.<a class="code" href="classmlib_1_1criticalsection.html#af2c0f5ddba94dd9f80d5609547b96c42">leave</a> ();</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;  <span class="keywordflow">return</span> result;</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;  }</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160; </div>
-<div class="line"><a name="l00055"></a><span class="lineno"><a class="line" href="classmlib_1_1sync__queue.html#a9f66297001630c60e89c6a29d2dd0ca7">   55</a></span>&#160;  <span class="keywordtype">bool</span> <a class="code" href="classmlib_1_1sync__queue.html#a9f66297001630c60e89c6a29d2dd0ca7">empty</a>()</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;  {</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;  <a class="code" href="classmlib_1_1lock.html">lock</a> l (<a class="code" href="classmlib_1_1sync__queue.html#aab7b034c42205f5ad2643604f5516ce1">update</a>);</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    <span class="keywordflow">return</span> std::queue&lt;M, C&gt;::empty ();</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;  }</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160; </div>
-<div class="line"><a name="l00062"></a><span class="lineno"><a class="line" href="classmlib_1_1sync__queue.html#a8681c5baf7b9ac06a91fd6736ea7c893">   62</a></span>&#160;  <span class="keywordtype">size_t</span> <a class="code" href="classmlib_1_1sync__queue.html#a8681c5baf7b9ac06a91fd6736ea7c893">size</a> ()</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;  {</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;  <a class="code" href="classmlib_1_1lock.html">lock</a> l (<a class="code" href="classmlib_1_1sync__queue.html#aab7b034c42205f5ad2643604f5516ce1">update</a>);</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    <span class="keywordflow">return</span> std::queue&lt;M, C&gt;::size ();</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;  }</div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#include &quot;<a class="code" href="stopwatch_8h.html">stopwatch.h</a>&quot;</span></div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160; </div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="keyword">namespace </span>mlib </div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;{</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> M&gt;</div>
+<div class="line"><a name="l00029"></a><span class="lineno"><a class="line" href="classmlib_1_1sync__queue.html">   29</a></span>&#160;<span class="keyword">class </span><a class="code" href="classmlib_1_1sync__queue.html">sync_queue</a></div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;{</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160; </div>
+<div class="line"><a name="l00034"></a><span class="lineno"><a class="line" href="classmlib_1_1sync__queue.html#a741db1b251cac10a2d20db537375c309">   34</a></span>&#160;  <a class="code" href="classmlib_1_1sync__queue.html#a741db1b251cac10a2d20db537375c309">sync_queue</a> () : message(nullptr) {}</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160; </div>
+<div class="line"><a name="l00037"></a><span class="lineno"><a class="line" href="classmlib_1_1sync__queue.html#ac40f64a42d74ed4456a6d1588176a019">   37</a></span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classmlib_1_1sync__queue.html#ac40f64a42d74ed4456a6d1588176a019">produce</a> (<span class="keyword">const</span> M&amp; obj)</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;  {</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    update.<a class="code" href="classmlib_1_1criticalsection.html#add3158ebb8f15fa377fcf5f126d2c02e">enter</a> ();</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    <span class="keywordflow">while</span> (message)</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    {</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;      update.<a class="code" href="classmlib_1_1criticalsection.html#af2c0f5ddba94dd9f80d5609547b96c42">leave</a> ();</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;      prod_sema.<a class="code" href="classmlib_1_1syncbase.html#a99433891d3ccd92884b2e003c4c5e7ca">wait</a> ();</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;      update.<a class="code" href="classmlib_1_1criticalsection.html#add3158ebb8f15fa377fcf5f126d2c02e">enter</a> ();</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    }</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    cons_sema.<a class="code" href="classmlib_1_1semaphore.html#a7e6461c4b43a5d92c40456e4a5a12051">signal</a> ();</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;    message = &amp;obj;</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    update.<a class="code" href="classmlib_1_1criticalsection.html#af2c0f5ddba94dd9f80d5609547b96c42">leave</a> ();</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;  }</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160; </div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;  <span class="keywordtype">void</span> consume (M&amp; obj)</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;  {</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    update.<a class="code" href="classmlib_1_1criticalsection.html#add3158ebb8f15fa377fcf5f126d2c02e">enter</a> ();</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    <span class="keywordflow">while</span> (!message)</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    {</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;      update.<a class="code" href="classmlib_1_1criticalsection.html#af2c0f5ddba94dd9f80d5609547b96c42">leave</a> ();</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;      cons_sema.<a class="code" href="classmlib_1_1syncbase.html#a99433891d3ccd92884b2e003c4c5e7ca">wait</a> ();</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;      update.<a class="code" href="classmlib_1_1criticalsection.html#add3158ebb8f15fa377fcf5f126d2c02e">enter</a> ();</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    }</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    prod_sema.<a class="code" href="classmlib_1_1semaphore.html#a7e6461c4b43a5d92c40456e4a5a12051">signal</a> ();</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    obj = *message;</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    message = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    update.<a class="code" href="classmlib_1_1criticalsection.html#af2c0f5ddba94dd9f80d5609547b96c42">leave</a> ();</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;  }</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160; </div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;<span class="keyword">private</span>:</div>
 <div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160; </div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;<span class="keyword">protected</span>:</div>
-<div class="line"><a name="l00069"></a><span class="lineno"><a class="line" href="classmlib_1_1sync__queue.html#a6d88649e6ac700ce2b49ff9dfbd32b85">   69</a></span>&#160;  <a class="code" href="classmlib_1_1semaphore.html">semaphore</a> <a class="code" href="classmlib_1_1sync__queue.html#a6d88649e6ac700ce2b49ff9dfbd32b85">con_sema</a>;       </div>
-<div class="line"><a name="l00070"></a><span class="lineno"><a class="line" href="classmlib_1_1sync__queue.html#aab7b034c42205f5ad2643604f5516ce1">   70</a></span>&#160;  <a class="code" href="classmlib_1_1criticalsection.html">criticalsection</a> <a class="code" href="classmlib_1_1sync__queue.html#aab7b034c42205f5ad2643604f5516ce1">update</a>;   </div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;};</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160; </div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;<span class="keyword">template</span>&lt; <span class="keyword">class</span> M, <span class="keyword">class</span> C = std::deque&lt;M&gt; &gt;</div>
-<div class="line"><a name="l00080"></a><span class="lineno"><a class="line" href="classmlib_1_1bounded__queue.html">   80</a></span>&#160;<span class="keyword">class </span><a class="code" href="classmlib_1_1bounded__queue.html">bounded_queue</a> : <span class="keyword">public</span> <a class="code" href="classmlib_1_1sync__queue.html">sync_queue</a>&lt;M, C&gt;</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;{</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;  <a class="code" href="classmlib_1_1bounded__queue.html">bounded_queue</a> (<span class="keywordtype">size_t</span> limit_) : limit (limit_)</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;  {</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;  <a class="code" href="classmlib_1_1bounded__queue.html#a55a9193d669811e621d991e3322b3dc4">pro_sema</a>.<a class="code" href="classmlib_1_1semaphore.html#a7e6461c4b43a5d92c40456e4a5a12051">signal</a> ((<span class="keywordtype">int</span>)limit);</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;  }</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160; </div>
-<div class="line"><a name="l00090"></a><span class="lineno"><a class="line" href="classmlib_1_1bounded__queue.html#a9be60a21d7ff67c65bd9b4b33aad5af4">   90</a></span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classmlib_1_1bounded__queue.html#a9be60a21d7ff67c65bd9b4b33aad5af4">produce</a> (<span class="keyword">const</span> M&amp; obj)</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;  criticalsection update;   </div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;  semaphore prod_sema;      </div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;  semaphore cons_sema;      </div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;  <span class="keyword">const</span> M* message; </div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;};</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160; </div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160; </div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> M, <span class="keyword">class</span> C=std::deque&lt;M&gt;&gt; </div>
+<div class="line"><a name="l00085"></a><span class="lineno"><a class="line" href="classmlib_1_1async__queue.html">   85</a></span>&#160;<span class="keyword">class </span><a class="code" href="classmlib_1_1async__queue.html">async_queue</a> : <span class="keyword">protected</span> std::queue&lt;M, C&gt;</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;{</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00089"></a><span class="lineno"><a class="line" href="classmlib_1_1async__queue.html#aa58b124cc7c75bb650a5f9ff29350702">   89</a></span>&#160;  <a class="code" href="classmlib_1_1async__queue.html#aa58b124cc7c75bb650a5f9ff29350702">async_queue</a> (<span class="keywordtype">int</span> limit_ = INFINITE) </div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    : limit (limit_)</div>
 <div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;  {</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    this-&gt;<a class="code" href="classmlib_1_1sync__queue.html#aab7b034c42205f5ad2643604f5516ce1">update</a>.<a class="code" href="classmlib_1_1criticalsection.html#add3158ebb8f15fa377fcf5f126d2c02e">enter</a> ();</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    <span class="keywordflow">while</span> (std::queue&lt;M, C&gt;::size () &gt; limit)</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;    {</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;      this-&gt;<a class="code" href="classmlib_1_1sync__queue.html#aab7b034c42205f5ad2643604f5516ce1">update</a>.<a class="code" href="classmlib_1_1criticalsection.html#af2c0f5ddba94dd9f80d5609547b96c42">leave</a> ();</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    <a class="code" href="classmlib_1_1bounded__queue.html#a55a9193d669811e621d991e3322b3dc4">pro_sema</a>.<a class="code" href="classmlib_1_1syncbase.html#a99433891d3ccd92884b2e003c4c5e7ca">wait</a> ();</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;      this-&gt;<a class="code" href="classmlib_1_1sync__queue.html#aab7b034c42205f5ad2643604f5516ce1">update</a>.<a class="code" href="classmlib_1_1criticalsection.html#add3158ebb8f15fa377fcf5f126d2c02e">enter</a> ();</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    }</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;    this-&gt;push (obj);</div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;    this-&gt;<a class="code" href="classmlib_1_1sync__queue.html#a6d88649e6ac700ce2b49ff9dfbd32b85">con_sema</a>.<a class="code" href="classmlib_1_1semaphore.html#a7e6461c4b43a5d92c40456e4a5a12051">signal</a> ();</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    this-&gt;<a class="code" href="classmlib_1_1sync__queue.html#aab7b034c42205f5ad2643604f5516ce1">update</a>.<a class="code" href="classmlib_1_1criticalsection.html#af2c0f5ddba94dd9f80d5609547b96c42">leave</a> ();</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;  }</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160; </div>
-<div class="line"><a name="l00105"></a><span class="lineno"><a class="line" href="classmlib_1_1bounded__queue.html#a9934d7deea96168250a5e42cba9f7c09">  105</a></span>&#160;  M <a class="code" href="classmlib_1_1bounded__queue.html#a9934d7deea96168250a5e42cba9f7c09">consume</a> ()</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;  {</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;  M result;</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;    this-&gt;<a class="code" href="classmlib_1_1sync__queue.html#aab7b034c42205f5ad2643604f5516ce1">update</a>.<a class="code" href="classmlib_1_1criticalsection.html#add3158ebb8f15fa377fcf5f126d2c02e">enter</a> ();</div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;    <span class="keywordflow">if</span> (std::queue&lt;M, C&gt;::empty ())</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;  {</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    <span class="keywordflow">while</span> (1)</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    {</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;        this-&gt;<a class="code" href="classmlib_1_1sync__queue.html#aab7b034c42205f5ad2643604f5516ce1">update</a>.<a class="code" href="classmlib_1_1criticalsection.html#af2c0f5ddba94dd9f80d5609547b96c42">leave</a> ();</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;        this-&gt;<a class="code" href="classmlib_1_1sync__queue.html#a6d88649e6ac700ce2b49ff9dfbd32b85">con_sema</a>.<a class="code" href="classmlib_1_1syncbase.html#a99433891d3ccd92884b2e003c4c5e7ca">wait</a> ();        <span class="comment">//wait for a producer</span></div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;        this-&gt;<a class="code" href="classmlib_1_1sync__queue.html#aab7b034c42205f5ad2643604f5516ce1">update</a>.<a class="code" href="classmlib_1_1criticalsection.html#add3158ebb8f15fa377fcf5f126d2c02e">enter</a> ();</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;        <span class="keywordflow">if</span> (!std::queue&lt;M, C&gt;::empty ())</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;        <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;    }</div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;  }</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;    result = this-&gt;front ();  <span class="comment">//get the message</span></div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    this-&gt;pop ();</div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;  <a class="code" href="classmlib_1_1bounded__queue.html#a55a9193d669811e621d991e3322b3dc4">pro_sema</a>.<a class="code" href="classmlib_1_1semaphore.html#a7e6461c4b43a5d92c40456e4a5a12051">signal</a> ();  <span class="comment">//signal producers there is space available</span></div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    this-&gt;<a class="code" href="classmlib_1_1sync__queue.html#aab7b034c42205f5ad2643604f5516ce1">update</a>.<a class="code" href="classmlib_1_1criticalsection.html#af2c0f5ddba94dd9f80d5609547b96c42">leave</a> ();</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;  <span class="keywordflow">return</span> result;</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;  }</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160; </div>
-<div class="line"><a name="l00128"></a><span class="lineno"><a class="line" href="classmlib_1_1bounded__queue.html#a5ff67b764b4ba7b363682b043adf3f18">  128</a></span>&#160;  <span class="keywordtype">bool</span> <a class="code" href="classmlib_1_1bounded__queue.html#a5ff67b764b4ba7b363682b043adf3f18">full</a> ()</div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;  {</div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;    <a class="code" href="classmlib_1_1lock.html">lock</a> l (this-&gt;<a class="code" href="classmlib_1_1sync__queue.html#aab7b034c42205f5ad2643604f5516ce1">update</a>);</div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;    <span class="keywordflow">return</span> (std::queue&lt;M, C&gt;.<a class="code" href="classmlib_1_1sync__queue.html#a8681c5baf7b9ac06a91fd6736ea7c893">size</a> () == limit);</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    <span class="keywordflow">if</span> (limit &gt; 0 &amp;&amp; limit &lt; INFINITE)</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;      <a class="code" href="classmlib_1_1async__queue.html#a662d2b27c051b1e65b1cf719ce642094">prod_sema</a>.<a class="code" href="classmlib_1_1semaphore.html#a7e6461c4b43a5d92c40456e4a5a12051">signal</a> (limit);</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;  }</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160; </div>
+<div class="line"><a name="l00098"></a><span class="lineno"><a class="line" href="classmlib_1_1async__queue.html#ad25ac6f844b051f5a6fad0edff437845">   98</a></span>&#160;  <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code" href="classmlib_1_1async__queue.html#ad25ac6f844b051f5a6fad0edff437845">produce</a> (<span class="keyword">const</span> M&amp; obj, DWORD timeout = INFINITE)</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;  {</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;    <span class="keywordflow">if</span> (limit &lt; INFINITE)</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    {</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;      <span class="comment">// Bounded queue. See if there is enough space to produce</span></div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;      <a class="code" href="classmlib_1_1stopwatch.html">stopwatch</a> t; <span class="comment">//need a stopwatch to count cumulated wait time</span></div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;      <span class="keywordflow">if</span> (timeout != INFINITE)</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;        t.<a class="code" href="classmlib_1_1stopwatch.html#ac1acc8de90440a2ae9f266b9120ed316">start</a> ();</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;      <a class="code" href="classmlib_1_1async__queue.html#aa7be3ba66aab04514d34a150c9bb0097">update</a>.<a class="code" href="classmlib_1_1criticalsection.html#add3158ebb8f15fa377fcf5f126d2c02e">enter</a> ();</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;      <span class="keywordflow">while</span> (std::queue&lt;M, C&gt;::size () &gt;= limit)</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;      {</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;        <a class="code" href="classmlib_1_1async__queue.html#aa7be3ba66aab04514d34a150c9bb0097">update</a>.<a class="code" href="classmlib_1_1criticalsection.html#af2c0f5ddba94dd9f80d5609547b96c42">leave</a> ();</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;        <span class="keywordflow">if</span> (timeout != INFINITE)</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;        {</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;          <span class="keywordtype">int</span> t_wait = timeout - (int)t.<a class="code" href="classmlib_1_1stopwatch.html#a403fa4c565d4f7ccc234abb305b8651f">msecLap</a> ();</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;          <span class="keywordflow">if</span> (t_wait &lt; 0 || <a class="code" href="classmlib_1_1async__queue.html#a662d2b27c051b1e65b1cf719ce642094">prod_sema</a>.<a class="code" href="classmlib_1_1syncbase.html#a99433891d3ccd92884b2e003c4c5e7ca">wait</a> (t_wait) == WAIT_TIMEOUT)</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;        }</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;        <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;          <a class="code" href="classmlib_1_1async__queue.html#a662d2b27c051b1e65b1cf719ce642094">prod_sema</a>.<a class="code" href="classmlib_1_1syncbase.html#a99433891d3ccd92884b2e003c4c5e7ca">wait</a> ();</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;        <a class="code" href="classmlib_1_1async__queue.html#aa7be3ba66aab04514d34a150c9bb0097">update</a>.<a class="code" href="classmlib_1_1criticalsection.html#add3158ebb8f15fa377fcf5f126d2c02e">enter</a> ();</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;      }</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;      push (obj);</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;      <a class="code" href="classmlib_1_1async__queue.html#a830ac441ec750e21d5e94e6e14ee90ab">cons_sema</a>.<a class="code" href="classmlib_1_1semaphore.html#a7e6461c4b43a5d92c40456e4a5a12051">signal</a> ();</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;      <a class="code" href="classmlib_1_1async__queue.html#aa7be3ba66aab04514d34a150c9bb0097">update</a>.<a class="code" href="classmlib_1_1criticalsection.html#af2c0f5ddba94dd9f80d5609547b96c42">leave</a> ();</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    }</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;    {</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;      <span class="comment">// Unbounded queue. Producer will always be successful</span></div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;      <a class="code" href="classmlib_1_1lock.html">lock</a> l (<a class="code" href="classmlib_1_1async__queue.html#aa7be3ba66aab04514d34a150c9bb0097">update</a>);        <span class="comment">//take control of the queue</span></div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;      push (obj);             <span class="comment">//put a copy of the object at the end</span></div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;      <a class="code" href="classmlib_1_1async__queue.html#a830ac441ec750e21d5e94e6e14ee90ab">cons_sema</a>.<a class="code" href="classmlib_1_1semaphore.html#a7e6461c4b43a5d92c40456e4a5a12051">signal</a> ();     <span class="comment">//and signal the semaphore</span></div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;    }</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
 <div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;  }</div>
 <div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160; </div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160; </div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;<span class="keyword">protected</span>:</div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;  <span class="keywordtype">size_t</span> limit;</div>
-<div class="line"><a name="l00137"></a><span class="lineno"><a class="line" href="classmlib_1_1bounded__queue.html#a55a9193d669811e621d991e3322b3dc4">  137</a></span>&#160;  <a class="code" href="classmlib_1_1semaphore.html">semaphore</a> <a class="code" href="classmlib_1_1bounded__queue.html#a55a9193d669811e621d991e3322b3dc4">pro_sema</a>;   </div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;};</div>
-<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160; </div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160; </div>
-<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;}  <span class="comment">//end namespace</span></div>
+<div class="line"><a name="l00136"></a><span class="lineno"><a class="line" href="classmlib_1_1async__queue.html#a582390dcdd897a61dbe65457bb8aff49">  136</a></span>&#160;  <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code" href="classmlib_1_1async__queue.html#a582390dcdd897a61dbe65457bb8aff49">consume</a> (M&amp; result, <span class="keywordtype">int</span> timeout = INFINITE)</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;  {</div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;    <span class="keywordflow">if</span> (timeout != INFINITE)</div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;    {</div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;      <a class="code" href="classmlib_1_1stopwatch.html">stopwatch</a> t;</div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;      <span class="keywordtype">int</span> t_wait;</div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;      t.<a class="code" href="classmlib_1_1stopwatch.html#ac1acc8de90440a2ae9f266b9120ed316">start</a> ();</div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;      <a class="code" href="classmlib_1_1async__queue.html#aa7be3ba66aab04514d34a150c9bb0097">update</a>.<a class="code" href="classmlib_1_1criticalsection.html#add3158ebb8f15fa377fcf5f126d2c02e">enter</a> ();</div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;      <span class="keywordflow">while</span> (std::queue&lt;M, C&gt;::empty ())</div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;      {</div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;        <a class="code" href="classmlib_1_1async__queue.html#aa7be3ba66aab04514d34a150c9bb0097">update</a>.<a class="code" href="classmlib_1_1criticalsection.html#af2c0f5ddba94dd9f80d5609547b96c42">leave</a> ();</div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;        t_wait = timeout - (int)t.<a class="code" href="classmlib_1_1stopwatch.html#a403fa4c565d4f7ccc234abb305b8651f">msecLap</a> ();</div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;        <span class="comment">// give up or wait for a producer</span></div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;        <span class="keywordflow">if</span> (t_wait &lt;= 0 || <a class="code" href="classmlib_1_1async__queue.html#a830ac441ec750e21d5e94e6e14ee90ab">cons_sema</a>.<a class="code" href="classmlib_1_1syncbase.html#a99433891d3ccd92884b2e003c4c5e7ca">wait</a> (t_wait) == WAIT_TIMEOUT )</div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;          <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;        <a class="code" href="classmlib_1_1async__queue.html#aa7be3ba66aab04514d34a150c9bb0097">update</a>.<a class="code" href="classmlib_1_1criticalsection.html#add3158ebb8f15fa377fcf5f126d2c02e">enter</a> ();</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;      }</div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;    }</div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;    {</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;      <a class="code" href="classmlib_1_1async__queue.html#aa7be3ba66aab04514d34a150c9bb0097">update</a>.<a class="code" href="classmlib_1_1criticalsection.html#add3158ebb8f15fa377fcf5f126d2c02e">enter</a> ();</div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;      <span class="keywordflow">if</span> (std::queue&lt;M, C&gt;::empty ())</div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;      {</div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;        <span class="keywordflow">while</span> (1)</div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;        {</div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;          <a class="code" href="classmlib_1_1async__queue.html#aa7be3ba66aab04514d34a150c9bb0097">update</a>.<a class="code" href="classmlib_1_1criticalsection.html#af2c0f5ddba94dd9f80d5609547b96c42">leave</a> ();</div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;          <a class="code" href="classmlib_1_1async__queue.html#a830ac441ec750e21d5e94e6e14ee90ab">cons_sema</a>.<a class="code" href="classmlib_1_1syncbase.html#a99433891d3ccd92884b2e003c4c5e7ca">wait</a> ();        <span class="comment">//wait for a producer</span></div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;          <a class="code" href="classmlib_1_1async__queue.html#aa7be3ba66aab04514d34a150c9bb0097">update</a>.<a class="code" href="classmlib_1_1criticalsection.html#add3158ebb8f15fa377fcf5f126d2c02e">enter</a> ();</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;          <span class="keywordflow">if</span> (!std::queue&lt;M, C&gt;::empty ())</div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;            <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;        }</div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;      }</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;    }</div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;    result = front ();  <span class="comment">//get the message</span></div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;    pop ();</div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;    <span class="keywordflow">if</span> (limit != INFINITE)</div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;      <a class="code" href="classmlib_1_1async__queue.html#a662d2b27c051b1e65b1cf719ce642094">prod_sema</a>.<a class="code" href="classmlib_1_1semaphore.html#a7e6461c4b43a5d92c40456e4a5a12051">signal</a> ();  <span class="comment">//signal producers there is space available</span></div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160; </div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;    <a class="code" href="classmlib_1_1async__queue.html#aa7be3ba66aab04514d34a150c9bb0097">update</a>.<a class="code" href="classmlib_1_1criticalsection.html#af2c0f5ddba94dd9f80d5609547b96c42">leave</a> ();</div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;  }</div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160; </div>
+<div class="line"><a name="l00179"></a><span class="lineno"><a class="line" href="classmlib_1_1async__queue.html#a5304ce03b0128adc6d43de1b6bae3dd7">  179</a></span>&#160;  <span class="keywordtype">bool</span> <a class="code" href="classmlib_1_1async__queue.html#a5304ce03b0128adc6d43de1b6bae3dd7">empty</a>()</div>
+<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;  {</div>
+<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;    <a class="code" href="classmlib_1_1lock.html">lock</a> l (<a class="code" href="classmlib_1_1async__queue.html#aa7be3ba66aab04514d34a150c9bb0097">update</a>);</div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;    <span class="keywordflow">return</span> std::queue&lt;M, C&gt;::empty ();</div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;  }</div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160; </div>
+<div class="line"><a name="l00186"></a><span class="lineno"><a class="line" href="classmlib_1_1async__queue.html#a62aded3b58edd715e73a72d0029fa258">  186</a></span>&#160;  <span class="keywordtype">bool</span> <a class="code" href="classmlib_1_1async__queue.html#a62aded3b58edd715e73a72d0029fa258">full</a> ()</div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;  {</div>
+<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;    <a class="code" href="classmlib_1_1lock.html">lock</a> l (this-&gt;<a class="code" href="classmlib_1_1async__queue.html#aa7be3ba66aab04514d34a150c9bb0097">update</a>);</div>
+<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;    <span class="keywordflow">return</span> (std::queue&lt;M, C&gt;.<a class="code" href="classmlib_1_1async__queue.html#a9ab1a0dbce1d879e295056c64e79e6ee">size</a> () == limit);</div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;  }</div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160; </div>
+<div class="line"><a name="l00193"></a><span class="lineno"><a class="line" href="classmlib_1_1async__queue.html#a9ab1a0dbce1d879e295056c64e79e6ee">  193</a></span>&#160;  <span class="keywordtype">size_t</span> <a class="code" href="classmlib_1_1async__queue.html#a9ab1a0dbce1d879e295056c64e79e6ee">size</a> ()</div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;  {</div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;    <a class="code" href="classmlib_1_1lock.html">lock</a> l (<a class="code" href="classmlib_1_1async__queue.html#aa7be3ba66aab04514d34a150c9bb0097">update</a>);</div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;    <span class="keywordflow">return</span> std::queue&lt;M, C&gt;::size ();</div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;  }</div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160; </div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;<span class="keyword">protected</span>:</div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;  <span class="keywordtype">int</span> limit;</div>
+<div class="line"><a name="l00201"></a><span class="lineno"><a class="line" href="classmlib_1_1async__queue.html#a662d2b27c051b1e65b1cf719ce642094">  201</a></span>&#160;  <a class="code" href="classmlib_1_1semaphore.html">semaphore</a> <a class="code" href="classmlib_1_1async__queue.html#a662d2b27c051b1e65b1cf719ce642094">prod_sema</a>;      </div>
+<div class="line"><a name="l00202"></a><span class="lineno"><a class="line" href="classmlib_1_1async__queue.html#a830ac441ec750e21d5e94e6e14ee90ab">  202</a></span>&#160;  <a class="code" href="classmlib_1_1semaphore.html">semaphore</a> <a class="code" href="classmlib_1_1async__queue.html#a830ac441ec750e21d5e94e6e14ee90ab">cons_sema</a>;      </div>
+<div class="line"><a name="l00203"></a><span class="lineno"><a class="line" href="classmlib_1_1async__queue.html#aa7be3ba66aab04514d34a150c9bb0097">  203</a></span>&#160;  <a class="code" href="classmlib_1_1criticalsection.html">criticalsection</a> <a class="code" href="classmlib_1_1async__queue.html#aa7be3ba66aab04514d34a150c9bb0097">update</a>;   </div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;};</div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160; </div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160; </div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160; </div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;}  <span class="comment">//end namespace</span></div>
 </div><!-- fragment --></div><!-- contents -->
-<div class="ttc" id="aclassmlib_1_1bounded__queue_html"><div class="ttname"><a href="classmlib_1_1bounded__queue.html">mlib::bounded_queue</a></div><div class="ttdoc">A synchronized queue with a limited size.</div><div class="ttdef"><b>Definition:</b> syncque.h:81</div></div>
-<div class="ttc" id="aclassmlib_1_1sync__queue_html_a6d88649e6ac700ce2b49ff9dfbd32b85"><div class="ttname"><a href="classmlib_1_1sync__queue.html#a6d88649e6ac700ce2b49ff9dfbd32b85">mlib::sync_queue::con_sema</a></div><div class="ttdeci">semaphore con_sema</div><div class="ttdoc">consumers' semaphore counts down until queue is empty</div><div class="ttdef"><b>Definition:</b> syncque.h:69</div></div>
+<div class="ttc" id="aclassmlib_1_1async__queue_html_aa58b124cc7c75bb650a5f9ff29350702"><div class="ttname"><a href="classmlib_1_1async__queue.html#aa58b124cc7c75bb650a5f9ff29350702">mlib::async_queue::async_queue</a></div><div class="ttdeci">async_queue(int limit_=INFINITE)</div><div class="ttdoc">Crates a queue with the given maximum size.</div><div class="ttdef"><b>Definition:</b> syncque.h:89</div></div>
+<div class="ttc" id="aclassmlib_1_1async__queue_html_a662d2b27c051b1e65b1cf719ce642094"><div class="ttname"><a href="classmlib_1_1async__queue.html#a662d2b27c051b1e65b1cf719ce642094">mlib::async_queue::prod_sema</a></div><div class="ttdeci">semaphore prod_sema</div><div class="ttdoc">producers' semaphore counts down until queue is full</div><div class="ttdef"><b>Definition:</b> syncque.h:201</div></div>
+<div class="ttc" id="aclassmlib_1_1async__queue_html_aa7be3ba66aab04514d34a150c9bb0097"><div class="ttname"><a href="classmlib_1_1async__queue.html#aa7be3ba66aab04514d34a150c9bb0097">mlib::async_queue::update</a></div><div class="ttdeci">criticalsection update</div><div class="ttdoc">critical section protects queue's integrity</div><div class="ttdef"><b>Definition:</b> syncque.h:203</div></div>
 <div class="ttc" id="aclassmlib_1_1criticalsection_html_af2c0f5ddba94dd9f80d5609547b96c42"><div class="ttname"><a href="classmlib_1_1criticalsection.html#af2c0f5ddba94dd9f80d5609547b96c42">mlib::criticalsection::leave</a></div><div class="ttdeci">virtual void leave()</div><div class="ttdoc">Leave critical section.</div><div class="ttdef"><b>Definition:</b> critsect.h:113</div></div>
-<div class="ttc" id="aclassmlib_1_1bounded__queue_html_a55a9193d669811e621d991e3322b3dc4"><div class="ttname"><a href="classmlib_1_1bounded__queue.html#a55a9193d669811e621d991e3322b3dc4">mlib::bounded_queue::pro_sema</a></div><div class="ttdeci">semaphore pro_sema</div><div class="ttdoc">producers' semaphore counts down until queue is full</div><div class="ttdef"><b>Definition:</b> syncque.h:137</div></div>
 <div class="ttc" id="aclassmlib_1_1criticalsection_html"><div class="ttname"><a href="classmlib_1_1criticalsection.html">mlib::criticalsection</a></div><div class="ttdoc">Lightweight inter-thread synchronization.</div><div class="ttdef"><b>Definition:</b> critsect.h:24</div></div>
-<div class="ttc" id="aclassmlib_1_1sync__queue_html"><div class="ttname"><a href="classmlib_1_1sync__queue.html">mlib::sync_queue</a></div><div class="ttdoc">A template class that implements &quot;synchronized queues&quot;.</div><div class="ttdef"><b>Definition:</b> syncque.h:25</div></div>
+<div class="ttc" id="aclassmlib_1_1sync__queue_html"><div class="ttname"><a href="classmlib_1_1sync__queue.html">mlib::sync_queue</a></div><div class="ttdoc">A template class that implements a &quot;synchronous queue&quot;, in effect a mailbox that can store one &quot;messa...</div><div class="ttdef"><b>Definition:</b> syncque.h:30</div></div>
 <div class="ttc" id="aclassmlib_1_1lock_html"><div class="ttname"><a href="classmlib_1_1lock.html">mlib::lock</a></div><div class="ttdoc">Automatic wrapper for critical sections.</div><div class="ttdef"><b>Definition:</b> critsect.h:68</div></div>
+<div class="ttc" id="aclassmlib_1_1stopwatch_html_ac1acc8de90440a2ae9f266b9120ed316"><div class="ttname"><a href="classmlib_1_1stopwatch.html#ac1acc8de90440a2ae9f266b9120ed316">mlib::stopwatch::start</a></div><div class="ttdeci">void start()</div><div class="ttdoc">Start the stopwatch.</div><div class="ttdef"><b>Definition:</b> stopwatch.cpp:26</div></div>
 <div class="ttc" id="asemaphore_8h_html"><div class="ttname"><a href="semaphore_8h.html">semaphore.h</a></div></div>
-<div class="ttc" id="aclassmlib_1_1bounded__queue_html_a9934d7deea96168250a5e42cba9f7c09"><div class="ttname"><a href="classmlib_1_1bounded__queue.html#a9934d7deea96168250a5e42cba9f7c09">mlib::bounded_queue::consume</a></div><div class="ttdeci">M consume()</div><div class="ttdoc">Extract and return first element in queue.</div><div class="ttdef"><b>Definition:</b> syncque.h:105</div></div>
+<div class="ttc" id="aclassmlib_1_1stopwatch_html"><div class="ttname"><a href="classmlib_1_1stopwatch.html">mlib::stopwatch</a></div><div class="ttdoc">Simple stopwatch timer (yet another one!)</div><div class="ttdef"><b>Definition:</b> stopwatch.h:20</div></div>
 <div class="ttc" id="aclassmlib_1_1semaphore_html"><div class="ttname"><a href="classmlib_1_1semaphore.html">mlib::semaphore</a></div><div class="ttdoc">Wrapper for Windows semaphore objects. A semaphore is a counter incremented by signal and decremented...</div><div class="ttdef"><b>Definition:</b> semaphore.h:16</div></div>
-<div class="ttc" id="aclassmlib_1_1sync__queue_html_aab7b034c42205f5ad2643604f5516ce1"><div class="ttname"><a href="classmlib_1_1sync__queue.html#aab7b034c42205f5ad2643604f5516ce1">mlib::sync_queue::update</a></div><div class="ttdeci">criticalsection update</div><div class="ttdoc">critical section protects queue's integrity</div><div class="ttdef"><b>Definition:</b> syncque.h:70</div></div>
-<div class="ttc" id="aclassmlib_1_1sync__queue_html_a9f66297001630c60e89c6a29d2dd0ca7"><div class="ttname"><a href="classmlib_1_1sync__queue.html#a9f66297001630c60e89c6a29d2dd0ca7">mlib::sync_queue::empty</a></div><div class="ttdeci">bool empty()</div><div class="ttdoc">Return true if queue is empty.</div><div class="ttdef"><b>Definition:</b> syncque.h:55</div></div>
+<div class="ttc" id="aclassmlib_1_1async__queue_html_a582390dcdd897a61dbe65457bb8aff49"><div class="ttname"><a href="classmlib_1_1async__queue.html#a582390dcdd897a61dbe65457bb8aff49">mlib::async_queue::consume</a></div><div class="ttdeci">virtual bool consume(M &amp;result, int timeout=INFINITE)</div><div class="ttdef"><b>Definition:</b> syncque.h:136</div></div>
+<div class="ttc" id="aclassmlib_1_1sync__queue_html_a741db1b251cac10a2d20db537375c309"><div class="ttname"><a href="classmlib_1_1sync__queue.html#a741db1b251cac10a2d20db537375c309">mlib::sync_queue::sync_queue</a></div><div class="ttdeci">sync_queue()</div><div class="ttdoc">Create a synchronous queue.</div><div class="ttdef"><b>Definition:</b> syncque.h:34</div></div>
+<div class="ttc" id="aclassmlib_1_1async__queue_html_a830ac441ec750e21d5e94e6e14ee90ab"><div class="ttname"><a href="classmlib_1_1async__queue.html#a830ac441ec750e21d5e94e6e14ee90ab">mlib::async_queue::cons_sema</a></div><div class="ttdeci">semaphore cons_sema</div><div class="ttdoc">consumers' semaphore counts down until queue is empty</div><div class="ttdef"><b>Definition:</b> syncque.h:202</div></div>
+<div class="ttc" id="aclassmlib_1_1stopwatch_html_a403fa4c565d4f7ccc234abb305b8651f"><div class="ttname"><a href="classmlib_1_1stopwatch.html#a403fa4c565d4f7ccc234abb305b8651f">mlib::stopwatch::msecLap</a></div><div class="ttdeci">double msecLap()</div><div class="ttdoc">Return number of milliseconds elapsed from start.</div><div class="ttdef"><b>Definition:</b> stopwatch.cpp:43</div></div>
 <div class="ttc" id="acritsect_8h_html"><div class="ttname"><a href="critsect_8h.html">critsect.h</a></div></div>
+<div class="ttc" id="aclassmlib_1_1async__queue_html_a5304ce03b0128adc6d43de1b6bae3dd7"><div class="ttname"><a href="classmlib_1_1async__queue.html#a5304ce03b0128adc6d43de1b6bae3dd7">mlib::async_queue::empty</a></div><div class="ttdeci">bool empty()</div><div class="ttdoc">Return true if queue is empty.</div><div class="ttdef"><b>Definition:</b> syncque.h:179</div></div>
 <div class="ttc" id="aclassmlib_1_1semaphore_html_a7e6461c4b43a5d92c40456e4a5a12051"><div class="ttname"><a href="classmlib_1_1semaphore.html#a7e6461c4b43a5d92c40456e4a5a12051">mlib::semaphore::signal</a></div><div class="ttdeci">int signal(int count=1)</div><div class="ttdoc">Signal a semaphore object.</div><div class="ttdef"><b>Definition:</b> semaphore.cpp:44</div></div>
-<div class="ttc" id="aclassmlib_1_1sync__queue_html_a6f98e887ada519951e7bd7db2be48501"><div class="ttname"><a href="classmlib_1_1sync__queue.html#a6f98e887ada519951e7bd7db2be48501">mlib::sync_queue::produce</a></div><div class="ttdeci">virtual void produce(const M &amp;obj)</div><div class="ttdoc">Append an element to queue.</div><div class="ttdef"><b>Definition:</b> syncque.h:30</div></div>
-<div class="ttc" id="aclassmlib_1_1sync__queue_html_a8681c5baf7b9ac06a91fd6736ea7c893"><div class="ttname"><a href="classmlib_1_1sync__queue.html#a8681c5baf7b9ac06a91fd6736ea7c893">mlib::sync_queue::size</a></div><div class="ttdeci">size_t size()</div><div class="ttdoc">Return queue size.</div><div class="ttdef"><b>Definition:</b> syncque.h:62</div></div>
 <div class="ttc" id="aclassmlib_1_1criticalsection_html_add3158ebb8f15fa377fcf5f126d2c02e"><div class="ttname"><a href="classmlib_1_1criticalsection.html#add3158ebb8f15fa377fcf5f126d2c02e">mlib::criticalsection::enter</a></div><div class="ttdeci">virtual void enter()</div><div class="ttdoc">Enter critical section.</div><div class="ttdef"><b>Definition:</b> critsect.h:99</div></div>
-<div class="ttc" id="aclassmlib_1_1bounded__queue_html_a9be60a21d7ff67c65bd9b4b33aad5af4"><div class="ttname"><a href="classmlib_1_1bounded__queue.html#a9be60a21d7ff67c65bd9b4b33aad5af4">mlib::bounded_queue::produce</a></div><div class="ttdeci">void produce(const M &amp;obj)</div><div class="ttdef"><b>Definition:</b> syncque.h:90</div></div>
-<div class="ttc" id="aclassmlib_1_1syncbase_html_a99433891d3ccd92884b2e003c4c5e7ca"><div class="ttname"><a href="classmlib_1_1syncbase.html#a99433891d3ccd92884b2e003c4c5e7ca">mlib::syncbase::wait</a></div><div class="ttdeci">virtual DWORD wait(DWORD time_limit=INFINITE)</div><div class="ttdoc">Wait for the object to become signaled.</div><div class="ttdef"><b>Definition:</b> syncbase.cpp:90</div></div>
-<div class="ttc" id="aclassmlib_1_1bounded__queue_html_a5ff67b764b4ba7b363682b043adf3f18"><div class="ttname"><a href="classmlib_1_1bounded__queue.html#a5ff67b764b4ba7b363682b043adf3f18">mlib::bounded_queue::full</a></div><div class="ttdeci">bool full()</div><div class="ttdoc">Return true if queue is at capacity.</div><div class="ttdef"><b>Definition:</b> syncque.h:128</div></div>
-<div class="ttc" id="aclassmlib_1_1sync__queue_html_a77199fa160a9af05ff8e37a9692b553b"><div class="ttname"><a href="classmlib_1_1sync__queue.html#a77199fa160a9af05ff8e37a9692b553b">mlib::sync_queue::consume</a></div><div class="ttdeci">virtual M consume()</div><div class="ttdoc">Extract and return first element in queue.</div><div class="ttdef"><b>Definition:</b> syncque.h:38</div></div>
+<div class="ttc" id="aclassmlib_1_1sync__queue_html_ac40f64a42d74ed4456a6d1588176a019"><div class="ttname"><a href="classmlib_1_1sync__queue.html#ac40f64a42d74ed4456a6d1588176a019">mlib::sync_queue::produce</a></div><div class="ttdeci">void produce(const M &amp;obj)</div><div class="ttdoc">Put new element in queue.</div><div class="ttdef"><b>Definition:</b> syncque.h:37</div></div>
+<div class="ttc" id="aclassmlib_1_1syncbase_html_a99433891d3ccd92884b2e003c4c5e7ca"><div class="ttname"><a href="classmlib_1_1syncbase.html#a99433891d3ccd92884b2e003c4c5e7ca">mlib::syncbase::wait</a></div><div class="ttdeci">virtual DWORD wait(DWORD time_limit=INFINITE)</div><div class="ttdoc">Wait for the object to become signaled.</div><div class="ttdef"><b>Definition:</b> syncbase.cpp:127</div></div>
+<div class="ttc" id="aclassmlib_1_1async__queue_html_a9ab1a0dbce1d879e295056c64e79e6ee"><div class="ttname"><a href="classmlib_1_1async__queue.html#a9ab1a0dbce1d879e295056c64e79e6ee">mlib::async_queue::size</a></div><div class="ttdeci">size_t size()</div><div class="ttdoc">Return queue size.</div><div class="ttdef"><b>Definition:</b> syncque.h:193</div></div>
+<div class="ttc" id="aclassmlib_1_1async__queue_html"><div class="ttname"><a href="classmlib_1_1async__queue.html">mlib::async_queue</a></div><div class="ttdoc">A template class that implements &quot;asynchronous queues&quot;.</div><div class="ttdef"><b>Definition:</b> syncque.h:86</div></div>
+<div class="ttc" id="aclassmlib_1_1async__queue_html_a62aded3b58edd715e73a72d0029fa258"><div class="ttname"><a href="classmlib_1_1async__queue.html#a62aded3b58edd715e73a72d0029fa258">mlib::async_queue::full</a></div><div class="ttdeci">bool full()</div><div class="ttdoc">Return true if queue is at capacity.</div><div class="ttdef"><b>Definition:</b> syncque.h:186</div></div>
+<div class="ttc" id="aclassmlib_1_1async__queue_html_ad25ac6f844b051f5a6fad0edff437845"><div class="ttname"><a href="classmlib_1_1async__queue.html#ad25ac6f844b051f5a6fad0edff437845">mlib::async_queue::produce</a></div><div class="ttdeci">virtual bool produce(const M &amp;obj, DWORD timeout=INFINITE)</div><div class="ttdef"><b>Definition:</b> syncque.h:98</div></div>
+<div class="ttc" id="astopwatch_8h_html"><div class="ttname"><a href="stopwatch_8h.html">stopwatch.h</a></div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">

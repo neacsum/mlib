@@ -23,8 +23,8 @@ SUITE (threads)
     thread th2 (f2);
     th1.start ();
     th2.start ();
-    syncbase* p[]{ &th1, &th2 };
-    multiwait (true, 2, p);
+    std::vector<syncbase> p{ th1, th2 };
+    multiwait (p);
     CHECK_EQUAL (1, th1.result ());
 
   }

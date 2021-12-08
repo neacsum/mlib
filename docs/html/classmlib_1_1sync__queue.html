@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.18"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>MLIB: mlib::sync_queue&lt; M, C &gt; Class Template Reference</title>
+<title>MLIB: mlib::sync_queue&lt; M &gt; Class Template Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -44,61 +44,38 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pro-attribs">Protected Attributes</a> &#124;
 <a href="classmlib_1_1sync__queue-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">mlib::sync_queue&lt; M, C &gt; Class Template Reference</div>  </div>
+<div class="title">mlib::sync_queue&lt; M &gt; Class Template Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 
-<p>A template class that implements "synchronized queues".  
+<p>A template class that implements a "synchronous queue", in effect a mailbox that can store one "message", created by a producer thread, until consumed by a consumer thread.  
  <a href="classmlib_1_1sync__queue.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="syncque_8h_source.html">syncque.h</a>&gt;</code></p>
-<div class="dynheader">
-Inheritance diagram for mlib::sync_queue&lt; M, C &gt;:</div>
-<div class="dyncontent">
- <div class="center">
-  <img src="classmlib_1_1sync__queue.png" alt=""/>
- </div></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a6f98e887ada519951e7bd7db2be48501"><td class="memItemLeft" align="right" valign="top"><a id="a6f98e887ada519951e7bd7db2be48501"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1sync__queue.html#a6f98e887ada519951e7bd7db2be48501">produce</a> (const M &amp;obj)</td></tr>
-<tr class="memdesc:a6f98e887ada519951e7bd7db2be48501"><td class="mdescLeft">&#160;</td><td class="mdescRight">Append an element to queue. <br /></td></tr>
-<tr class="separator:a6f98e887ada519951e7bd7db2be48501"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a77199fa160a9af05ff8e37a9692b553b"><td class="memItemLeft" align="right" valign="top"><a id="a77199fa160a9af05ff8e37a9692b553b"></a>
-virtual M&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1sync__queue.html#a77199fa160a9af05ff8e37a9692b553b">consume</a> ()</td></tr>
-<tr class="memdesc:a77199fa160a9af05ff8e37a9692b553b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Extract and return first element in queue. <br /></td></tr>
-<tr class="separator:a77199fa160a9af05ff8e37a9692b553b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9f66297001630c60e89c6a29d2dd0ca7"><td class="memItemLeft" align="right" valign="top"><a id="a9f66297001630c60e89c6a29d2dd0ca7"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1sync__queue.html#a9f66297001630c60e89c6a29d2dd0ca7">empty</a> ()</td></tr>
-<tr class="memdesc:a9f66297001630c60e89c6a29d2dd0ca7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return <em>true</em> if queue is empty. <br /></td></tr>
-<tr class="separator:a9f66297001630c60e89c6a29d2dd0ca7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8681c5baf7b9ac06a91fd6736ea7c893"><td class="memItemLeft" align="right" valign="top"><a id="a8681c5baf7b9ac06a91fd6736ea7c893"></a>
-size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1sync__queue.html#a8681c5baf7b9ac06a91fd6736ea7c893">size</a> ()</td></tr>
-<tr class="memdesc:a8681c5baf7b9ac06a91fd6736ea7c893"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return queue size. <br /></td></tr>
-<tr class="separator:a8681c5baf7b9ac06a91fd6736ea7c893"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
-Protected Attributes</h2></td></tr>
-<tr class="memitem:a6d88649e6ac700ce2b49ff9dfbd32b85"><td class="memItemLeft" align="right" valign="top"><a id="a6d88649e6ac700ce2b49ff9dfbd32b85"></a>
-<a class="el" href="classmlib_1_1semaphore.html">semaphore</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1sync__queue.html#a6d88649e6ac700ce2b49ff9dfbd32b85">con_sema</a></td></tr>
-<tr class="memdesc:a6d88649e6ac700ce2b49ff9dfbd32b85"><td class="mdescLeft">&#160;</td><td class="mdescRight">consumers' semaphore counts down until queue is empty <br /></td></tr>
-<tr class="separator:a6d88649e6ac700ce2b49ff9dfbd32b85"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aab7b034c42205f5ad2643604f5516ce1"><td class="memItemLeft" align="right" valign="top"><a id="aab7b034c42205f5ad2643604f5516ce1"></a>
-<a class="el" href="classmlib_1_1criticalsection.html">criticalsection</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1sync__queue.html#aab7b034c42205f5ad2643604f5516ce1">update</a></td></tr>
-<tr class="memdesc:aab7b034c42205f5ad2643604f5516ce1"><td class="mdescLeft">&#160;</td><td class="mdescRight">critical section protects queue's integrity <br /></td></tr>
-<tr class="separator:aab7b034c42205f5ad2643604f5516ce1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a741db1b251cac10a2d20db537375c309"><td class="memItemLeft" align="right" valign="top"><a id="a741db1b251cac10a2d20db537375c309"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1sync__queue.html#a741db1b251cac10a2d20db537375c309">sync_queue</a> ()</td></tr>
+<tr class="memdesc:a741db1b251cac10a2d20db537375c309"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a synchronous queue. <br /></td></tr>
+<tr class="separator:a741db1b251cac10a2d20db537375c309"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac40f64a42d74ed4456a6d1588176a019"><td class="memItemLeft" align="right" valign="top"><a id="ac40f64a42d74ed4456a6d1588176a019"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1sync__queue.html#ac40f64a42d74ed4456a6d1588176a019">produce</a> (const M &amp;obj)</td></tr>
+<tr class="memdesc:ac40f64a42d74ed4456a6d1588176a019"><td class="mdescLeft">&#160;</td><td class="mdescRight">Put new element in queue. <br /></td></tr>
+<tr class="separator:ac40f64a42d74ed4456a6d1588176a019"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab6cb0e3071c8308312277c84301ffbfb"><td class="memItemLeft" align="right" valign="top"><a id="ab6cb0e3071c8308312277c84301ffbfb"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>consume</b> (M &amp;obj)</td></tr>
+<tr class="separator:ab6cb0e3071c8308312277c84301ffbfb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><h3>template&lt;class M, class C = std::deque&lt;M&gt;&gt;<br />
-class mlib::sync_queue&lt; M, C &gt;</h3>
+<div class="textblock"><h3>template&lt;class M&gt;<br />
+class mlib::sync_queue&lt; M &gt;</h3>
 
-<p>A template class that implements "synchronized queues". </p>
-<p>These are producer/consumer queues which can hold "messages" and deliver them in FIFO order. Attempting to consume from an empty queue will block the calling thread until a message arrives.</p>
-<dl class="section note"><dt>Note</dt><dd><a class="el" href="classmlib_1_1sync__queue.html" title="A template class that implements &quot;synchronized queues&quot;.">sync_queue</a> is not bounded and it can grow up to the available memory. </dd></dl>
+<p>A template class that implements a "synchronous queue", in effect a mailbox that can store one "message", created by a producer thread, until consumed by a consumer thread. </p>
+<p>If the mailbox is full (a message already there), the producer is blocked until previous message is consumed. If the mailbox is empty, a consumer is blocked until a new message arrives.</p>
+<p>This is strictly equivalent with an <a class="el" href="classmlib_1_1async__queue.html" title="A template class that implements &quot;asynchronous queues&quot;.">async_queue</a> with size 1 however it doesn't have the underlining std::queue structure and avoids all the back and forth copying of messages. </p>
 </div><hr/>The documentation for this class was generated from the following file:<ul>
 <li>C:/development/mlib/include/mlib/<a class="el" href="syncque_8h_source.html">syncque.h</a></li>
 </ul>

@@ -51,21 +51,22 @@ $(function() {
 <div class="textblock"><code>#include &lt;queue&gt;</code><br />
 <code>#include &quot;<a class="el" href="semaphore_8h_source.html">semaphore.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="critsect_8h_source.html">critsect.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="stopwatch_8h_source.html">stopwatch.h</a>&quot;</code><br />
 </div>
 <p><a href="syncque_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1sync__queue.html">mlib::sync_queue&lt; M, C &gt;</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A template class that implements "synchronized queues".  <a href="classmlib_1_1sync__queue.html#details">More...</a><br /></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1sync__queue.html">mlib::sync_queue&lt; M &gt;</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A template class that implements a "synchronous queue", in effect a mailbox that can store one "message", created by a producer thread, until consumed by a consumer thread.  <a href="classmlib_1_1sync__queue.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1bounded__queue.html">mlib::bounded_queue&lt; M, C &gt;</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A synchronized queue with a limited size.  <a href="classmlib_1_1bounded__queue.html#details">More...</a><br /></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1async__queue.html">mlib::async_queue&lt; M, C &gt;</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">A template class that implements "asynchronous queues".  <a href="classmlib_1_1async__queue.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Definition of sync_queue and bounded_queue classes</p>
-<p>(c) Mircea Neacsu 1999-2020. All rights reserved. </p>
+<div class="textblock"><p>Definition of sync_queue and async_queue classes</p>
+<p>(c) Mircea Neacsu 1999-2021. All rights reserved. </p>
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

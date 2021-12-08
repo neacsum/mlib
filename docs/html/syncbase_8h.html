@@ -51,6 +51,9 @@ $(function() {
 <div class="contents">
 <div class="textblock"><code>#include &lt;windows.h&gt;</code><br />
 <code>#include &lt;string&gt;</code><br />
+<code>#include &lt;atomic&gt;</code><br />
+<code>#include &lt;vector&gt;</code><br />
+<code>#include &lt;assert.h&gt;</code><br />
 </div>
 <p><a href="syncbase_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
@@ -62,10 +65,22 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:gabbfea6149db000dda82fc04a81b824b6"><td class="memItemLeft" align="right" valign="top">DWORD&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__syncro.html#gabbfea6149db000dda82fc04a81b824b6">mlib::multiwait</a> (bool all, int count, syncbase **array, DWORD time_limit=INFINITE)</td></tr>
-<tr class="separator:gabbfea6149db000dda82fc04a81b824b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gae9bba06f8f296bc6a6137bf3b7cd8fae"><td class="memItemLeft" align="right" valign="top">DWORD&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__syncro.html#gae9bba06f8f296bc6a6137bf3b7cd8fae">mlib::multiwait_msg</a> (bool all, int count, syncbase **array, DWORD time_limit=INFINITE, DWORD mask=QS_ALLINPUT)</td></tr>
-<tr class="separator:gae9bba06f8f296bc6a6137bf3b7cd8fae"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga9328e3d659d056a0fa2c97d9f5489045"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
+<tr class="memitem:ga9328e3d659d056a0fa2c97d9f5489045"><td class="memTemplItemLeft" align="right" valign="top">DWORD&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__syncro.html#ga9328e3d659d056a0fa2c97d9f5489045">mlib::multiwait</a> (T *objs, int count, bool all=true, DWORD time_limit=INFINITE)</td></tr>
+<tr class="memdesc:ga9328e3d659d056a0fa2c97d9f5489045"><td class="mdescLeft">&#160;</td><td class="mdescRight">Wait for multiple objects.  <a href="group__syncro.html#ga9328e3d659d056a0fa2c97d9f5489045">More...</a><br /></td></tr>
+<tr class="separator:ga9328e3d659d056a0fa2c97d9f5489045"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaba1977caf32e839454a37ffa5edb133c"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
+<tr class="memitem:gaba1977caf32e839454a37ffa5edb133c"><td class="memTemplItemLeft" align="right" valign="top">DWORD&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__syncro.html#gaba1977caf32e839454a37ffa5edb133c">mlib::multiwait</a> (std::vector&lt; T &gt; &amp;objs, bool all=true, DWORD time_limit=INFINITE)</td></tr>
+<tr class="memdesc:gaba1977caf32e839454a37ffa5edb133c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Wait for multiple objects.  <a href="group__syncro.html#gaba1977caf32e839454a37ffa5edb133c">More...</a><br /></td></tr>
+<tr class="separator:gaba1977caf32e839454a37ffa5edb133c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaa3a5b6923d36082256a97a5d13dee1e6"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
+<tr class="memitem:gaa3a5b6923d36082256a97a5d13dee1e6"><td class="memTemplItemLeft" align="right" valign="top">DWORD&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__syncro.html#gaa3a5b6923d36082256a97a5d13dee1e6">mlib::multiwait_msg</a> (T *objs, int count, bool all=true, DWORD time_limit=INFINITE, DWORD mask=QS_ALLINPUT)</td></tr>
+<tr class="memdesc:gaa3a5b6923d36082256a97a5d13dee1e6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Wait for multiple objects or a message to be queued.  <a href="group__syncro.html#gaa3a5b6923d36082256a97a5d13dee1e6">More...</a><br /></td></tr>
+<tr class="separator:gaa3a5b6923d36082256a97a5d13dee1e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gae3fbb862d9373cf025d63a59721a993f"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
+<tr class="memitem:gae3fbb862d9373cf025d63a59721a993f"><td class="memTemplItemLeft" align="right" valign="top">DWORD&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__syncro.html#gae3fbb862d9373cf025d63a59721a993f">mlib::multiwait_msg</a> (std::vector&lt; T &gt; &amp;objs, bool all=true, DWORD time_limit=INFINITE, DWORD mask=QS_ALLINPUT)</td></tr>
+<tr class="memdesc:gae3fbb862d9373cf025d63a59721a993f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Wait for multiple objects or a message to be queued.  <a href="group__syncro.html#gae3fbb862d9373cf025d63a59721a993f">More...</a><br /></td></tr>
+<tr class="separator:gae3fbb862d9373cf025d63a59721a993f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1fe8d90527b62e3fe3987f6e371e3733"><td class="memItemLeft" align="right" valign="top"><a id="a1fe8d90527b62e3fe3987f6e371e3733"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="syncbase_8h.html#a1fe8d90527b62e3fe3987f6e371e3733">mlib::udelay</a> (unsigned short usec)</td></tr>
 <tr class="memdesc:a1fe8d90527b62e3fe3987f6e371e3733"><td class="mdescLeft">&#160;</td><td class="mdescRight">Busy waiting for a number of microseconds. <br /></td></tr>

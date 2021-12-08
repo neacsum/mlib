@@ -80,43 +80,53 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:gabbfea6149db000dda82fc04a81b824b6"><td class="memItemLeft" align="right" valign="top">DWORD&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__syncro.html#gabbfea6149db000dda82fc04a81b824b6">mlib::multiwait</a> (bool all, int count, <a class="el" href="classmlib_1_1syncbase.html">syncbase</a> **array, DWORD time_limit=INFINITE)</td></tr>
-<tr class="separator:gabbfea6149db000dda82fc04a81b824b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gae9bba06f8f296bc6a6137bf3b7cd8fae"><td class="memItemLeft" align="right" valign="top">DWORD&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__syncro.html#gae9bba06f8f296bc6a6137bf3b7cd8fae">mlib::multiwait_msg</a> (bool all, int count, <a class="el" href="classmlib_1_1syncbase.html">syncbase</a> **array, DWORD time_limit=INFINITE, DWORD mask=QS_ALLINPUT)</td></tr>
-<tr class="separator:gae9bba06f8f296bc6a6137bf3b7cd8fae"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga9328e3d659d056a0fa2c97d9f5489045"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
+<tr class="memitem:ga9328e3d659d056a0fa2c97d9f5489045"><td class="memTemplItemLeft" align="right" valign="top">DWORD&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__syncro.html#ga9328e3d659d056a0fa2c97d9f5489045">mlib::multiwait</a> (T *objs, int count, bool all=true, DWORD time_limit=INFINITE)</td></tr>
+<tr class="memdesc:ga9328e3d659d056a0fa2c97d9f5489045"><td class="mdescLeft">&#160;</td><td class="mdescRight">Wait for multiple objects.  <a href="group__syncro.html#ga9328e3d659d056a0fa2c97d9f5489045">More...</a><br /></td></tr>
+<tr class="separator:ga9328e3d659d056a0fa2c97d9f5489045"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaba1977caf32e839454a37ffa5edb133c"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
+<tr class="memitem:gaba1977caf32e839454a37ffa5edb133c"><td class="memTemplItemLeft" align="right" valign="top">DWORD&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__syncro.html#gaba1977caf32e839454a37ffa5edb133c">mlib::multiwait</a> (std::vector&lt; T &gt; &amp;objs, bool all=true, DWORD time_limit=INFINITE)</td></tr>
+<tr class="memdesc:gaba1977caf32e839454a37ffa5edb133c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Wait for multiple objects.  <a href="group__syncro.html#gaba1977caf32e839454a37ffa5edb133c">More...</a><br /></td></tr>
+<tr class="separator:gaba1977caf32e839454a37ffa5edb133c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaa3a5b6923d36082256a97a5d13dee1e6"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
+<tr class="memitem:gaa3a5b6923d36082256a97a5d13dee1e6"><td class="memTemplItemLeft" align="right" valign="top">DWORD&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__syncro.html#gaa3a5b6923d36082256a97a5d13dee1e6">mlib::multiwait_msg</a> (T *objs, int count, bool all=true, DWORD time_limit=INFINITE, DWORD mask=QS_ALLINPUT)</td></tr>
+<tr class="memdesc:gaa3a5b6923d36082256a97a5d13dee1e6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Wait for multiple objects or a message to be queued.  <a href="group__syncro.html#gaa3a5b6923d36082256a97a5d13dee1e6">More...</a><br /></td></tr>
+<tr class="separator:gaa3a5b6923d36082256a97a5d13dee1e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gae3fbb862d9373cf025d63a59721a993f"><td class="memTemplParams" colspan="2">template&lt;typename T &gt; </td></tr>
+<tr class="memitem:gae3fbb862d9373cf025d63a59721a993f"><td class="memTemplItemLeft" align="right" valign="top">DWORD&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="group__syncro.html#gae3fbb862d9373cf025d63a59721a993f">mlib::multiwait_msg</a> (std::vector&lt; T &gt; &amp;objs, bool all=true, DWORD time_limit=INFINITE, DWORD mask=QS_ALLINPUT)</td></tr>
+<tr class="memdesc:gae3fbb862d9373cf025d63a59721a993f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Wait for multiple objects or a message to be queued.  <a href="group__syncro.html#gae3fbb862d9373cf025d63a59721a993f">More...</a><br /></td></tr>
+<tr class="separator:gae3fbb862d9373cf025d63a59721a993f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <p>Wrapper classes for Windows synchronization mechanisms. </p>
+<p>While, currently, most of these objects have standard conforming replacements (std::mutex, std::semaphore, std::thread, etc.) there are still use cases where standard versions lack functionality compared to objects in this library.</p>
+<p>One such case is when trying to achieve synchronization between different processes. Standard objects have no (portable) mechanism for sharing them between processes. Other limitations include wakeup on message received (<a class="el" href="classmlib_1_1syncbase.html#a96f190fef9906dbc9641ff73859a3ef7">syncbase::wait_alertable</a>) and many limitations related to <a class="el" href="classmlib_1_1thread.html" title="Wrapper for a Windows thread.">mlib::thread</a> objects. </p>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="gabbfea6149db000dda82fc04a81b824b6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gabbfea6149db000dda82fc04a81b824b6">&#9670;&nbsp;</a></span>multiwait()</h2>
+<a id="gaba1977caf32e839454a37ffa5edb133c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaba1977caf32e839454a37ffa5edb133c">&#9670;&nbsp;</a></span>multiwait() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
+<div class="memtemplate">
+template&lt;typename T &gt; </div>
       <table class="memname">
         <tr>
           <td class="memname">DWORD mlib::multiwait </td>
           <td>(</td>
+          <td class="paramtype">std::vector&lt; T &gt; &amp;&#160;</td>
+          <td class="paramname"><em>objs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
           <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>all</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>count</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classmlib_1_1syncbase.html">syncbase</a> **&#160;</td>
-          <td class="paramname"><em>array</em>, </td>
+          <td class="paramname"><em>all</em> = <code>true</code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">DWORD&#160;</td>
-          <td class="paramname"><em>time_limit</em>&#160;</td>
+          <td class="paramname"><em>time_limit</em> = <code>INFINITE</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -125,11 +135,12 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Wait for multiple objects </p><dl class="params"><dt>Parameters</dt><dd>
+
+<p>Wait for multiple objects. </p>
+<p>Wrapper for <a href="https://docs.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-waitformultipleobjects">WaitForMultipleObjects</a> Windows API function. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
+    <tr><td class="paramname">objs</td><td>vector of objects to wait for </td></tr>
     <tr><td class="paramname">all</td><td>if true wait for all objects to become signaled </td></tr>
-    <tr><td class="paramname">count</td><td>number of objects in <code>array</code> </td></tr>
-    <tr><td class="paramname">array</td><td>array of objects to wait for </td></tr>
     <tr><td class="paramname">time_limit</td><td>time limit in milliseconds </td></tr>
   </table>
   </dd>
@@ -137,17 +148,19 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="gae9bba06f8f296bc6a6137bf3b7cd8fae"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gae9bba06f8f296bc6a6137bf3b7cd8fae">&#9670;&nbsp;</a></span>multiwait_msg()</h2>
+<a id="ga9328e3d659d056a0fa2c97d9f5489045"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga9328e3d659d056a0fa2c97d9f5489045">&#9670;&nbsp;</a></span>multiwait() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
+<div class="memtemplate">
+template&lt;typename T &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">DWORD mlib::multiwait_msg </td>
+          <td class="memname">DWORD mlib::multiwait </td>
           <td>(</td>
-          <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>all</em>, </td>
+          <td class="paramtype">T *&#160;</td>
+          <td class="paramname"><em>objs</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -158,20 +171,14 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classmlib_1_1syncbase.html">syncbase</a> **&#160;</td>
-          <td class="paramname"><em>array</em>, </td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>all</em> = <code>true</code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">DWORD&#160;</td>
-          <td class="paramname"><em>time_limit</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">DWORD&#160;</td>
-          <td class="paramname"><em>mask</em>&#160;</td>
+          <td class="paramname"><em>time_limit</em> = <code>INFINITE</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -180,11 +187,125 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Wait for multiple objects or a message to be queued </p><dl class="params"><dt>Parameters</dt><dd>
+
+<p>Wait for multiple objects. </p>
+<p>Wrapper for <a href="https://docs.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-waitformultipleobjects">WaitForMultipleObjects</a> Windows API function. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">all</td><td>if true wait for all objects to become signaled </td></tr>
+    <tr><td class="paramname">objs</td><td>array of objects to wait for </td></tr>
     <tr><td class="paramname">count</td><td>number of objects in <code>array</code> </td></tr>
-    <tr><td class="paramname">array</td><td>array of objects to wait for </td></tr>
+    <tr><td class="paramname">all</td><td>if true wait for all objects to become signaled </td></tr>
+    <tr><td class="paramname">time_limit</td><td>time limit in milliseconds </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gae3fbb862d9373cf025d63a59721a993f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gae3fbb862d9373cf025d63a59721a993f">&#9670;&nbsp;</a></span>multiwait_msg() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">DWORD mlib::multiwait_msg </td>
+          <td>(</td>
+          <td class="paramtype">std::vector&lt; T &gt; &amp;&#160;</td>
+          <td class="paramname"><em>objs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>all</em> = <code>true</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">DWORD&#160;</td>
+          <td class="paramname"><em>time_limit</em> = <code>INFINITE</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">DWORD&#160;</td>
+          <td class="paramname"><em>mask</em> = <code>QS_ALLINPUT</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Wait for multiple objects or a message to be queued. </p>
+<p>Wrapper for <a href="https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-msgwaitformultipleobjects">MsgWaitForMultipleObjects</a> Windows API function. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">objs</td><td>array of objects to wait for </td></tr>
+    <tr><td class="paramname">all</td><td>if true wait for all objects to become signaled </td></tr>
+    <tr><td class="paramname">time_limit</td><td>time limit in milliseconds </td></tr>
+    <tr><td class="paramname">mask</td><td>message mask (combination of QS_... constants) </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="gaa3a5b6923d36082256a97a5d13dee1e6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaa3a5b6923d36082256a97a5d13dee1e6">&#9670;&nbsp;</a></span>multiwait_msg() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">DWORD mlib::multiwait_msg </td>
+          <td>(</td>
+          <td class="paramtype">T *&#160;</td>
+          <td class="paramname"><em>objs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>count</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>all</em> = <code>true</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">DWORD&#160;</td>
+          <td class="paramname"><em>time_limit</em> = <code>INFINITE</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">DWORD&#160;</td>
+          <td class="paramname"><em>mask</em> = <code>QS_ALLINPUT</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Wait for multiple objects or a message to be queued. </p>
+<p>Wrapper for <a href="https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-msgwaitformultipleobjects">MsgWaitForMultipleObjects</a> Windows API function. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">objs</td><td>array of objects to wait for </td></tr>
+    <tr><td class="paramname">count</td><td>number of objects in <code>array</code> </td></tr>
+    <tr><td class="paramname">all</td><td>if true wait for all objects to become signaled </td></tr>
     <tr><td class="paramname">time_limit</td><td>time limit in milliseconds </td></tr>
     <tr><td class="paramname">mask</td><td>message mask (combination of QS_... constants) </td></tr>
   </table>

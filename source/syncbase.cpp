@@ -4,13 +4,21 @@
   (c) Mircea Neacsu 1999-2017
 
 */
-#include <assert.h>
 #include <mlib/syncbase.h>
 
 namespace mlib {
 /*!
   \defgroup syncro  Synchronization Objects
   \brief Wrapper classes for Windows synchronization mechanisms.
+
+  While, currently, most of these objects have standard conforming replacements
+  (std::mutex, std::semaphore, std::thread, etc.) there are still use cases where
+  standard versions lack functionality compared to objects in this library.
+
+  One such case is when trying to achieve synchronization between different processes.
+  Standard objects have no (portable) mechanism for sharing them between processes.
+  Other limitations include wakeup on message received (syncbase::wait_alertable)
+  and many limitations related to mlib::thread objects.
 */
 
 /*!
@@ -35,18 +43,27 @@ syncbase::syncbase (const char *a_name)
   : hl (new handle_life)
   , name_ (a_name?a_name:std::string())
 {
-  hl->handle_ = NULL;
+  hl->handle_ = nullptr;
   hl->lives = 1;
 }
 
 /// Copy constructor
 syncbase::syncbase (const syncbase& other) :
-hl (other.hl),
 name_ (other.name_)
 {
-  hl->lives++;
+  hl = other.hl;
+  if (hl)
+    hl->lives++;
 }
 
+/// Move constructor
+syncbase::syncbase (syncbase&& other) noexcept:
+  name_ (other.name_)
+{
+  hl = other.hl;
+  other.hl = 0;
+  other.name_.clear ();
+}
 
 /// Destructor
 syncbase::~syncbase ()
@@ -79,6 +96,26 @@ syncbase& syncbase::operator =(const syncbase& rhs)
   return *this;
 }
 
+/// Move assignment operator
+syncbase& syncbase::operator = (syncbase&& rhs) noexcept
+{
+  if (&rhs == this)
+    return *this;       //trivial assignment
+
+  if (hl && --hl->lives == 0)
+  {
+    if (hl->handle_)
+      CloseHandle (hl->handle_);
+    delete hl;
+  }
+  hl = rhs.hl;
+  rhs.hl = nullptr;
+  rhs.name_.clear ();
+  name_ = rhs.name_;
+  return *this;
+}
+
+
 /// Equality operator
 int syncbase::operator ==(const syncbase& rhs) const
 {
@@ -89,7 +126,7 @@ int syncbase::operator ==(const syncbase& rhs) const
 /// Wait for the object to become signaled
 DWORD syncbase::wait (DWORD time_limit)
 {
-  assert (hl->handle_);
+  assert (hl && hl->handle_);
   return WaitForSingleObject (hl->handle_, time_limit);
 }
 
@@ -97,7 +134,7 @@ DWORD syncbase::wait (DWORD time_limit)
 /// to occur
 DWORD syncbase::wait_alertable (DWORD time_limit)
 {
-  assert (hl->handle_);
+  assert (hl && hl->handle_);
   return WaitForSingleObjectEx (hl->handle_, time_limit, TRUE);
 }
 
@@ -133,47 +170,6 @@ syncbase::operator bool ()
 DWORD syncbase::wait_msg (DWORD time_limit, DWORD mask)
 {
   return MsgWaitForMultipleObjects (1, &hl->handle_, FALSE, time_limit, mask);
-}
-
-/*!
-  \ingroup syncro
-
-  Wait for multiple objects
-  \param  all     if true wait for all objects to become signaled
-  \param  count   number of objects in \p array 
-  \param  array   array of objects to wait for
-  \param  time_limit  time limit in milliseconds 
-*/
-DWORD multiwait (bool all, int count, syncbase** array, DWORD time_limit)
-{
-  assert (count < MAXIMUM_WAIT_OBJECTS);
-  HANDLE harr[MAXIMUM_WAIT_OBJECTS];
-  for (int i=0; i<count; i++)
-    harr[i] = array[i]->handle();
-
-  DWORD result = WaitForMultipleObjects (count, harr, all, time_limit);
-  return result;
-}
-
-/*!
-  \ingroup syncro
-  
-  Wait for multiple objects or a message to be queued
-  \param  all     if true wait for all objects to become signaled
-  \param  count   number of objects in \p array 
-  \param  array   array of objects to wait for
-  \param  time_limit  time limit in milliseconds
-  \param  mask    message mask (combination of QS_... constants)
-*/
-DWORD multiwait_msg (bool all, int count, syncbase** array, DWORD time_limit, DWORD mask)
-{
-  assert (count < MAXIMUM_WAIT_OBJECTS);
-  HANDLE harr[MAXIMUM_WAIT_OBJECTS];
-  for (int i=0; i<count; i++)
-    harr[i] = array[i]->handle();
-
-  DWORD result = MsgWaitForMultipleObjects (count, harr, all, time_limit, mask);
-  return result;
 }
 
 /// Busy waiting for a number of microseconds
