@@ -22,10 +22,16 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ui-sample", "samples\ui-sam
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "echoserv", "samples\echoserv\echoserv.vcxproj", "{4C13ECFA-DF53-48FB-984B-C228FB82BB65}"
+	ProjectSection(ProjectDependencies) = postProject
+		{F9E11AA9-FAB8-40D8-96D9-F92C5725762B} = {F9E11AA9-FAB8-40D8-96D9-F92C5725762B}
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{D05927DA-0F18-4D5A-8936-7CBC8E75CB66}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "yacb", "samples\yacb\yacb.vcxproj", "{1E05EAD9-9C78-4FF2-A4E0-006BEB57DF44}"
+	ProjectSection(ProjectDependencies) = postProject
+		{F9E11AA9-FAB8-40D8-96D9-F92C5725762B} = {F9E11AA9-FAB8-40D8-96D9-F92C5725762B}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

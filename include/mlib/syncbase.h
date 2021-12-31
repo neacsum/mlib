@@ -110,7 +110,7 @@ DWORD multiwait (std::vector<T>& objs, bool all=true, DWORD time_limit = INFINIT
 {
   assert (objs.size() < MAXIMUM_WAIT_OBJECTS);
   HANDLE harr[MAXIMUM_WAIT_OBJECTS];
-  for (int i = 0; i < objs.size(); i++)
+  for (size_t i = 0; i < objs.size(); i++)
     harr[i] = objs[i].handle ();
 
   DWORD result = WaitForMultipleObjects ((DWORD)objs.size(), harr, all, time_limit);

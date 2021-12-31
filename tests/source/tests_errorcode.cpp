@@ -92,10 +92,10 @@ SUITE (errorcode)
   // Can change facility's throw priority
   TEST (facility_pri)
   {
-    short p = errfac::Default ()->throw_priority ();
-    errfac::Default ()->throw_priority (ERROR_PRI_WARNING);
+    short p = errfac::Default ().throw_priority ();
+    errfac::Default ().throw_priority (ERROR_PRI_WARNING);
     CHECK_THROW (erc, g (1));
-    errfac::Default ()->throw_priority (p); //restore previous throw priority
+    errfac::Default ().throw_priority (p); //restore previous throw priority
     g (1);
   }
 

@@ -326,7 +326,7 @@ void syslog (int facility_priority, char* fmt, ...)
 
 }
 
-void syslog_debug (const char* fmt, ...)
+bool syslog_debug (const char* fmt, ...)
 {
   SYSTEMTIME stm;
   va_list ap;
@@ -337,7 +337,7 @@ void syslog_debug (const char* fmt, ...)
 
   int prm = LOG_MASK(LOG_DEBUG);
   if (!(prm & proclog->mask))
-    return;
+    return false; //not logging debug messages
 
   int facility_priority = proclog->facility | LOG_DEBUG;
 
@@ -362,6 +362,7 @@ void syslog_debug (const char* fmt, ...)
     fwrite(datagram, sizeof(char), strlen(datagram), proclog->file);
     fflush(proclog->file);
   }
+  return true;
 }
 
 /*!

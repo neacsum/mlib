@@ -86,11 +86,11 @@ class async_queue : protected std::queue<M, C>
 {
 public:
   /// Crates a queue with the given maximum size
-  async_queue (int limit_ = INFINITE) 
+  async_queue (size_t limit_ = INFINITE) 
     : limit (limit_)
   {
     if (limit > 0 && limit < INFINITE)
-      prod_sema.signal (limit);
+      prod_sema.signal ((int)limit);
   }
 
   /// Append an element to queue
@@ -197,7 +197,7 @@ public:
   }
 
 protected:
-  int limit;
+  size_t limit;
   semaphore prod_sema;      ///< producers' semaphore counts down until queue is full
   semaphore cons_sema;      ///< consumers' semaphore counts down until queue is empty
   criticalsection update;   ///< critical section protects queue's integrity
