@@ -2,7 +2,7 @@
 #include <fstream>
 #include <mlib/mlib.h>
 
-int main (int argc, char **argv)
+TEST_MAIN (int argc, char **argv)
 {
   if (argc == 1)
   {
