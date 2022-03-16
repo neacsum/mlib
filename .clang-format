@@ -1,0 +1,11 @@
+BasedOnStyle:  Microsoft
+TabWidth:        2
+IndentWidth:     2
+ConstructorInitializerIndentWidth: 2
+ContinuationIndentWidth: 2
+SpaceBeforeParens: Always
+BraceWrapping:
+  AfterNamespace:  false
+BreakBeforeBinaryOperators: NonAssignment
+BreakConstructorInitializers: BeforeComma
+ColumnLimit: 100
