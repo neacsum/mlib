@@ -166,6 +166,7 @@
     <ClInclude Include="include\mlib\inaddr.h" />
     <ClInclude Include="include\mlib\ipow.h" />
     <ClInclude Include="include\mlib\jbridge.h" />
+    <ClInclude Include="include\mlib\json.h" />
     <ClInclude Include="include\mlib\log.h" />
     <ClInclude Include="include\mlib\md5.h" />
     <ClInclude Include="include\mlib\mlib.h" />
@@ -202,6 +203,7 @@
     <ClCompile Include="source\convert.cpp" />
     <ClCompile Include="source\crc32.c" />
     <ClCompile Include="source\dprintf.cpp" />
+    <ClCompile Include="source\json.cpp" />
     <ClCompile Include="source\rdir.cpp" />
     <ClCompile Include="source\errorcode.cpp" />
     <ClCompile Include="source\event.cpp" />

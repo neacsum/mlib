@@ -25,6 +25,7 @@
     <ClCompile Include="source\tests_errorcode.cpp" />
     <ClCompile Include="source\tests_httpd.cpp" />
     <ClCompile Include="source\tests_ipow.cpp" />
+    <ClCompile Include="source\tests_json.cpp" />
     <ClCompile Include="source\tests_main.cpp" />
     <ClCompile Include="source\tests_options.cpp" />
     <ClCompile Include="source\tests_rdir.cpp" />
