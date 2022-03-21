@@ -3,7 +3,6 @@
 #include <map>
 #include <memory>
 #include <mlib/errorcode.h>
-#include <ostream>
 #include <string>
 #include <vector>
 
@@ -13,16 +12,25 @@ namespace json {
 
 constexpr int max_array_size = 8192;
 constexpr int max_object_names = 8192;
+constexpr int max_string_length = 8192;
+constexpr int max_num_digits = 20;
+
 
 // Errors
 #define ERR_JSON_INVTYPE    -1    //invalid node type
 #define ERR_JSON_TOOMANY    -2    //too many descendants
 #define ERR_JSON_ITERTYPE   -3    //invalid iterator type
 #define ERR_JSON_ITERPOS    -4    //invalid iterator position
+#define ERR_JSON_INPUT      -5    //invalid character in input stream
+#define ERR_JSON_SIZE       -7    //invalid element size
 
 extern mlib::errfac* errors;
 
-enum type { null, object, array, numeric, string, boolean };
+class node;
+enum class type { null, object, array, numeric, string, boolean };
+
+mlib::erc read (std::istream& is, node& n);
+mlib::erc write (std::ostream& os, const node& n);
 
 class node {
 public:
@@ -240,6 +248,11 @@ public:
   typedef iterator_type<true> const_iterator;
 
   node& operator = (const node& rhs);
+  node& operator = (bool b);
+  node& operator = (int n);
+  node& operator = (double d);
+  node& operator = (const std::string& s);
+  node& operator = (const char* s);
 
   node& operator [](const std::string& name);
   node& operator [](int index);
@@ -277,9 +290,9 @@ public:
       throw mlib::erc (ERR_JSON_INVTYPE, ERROR_PRI_ERROR, errors);
   }
 
-  void clear ();
+  void clear (type t = type::null);
   type kind () const;
-  int descendants () const;
+  int size () const;
 
 private:
   type t;
@@ -329,46 +342,6 @@ inline node::node (bool b)
 {
 }
 
-/// Return value of an object node element
-inline node& node::operator[](const std::string& name)
-{
-  if (t == type::null)
-  {
-    t = type::object;
-    new (&obj) nodes_map ();
-  }
-  else if (t != type::object)
-    throw mlib::erc (ERR_JSON_INVTYPE, ERROR_PRI_ERROR, errors);
-
-  auto p = obj.find (name);
-  if (p == obj.end ())
-  {
-    if (obj.size () < max_object_names)
-      p = obj.emplace (std::make_pair (name, std::make_unique<node> ())).first;
-    else
-      throw mlib::erc (ERR_JSON_TOOMANY, ERROR_PRI_ERROR, errors);
-  }
-  return *p->second;
-}
-
-/// Return value of an array node element
-inline node& node::operator[](int index)
-{
-  if (t == type::null)
-    t = type::array;
-  else if (t != type::array)
-    throw mlib::erc (ERR_JSON_INVTYPE, ERROR_PRI_ERROR, errors);
-
-  if (index >= arr.size ())
-  {
-    if (index < max_array_size - 1)
-      arr.resize (index + 1);
-    else
-      throw mlib::erc (ERR_JSON_TOOMANY, ERROR_PRI_ERROR, errors);
-  }
-  return *arr[index];
-}
-
 // Begin iterator
 inline node::const_iterator node::begin () const
 {
@@ -411,27 +384,23 @@ inline node::iterator node::end ()
     return iterator (*this, true);
 }
 
-// Remove node content
-inline void node::clear ()
+/// Remove previous node content
+inline void node::clear (type t_)
 {
-  switch (t)
-  {
-  case type::object:
-    obj.clear ();
-    break;
-  case type::array:
-    arr.clear ();
-    break;
-  case type::string:
-    str.clear ();
-    break;
-  case type::numeric:
-    num = 0.;
-    break;
-  case type::boolean:
-    logic = false;
-    break;
-  }
+  //clear previous content
+  if (t == type::object)
+    (&obj)->~nodes_map ();
+  else if (t == type::array)
+    (&arr)->~nodes_array ();
+  else if (t == type::string)
+    (&str)->~basic_string ();
+  t = t_;
+  if (t == type::object)
+    new (&obj)nodes_map ();
+  else if (t == type::array)
+    new (&arr)nodes_array ();
+  else if (t == type::string)
+    new (&str)std::string ();
 }
 
 /// Return the type of node
@@ -441,7 +410,7 @@ inline type node::kind () const
 }
 
 /// Return number of direct descendants
-inline int node::descendants () const
+inline int node::size () const
 {
   return (t == type::object) ? (int)obj.size () :
          (t == type::array) ? (int)arr.size () : 0;
@@ -450,6 +419,6 @@ inline int node::descendants () const
 } //namespace json
 
 std::ostream& operator << (std::ostream& os, const json::node& n);
-
+std::istream& operator >> (std::istream& is, json::node& n);
 
 } //namespace mlib
