@@ -3,6 +3,7 @@
 #include <map>
 #include <memory>
 #include <mlib/errorcode.h>
+#include <iomanip>
 #include <string>
 #include <vector>
 
@@ -13,8 +14,8 @@ namespace json {
 constexpr int max_array_size = 8192;
 constexpr int max_object_names = 8192;
 constexpr int max_string_length = 8192;
-constexpr int max_num_digits = 20;
 
+#define JSON_FMT_INDENT 0x10000
 
 // Errors
 #define ERR_JSON_INVTYPE    -1    //invalid node type
@@ -30,7 +31,8 @@ class node;
 enum class type { null, object, array, numeric, string, boolean };
 
 mlib::erc read (std::istream& is, node& n);
-mlib::erc write (std::ostream& os, const node& n);
+mlib::erc write (std::ostream& os, const node& n, int flags=0);
+mlib::erc read (const std::string& s, node& n);
 
 class node {
 public:
@@ -415,6 +417,17 @@ inline int node::size () const
   return (t == type::object) ? (int)obj.size () :
          (t == type::array) ? (int)arr.size () : 0;
 }
+
+// manipulators
+#ifdef _MSC_VER
+void indenter (std::ios_base& os, int spaces);
+
+inline std::_Smanip<int>
+  spaces (int nspc) { return std::_Smanip<int> (&indenter, nspc); }
+inline std::ostream& indent (std::ostream& os) { indenter (os, 2); return os; };
+inline std::ostream& tabs (std::ostream& os) { indenter (os, 0); return os; };
+std::ostream& noindent (std::ostream& os);
+#endif
 
 } //namespace json
 

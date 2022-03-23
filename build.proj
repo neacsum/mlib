@@ -1,27 +1,27 @@
 <Project DefaultTargets="lib;tests">
     <PropertyGroup>
-      <SQLiteVersion>3370200</SQLiteVersion>
-      <SQLiteName>sqlite-amalgamation-3370200</SQLiteName>
+      <SQLiteVersion>3380100</SQLiteVersion>
+      <SQLiteName>sqlite-amalgamation-3380100</SQLiteName>
       <SQLiteUrl>https://www.sqlite.org/2022/$(SQLiteName).zip</SQLiteUrl>
     </PropertyGroup>
 
-    <Target Name="DownloadSQLite" BeforeTargets="lib">
+    <Target Name="lib" DependsOnTargets="DownloadSQLite">
+        <MSBuild Projects="mlib.vcxproj" Properties="Configuration=Debug;Platform=x64"/>  
+        <MSBuild Projects="mlib.vcxproj" Properties="Configuration=Release;Platform=x64"/> 
+        <MSBuild Projects="mlib.vcxproj" Properties="Configuration=Debug;Platform=x86"/>  
+        <MSBuild Projects="mlib.vcxproj" Properties="Configuration=Release;Platform=x86"/>
+    </Target>
+    <Target Name="tests" DependsOnTargets="lib">
+        <MSBuild Projects="tests\mlib_test.vcxproj" Properties="SolutionDir=..\;Configuration=Debug;Platform=x64"/>  
+        <MSBuild Projects="tests\mlib_test.vcxproj" Properties="SolutionDir=..\;Configuration=Release;Platform=x64"/> 
+        <MSBuild Projects="tests\mlib_test.vcxproj" Properties="SolutionDir=..\;Configuration=Debug;Platform=x86"/>  
+        <MSBuild Projects="tests\mlib_test.vcxproj" Properties="SolutionDir=..\;Configuration=Release;Platform=x86"/>
+    </Target>
+    <Target Name="DownloadSQLite">
         <DownloadFile SourceUrl="$(SQLiteUrl)" DestinationFolder="$(MSBuildProjectDirectory)\sqlite" />
         <Unzip SourceFiles=".\sqlite\$(SQLiteName).zip" DestinationFolder="sqlite" />
         <Copy SourceFiles=".\sqlite\$(SQLiteName)\sqlite3.c" DestinationFolder="source" SkipUnchangedFiles="true" />
         <Copy SourceFiles=".\sqlite\$(SQLiteName)\sqlite3.h" DestinationFolder="include\mlib" SkipUnchangedFiles="true" />
         <Copy SourceFiles=".\sqlite\$(SQLiteName)\sqlite3ext.h" DestinationFolder="include\mlib" SkipUnchangedFiles="true" />
     </Target>  
-    <Target Name="lib">
-        <MSBuild Projects="mlib.vcxproj" Properties="Configuration=Debug;Platform=x64"/>  
-        <MSBuild Projects="mlib.vcxproj" Properties="Configuration=Release;Platform=x64"/> 
-        <MSBuild Projects="mlib.vcxproj" Properties="Configuration=Debug;Platform=x86"/>  
-        <MSBuild Projects="mlib.vcxproj" Properties="Configuration=Release;Platform=x86"/>
-    </Target>
-    <Target Name="tests">
-        <MSBuild Projects="tests\mlib_test.vcxproj" Properties="SolutionDir=..\;Configuration=Debug;Platform=x64"/>  
-        <MSBuild Projects="tests\mlib_test.vcxproj" Properties="SolutionDir=..\;Configuration=Release;Platform=x64"/> 
-        <MSBuild Projects="tests\mlib_test.vcxproj" Properties="SolutionDir=..\;Configuration=Debug;Platform=x86"/>  
-        <MSBuild Projects="tests\mlib_test.vcxproj" Properties="SolutionDir=..\;Configuration=Release;Platform=x86"/>
-    </Target>
 </Project>

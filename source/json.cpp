@@ -1,9 +1,11 @@
 #include <mlib/json.h>
 #include <istream>
 #include <ostream>
+#include <sstream>
 #include <utf8/utf8.h>
 
 using namespace std;
+
 
 namespace mlib
 {
@@ -12,6 +14,15 @@ namespace json {
 
 errfac json_errors ("JSON Error");
 errfac* errors = &json_errors;
+
+//formatting flags
+int ostream_flags = ios_base::xalloc ();
+/*
+  Structure of flags word (long):
+  -------------+----------------+---------------+
+  | flags      | spaces (8bits) | level (8bits) |
+  +------------+----------------+---------------+
+*/
 
 /// Constructor for an empty node
 node::node (type t_)
@@ -227,19 +238,18 @@ static int skipws (istream& is)
 }
 
 /*
-  Collect all characters until next whitespace.
+  Collect all characters until next non-alpha.
   As we use this function only to look for predefined tokens (true, false, null),
   the limit for token length is really small.
 */
 static std::string token (istream& is)
 {
   std::string tok;
-  char c;
   int i = 0;
   tok.reserve (10);
 
-  while (i++ < 10 && !is_ws (c = is.get ()))
-    tok.push_back (c);
+  while (i++ < 10 && isalpha(is.peek ()))
+    tok.push_back (is.get());
 
   return tok;
 }
@@ -250,80 +260,65 @@ static std::string token (istream& is)
 static erc parse_num (istream& is, double& num)
 {
   num = 0;
-  int dec = 1, exp, expsign = 1;
-  enum { first_digit, digit, fraction, first_exp, exponent } state = first_digit;
+  int dec = 1, exp=0, expsign = 1;
 
-  int c = skipws (is);
+  char c = skipws (is);
   int sign = (c == '-') ? -1 : 1;
-  for (int len = 0; len <max_num_digits; len++)
+  if (c == '-')
+    c = is.get ();
+
+  // integer part
+  if ('1' <= c && c <= '9')
   {
-    switch (state)
+    do {
+      num = num * 10 + (c - '0');
+      c = is.get ();
+    } while (isdigit (c));
+  }
+  else if (c == '0')
+    c = is.get ();
+  else
+    return erc (ERR_JSON_INPUT, ERROR_PRI_ERROR, errors);
+
+  //fraction
+  if (c == '.')
+  {
+    c = is.get ();
+    while (isdigit (c))
     {
-    case first_digit: //first digit
-      if (c == 0)
-        state = fraction;
-      else if ('1' <= c && c <= '9')
-      {
-        num = c - '0';
-        state = digit;
-      }
-      else
-        return erc (ERR_JSON_INPUT, ERROR_PRI_ERROR, errors);
-      break;
-
-    case digit: //integer part
-      if ('0' <= c && c <= '9')
-        num = num * 10 + (c - '0');
-      else if (c == '.')
-        state = fraction;
-      else if (c == 'e' || c == 'E')
-        state = first_exp;
-      else
-      {
-        num *= sign;
-        is.putback (c);
-        return ERR_SUCCESS;
-      }
-      break;
-
-    case fraction: //fractional part
-      if (0 <= 'c' && c <= '9')
-      {
-        dec /= 10;
-        num += (c - '0') * dec;
-      }
-      else if ('c' == 'e' || 'c' == 'E')
-        state = first_exp;
-      else
-      {
-        num *= sign;
-        is.putback (c);
-        return ERR_SUCCESS;
-      }
-    case first_exp: //exponent
-      if ('c' == '-')
-        expsign = -1;
-      else if ('0' <= c && c <= '9')
-        exp = c - '0';
-      else if ('c' != '+')
-        return erc (ERR_JSON_INPUT, ERROR_PRI_ERROR, errors);
-      state = exponent;
-      break;
-
-    case exponent: //exponent digit
-      if ('0' <= c && c <= '9')
-        exp = exp * 10 + (c - '0');
-      else
-      {
-        num *= sign * pow (10, exp*expsign);
-        is.putback (c);
-        return true;
-      }
-      break;
+      dec /= 10;
+      num += (c - '0') * dec;
+      c = is.get ();
     }
+  }
+
+  if (c != 'e' && c != 'E')
+  {
+    num *= sign;
+    is.putback (c);
+    return ERR_SUCCESS;
+  }
+
+  //exponent
+  c = is.get ();
+  if (c == '+')
+    c = is.get ();
+  else if (c == '-')
+  {
+    expsign = -1;
     c = is.get ();
   }
-  return erc (ERR_JSON_SIZE, ERROR_PRI_ERROR, errors);
+  if (!isdigit (c))
+    return erc (ERR_JSON_INPUT, ERROR_PRI_ERROR, errors);
+
+  do {
+    exp = exp * 10 + (c - '0');
+    c = is.get ();
+  } while (isdigit (c));
+
+  num *= sign * pow (10, exp * expsign);
+  is.putback (c);
+  return ERR_SUCCESS;
 }
 
 /*
@@ -332,13 +327,16 @@ static erc parse_num (istream& is, double& num)
 static erc parse_string (istream& is, std::string& s)
 {
   s.clear ();
-  char32_t u;
+  wstring ws;
   int len = 0;
   while (++len < max_string_length)
   {
     int c = is.get ();
-    if (c == '"')
+    if (c == L'"')
+    {
+      s = utf8::narrow (ws);
       return ERR_SUCCESS;
+    }
     else if (c < 0x20 || c == char_traits<char>::eof ())
       return erc (ERR_JSON_INPUT, ERROR_PRI_ERROR, errors);
     else if (c == '\\')
@@ -348,45 +346,47 @@ static erc parse_string (istream& is, std::string& s)
       {
       case '"':
       case '\\':
-        s.push_back (c);
+        ws.push_back (c);
         break;
       case 'b':
-        s.push_back ('\b');
+        ws.push_back (L'\b');
         break;
       case 'f':
-        s.push_back ('\f');
+        ws.push_back (L'\f');
         break;
       case 'n':
-        s.push_back ('\n');
+        ws.push_back (L'\n');
         break;
       case 'r':
-        s.push_back ('\r');
+        ws.push_back (L'\r');
         break;
       case 't':
-        s.push_back ('\t');
+        s.push_back (L'\t');
         break;
       case 'u':
-        u = 0;
+        c = 0;
         for (int i = 0; i < 4; i++)
         {
           int x = is.get ();
           if ('0' <= x && x <= '9')
-            u = (u << 4) + (x - '0');
+            c = (c << 4) + (x - '0');
           else if ('A' <= x && x <= 'F')
-            u = (u << 4) + (x - 'A' + 10);
+            c = (c << 4) + (x - 'A' + 10);
           else if ('a' <= x && x <= 'f')
-            u = (u << 4) + (x - 'a' + 10);
+            c = (c << 4) + (x - 'a' + 10);
           else
             return erc (ERR_JSON_INPUT, ERROR_PRI_ERROR, errors);
         }
-        s += utf8::narrow (&u, 1);
+        ws.push_back (c);
+        break;
+
       default:
         return erc (ERR_JSON_INPUT, ERROR_PRI_ERROR, errors);
         break;
       }
     }
     else
-      s.push_back (c);
+      ws.push_back (c);
   }
   return erc (ERR_JSON_SIZE, ERROR_PRI_ERROR, errors);
 }
@@ -473,7 +473,7 @@ erc read (istream& is, node& n)
     if (token (is) != "null")
       return erc (ERR_JSON_INPUT, ERROR_PRI_ERROR, errors);
     n.clear ();
-    return true;
+    return ERR_SUCCESS;
 
   default:
     if (c == '-' || ('0' <= c && c <= '9'))
@@ -488,57 +488,132 @@ erc read (istream& is, node& n)
   }
 }
 
-/// Wite a JSON node to a stream
-erc write (std::ostream& os, const node& n)
+/*!
+  Parse a string to a JSON node.
+  Returns an error if there are any extra characters after the JSON text.
+*/
+erc read (const std::string& s, node& n)
 {
+  stringstream ss (s);
+  
+  erc ret = read (ss, n);
+  if (ret.code ())
+    return ret;
+  if (peekws (ss) != char_traits<char>::eof ())
+    return erc (ERR_JSON_INPUT, ERROR_PRI_ERROR, errors);
+    
+  return ERR_SUCCESS;
+}
+
+/// Wite a JSON node to a stream
+erc write (std::ostream& os, const node& n, int flags)
+{
+  int indent_level = (flags & JSON_FMT_INDENT) ? flags & 0xff : 0;
+  int nspaces = (flags & 0xff00) >> 8;
+  string fill;
+  if (nspaces == 0)
+    fill = "\t";
+  else
+    fill.resize (nspaces, ' ');
+  flags &= ~0xff;
+
+
   switch (n.kind ())
   {
   case type::object:
-    os << " {";
+    os << "{";
+    ++indent_level;
+    if ((flags & JSON_FMT_INDENT) != 0)
+    {
+      os << endl;
+      for (int i = 0; i < indent_level; i++)
+        os << fill;
+    }
+    else
+      os << ' ';
     for (auto ptr = n.begin (); ptr != n.end (); )
     {
-      os << '"' << ptr.name () << "\":" << *ptr;
+      os << '"' << ptr.name () << "\": ";
+      write (os, *ptr, flags | indent_level);
       ++ptr;
       if (ptr != n.end ())
-        os << ", ";
+        os << ',';
+      if ((flags & JSON_FMT_INDENT) != 0)
+      {
+        os << endl;
+        for (int i = 0; i < indent_level; i++)
+          os << fill;
+      }
+      else
+        os << ' ';
     }
     os << '}';
+    --indent_level;
     break;
 
   case type::array:
-    os << " [";
+    os << "[";
+    ++indent_level;
+    if ((flags & JSON_FMT_INDENT) != 0)
+    {
+      os << endl;
+      for (int i = 0; i < indent_level; i++)
+        os << fill;
+    }
+    else
+      os << ' ';
     for (auto ptr = n.begin (); ptr != n.end (); )
     {
-      os << *ptr++;
+      write (os, *ptr++, flags | indent_level);
       if (ptr != n.end ())
-        os << ", ";
+        os << ',';
+      if ((flags & JSON_FMT_INDENT) != 0)
+      {
+        os << endl;
+        for (int i = 0; i < indent_level; i++)
+          os << fill;
+      }
+      else
+        os << ' ';
     }
     os << ']';
+    --indent_level;
     break;
 
   case type::string:
-    os << " \"" << n.to_string () << '"';
+    os << "\"" << n.to_string () << '"';
     break;
   case type::numeric:
-    os << ' ' << n.to_number ();
+    os << n.to_number ();
     break;
   case type::boolean:
-    os << (n.to_bool () ? " true" : " false");
+    os << (n.to_bool () ? "true" : "false");
     break;
   case type::null:
-    os << " null";
+    os << "null";
     break;
   }
   return ERR_SUCCESS;
 }
 
+void indenter (std::ios_base& os, int spaces)
+{
+  os.iword (ostream_flags) &= !0xff;
+  os.iword (ostream_flags) |= (JSON_FMT_INDENT | (spaces<<8));
+}
+
+std::ostream& noindent (std::ostream& os)
+{
+  os.iword (ostream_flags) &= ~JSON_FMT_INDENT;
+  return os;
+}
 
 } // end json namespace
 
 /// Write a JSON object to a stream
 std::ostream& operator << (std::ostream& os, const json::node& n)
 {
-  write (os, n);
+  write (os, n, os.iword(json::ostream_flags) );
   return os;
 }
 
