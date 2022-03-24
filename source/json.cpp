@@ -1,28 +1,23 @@
+/*!
+  \file json.cpp Implementation of json::node class
+
+  (c) Mircea Neacsu 2022. All rights reserved.
+*/
+
 #include <mlib/json.h>
+#include <mlib/trace.h>
 #include <istream>
 #include <ostream>
 #include <sstream>
 #include <utf8/utf8.h>
 
 using namespace std;
-
-
-namespace mlib
-{
+using namespace mlib;
 
 namespace json {
 
 errfac json_errors ("JSON Error");
 errfac* errors = &json_errors;
-
-//formatting flags
-int ostream_flags = ios_base::xalloc ();
-/*
-  Structure of flags word (long):
-  -------------+----------------+---------------+
-  | flags      | spaces (8bits) | level (8bits) |
-  +------------+----------------+---------------+
-*/
 
 /// Constructor for an empty node
 node::node (type t_)
@@ -58,13 +53,11 @@ node::node (const node& other)
     for (auto n = other.obj.begin(); n != other.obj.end (); ++n)
       obj.emplace (n->first, make_unique<node> (n->second.get()));
     break;
-
   case type::array:
     new (&arr) nodes_array (other.arr.size ());
     for (auto n = other.arr.begin (); n != other.arr.end (); ++n)
       arr.emplace_back (make_unique<node> (n->get()));
     break;
-
   case type::numeric:
     num = other.num;
     break;
@@ -76,6 +69,14 @@ node::node (const node& other)
     logic = other.logic;
     break;
   }
+}
+
+/// Move constructor
+node::node (node&& other)
+{
+  size_t sz = sizeof (node);
+  memmove (this, &other, sz);
+  other.t = type::null;
 }
 
 // Destructor
@@ -115,6 +116,17 @@ node& node::operator=(const node& rhs)
       logic = rhs.logic;
       break;
     }
+  }
+  return *this;
+}
+
+/// Move assignment operator
+node& node::operator =(node&& rhs)
+{
+  if (&rhs != this)
+  {
+    memmove (this, &rhs, sizeof (node));
+    rhs.t = type::null;
   }
   return *this;
 }
@@ -182,6 +194,21 @@ node& node::operator[](const std::string& name)
   return *p->second;
 }
 
+/*!
+  Return value of an object node element (const version)
+  If element doesn't exist it throws an ERR_JSON_MISSING exception.
+*/
+node& node::operator[](const std::string& name) const
+{
+  if (t != type::object)
+    throw mlib::erc (ERR_JSON_INVTYPE, ERROR_PRI_ERROR, errors);
+
+  auto p = obj.find (name);
+  if (p == obj.end ())
+    throw mlib::erc (ERR_JSON_MISSING, ERROR_PRI_ERROR, errors);
+  return *p->second;
+}
+
 /// Return value of an array node element
 node& node::operator[](int index)
 {
@@ -209,8 +236,79 @@ node& node::operator[](int index)
   return *arr[index];
 }
 
+/*!
+  Return value of an array node element (const version)
+  If element doesn't exist it throws an ERR_JSON_MISSING exception.
+*/
+node& node::operator[](int index) const
+{
+  if (t != type::array)
+    throw mlib::erc (ERR_JSON_INVTYPE, ERROR_PRI_ERROR, errors);
+
+  if (index >= arr.size ())
+    throw mlib::erc (ERR_JSON_MISSING, ERROR_PRI_ERROR, errors);
+
+  return *arr[index];
+}
+
+/// Equality operator
+bool node::operator==(const node& other) const
+{
+  if (t == other.t)
+  {
+    switch (t)
+    {
+    case type::object:
+      return (obj.size () == other.obj.size ())
+        && std::equal (obj.begin (), obj.end (), other.obj.begin (), other.obj.end (),
+          [](auto const& n, auto const& m) ->bool {
+            return (n.first == m.first) && (*n.second == *m.second);
+          });
+
+    case type::array:
+      return (arr.size() == other.arr.size())
+        && std::equal (arr.begin (), arr.end (), other.arr.begin (), other.arr.end (),
+          [](auto const& n, auto const& m) ->bool {
+            return *n == *m;
+          });
+
+    case type::numeric:
+      return num == other.num;
+    case type::string:
+      return str == other.str;
+    case type::boolean:
+      return logic == other.logic;
+    case type::null:
+      return true;
+    }
+  }
+  return false;
+}
+
+/// Return `true` if node is an object and has a child with that name
+bool node::has (const std::string& name) const
+{
+  if (t == type::object)
+    return obj.find (name) != obj.end ();
+  return false;
+}
+
+/// Erase the child with that name, if it exists
+void node::erase (const std::string& name)
+{
+  if (t == type::object)
+  {
+    auto n = obj.find (name);
+    if (n != obj.end ())
+      obj.erase (n);
+  }
+}
+
+
+
+
 // Parsing helper functions ---------------------------------------------------
-// Check if caharcter is whitespace
+// Check if character is whitespace
 static bool is_ws (char c)
 {
   const char ws[] = " \t\r\n";
@@ -260,7 +358,8 @@ static std::string token (istream& is)
 static erc parse_num (istream& is, double& num)
 {
   num = 0;
-  int dec = 1, exp=0, expsign = 1;
+  double dec = 1.;
+  int exp=0, expsign = 1;
 
   char c = skipws (is);
   int sign = (c == '-') ? -1 : 1;
@@ -391,10 +490,10 @@ static erc parse_string (istream& is, std::string& s)
   return erc (ERR_JSON_SIZE, ERROR_PRI_ERROR, errors);
 }
 
-erc read (istream& is, node& n)
+erc node::read (istream& is)
 {
-  std::string str;
-  double num;
+  std::string sval;
+  double numval;
   erc ret;
 
   char c = peekws (is);
@@ -402,14 +501,17 @@ erc read (istream& is, node& n)
   {
   case '"':
     is.get ();
-    ret = parse_string (is, str);
+    ret = parse_string (is, sval);
     if (ret.code () == 0)
-      n = str;
+    {
+      clear (type::string);
+      str = sval;
+    }
     return ret;
 
   case '[':
     is.get ();
-    n.clear (type::array);
+    clear (type::array);
     if (peekws (is) == ']')
     {
       is.get ();
@@ -418,7 +520,8 @@ erc read (istream& is, node& n)
 
     for (int i = 0; i < max_array_size; i++)
     {
-      ret = read (is, n[i]);
+      arr.push_back (std::make_unique<node> ());
+      ret = arr[i]->read (is);
       if (ret.code () != 0)
         return ret;
 
@@ -431,7 +534,7 @@ erc read (istream& is, node& n)
 
   case '{':
     is.get ();
-    n.clear (type::object);
+    clear (type::object);
     if ((c = skipws (is)) == '}')
       return ERR_SUCCESS;
 
@@ -439,13 +542,14 @@ erc read (istream& is, node& n)
     {
       if (c != '"')
         return erc (ERR_JSON_INPUT, ERROR_PRI_ERROR, errors);
-      ret = parse_string (is, str);
+      ret = parse_string (is, sval);
       if (ret.code () != 0)
         return ret;
       c = skipws (is);
       if (c != ':')
         return erc (ERR_JSON_INPUT, ERROR_PRI_ERROR, errors);
-      ret = read (is, n[str]);
+      auto n = obj.emplace (sval, std::make_unique<node> ()).first;
+      ret = n->second->read (is);
       if (ret.code () != 0)
         return ret;
       c = skipws (is);
@@ -460,28 +564,31 @@ erc read (istream& is, node& n)
   case 't':
     if (token (is) != "true")
       return erc (ERR_JSON_INPUT, ERROR_PRI_ERROR, errors);
-    n = true;
+    clear (type::boolean);
+    logic = true;
     return ERR_SUCCESS;
 
   case 'f':
     if (token (is) != "false")
       return erc (ERR_JSON_INPUT, ERROR_PRI_ERROR, errors);
-    n = false;
+    clear (type::boolean);
+    logic = false;
     return ERR_SUCCESS;
 
   case 'n':
     if (token (is) != "null")
       return erc (ERR_JSON_INPUT, ERROR_PRI_ERROR, errors);
-    n.clear ();
+    clear ();
     return ERR_SUCCESS;
 
   default:
     if (c == '-' || ('0' <= c && c <= '9'))
     {
-      ret = parse_num (is, num);
+      ret = parse_num (is, numval);
       if (ret.code () != 0)
         return ret;
-      n = num;
+      clear (type::numeric);
+      num = numval;
       return ERR_SUCCESS;
     }
     return erc (ERR_JSON_INPUT, ERROR_PRI_ERROR, errors);
@@ -492,11 +599,11 @@ erc read (istream& is, node& n)
   Parse a string to a JSON node.
   Returns an error if there are any extra characters after the JSON text.
 */
-erc read (const std::string& s, node& n)
+erc node::read (const std::string& s)
 {
   stringstream ss (s);
   
-  erc ret = read (ss, n);
+  erc ret = read (ss);
   if (ret.code ())
     return ret;
   if (peekws (ss) != char_traits<char>::eof ())
@@ -505,8 +612,56 @@ erc read (const std::string& s, node& n)
   return ERR_SUCCESS;
 }
 
-/// Wite a JSON node to a stream
-erc write (std::ostream& os, const node& n, int flags)
+// Quotes all characters in a string that need to be quoted
+static void quote (ostream& os, const std::string& s)
+{
+  std::u32string r = utf8::runes (s);
+  for (auto chr : r)
+  {
+    switch (chr)
+    {
+    case '\b':  os << "\\b"; break;
+    case '\f':  os << "\\f"; break;
+    case '\n':  os << "\\n"; break;
+    case '\r':  os << "\\r"; break;
+    case '\t':  os << "\\t"; break;
+    case '\\':  os << "\\\\"; break;
+    case '/':   os << "\\/"; break;
+
+    default:
+      if (chr >= ' ' && chr <= 0x7f)
+        os << (char)chr;
+      else if (chr < ' ' && chr < 0xffff)
+      {
+        //controls & basic multilingual plane
+        char buf[8];
+        sprintf (buf, "\\u%04x", (unsigned int)chr);
+        os << buf;
+      }
+      else
+      {
+        //supplemental multilingual planes
+        wstring ws = utf8::widen (utf8::narrow (&chr, 1));
+        char buf[16];
+        sprintf (buf, "\\u%04x\\u%04x", ws[0], ws[1]);
+        os << buf;
+      }
+      break;
+    }
+  }
+}
+
+//formatting flags
+int ostream_flags = ios_base::xalloc ();
+/*
+  Structure of formatting flags word (long):
+  -----------------+----------------+---------------+
+  | flags (16bits) | spaces (8bits) | level (8bits) |
+  +----------------+----------------+---------------+
+*/
+
+/// Write node to a stream
+erc node::write (std::ostream& os, int flags) const
 {
   int indent_level = (flags & JSON_FMT_INDENT) ? flags & 0xff : 0;
   int nspaces = (flags & 0xff00) >> 8;
@@ -518,7 +673,7 @@ erc write (std::ostream& os, const node& n, int flags)
   flags &= ~0xff;
 
 
-  switch (n.kind ())
+  switch (t)
   {
   case type::object:
     os << "{";
@@ -529,14 +684,14 @@ erc write (std::ostream& os, const node& n, int flags)
       for (int i = 0; i < indent_level; i++)
         os << fill;
     }
-    else
-      os << ' ';
-    for (auto ptr = n.begin (); ptr != n.end (); )
+    for (auto ptr = obj.begin (); ptr != obj.end (); )
     {
-      os << '"' << ptr.name () << "\": ";
-      write (os, *ptr, flags | indent_level);
+      os << '"';
+      quote (os, ptr->first);
+      os << "\":";
+      ptr->second->write (os, flags | indent_level);
       ++ptr;
-      if (ptr != n.end ())
+      if (ptr != obj.end ())
         os << ',';
       if ((flags & JSON_FMT_INDENT) != 0)
       {
@@ -544,8 +699,6 @@ erc write (std::ostream& os, const node& n, int flags)
         for (int i = 0; i < indent_level; i++)
           os << fill;
       }
-      else
-        os << ' ';
     }
     os << '}';
     --indent_level;
@@ -560,12 +713,10 @@ erc write (std::ostream& os, const node& n, int flags)
       for (int i = 0; i < indent_level; i++)
         os << fill;
     }
-    else
-      os << ' ';
-    for (auto ptr = n.begin (); ptr != n.end (); )
+    for (auto ptr = arr.begin (); ptr != arr.end (); )
     {
-      write (os, *ptr++, flags | indent_level);
-      if (ptr != n.end ())
+      (*ptr++)->write (os, flags | indent_level);
+      if (ptr != arr.end ())
         os << ',';
       if ((flags & JSON_FMT_INDENT) != 0)
       {
@@ -573,21 +724,21 @@ erc write (std::ostream& os, const node& n, int flags)
         for (int i = 0; i < indent_level; i++)
           os << fill;
       }
-      else
-        os << ' ';
     }
     os << ']';
     --indent_level;
     break;
 
   case type::string:
-    os << "\"" << n.to_string () << '"';
+    os << '"';
+    quote (os, str);
+    os << '"';
     break;
   case type::numeric:
-    os << n.to_number ();
+    os << num;
     break;
   case type::boolean:
-    os << (n.to_bool () ? "true" : "false");
+    os << (logic ? "true" : "false");
     break;
   case type::null:
     os << "null";
@@ -596,11 +747,23 @@ erc write (std::ostream& os, const node& n, int flags)
   return ERR_SUCCESS;
 }
 
+/// Write node to a string
+mlib::erc node::write (std::string& s, int flags) const
+{
+  ostringstream os;
+  auto ret = write (os, flags);
+  if (ret.code () == ERR_SUCCESS)
+    s = os.str ();
+  return ret;
+}
+
 void indenter (std::ios_base& os, int spaces)
 {
   os.iword (ostream_flags) &= !0xff;
   os.iword (ostream_flags) |= (JSON_FMT_INDENT | (spaces<<8));
 }
+
+
 
 std::ostream& noindent (std::ostream& os)
 {
@@ -608,20 +771,18 @@ std::ostream& noindent (std::ostream& os)
   return os;
 }
 
-} // end json namespace
-
 /// Write a JSON object to a stream
-std::ostream& operator << (std::ostream& os, const json::node& n)
+std::ostream& operator << (std::ostream& os, const node& n)
 {
-  write (os, n, os.iword(json::ostream_flags) );
+  n.write (os, os.iword (json::ostream_flags));
   return os;
 }
 
 /// Read a JSON node from a stream
-std::istream& operator >> (std::istream& is, json::node& n)
+std::istream& operator >> (std::istream& is, node& n)
 {
   n.clear ();
-  erc ret = read (is, n);
+  erc ret = n.read (is);
   if (ret.code () != 0)
     throw ret;
   if (n.kind () != json::type::array && n.kind () != json::type::object)
@@ -630,4 +791,6 @@ std::istream& operator >> (std::istream& is, json::node& n)
   return is;
 }
 
-} //end mlib namespace
+} // end json namespace
+
+

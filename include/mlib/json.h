@@ -1,4 +1,9 @@
 #pragma once
+/*!
+  \file json.h Definition of json::node class
+
+  (c) Mircea Neacsu 2022. All rights reserved.
+*/
 
 #include <map>
 #include <memory>
@@ -6,8 +11,6 @@
 #include <iomanip>
 #include <string>
 #include <vector>
-
-namespace mlib {
 
 namespace json {
 
@@ -24,15 +27,12 @@ constexpr int max_string_length = 8192;
 #define ERR_JSON_ITERPOS    -4    //invalid iterator position
 #define ERR_JSON_INPUT      -5    //invalid character in input stream
 #define ERR_JSON_SIZE       -7    //invalid element size
+#define ERR_JSON_MISSING    -8    //invalid index or key on const node 
 
 extern mlib::errfac* errors;
 
 class node;
 enum class type { null, object, array, numeric, string, boolean };
-
-mlib::erc read (std::istream& is, node& n);
-mlib::erc write (std::ostream& os, const node& n, int flags=0);
-mlib::erc read (const std::string& s, node& n);
 
 class node {
 public:
@@ -48,6 +48,7 @@ public:
   node (int d);
   node (bool b);
   node (const node& other);
+  node (node&& other);
   ~node ();
 
   template <bool C_>
@@ -249,49 +250,49 @@ public:
   typedef iterator_type<false> iterator;
   typedef iterator_type<true> const_iterator;
 
+  //principal assignment operator
   node& operator = (const node& rhs);
+  
+  //move assignment operator
+  node& operator = (node&& rhs);
+
+  //value assignment operators
   node& operator = (bool b);
   node& operator = (int n);
   node& operator = (double d);
   node& operator = (const std::string& s);
   node& operator = (const char* s);
 
+  //indexing
   node& operator [](const std::string& name);
+  node& operator [](const std::string& name) const;
+
   node& operator [](int index);
+  node& operator [](int index) const;
 
   const_iterator begin () const;
   iterator begin ();
-
   const_iterator end () const;
   iterator end ();
 
-  /// String value
-  std::string to_string () const
-  {
-    if (t == type::string)
-      return str;
-    else
-      throw mlib::erc (ERR_JSON_INVTYPE, ERROR_PRI_ERROR, errors);
-  }
+  // Value functions
+  std::string to_string () const;
+  double      to_number () const;
+  bool        to_bool () const;
 
-  /// Numeric value
-  double to_number () const
-  {
-    if (t == type::numeric)
-      return num;
-    else
-      throw mlib::erc (ERR_JSON_INVTYPE, ERROR_PRI_ERROR, errors);
-  }
+  //(in)equality operators
+  bool operator == (const node& other) const;
+  bool operator != (const node& other) const;
 
-  /// Boolean value
-  bool to_bool () const
-  {
-    if (t == type::boolean)
-      return logic;
-    else
-      throw mlib::erc (ERR_JSON_INVTYPE, ERROR_PRI_ERROR, errors);
-  }
+  //streaming (encoding/decoding)
+  mlib::erc read (std::istream&);
+  mlib::erc read (const std::string& s);
+  mlib::erc write (std::ostream& os, int flags = 0) const;
+  mlib::erc write (std::string& s, int flags = 0) const;
 
+  //other operations
+  bool has (const std::string& name) const;
+  void erase (const std::string& name);
   void clear (type t = type::null);
   type kind () const;
   int size () const;
@@ -304,7 +305,6 @@ private:
     std::string str;
     double num;
     bool logic;
-    friend class node;
   };
 };
 
@@ -344,7 +344,7 @@ inline node::node (bool b)
 {
 }
 
-// Begin iterator
+/// Begin iterator (const variant)
 inline node::const_iterator node::begin () const
 {
   if (t == type::object)
@@ -355,6 +355,7 @@ inline node::const_iterator node::begin () const
     return const_iterator (*this, false);
 }
 
+/// Begin iterator (non-const variant)
 inline node::iterator node::begin ()
 {
   if (t == type::object)
@@ -365,7 +366,7 @@ inline node::iterator node::begin ()
     return iterator (*this, false);
 }
 
-/// End iterator
+/// End iterator (const variant)
 inline node::const_iterator node::end () const
 {
   if (t == type::object)
@@ -376,6 +377,7 @@ inline node::const_iterator node::end () const
     return const_iterator (*this, true);
 }
 
+/// End iterator (non-const variant)
 inline node::iterator node::end ()
 {
   if (t == type::object)
@@ -384,6 +386,33 @@ inline node::iterator node::end ()
     return iterator (*this, arr.end ());
   else
     return iterator (*this, true);
+}
+
+/// Return the string value of a node
+inline std::string node::to_string () const
+{
+  if (t == type::string)
+    return str;
+  else
+    throw mlib::erc (ERR_JSON_INVTYPE, ERROR_PRI_ERROR, errors);
+}
+
+/// Return numeric value of a node
+inline double node::to_number () const
+{
+  if (t == type::numeric)
+    return num;
+  else
+    throw mlib::erc (ERR_JSON_INVTYPE, ERROR_PRI_ERROR, errors);
+}
+
+/// Return boolean value of a node
+inline bool node::to_bool () const
+{
+  if (t == type::boolean)
+    return logic;
+  else
+    throw mlib::erc (ERR_JSON_INVTYPE, ERROR_PRI_ERROR, errors);
 }
 
 /// Remove previous node content
@@ -411,11 +440,18 @@ inline type node::kind () const
   return t;
 }
 
+
 /// Return number of direct descendants
 inline int node::size () const
 {
   return (t == type::object) ? (int)obj.size () :
          (t == type::array) ? (int)arr.size () : 0;
+}
+
+/// inequality operator
+inline bool node::operator!=(const node& other) const
+{
+  return !operator ==(other);
 }
 
 // manipulators
@@ -429,9 +465,9 @@ inline std::ostream& tabs (std::ostream& os) { indenter (os, 0); return os; };
 std::ostream& noindent (std::ostream& os);
 #endif
 
+std::ostream& operator << (std::ostream& os, const node& n);
+std::istream& operator >> (std::istream& is, node& n);
+
 } //namespace json
 
-std::ostream& operator << (std::ostream& os, const json::node& n);
-std::istream& operator >> (std::istream& is, json::node& n);
 
-} //namespace mlib
