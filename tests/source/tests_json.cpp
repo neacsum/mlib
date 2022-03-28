@@ -1,8 +1,12 @@
 ﻿#include <utpp/utpp.h>
 #include <mlib/json.h>
 #include <utf8/utf8.h>
+#include <float.h>
 
 #pragma warning (disable:4566)
+
+#define STR(X) #X
+#define STRINGIZE(X) STR(X)
 
 using namespace mlib;
 using namespace std;
@@ -123,6 +127,7 @@ TEST (string_in_supplemental_plane)
 TEST (y_tests)
 {
   json::node n;
+  string s;
   //array arrays with spaces
   CHECK_EQUAL (ERR_SUCCESS, n.read (R"([[]   ])"));
 
@@ -161,95 +166,188 @@ TEST (y_tests)
   CHECK_EQUAL (ERR_SUCCESS, n.read (R"([ 4])"));
 
   //number double close to 0
-  CHECK_EQUAL (ERR_SUCCESS, n.read (R"([-0.000000000000000000000000000000000000000000000000000000000000000000000000000001])"));
+  s = R"([-0.000000000000000000000000000000000000000000000000000000000000000000000000000001])";
+  CHECK_EQUAL (ERR_SUCCESS, n.read (s));
+  CHECK_CLOSE (-1E-78, n[0].to_number (), DBL_EPSILON);
+
+  //Min positive value
+  s = "[" STRINGIZE (DBL_MIN) "]";
+  CHECK_EQUAL (ERR_SUCCESS, n.read (s));
+  CHECK_CLOSE (DBL_MIN, n[0].to_number (), DBL_EPSILON);
+
+  //smallest such that 1.0+DBL_EPSILON != 1.0
+  s = "[" STRINGIZE (DBL_EPSILON) "]";
+  CHECK_EQUAL (ERR_SUCCESS, n.read (s));
+  CHECK (1.0 != 1.0 + n[0].to_number ());
 
   //number with exp
-  CHECK_EQUAL (ERR_SUCCESS, n.read (R"([20e1])"));
+  s = R"([20e1])";
+  CHECK_EQUAL (ERR_SUCCESS, n.read (s));
 
   //number minus 0
-  CHECK_EQUAL (ERR_SUCCESS, n.read (R"([-0])"));
+  s = R"([-0])";
+  CHECK_EQUAL (ERR_SUCCESS, n.read (s));
   CHECK_EQUAL (0, n[0].to_number ());
 
   //number negative int
-  CHECK_EQUAL (ERR_SUCCESS, n.read (R"([-123])"));
+  s = R"([-123])";
+  CHECK_EQUAL (ERR_SUCCESS, n.read (s));
   CHECK_EQUAL (-123, n[0].to_number ());
 
   //number positive int
-  CHECK_EQUAL (ERR_SUCCESS, n.read (R"([123])"));
+  s = R"([123])";
+  CHECK_EQUAL (ERR_SUCCESS, n.read (s));
   CHECK_EQUAL (123, n[0].to_number ());
 
   //number simple real
-  CHECK_EQUAL (ERR_SUCCESS, n.read (R"([123.456789])"));
+  s = R"([123.456789])";
+  CHECK_EQUAL (ERR_SUCCESS, n.read (s));
   CHECK_EQUAL (123.456789, n[0].to_number ());
 
   //number real exponent
-  CHECK_EQUAL (ERR_SUCCESS, n.read (R"([123e45])"));
+  s = R"([123e45])";
+  CHECK_EQUAL (ERR_SUCCESS, n.read (s));
   CHECK_EQUAL (123e45, n[0].to_number ());
 
   //number real fraction exponent
-  CHECK_EQUAL (ERR_SUCCESS, n.read (R"([123.456e78])"));
+  s = R"([123.456e78])";
+  CHECK_EQUAL (ERR_SUCCESS, n.read (s));
   CHECK_EQUAL (123.456e78, n[0].to_number ());
 
   //number negative 1
-  CHECK_EQUAL (ERR_SUCCESS, n.read (R"([-1])"));
+  s = R"([-1])";
+  CHECK_EQUAL (ERR_SUCCESS, n.read (s));
 
   //number real capital E
-  CHECK_EQUAL (ERR_SUCCESS, n.read (R"([1E22])"));
+  s = R"([1E22])";
+  CHECK_EQUAL (ERR_SUCCESS, n.read (s));
   CHECK_EQUAL (1e22, n[0].to_number ());
 
   // number real capital E negative exp
-  CHECK_EQUAL (ERR_SUCCESS, n.read (R"([1E-2])"));
+  s = R"([1E-2])";
+  CHECK_EQUAL (ERR_SUCCESS, n.read (s));
   CHECK_EQUAL (0.01, n[0].to_number ());
 
   //number real capital E positive exp
-  CHECK_EQUAL (ERR_SUCCESS, n.read (R"([1E+2])"));
+  s = R"([1E+2])";
+  CHECK_EQUAL (ERR_SUCCESS, n.read (s));
   CHECK_EQUAL (100, n[0].to_number ());
 
   //number real negative exp
-  CHECK_EQUAL (ERR_SUCCESS, n.read (R"([1e-2])"));
+  s = R"([1e-2])";
+  CHECK_EQUAL (ERR_SUCCESS, n.read (s));
   CHECK_EQUAL (0.01, n[0].to_number ());
 
   //number real exp with + sign
-  CHECK_EQUAL (ERR_SUCCESS, n.read (R"([1e+2])"));
+  s = R"([1e+2])";
+  CHECK_EQUAL (ERR_SUCCESS, n.read (s));
   CHECK_EQUAL (100, n[0].to_number ());
 
   //object
-  CHECK_EQUAL (ERR_SUCCESS, n.read (R"({"asd":"sdf", "dfg":"fgh"})"));
+  s = R"({"asd":"sdf", "dfg":"fgh"})";
+  CHECK_EQUAL (ERR_SUCCESS, n.read (s));
 
   //object basic
-  CHECK_EQUAL (ERR_SUCCESS, n.read (R"({"asd":"sdf"})"));
+  s = R"({"asd":"sdf"})";
+  CHECK_EQUAL (ERR_SUCCESS, n.read (s));
   CHECK_EQUAL ("sdf", n["asd"].to_string ());
 
   //object escaped null in key
-  CHECK_EQUAL (ERR_SUCCESS, n.read (R"({"foo\u0000bar": 42})"));
+  s = R"({"foo\u0000bar": 42})";
+  CHECK_EQUAL (ERR_SUCCESS, n.read (s));
   string foo_bar = { 'f','o','o','\0','b', 'a','r' };
   CHECK_EQUAL (42, n[foo_bar].to_number ());
 
   //object extreme numbers
-  CHECK_EQUAL (ERR_SUCCESS, n.read (R"({ "min": -1.0e+28, "max": 1.0e+28 })"));
+  s = R"({ "min": -1.0e+28, "max": 1.0e+28 })";
+  CHECK_EQUAL (ERR_SUCCESS, n.read (s));
   CHECK_EQUAL (-1e28, n["min"].to_number ());
   CHECK_EQUAL (1e28, n["max"].to_number ());
 
   //object long strings
-  CHECK_EQUAL (ERR_SUCCESS, n.read (R"({"x":[{"id": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"}], "id": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"})"));
+  s = R"({"x":[{"id": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"}], "id": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"})";
+  CHECK_EQUAL (ERR_SUCCESS, n.read (s));
   CHECK_EQUAL (n["x"][0]["id"], n["id"]);
 
   //array object string unicode
-  CHECK_EQUAL (ERR_SUCCESS, n.read (R"({"title":"\u041f\u043e\u043b\u0442\u043e\u0440\u0430 \u0417\u0435\u043c\u043b\u0435\u043a\u043e\u043f\u0430" })"));
+  s = R"({"title":"\u041f\u043e\u043b\u0442\u043e\u0440\u0430 \u0417\u0435\u043c\u043b\u0435\u043a\u043e\u043f\u0430" })";
+  CHECK_EQUAL (ERR_SUCCESS, n.read (s));
   CHECK_EQUAL (u8"Полтора Землекопа", n["title"].to_string ());
 
   //object with newlines
-  CHECK_EQUAL (ERR_SUCCESS, n.read (R"({
+  s = R"({
 "a": "b"
-})"));
+})";
+  CHECK_EQUAL (ERR_SUCCESS, n.read (s));
 
   //string 1 2 3 UTF8 sequences
-  CHECK_EQUAL (ERR_SUCCESS, n.read (R"(["\u0060\u012a\u12AB"])"));
+  s = R"(["\u0060\u012a\u12AB"])";
+  CHECK_EQUAL (ERR_SUCCESS, n.read (s));
 
-  //string accepted surrogate pair
-  CHECK_EQUAL (ERR_SUCCESS, n.read ("[\"\\uD801\\udc37\"]"));
-  wstring ws = utf8::widen (n[0].to_string ());
-  char32_t r = utf8::rune (n[0].to_string ().c_str ());
+  //string accepted surrogate pair U+1f639, U+1f48d
+  s = R"(["\ud83d\ude39\ud83d\udc8d"])";
+  CHECK_EQUAL (ERR_SUCCESS, n.read (s));
+  CHECK_EQUAL (u8"😹💍", n[0].to_string ());
+
+  //string allowed escapes
+  s = R"(["\"\\\/\b\f\n\r\t"])";
+  CHECK_EQUAL (ERR_SUCCESS, n.read (s));
+  CHECK_EQUAL (8, n[0].to_string ().size ());
+
+  //backslash and u-escaped 0 (this might be an error in input string)
+  s = R"(["\\u0000"])";
+  CHECK_EQUAL (ERR_SUCCESS, n.read (s));
+  CHECK_EQUAL (6, n[0].to_string ().size ());
+
+  //previous test but more meaningful
+  s = R"(["\\\u0000"])";
+  CHECK_EQUAL (ERR_SUCCESS, n.read (s));
+  CHECK_EQUAL (2, n[0].to_string ().size ());
+
+  //backslash double quotes
+  s = R"(["\""])";
+  CHECK_EQUAL (ERR_SUCCESS, n.read (s));
+  CHECK_EQUAL (1, n[0].to_string ().size ());
+
+  //string comments
+  s = R"(["a/*b*/c/*d//e"])";
+  CHECK_EQUAL (ERR_SUCCESS, n.read (s));
+  CHECK_EQUAL ("a/*b*/c/*d//e", n[0].to_string ());
+
+  //string double escape a
+  s = R"(["\\a"])";
+  CHECK_EQUAL (ERR_SUCCESS, n.read (s));
+  CHECK_EQUAL ("\\a", n[0].to_string ());
+
+  //string double escape n
+  s = R"(["\\n"])";
+  CHECK_EQUAL (ERR_SUCCESS, n.read (s));
+  CHECK_EQUAL ("\\n", n[0].to_string ());
+
+  //string escaped control character
+  s = R"(["\u0012"])";
+  CHECK_EQUAL (ERR_SUCCESS, n.read (s));
+  CHECK_EQUAL ('\x12', n[0].to_string ()[0]);
+
+  //string escaped non-character
+  s = R"(["\uffff"])";
+  CHECK_EQUAL (ERR_SUCCESS, n.read (s));
+  CHECK_EQUAL (0xffff, utf8::rune (n[0].to_string ().begin ()));
+
+  //string last surrogates 1 and 2
+  s = R"(["\uDBFF\uDFFF"])";
+  CHECK_EQUAL (ERR_SUCCESS, n.read (s));
+  CHECK_EQUAL (0x10ffff, utf8::rune (n[0].to_string ().begin ()));
+
+  // string escaped newline
+  s = R"(["new\u000aline"])";
+  CHECK_EQUAL (ERR_SUCCESS, n.read (s));
+
+  //string one byte UTF8
+  s = R"(["\u002c"])";
+  CHECK_EQUAL (ERR_SUCCESS, n.read (s));
+  CHECK_EQUAL (",", n[0].to_string ());
+
 }
 
 /*
@@ -433,7 +531,7 @@ TEST (StreamRead)
   ss.str (in2);
 
   ss >> n;
-  cout << json::indent << n << endl << endl;
+    cout << json::indent << n << endl << endl;
 
   cout << json::tabs;
 

@@ -18,7 +18,8 @@ constexpr int max_array_size = 8192;
 constexpr int max_object_names = 8192;
 constexpr int max_string_length = 8192;
 
-#define JSON_FMT_INDENT 0x10000
+#define JSON_FMT_INDENT 0x01
+#define JSON_FMT_QUOTESLASH 0x02
 
 // Errors
 #define ERR_JSON_INVTYPE    -1    //invalid node type
@@ -287,8 +288,8 @@ public:
   //streaming (encoding/decoding)
   mlib::erc read (std::istream&);
   mlib::erc read (const std::string& s);
-  mlib::erc write (std::ostream& os, int flags = 0) const;
-  mlib::erc write (std::string& s, int flags = 0) const;
+  mlib::erc write (std::ostream& os, int flags = 0, int spaces = 0, int level = 0) const;
+  mlib::erc write (std::string& s, int flags = 0, int spaces=0) const;
 
   //other operations
   bool has (const std::string& name) const;

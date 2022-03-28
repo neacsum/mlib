@@ -445,6 +445,7 @@ static erc parse_string (istream& is, std::string& s)
       {
       case '"':
       case '\\':
+      case '/':
         ws.push_back (c);
         break;
       case 'b':
@@ -460,7 +461,7 @@ static erc parse_string (istream& is, std::string& s)
         ws.push_back (L'\r');
         break;
       case 't':
-        s.push_back (L'\t');
+        ws.push_back (L'\t');
         break;
       case 'u':
         c = 0;
@@ -612,8 +613,8 @@ erc node::read (const std::string& s)
   return ERR_SUCCESS;
 }
 
-// Quotes all characters in a string that need to be quoted
-static void quote (ostream& os, const std::string& s)
+// Quotes all characters that need to be quotes in a string
+static void quote (ostream& os, const std::string& s, bool quote_slash)
 {
   std::u32string r = utf8::runes (s);
   for (auto chr : r)
@@ -626,7 +627,12 @@ static void quote (ostream& os, const std::string& s)
     case '\r':  os << "\\r"; break;
     case '\t':  os << "\\t"; break;
     case '\\':  os << "\\\\"; break;
-    case '/':   os << "\\/"; break;
+    case '/':
+      if (quote_slash)
+        os << "\\/";
+      else
+        os << '/';
+      break;
 
     default:
       if (chr >= ' ' && chr <= 0x7f)
@@ -655,83 +661,78 @@ static void quote (ostream& os, const std::string& s)
 int ostream_flags = ios_base::xalloc ();
 /*
   Structure of formatting flags word (long):
-  -----------------+----------------+---------------+
-  | flags (16bits) | spaces (8bits) | level (8bits) |
-  +----------------+----------------+---------------+
+  -----------------+----------------+
+  | flags (8bits)  | spaces (8bits) |
+  +----------------+----------------+
 */
 
-/// Write node to a stream
-erc node::write (std::ostream& os, int flags) const
+/*!
+  Write node to a stream.
+  \param os stream to write to
+  \param flags formatting flags
+  \param spaces number of spaces to indent. If 0 uses tabs instead of spaces
+  \param level starting indentation level
+*/ 
+erc node::write (std::ostream& os, int flags, int spaces, int level) const
 {
-  int indent_level = (flags & JSON_FMT_INDENT) ? flags & 0xff : 0;
-  int nspaces = (flags & 0xff00) >> 8;
   string fill;
-  if (nspaces == 0)
-    fill = "\t";
+  ++level;
+  if (spaces == 0)
+    fill.resize (level, '\t');
   else
-    fill.resize (nspaces, ' ');
-  flags &= ~0xff;
-
+    fill.resize (spaces*level, ' ');
 
   switch (t)
   {
   case type::object:
     os << "{";
-    ++indent_level;
     if ((flags & JSON_FMT_INDENT) != 0)
     {
       os << endl;
-      for (int i = 0; i < indent_level; i++)
-        os << fill;
+      os << fill;
     }
     for (auto ptr = obj.begin (); ptr != obj.end (); )
     {
       os << '"';
-      quote (os, ptr->first);
+      quote (os, ptr->first, (flags & JSON_FMT_QUOTESLASH) != 0);
       os << "\":";
-      ptr->second->write (os, flags | indent_level);
+      ptr->second->write (os, flags, spaces, level);
       ++ptr;
       if (ptr != obj.end ())
         os << ',';
       if ((flags & JSON_FMT_INDENT) != 0)
       {
         os << endl;
-        for (int i = 0; i < indent_level; i++)
-          os << fill;
+        os << fill;
       }
     }
     os << '}';
-    --indent_level;
     break;
 
   case type::array:
     os << "[";
-    ++indent_level;
     if ((flags & JSON_FMT_INDENT) != 0)
     {
       os << endl;
-      for (int i = 0; i < indent_level; i++)
-        os << fill;
+      os << fill;
     }
     for (auto ptr = arr.begin (); ptr != arr.end (); )
     {
-      (*ptr++)->write (os, flags | indent_level);
+      (*ptr++)->write (os, flags, spaces, level);
       if (ptr != arr.end ())
         os << ',';
       if ((flags & JSON_FMT_INDENT) != 0)
       {
         os << endl;
-        for (int i = 0; i < indent_level; i++)
-          os << fill;
+        os << fill;
       }
     }
     os << ']';
-    --indent_level;
     break;
 
   case type::string:
     os << '"';
-    quote (os, str);
+    quote (os, str, (flags & JSON_FMT_QUOTESLASH) != 0);
     os << '"';
     break;
   case type::numeric:
@@ -744,14 +745,15 @@ erc node::write (std::ostream& os, int flags) const
     os << "null";
     break;
   }
+  --level;
   return ERR_SUCCESS;
 }
 
 /// Write node to a string
-mlib::erc node::write (std::string& s, int flags) const
+mlib::erc node::write (std::string& s, int flags, int spaces) const
 {
   ostringstream os;
-  auto ret = write (os, flags);
+  auto ret = write (os, flags, spaces, 0);
   if (ret.code () == ERR_SUCCESS)
     s = os.str ();
   return ret;
@@ -759,22 +761,23 @@ mlib::erc node::write (std::string& s, int flags) const
 
 void indenter (std::ios_base& os, int spaces)
 {
-  os.iword (ostream_flags) &= !0xff;
-  os.iword (ostream_flags) |= (JSON_FMT_INDENT | (spaces<<8));
+  os.iword (ostream_flags) &= ~0xff;
+  os.iword (ostream_flags) |= (JSON_FMT_INDENT << 8) | spaces;
 }
 
 
 
 std::ostream& noindent (std::ostream& os)
 {
-  os.iword (ostream_flags) &= ~JSON_FMT_INDENT;
+  os.iword (ostream_flags) &= ~(JSON_FMT_INDENT << 8);
   return os;
 }
 
 /// Write a JSON object to a stream
 std::ostream& operator << (std::ostream& os, const node& n)
 {
-  n.write (os, os.iword (json::ostream_flags));
+  long fmt = os.iword (json::ostream_flags);
+  n.write (os, fmt >> 8, fmt & 0xff);
   return os;
 }
 
