@@ -48,6 +48,19 @@ TEST (Write_with_quoted_strings)
   CHECK_EQUAL (in, out);
 }
 
+TEST (Write_fixed_manip)
+{
+  json::node n;
+  n[0] = 123E9;
+  n[1] = 123E9;
+
+  stringstream ss;
+  ss << fixed << n[0] << " " << defaultfloat << n[1];
+  auto s = ss.str ();
+  CHECK_EQUAL ("123000000000.000000 1.23e+11", ss.str ());
+}
+
+
 TEST (quoted_string_outside_bmp)
 {
   string in{ R"({"G clef":"\ud834\udd1e"})" };

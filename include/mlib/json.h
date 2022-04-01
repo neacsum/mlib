@@ -18,8 +18,9 @@ constexpr int max_array_size = 8192;
 constexpr int max_object_names = 8192;
 constexpr int max_string_length = 8192;
 
-#define JSON_FMT_INDENT 0x01
-#define JSON_FMT_QUOTESLASH 0x02
+//Formatting flags
+#define JSON_FMT_INDENT     0x01      //!< Indent JSON string when writing
+#define JSON_FMT_QUOTESLASH 0x02      //!< Quote all solidus ('/') characters
 
 // Errors
 #define ERR_JSON_INVTYPE    -1    //invalid node type
@@ -261,6 +262,8 @@ public:
   node& operator = (bool b);
   node& operator = (int n);
   node& operator = (double d);
+  node& operator = (unsigned int n);
+  node& operator = (unsigned long n);
   node& operator = (const std::string& s);
   node& operator = (const char* s);
 

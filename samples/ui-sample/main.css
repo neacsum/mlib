@@ -202,27 +202,3 @@ h4 {
   height: 0;
 }
 
-.fixr {
-  font-family: 'DejaVu Sans Mono', Menlo, Consolas, monospace;
-  text-align: right;
-}
-
-.coord
-{
-  font-family: 'DejaVu Sans Mono', Menlo, Consolas, monospace;
-  text-align: right;
-  font-weight: bold;
-}
-
-.hemi
-{
-  font-family: 'DejaVu Sans Mono', Menlo, Consolas, monospace;
-  text-align: left;
-  font-weight: bold;
-}
-
-.fixl {
-  font-family: 'DejaVu Sans Mono', Menlo, Consolas, monospace;
-  text-align: left;
-}
-

@@ -6,9 +6,13 @@
 #pragma once
 
 #include "httpd.h"
+#include "json.h"
 
 namespace mlib {
 
+//Errors
+#define ERR_JSON_NOTFOUND   -10   ///< Entry not found
+#define ERR_JSON_DICSTRUC   -11   ///< Bad dictionary structure
 /// JSON dictionary entry types
 enum js_type {
   JT_SHORT,     ///< short int
@@ -49,7 +53,7 @@ typedef struct jsonvar_t {
   \param V  Name of variable
   \param T  Type of variable (one of JT_... values)
   \param C  Number of elements (for arrays)
-  \param S  Element size (only for JT_STR and JT_PSTR types)
+  \param S  Element size (only for JT_STR types)
 */
 #define JSD(V, T, C, S) {#V, &##V, T, S, C}
 
@@ -99,23 +103,22 @@ public:
   virtual void post_parse ();
   http_connection& client ();
 
+  bool parse_urlencoded ();
+  bool parse_jsonencoded ();
+
 protected:
-  bool jsonify (const JSONVAR*& entry);
-  void bprintf (const char *fmt, ...);
+  erc jsonify (json::node& n, const JSONVAR*& entry);
   void not_found (const char *varname);
-  bool strquote (const char *str);
-  JSONVAR *find (const char *name, int *idx);
+  JSONVAR *find (const char* name, int *idx = 0);
 
 private:
-  bool json_begin ();
-  void json_end ();
-  bool parse_urlencoded ();
+  erc json_begin (json::node& obj);
+  erc json_end (json::node& obj);
+  erc do_node (json::node& n, const JSONVAR*& entry, int index=0);
 
   std::string path_;
   JSONVAR* dictionary;
   http_connection *client_;
-  char *buffer;
-  char *bufptr;
   criticalsection in_use;
   static int callback (const char *uri, http_connection& client, JSONBridge *ctx);
 };

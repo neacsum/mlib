@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>Sample User Interface</title>
-<script type="text/javascript" src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <link rel="stylesheet" type="text/css" media="all" href="main.css" />
 
 <script type="text/javascript">
@@ -32,9 +32,9 @@ function do_parse (json)
   $("#hvar").val(data.hvar);
   $("#huvar").val("0x"+data.huvar.toString(16));
   $("#ivar").val(data.ivar);
-  $("#iuvar").val("0x"+data.iuvar.toString(16));
+  $("#iuvar").val(data.iuvar.toString());
   $("#lvar").val(data.lvar);
-  $("#luvar").val("0x"+data.luvar.toString(16));
+  $("#luvar").val(data.luvar.toString());
   $("#fvar").val(data.fvar);
   $("#dvar").val(data.dvar);
   $("#pstr").val(data.pstr);
@@ -59,7 +59,7 @@ $(document).ready ( function ()
     do_parse(sample_default)
   });
   $.getJSON("/var?varpi", function (r) {
-    $("#pi").html(r.varpi);
+    $("#pi").html(r);
   });
 
 });
@@ -109,7 +109,7 @@ $(document).ready ( function ()
           <td><input id="ivar" name="ivar"/></td>
         </tr>
         <tr>
-          <td>Unsigned integer iuvar (hex):</td>
+          <td>Unsigned integer iuvar:</td>
           <td><input id="iuvar" name="iuvar" /></td>
         </tr>
         <tr>
@@ -117,7 +117,7 @@ $(document).ready ( function ()
           <td><input id="lvar" name="lvar" /></td>
         </tr>
         <tr>
-          <td>Unsigned long luvar (hex):</td>
+          <td>Unsigned long luvar:</td>
           <td><input id="luvar" name="luvar" /></td>
         </tr>
         <tr>
@@ -179,7 +179,7 @@ $(document).ready ( function ()
       </form>
       <p>
       String array sarr:</p>
-      <form method="post" action="/var">
+      <form method="post" action="/var?submit_sarr">
         <table>
           <tr>
             <td>sarr[0]:</td>
@@ -231,7 +231,7 @@ $(document).ready ( function ()
       </table>
     </div>
     <div class="clear"></div>
-    The value of pi is <span id="pi"></span>.
+    The value of pi is <span id="pi"></span>
   </div>
 </body>
 </html>

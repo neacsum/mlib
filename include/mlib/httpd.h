@@ -29,7 +29,7 @@ namespace mlib {
 class http_connection;
 
 ///Case insensitive comparison function
-struct ciLess : public std::function <bool (std::string, std::string)> {
+struct ci_less : public std::function <bool (std::string, std::string)> {
   bool operator()(const std::string &lhs, const std::string &rhs) const {
     return _stricmp (lhs.c_str (), rhs.c_str ()) < 0;
   }
@@ -37,7 +37,7 @@ struct ciLess : public std::function <bool (std::string, std::string)> {
 
 /// Key-value string pairs used for headers, URL-encoded data, etc.
 /// Keys are case insensitive.
-typedef std::map<std::string, std::string, ciLess> str_pairs;
+typedef std::map<std::string, std::string, ci_less> str_pairs;
 
 /// User defined URL handler function
 typedef int (*uri_handler)(const char *uri, http_connection& client, void *info);

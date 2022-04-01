@@ -41,7 +41,6 @@
 #include <assert.h>
 #include <mlib/log.h>
 #include <direct.h>
-//#include <nmea.h>
 #include <mlib/convert.h>
 
 #include "resource.h"
@@ -64,10 +63,10 @@ HWND                mainWnd;
 char str1[256] {"A string of up to 256 chars"};
 short hvar = -123;
 unsigned short huvar = 0xffff;
-int ivar = 123;
-unsigned int iuvar = 0x80000000;
-long lvar = 1234567;
-unsigned long luvar = 0xffffffff;
+int ivar = -12345678;
+unsigned int iuvar = 12345678;
+long lvar = -12345678;
+unsigned long luvar = 12345678;
 float fvar = 123.45f;
 double dvar = 123.45;
 char *pstr = str1;
@@ -80,16 +79,18 @@ char *psarr[4]
   "A message from our C++ program",
   "<span style=\"color:red\">A red text</span>",
   "<b>Bold</b> word",
-  "As seen above strings can contain embedded HTML"
+  "As seen above, strings can contain embedded HTML"
 };
 
 double pi = M_PI;
 
 httpd       ui_server;      //HTTP server for user interface
+int submit_sarr (const char* uri, http_connection& client, JSONBridge* ui);
 
 //Data dictionary for user interface
 JSD_STARTDIC (uivars)
   JSD_OBJECT ("sample"),
+    JSD (iarr, JT_INT, _countof (iarr), 0),
     JSD (hvar, JT_SHORT, 1, 0),
     JSD (huvar, JT_USHORT, 1, 0),
     JSD (ivar, JT_INT, 1, 0),
@@ -101,10 +102,10 @@ JSD_STARTDIC (uivars)
     JSD (pstr, JT_PSTR, 1, sizeof (str1)),
     JSD (str, JT_STR, 1, sizeof (str)),
     JSD (bvar, JT_BOOL, 1, 0),
-    JSD (iarr, JT_INT, _countof (iarr), 0),
     JSD (sarr, JT_STR, _countof (sarr), sizeof (sarr[0])),
     JSD (psarr, JT_PSTR, _countof (psarr), 0),
   JSD_ENDOBJ,
+  JSD (submit_sarr, JT_POSTFUN, 1, 0),
   JSDN (pi, "varpi", JT_DBL, 1, 0), //a variable with a different 'external' name
 JSD_ENDDIC;
 
@@ -164,7 +165,7 @@ LRESULT WINAPI WndProc (HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
     case ID_OPENINTERFACE:
       sprintf_s (cmd, "http://localhost:%d", SERVER_PORT);
-      ShellExecute (0, L"open", utf8::widen (cmd).c_str (), L"", L".", SW_SHOW);
+      utf8::ShellExecute (cmd, "open");
       break;
 
     case ID_SAMPLE_EXIT:
@@ -229,7 +230,7 @@ int APIENTRY WinMain (HINSTANCE hInstance, HINSTANCE, LPSTR /*lpCmdLine*/, int /
   if ((prevWnd = FindWindow (SERVER_WNDCLASSNAME, 0)))
   {
     PostMessage (prevWnd, WM_COMMAND, ID_OPENINTERFACE, 0);
-    return 0;   //already running
+    return 0;   //already running; just show the interface
   }
 
   // Initialize globals
@@ -368,6 +369,38 @@ static void *mem_resource (int name, int type, DWORD& size)
   return LockResource (rcData);
 }
 
+/*
+  A function called through the JT_POSTFUN mechanism.
+
+  The corresponding entry in our JSON dictionary is:
+    JSD (submit_sarr, JT_POSTFUN, 0, 0),
+
+  The function is invoked in response to a POST request like this:
+    POST /var?submit_sarr HTTP/1.1
+    Host: localhost:8080
+    Connection: keep-alive
+    Content-Length: 79
+    Pragma: no-cache
+    .... (other headers)
+
+    sarr_0=THE&sarr_1=THE+QUICK&sarr_2=THE+QUICK+BROWN&sarr_3=THE+QUICK+BROWN+FOX
+
+  It calls the parse_urlencoded function to retrieve the latest values
+  and then shows a message box with the new values of the sarr array.
+*/
+int submit_sarr (const char* uri, http_connection& client, JSONBridge* ui)
+{
+  bool ok = ui->parse_urlencoded ();
+  string msg{
+    "sarr[0] " + string (sarr[0]) + "\n"
+    "sarr[1] " + string (sarr[1]) + "\n"
+    "sarr[2] " + string (sarr[2]) + "\n"
+    "sarr[3] " + string (sarr[3]) + "\n"
+  };
+  utf8::MessageBox (mainWnd, msg, "UI Sample App", MB_OK);
+  return 0;
+}
+
 /*!
   This function provides a nice mechanism for 'hiding' the different
   assets needed by the HTTP server (pages, CSS files, images, etc.) inside the
@@ -377,10 +410,15 @@ static void *mem_resource (int name, int type, DWORD& size)
   (defined as 256) and is identified by its ID. This function writes the asset
   to a file.
 
+  The resource file (.rc) should contain some lines like these:
+    IDR_INDEX_HTML TEXTFILE  "index.html"
+    IDR_MAIN_CSS   TEXTFILE  "main.css"
+
+
   \param  path  root path for all assets (with or without terminating backslash
   \param  name  asset filename (it can include a relative path)
   \param  id    asset id
-  \param  fullpath  fullpath of asset file
+  \param  fullpath  full path of asset file
   \return _true_ if successful
 */
 bool write_asset_file (const std::string& path, const std::string& name, int id, std::string& fullpath)

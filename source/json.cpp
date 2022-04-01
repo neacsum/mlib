@@ -19,6 +19,8 @@ namespace json {
 errfac json_errors ("JSON Error");
 errfac* errors = &json_errors;
 
+void quote (std::string& s, bool quote_slash = false);
+
 /// Constructor for an empty node
 node::node (type t_)
   : t (t_)
@@ -152,6 +154,20 @@ node& node::operator=(double d)
 {
   clear (type::numeric);
   num = d;
+  return *this;
+}
+
+node& node::operator=(unsigned int n)
+{
+  clear (type::numeric);
+  num = n;
+  return *this;
+}
+
+node& node::operator=(unsigned long n)
+{
+  clear (type::numeric);
+  num = n;
   return *this;
 }
 
@@ -627,6 +643,7 @@ static void quote (ostream& os, const std::string& s, bool quote_slash)
     case '\r':  os << "\\r"; break;
     case '\t':  os << "\\t"; break;
     case '\\':  os << "\\\\"; break;
+    case '"':   os << "\\\""; break;
     case '/':
       if (quote_slash)
         os << "\\/";
@@ -735,9 +752,11 @@ erc node::write (std::ostream& os, int flags, int spaces, int level) const
     quote (os, str, (flags & JSON_FMT_QUOTESLASH) != 0);
     os << '"';
     break;
+
   case type::numeric:
     os << num;
     break;
+
   case type::boolean:
     os << (logic ? "true" : "false");
     break;
@@ -764,7 +783,6 @@ void indenter (std::ios_base& os, int spaces)
   os.iword (ostream_flags) &= ~0xff;
   os.iword (ostream_flags) |= (JSON_FMT_INDENT << 8) | spaces;
 }
-
 
 
 std::ostream& noindent (std::ostream& os)
