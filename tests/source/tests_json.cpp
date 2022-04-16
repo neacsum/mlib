@@ -89,6 +89,77 @@ TEST (move_assignment)
   CHECK_EQUAL ("sdf", n2["asd"].to_string ());
 }
 
+TEST (num_vector_assignment)
+{
+  std::vector<int> v{ 1, 2, 3 };
+  json::node n;
+  n = v;
+
+  string out;
+  n.write (out);
+  CHECK_EQUAL ("[1,2,3]", out);
+}
+
+TEST (num_vector_constructor)
+{
+  std::vector<int> v{ 1, 2, 3 };
+  json::node n (v);
+
+  string out;
+  n.write (out);
+  CHECK_EQUAL ("[1,2,3]", out);
+}
+
+TEST (string_vector_assignment)
+{
+  std::vector<std::string> v{ "abc", "def", "ghi"};
+  json::node n;
+  n = v;
+
+  string out;
+  n.write (out);
+  CHECK_EQUAL ("[\"abc\",\"def\",\"ghi\"]", out);
+}
+
+TEST (string_vector_constructor)
+{
+  std::vector<std::string> v{ "abc", "def", "ghi" };
+  json::node n = v;
+
+  string out;
+  n.write (out);
+  CHECK_EQUAL ("[\"abc\",\"def\",\"ghi\"]", out);
+}
+
+TEST (obj_to_json)
+{
+  struct Person {
+    std::string name;
+    int age;
+    double height;
+
+    inline int to_json (json::node& n) const {
+      n["Name"] = name;
+      n["Age"] = age;
+      n["Height"] = height;
+      return 1;
+    }
+  };
+
+  Person p{ "Joe", 42, 1.78 };
+
+  json::node n1, n2;
+  n1 = p;
+  n2["Name"] = p.name;
+  n2["Age"] = p.age;
+  n2["Height"] = p.height;
+
+  CHECK_EQUAL (n2, n1);
+
+  json::node n3 = p;
+  CHECK_EQUAL (n2, n3);
+}
+
 TEST (equality)
 {
   string in = R"({

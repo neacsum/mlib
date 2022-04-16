@@ -19,7 +19,6 @@ namespace json {
 errfac json_errors ("JSON Error");
 errfac* errors = &json_errors;
 
-void quote (std::string& s, bool quote_slash = false);
 
 /// Constructor for an empty node
 node::node (type t_)
@@ -92,23 +91,19 @@ node& node::operator=(const node& rhs)
 {
   if (&rhs != this)
   {
-    clear ();
+    clear (rhs.t);
 
-    t = rhs.t;
     switch (t)
     {
     case type::object:
-      new (&obj) nodes_map ();
       for (auto n = rhs.obj.begin (); n != rhs.obj.end (); ++n)
         obj.emplace (n->first, make_unique<node> (*n->second));
       break;
     case type::array:
-      new (&arr) nodes_array (rhs.arr.size ());
       for (int i = 0; i < rhs.arr.size(); i++)
-        arr[i] = make_unique<node> (*rhs.arr[i]);
+        arr.emplace_back (make_unique<node>(*rhs.arr[i]));
       break;
     case type::string:
-      new (&str)std::string ();
       str = rhs.str;
       break;
     case type::numeric:
@@ -132,61 +127,6 @@ node& node::operator =(node&& rhs)
   }
   return *this;
 }
-
-/// Assign a boolean value to node
-node& node::operator=(bool b)
-{
-  clear (type::boolean);
-  logic = b;
-  return *this;
-}
-
-/// Assign an integer value to node
-node& node::operator=(int n)
-{
-  clear (type::numeric);
-  num = n;
-  return *this;
-}
-
-/// Assign a float value to node
-node& node::operator=(double d)
-{
-  clear (type::numeric);
-  num = d;
-  return *this;
-}
-
-node& node::operator=(unsigned int n)
-{
-  clear (type::numeric);
-  num = n;
-  return *this;
-}
-
-node& node::operator=(unsigned long n)
-{
-  clear (type::numeric);
-  num = n;
-  return *this;
-}
-
-/// Assign a string value to node
-node& node::operator=(const std::string& s)
-{
-  clear (type::string);
-  str = s;
-  return *this;
-}
-
-/// Assign a string value to node
-node& node::operator=(const char* s)
-{
-  clear (type::string);
-  str = s;
-  return *this;
-}
-
 
 /// Return value of an object node element
 node& node::operator[](const std::string& name)
@@ -811,6 +751,7 @@ std::istream& operator >> (std::istream& is, node& n)
 
   return is;
 }
+
 
 } // end json namespace
 

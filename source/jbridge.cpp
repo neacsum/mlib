@@ -163,10 +163,10 @@ erc JSONBridge::do_node (json::node& n, const JSONVAR*& entry, int index)
     n = (char*)addr;
     break;
   case JT_SHORT:
-    n = *(short int*)addr;
+    n = (int) * (short int*)addr;
     break;
   case JT_USHORT:
-    n = *(unsigned short int*)addr;
+    n = (int) * (unsigned short int*)addr;
     break;
   case JT_INT:
     n = *(int*)addr;

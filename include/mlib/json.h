@@ -5,6 +5,7 @@
   (c) Mircea Neacsu 2022. All rights reserved.
 */
 
+#include <functional>
 #include <map>
 #include <memory>
 #include <mlib/errorcode.h>
@@ -49,6 +50,13 @@ public:
   node (double d);
   node (int d);
   node (bool b);
+
+  template <typename T>
+  node (const std::vector<T>& vec);
+
+  template <class T>
+  node (const T& t, decltype(&T::to_json)* = nullptr);
+
   node (const node& other);
   node (node&& other);
   ~node ();
@@ -252,20 +260,54 @@ public:
   typedef iterator_type<false> iterator;
   typedef iterator_type<true> const_iterator;
 
+  // ------------------ Assignments -------------------------------------------
   //principal assignment operator
   node& operator = (const node& rhs);
   
   //move assignment operator
   node& operator = (node&& rhs);
 
-  //value assignment operators
-  node& operator = (bool b);
-  node& operator = (int n);
-  node& operator = (double d);
-  node& operator = (unsigned int n);
-  node& operator = (unsigned long n);
-  node& operator = (const std::string& s);
-  node& operator = (const char* s);
+  /// Assignment operator
+  template <class T, typename B = decltype(&T::to_json)>
+  node& operator = (const T& t)
+  {
+    clear ();
+    t.to_json (*this);
+    return *this;
+  }
+
+  /// Boolean assignment
+  node& operator= (bool b)
+  {
+    clear (type::boolean);
+    logic = b;
+    return *this;
+  }
+
+  /// Numeric assignment
+  template <typename T, typename B = std::enable_if_t< std::is_arithmetic_v<T> > >
+  node& operator= (T n)
+  {
+    clear (type::numeric);
+    num = n;
+    return *this;
+  }
+
+  /// String assignment
+  node& operator= (const std::string& s)
+  {
+    clear (type::string);
+    str = s;
+    return *this;
+  }
+
+  /// C string assignment
+  node& operator= (const char* s)
+  {
+    clear (type::string);
+    str = s;
+    return *this;
+  }
 
   //indexing
   node& operator [](const std::string& name);
@@ -348,6 +390,25 @@ inline node::node (bool b)
 {
 }
 
+///Constructor from a vector
+template <typename T>
+node::node (const std::vector<T>& vec)
+  : t (type::array)
+{
+  new (&obj)nodes_array ();
+  for (int i = 0; i < vec.size (); ++i)
+    arr.emplace_back (make_unique<node>(vec[i]));
+}
+
+/// Constructor from an object
+template <class T>
+node::node (const T& t, decltype(&T::to_json)*)
+  : t(type::object)
+{
+  new (&obj)nodes_map ();
+  t.to_json (*this);
+}
+
 /// Begin iterator (const variant)
 inline node::const_iterator node::begin () const
 {
@@ -423,19 +484,23 @@ inline bool node::to_bool () const
 inline void node::clear (type t_)
 {
   //clear previous content
-  if (t == type::object)
-    (&obj)->~nodes_map ();
-  else if (t == type::array)
-    (&arr)->~nodes_array ();
-  else if (t == type::string)
-    (&str)->~basic_string ();
+  switch (t)
+  {
+  case type::object:  (&obj)->~nodes_map ();    break;
+  case type::array:   (&arr)->~nodes_array ();  break;
+  case type::string:  (&str)->~basic_string (); break;
+  }
+    
   t = t_;
-  if (t == type::object)
-    new (&obj)nodes_map ();
-  else if (t == type::array)
-    new (&arr)nodes_array ();
-  else if (t == type::string)
-    new (&str)std::string ();
+  //init new type
+  switch (t)
+  {
+  case type::object:  new (&obj)nodes_map ();   break;
+  case type::array:   new (&arr)nodes_array (); break;
+  case type::string:  new (&str)std::string (); break;
+  case type::numeric: num = 0.;                 break;
+  case type::boolean: logic = false;            break;
+  }
 }
 
 /// Return the type of node
@@ -443,7 +508,6 @@ inline type node::kind () const
 {
   return t;
 }
-
 
 /// Return number of direct descendants
 inline int node::size () const
@@ -471,6 +535,16 @@ std::ostream& noindent (std::ostream& os);
 
 std::ostream& operator << (std::ostream& os, const node& n);
 std::istream& operator >> (std::istream& is, node& n);
+
+/// Assign array value to a node
+template <typename T>
+void to_json (node& n, const std::vector<T>& vec)
+{
+  n.clear (type::array);
+  for (int i = 0; i < vec.size(); ++i)
+    n[i] = vec[i];
+}
+
 
 } //namespace json
 
