@@ -7,9 +7,9 @@
   the systray. To end the program right click on the systray icon and select
   "Exit".
 
-  The MIT License (MIT)
+  (c) Mircea Neacsu 2017-2022
 
-  (c) Mircea Neacsu 2017-2020
+  The MIT License (MIT)
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
@@ -119,19 +119,22 @@ variable will be formatted as a JSON string and sent back to the client.
 JSONBridge  user_interface ("var", uivars);
 
 //Assets for HTTP server
-struct assetid {
-  const char *name;
+struct asset {
+  asset (const char *name_, int id_) : name (name_), id (id_) {};
+  bool write (const std::string& path);
+  bool remove () { return utf8::remove (fullpath); };
+
+  const std::string name;
   int id;
-  string fname;
-} assets[] = {
+private:
+  std::string fullpath;
+};
+
+std::vector<asset> assets {
   { "index.html", IDR_INDEX_HTML },
 //  { "jquery.js", IDR_JQUERY_JS },
   { "main.css", IDR_MAIN_CSS },
-  { 0, 0 }
 };
-
-//prototypes
-bool write_asset_file (const std::string& path, const std::string& name, int id, std::string& fname);
 
 
 /*
@@ -244,17 +247,20 @@ int APIENTRY WinMain (HINSTANCE hInstance, HINSTANCE, LPSTR /*lpCmdLine*/, int /
   utf8::mkdir (docroot);
 
   /*Expand all assets in temp folder*/
-  assetid *asset = assets;
-  while (asset->name)
-  {
-    write_asset_file (docroot, asset->name, asset->id, asset->fname);
-    asset++;
-  }
+  for (auto a : assets)
+    a.write (docroot);
 
-  //Configure and start UI server
+  //Configure UI server
   ui_server.docroot (docroot.c_str());
   ui_server.port (SERVER_PORT);
+
+  //Attach the "JSON bridge" to server
   user_interface.attach_to (ui_server);
+
+  //Set action after receiving user data
+  user_interface.set_action ([](JSONBridge& ui) {ui.client ().redirect ("/"); });
+
+  //Start the server
   ui_server.start ();
 
   //Register main window class
@@ -343,12 +349,9 @@ int APIENTRY WinMain (HINSTANCE hInstance, HINSTANCE, LPSTR /*lpCmdLine*/, int /
   ui_server.terminate ();
 
   //Delete all assets from temp folder
-  asset = assets;
-  while (asset->name)
-  {
-    utf8::remove (asset->fname);
-    asset++;
-  }
+  for (auto a : assets)
+    a.remove ();
+
   utf8::rmdir (docroot);
   return (int)msg.wParam;
 }
@@ -416,28 +419,27 @@ int submit_sarr (const char* uri, http_connection& client, JSONBridge* ui)
 
 
   \param  path  root path for all assets (with or without terminating backslash
-  \param  name  asset filename (it can include a relative path)
-  \param  id    asset id
-  \param  fullpath  full path of asset file
   \return _true_ if successful
 */
-bool write_asset_file (const std::string& path, const std::string& name, int id, std::string& fullpath)
+bool asset::write (const std::string& path)
 {
   string tmp = path;
   int rc;
 
-  fullpath.clear ();
-  if (tmp.back () != '/' && tmp.back () != '\\'
-   && name.front() != '/' && name.front() != '\\')
-  {
-    //Root path must be terminated with '\' (unless name starts with one)
+  //Root path must be terminated with '\' or '\\'
+  if (tmp.back () != '/' && tmp.back () != '\\')
     tmp.push_back ('\\');
-  }
+
+  //Name cannot start with '/' or '\\'
+  int pstart = 0;
+  if (name.front() == '/' || name.front() == '\\')
+    pstart++;
+
 
   //Make sure all folders on path exist. If not we create them now
-  size_t idx = name.find_last_of ("/\\");
-  if (idx != string::npos)
-    tmp += name.substr (0, idx);
+  size_t pend = name.find_last_of ("/\\");
+  if (pend != string::npos)
+    tmp += name.substr (pstart, pend);
   if ((rc = r_mkdir (tmp)) && rc != EEXIST)
     return false; //could not create path
 
@@ -446,8 +448,8 @@ bool write_asset_file (const std::string& path, const std::string& name, int id,
   void* data = mem_resource (id, TEXTFILE, size);         //load resource...
   if (!data)
     return false;
-  if (idx != string::npos)
-    tmp += name.substr (idx + 1);
+  if (pend != string::npos)
+    tmp += name.substr (pend + 1);
   else
     tmp += name;
   FILE *f;

@@ -694,7 +694,10 @@ erc node::write (std::ostream& os, int flags, int spaces, int level) const
     break;
 
   case type::numeric:
-    os << num;
+    if (num == floor (num))
+      os << (int)num;
+    else
+      os << num;
     break;
 
   case type::boolean:

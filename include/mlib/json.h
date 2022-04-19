@@ -68,7 +68,7 @@ public:
     using difference_type = std::ptrdiff_t;
     using value_type = node;
     using reference = typename std::conditional_t< C_, node const&, node& >;
-    using pointer = typename std::conditional_t< C_, node const*, node* >;
+    using pointer = typename std::conditional_t< C_, const node*, node* >;
     using obj_iter = typename std::conditional_t< C_, nodes_map::const_iterator, nodes_map::iterator>;
     using arr_iter = typename std::conditional_t< C_, nodes_array::const_iterator, nodes_array::iterator>;
     using iterator_category = std::bidirectional_iterator_tag;
@@ -110,7 +110,7 @@ public:
         return **arrit;
       }
       else if (!at_end)
-        return target;
+        return const_cast<json::node&>(target);
       else
         throw mlib::erc (ERR_JSON_ITERPOS, ERROR_PRI_ERROR, errors);
     }
@@ -131,7 +131,7 @@ public:
         return arrit->get ();
       }
       else if (!at_end)
-        return &target;
+        return const_cast<json::node *>(&target);
       else
         throw mlib::erc (ERR_JSON_ITERPOS, ERROR_PRI_ERROR, errors);
     }
@@ -492,7 +492,7 @@ inline void node::clear (type t_)
   }
     
   t = t_;
-  //init new type
+  //initialize new type
   switch (t)
   {
   case type::object:  new (&obj)nodes_map ();   break;
@@ -513,7 +513,8 @@ inline type node::kind () const
 inline int node::size () const
 {
   return (t == type::object) ? (int)obj.size () :
-         (t == type::array) ? (int)arr.size () : 0;
+         (t == type::array) ? (int)arr.size () : 
+         (t != type::null)? 1 : 0;
 }
 
 /// inequality operator
@@ -528,6 +529,7 @@ void indenter (std::ios_base& os, int spaces);
 
 inline std::_Smanip<int>
   spaces (int nspc) { return std::_Smanip<int> (&indenter, nspc); }
+
 inline std::ostream& indent (std::ostream& os) { indenter (os, 2); return os; };
 inline std::ostream& tabs (std::ostream& os) { indenter (os, 0); return os; };
 std::ostream& noindent (std::ostream& os);

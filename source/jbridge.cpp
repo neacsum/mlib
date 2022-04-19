@@ -74,6 +74,7 @@ JSONBridge::JSONBridge (const char *path, JSONVAR* dict)
   : path_ (path)
   , dictionary (dict)
   , client_ (0)
+  , action (nullptr)
 {
 }
 
@@ -106,13 +107,14 @@ erc JSONBridge::json_begin (json::node& root)
 erc JSONBridge::json_end (json::node& obj)
 {
   try {
+    //serialize in a buffer to find content length
     stringstream ss;
     ss << fixed << obj;
 
     client ().out ()
       << "HTTP/1.1 200 OK\r\n"
       "Cache-Control: no-cache, no-store\r\n"
-      "Content-Type: text/plain\r\n"
+      "Content-Type: application/json\r\n"
       //"Access-Control-Allow-Origin: *\r\n"
       "Connection: Keep-Alive\r\n"
       "Content-Length: " << ss.str ().size () << "\r\n"
@@ -134,11 +136,11 @@ erc JSONBridge::jsonify (json::node& n, const JSONVAR*& entry)
     if (entry->cnt > 1)
     {
       for (int i = 0; i < entry->cnt; i++)
-        do_node (n[i], entry, i);
+        serialize_node (n[i], entry, i);
       return ERR_SUCCESS;
     }
     else
-      return do_node (n, entry);
+      return serialize_node (n, entry);
   }
   catch (erc& x) {
     x.reactivate ();
@@ -146,9 +148,10 @@ erc JSONBridge::jsonify (json::node& n, const JSONVAR*& entry)
   }
 }
 
-erc JSONBridge::do_node (json::node& n, const JSONVAR*& entry, int index)
+erc JSONBridge::serialize_node (json::node& n, const JSONVAR*& entry, int index)
 {
   char* addr;
+
   if (entry->type == JT_STR)
     addr = (char*)entry->addr + entry->sz * index;
   else
@@ -191,7 +194,7 @@ erc JSONBridge::do_node (json::node& n, const JSONVAR*& entry, int index)
     break;
   case JT_OBJECT:
     //Composite object - go through dictionary 
-    while (entry->name)
+    while (!entry->name.empty())
     {
       entry++;
       if (entry->type == JT_ENDOBJ)
@@ -209,14 +212,71 @@ erc JSONBridge::do_node (json::node& n, const JSONVAR*& entry, int index)
   return ERR_SUCCESS;
 }
 
+erc JSONBridge::deserialize_node (const json::node& n, const JSONVAR*& entry, int index)
+{
+  void* pv;
+
+  if (entry->type == JT_STR)
+    pv = (char*)(entry->addr) + entry->sz * index;
+  else
+    pv = (char*)(entry->addr) + jsz[entry->type] * index;
+  try {
+    switch (entry->type)
+    {
+    case JT_PSTR:
+      pv = *(char**)pv; //one more level of indirection
+      //flow through to JT_STR case. Don't break them apart!
+    case JT_STR:
+      strncpy ((char*)pv, n.to_string ().c_str (), entry->sz);
+      if (entry->sz)
+        *((char*)pv + entry->sz - 1) = 0; //always null-terminated
+      break;
+    case JT_INT:
+      *(int*)pv = (int)n.to_number ();
+      break;
+    case JT_UINT:
+      *(unsigned int*)pv = (unsigned int)n.to_number ();
+      break;
+    case JT_SHORT:
+      *(short*)pv = (short)n.to_number ();
+      break;
+    case JT_USHORT:
+      *(unsigned short*)pv = (unsigned short)n.to_number ();
+      break;
+    case JT_LONG:
+      *(long*)pv = (long)n.to_number ();
+      break;
+    case JT_ULONG:
+      *(unsigned long*)pv = (unsigned long)n.to_number ();
+      break;
+    case JT_FLT:
+      *(float*)pv = (float)n.to_number ();
+      break;
+    case JT_DBL:
+      *(double*)pv = n.to_number ();
+      break;
+    case JT_BOOL:
+      *(bool*)pv = n.to_bool ();
+      break;
+    default:
+      TRACE ("Unexpected entry type: %d", entry->type);
+    }
+  }
+  catch (mlib::erc& x) {
+    x.reactivate ();
+    return x;
+  }
+  return ERR_SUCCESS;
+}
+
 void JSONBridge::not_found (const char *varname)
 {
-  char tmp[1024];
-  sprintf (tmp, "HTTP/1.1 415 Unknown variable %s\r\n", varname);
+  string tmp = "HTTP/1.1 415 Unknown variable %s\r\n";
+  tmp += varname;
+
   client().out() << "HTTP/1.1 415 Unknown variable " << varname << "\r\n"
     << "Content-Type: text/plain\r\n"
-    << "Content-Length: " << strlen (tmp) << "\r\n"
-    << "\r\n"
+    << "Content-Length: " << tmp.size() << "\r\n\r\n"
     << tmp
     << endl;
 }
@@ -225,44 +285,50 @@ void JSONBridge::not_found (const char *varname)
   Search a variable in JSON dictionary. The variable name can be a construct
   `<name>_<index>` for an indexed variable.
 */
-JSONVAR* JSONBridge::find (const char* name, int *pidx)
+JSONVAR* JSONBridge::find (const std::string& name, int* pidx)
 {
   JSONVAR *entry;
-  char buf[256];
-  int idx;
+  int tmpidx;
+  string lookup = name;
 
   if (!pidx)
-    pidx = &idx;
+    pidx = &tmpidx;
 
-  strncpy_s (buf, name, sizeof (buf)-1);
-  buf[sizeof (buf) - 1] = 0;
-  char* pi = strchr (buf, '_');
+  size_t pnum = lookup.find_first_of ('_');
   *pidx = 0;
 
-  if (pi)
+  if (pnum != string::npos)
   {
-    char* tail;
-    *pidx = strtol (pi + 1, &tail, 10);
+    char *tail;
+    *pidx = strtol (lookup.substr (pnum+1).c_str(), &tail, 10);
+
     if (*tail || *pidx < 0) //if name doesn't match <var>_<number> or index is negative...
-      *pidx = 0;            //...search dictionary for whole name
+    {                       //...search dictionary for whole name
+      *pidx = 0;
+    }
     else
-      *pi = 0;
+      lookup.erase (pnum);
   }
 
   int lvl = 0;
-  for (entry = dictionary; entry->name; entry++)
+  for (entry = dictionary; !entry->name.empty(); entry++)
   {
+    assert (lvl >= 0); //sanity check
+
     //search only top level entries
     if (entry->type == JT_OBJECT)
       lvl++;
     else if (entry->type == JT_ENDOBJ)
+    {
       lvl--;
+      continue;
+    }
 
-    if (lvl <= 1 && !strcmp(buf, entry->name))
+    if (lvl <= 1 && lookup.c_str() == entry->name)
     {
       if (*pidx < entry->cnt)
         return entry;
-      TRACE ("Out of bounds %s[%d]", buf, *pidx);
+      TRACE ("Out of bounds %s[%d]", lookup.c_str(), *pidx);
       return NULL;
     }
   }
@@ -361,15 +427,43 @@ bool JSONBridge::parse_urlencoded ()
 
 bool JSONBridge::parse_jsonencoded ()
 {
-  return false;
-}
+  json::node n;
 
-/*!
-  Redirect client to root
-*/
-void JSONBridge::post_parse ()
-{
-  client().redirect ("/");
+  n.read (client ().get_body ());
+  if (n.kind () != json::type::object)
+    return false; //only JSON objects can be parsed
+
+  for (auto p = n.begin (); p != n.end (); p++)
+  {
+    const JSONVAR* k = find (p.name ());
+    if (!k)
+    {
+      TRACE ("Key %s not found in dictionary", p.name().c_str());
+      continue;
+    }
+    if (p->kind () == json::type::object)
+    {
+      //TODO - support multiple level objects
+      TRACE ("Multiple level objects not supported yet! %s", p.name ().c_str ());
+      return false;
+    }
+
+    try {
+      const json::node& n = *p;
+      if (n.kind () == json::type::array)
+      {
+        for (int idx = 0; idx < n.size () && idx < k->cnt; idx++)
+          deserialize_node (n[idx], k, idx);
+      }
+      else
+        deserialize_node (n, k);
+    }
+    catch (erc& ) {
+      TRACE ("Error %d while processing node %s", p.name ().c_str ());
+      return false;
+    }
+  }
+  return true;
 }
 
 int JSONBridge::callback (const char *uri, http_connection& client, JSONBridge *ctx)
@@ -382,10 +476,13 @@ int JSONBridge::callback (const char *uri, http_connection& client, JSONBridge *
   if (!_strcmpi (req, "GET"))
   {
     json::node root;
-    if (ctx->json_begin (root) == ERR_SUCCESS)
+    erc ret;
+    if ((ret = ctx->json_begin (root)) == ERR_SUCCESS)
       ctx->json_end (root);
+    else if (ret == ERR_JSON_NOTFOUND)
+      ctx->not_found (query);
     else
-      client.respond (404);
+      client.serve404 ();
   }
   else if (!_strcmpi (req, "POST"))
   {
@@ -397,21 +494,20 @@ int JSONBridge::callback (const char *uri, http_connection& client, JSONBridge *
 
 
     const JSONVAR* entry;
-    int idx;
     if (strlen (client.get_query ())
-      && (entry = ctx->find (client.get_query (), &idx))
+      && (entry = ctx->find (client.get_query ()))
       && entry->type == JT_POSTFUN)
     {
       uri_handler (entry->addr)(uri, client, ctx);
       ok = true;
     }
-    else if (content == "application/x-www-form-urlencoded")
+    else if (content.find("application/x-www-form-urlencoded") != string::npos)
       ok = ctx->parse_urlencoded ();
-    else if (content.rfind ("application/json", 0) == 0)
+    else if (content.find ("application/json", 0) != string::npos)
       ok = ctx->parse_jsonencoded ();
 
-    if (ok)
-      ctx->post_parse ();
+    if (ok && ctx->action)
+      ctx->action (*ctx);
   }
   ctx->unlock ();
   return 1;

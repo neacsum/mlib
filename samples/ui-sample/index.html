@@ -25,43 +25,57 @@ var sample_default =
  "psarr": [\"IJ\", \"KL\", \"MN\", \"OP\"]\n\
 }';
 
-function do_parse (json)
+function set_fields (json)
 {
-  var i;
-  var data = JSON.parse(json)
-  $("#hvar").val(data.hvar);
-  $("#huvar").val("0x"+data.huvar.toString(16));
-  $("#ivar").val(data.ivar);
-  $("#iuvar").val(data.iuvar.toString());
-  $("#lvar").val(data.lvar);
-  $("#luvar").val(data.luvar.toString());
-  $("#fvar").val(data.fvar);
-  $("#dvar").val(data.dvar);
-  $("#pstr").val(data.pstr);
-  $("#str").val(data.str);
-  $("#bvar").prop('checked', data.bvar);
-  for (i=0; i<4; i++)
+  $("#hvar").val(json.hvar);
+  $("#huvar").val("0x"+json.huvar.toString(16));
+  $("#ivar").val(json.ivar);
+  $("#iuvar").val(json.iuvar.toString());
+  $("#lvar").val(json.lvar);
+  $("#luvar").val(json.luvar.toString());
+  $("#fvar").val(json.fvar);
+  $("#dvar").val(json.dvar);
+  $("#pstr").val(json.pstr);
+  $("#str").val(json.str);
+  $("#bvar").prop('checked', json.bvar);
+
+  for (i = 0; i < 4; i++)
   {
-    $("#iarr_" + i).val(data.iarr[i]);
-    $("#sarr_" + i).val(data.sarr[i]);
-    $("#psarr_" + i).html(data.psarr[i]);
+    $("#iarr_" + i).val(json.iarr[i]);
+    $("#sarr_" + i).val(json.sarr[i]);
+    $("#psarr_" + i).html(json.psarr[i]);
   }
+}
+
+function send_json() {
+  const data = new Object();
+  data.hvar = parseInt ($("#hvar").val());
+  data.huvar = parseInt($("#huvar").val());
+  data.ivar = parseInt($("#ivar").val());
+  data.str = $("#str").val();
+  data.iarr = new Array();
+  for (i = 0; i < 4; i++)
+    data.iarr[i] = parseInt($("#iarr_" + i).val());
+
+  $.post({url: "/var", data: JSON.stringify(data), contentType: "application/json"});
 }
 
 $(document).ready ( function ()
 {
   $.get("/var?sample", function (r)
   {
-    do_parse(r)
+    set_fields(r)
   })
   .fail(function ()
   {
-    do_parse(sample_default)
+    set_fields(sample_default)
   });
   $.getJSON("/var?varpi", function (r) {
     $("#pi").html(r);
   });
 
+  //request for a non-existent entry
+  $.getJSON("/var?no_such_variable", function (r) { }).fail(function () { console.log("Expected 415 reply") })
 });
 
 </script>
@@ -95,58 +109,64 @@ $(document).ready ( function ()
     </div>
     <div class="grid_8">
       <form method="post" action="/var">
-      <table>
-        <tr>
-          <td>Short integer hvar:</td>
-          <td><input id="hvar" name="hvar" /></td>
-        </tr>
-        <tr>
-          <td>Short unsigned huvar (hex):</td>
-          <td><input id="huvar" name="huvar" /></td>
-        </tr>
-        <tr>
-          <td>Integer ivar:</td>
-          <td><input id="ivar" name="ivar"/></td>
-        </tr>
-        <tr>
-          <td>Unsigned integer iuvar:</td>
-          <td><input id="iuvar" name="iuvar" /></td>
-        </tr>
-        <tr>
-          <td>Long lvar:</td>
-          <td><input id="lvar" name="lvar" /></td>
-        </tr>
-        <tr>
-          <td>Unsigned long luvar:</td>
-          <td><input id="luvar" name="luvar" /></td>
-        </tr>
-        <tr>
-          <td>Float fvar:</td>
-          <td><input id="fvar" name="fvar" /></td>
-        </tr>
-        <tr>
-          <td>Double dvar:</td>
-          <td><input id="dvar" name="dvar" /></td>
-        </tr>
-        <tr>
-          <td>Pointer to string pstr:</td>
-          <td><input id="pstr" name="pstr" /></td>
-        </tr>
-        <tr>
-          <td>String str:</td>
-          <td><input id="str" name="str" /></td>
-        </tr>
-        <tr>
-          <td>Boolean bvar:</td>
-          <td>
-            <input type="hidden" name="bvar" value="0" />
-            <input type="checkbox" id="bvar" name="bvar" value="1"/>
-          </td>
-        </tr>
-        <tr>
-          <td colspan="2" style="text-align:center"><input type="submit" value="SUBMIT" /></td>
-        </tr>
-      </table>
+          <table>
+              <tr>
+                  <td>Short integer hvar:</td>
+                  <td><input id="hvar" name="hvar" /></td>
+              </tr>
+              <tr>
+                  <td>Short unsigned huvar (hex):</td>
+                  <td><input id="huvar" name="huvar" /></td>
+              </tr>
+              <tr>
+                  <td>Integer ivar:</td>
+                  <td><input id="ivar" name="ivar" /></td>
+              </tr>
+              <tr>
+                  <td>Unsigned integer iuvar:</td>
+                  <td><input id="iuvar" name="iuvar" /></td>
+              </tr>
+              <tr>
+                  <td>Long lvar:</td>
+                  <td><input id="lvar" name="lvar" /></td>
+              </tr>
+              <tr>
+                  <td>Unsigned long luvar:</td>
+                  <td><input id="luvar" name="luvar" /></td>
+              </tr>
+              <tr>
+                  <td>Float fvar:</td>
+                  <td><input id="fvar" name="fvar" /></td>
+              </tr>
+              <tr>
+                  <td>Double dvar:</td>
+                  <td><input id="dvar" name="dvar" /></td>
+              </tr>
+              <tr>
+                  <td>Pointer to string pstr:</td>
+                  <td><input id="pstr" name="pstr" /></td>
+              </tr>
+              <tr>
+                  <td>String str:</td>
+                  <td><input id="str" name="str" /></td>
+              </tr>
+              <tr>
+                  <td>Boolean bvar:</td>
+                  <td>
+                      <input type="hidden" name="bvar" value="0" />
+                      <input type="checkbox" id="bvar" name="bvar" value="1" />
+                  </td>
+              </tr>
+              <tr>
+                  <td colspan="2" style="text-align:center"><input type="submit" value="SUBMIT" /></td>
+              </tr>
+              <tr>
+                  <td colspan="2" style="text-align:center">
+                  <input type="button" value="SUBMIT AS JSON" onclick="send_json(); return false;"/>
+                  </td>
+              </tr>
+
+          </table>
       </form>
     </div>
     <div class="clear"></div>
