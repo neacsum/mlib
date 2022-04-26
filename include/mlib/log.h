@@ -54,11 +54,26 @@
   \name Flags for openlog
   The following flags can be specified in the opt argument of openlog():
 \{
+ 
+ //BSD stuff
  */
+/*
+ * LOG_ODELAY no longer does anything.
+ * LOG_NDELAY is the inverse of what it used to be.
+ */
+#define	LOG_PID		0x01	/* log the pid with each message */
+#define	LOG_CONS	0x02	/* log on the console if errors in sending */
+#define	LOG_ODELAY	0x04	/* delay open until first syslog() (default) */
+#define	LOG_NDELAY	0x08	/* don't delay open */
+#define	LOG_NOWAIT	0x10	/* don't wait for console forks: DEPRECATED */
+#define	LOG_PERROR	0x20	/* log to stderr as well */
+
+//mlib stuff
 #define LOGOPT_PID        0x01    //!< log the process id with each message
 #define LOGOPT_OUTDEBUG   0x02    //!< log to Windows debug port (OutputDebugString)
-#define LOGOPT_NOUDP      0x04    //!< do not send UDP data
-#define LOGOPT_FILE       0x08    //!< log to disk file
+
+#define LOGOPT_NOUDP      0x40    //!< do not send UDP data
+#define LOGOPT_FILE       0x80    //!< log to disk file
 ///\}
 
 #define LOG_PORT     514  /* port number for logger (same as SYSLOG service) */
@@ -80,7 +95,7 @@ int setlogmask (int mask);
 int setlogopt (int opt);
 
 /// Generate a log message using FMT string and option arguments. 
-void syslog (int facility_priority, char *fmt, ...);
+void syslog (int facility_priority, const char *fmt, ...);
 
 /// Generate a log message at debug level using FMT string and option arguments. 
 bool syslog_debug (const char *fmt, ...);

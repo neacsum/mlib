@@ -286,7 +286,7 @@ void closelog ()
           "Unable to make network connection to %s.", host );
 \endverbatim
  */
-void syslog (int facility_priority, char* fmt, ...)
+void syslog (int facility_priority, const char* fmt, ...)
 {
   SYSTEMTIME stm;
   va_list ap;
