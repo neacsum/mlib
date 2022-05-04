@@ -309,22 +309,26 @@ public:
     return *this;
   }
 
+  explicit operator std::string () const;
+  explicit operator const char* () const;
+  explicit operator double () const;
+  explicit operator int () const;
+  explicit operator bool () const;
+
+  double to_num () const;
+  std::string to_str () const;
+
   //indexing
   node& operator [](const std::string& name);
-  node& operator [](const std::string& name) const;
+  const node& operator [](const std::string& name) const;
 
-  node& operator [](int index);
-  node& operator [](int index) const;
+  node& operator [](size_t index);
+  const node& operator [](size_t index) const;
 
   const_iterator begin () const;
   iterator begin ();
   const_iterator end () const;
   iterator end ();
-
-  // Value functions
-  std::string to_string () const;
-  double      to_number () const;
-  bool        to_bool () const;
 
   //(in)equality operators
   bool operator == (const node& other) const;
@@ -344,6 +348,7 @@ public:
   int size () const;
 
 private:
+
   type t;
   union {
     nodes_map obj;
@@ -453,31 +458,42 @@ inline node::iterator node::end ()
     return iterator (*this, true);
 }
 
-/// Return the string value of a node
-inline std::string node::to_string () const
+/// Return node value as a string (if possible)
+inline node::operator std::string () const
+{
+  return to_str ();
+}
+
+/*
+  Return a pointer to node's string value.
+  Any assignment to node will invalidate the pointer
+*/
+inline node::operator const char* () const
 {
   if (t == type::string)
-    return str;
-  else
-    throw mlib::erc (ERR_JSON_INVTYPE, ERROR_PRI_ERROR, errors);
+    return str.c_str ();
+
+  throw mlib::erc (ERR_JSON_INVTYPE, ERROR_PRI_ERROR, errors);
 }
 
 /// Return numeric value of a node
-inline double node::to_number () const
+inline node::operator double () const
 {
-  if (t == type::numeric)
-    return num;
-  else
-    throw mlib::erc (ERR_JSON_INVTYPE, ERROR_PRI_ERROR, errors);
+  return to_num ();
 }
 
-/// Return boolean value of a node
-inline bool node::to_bool () const
+inline node::operator int () const
+{
+  return (int)to_num ();
+}
+
+/// Return boolean value of the node
+inline node::operator bool () const
 {
   if (t == type::boolean)
     return logic;
-  else
-    throw mlib::erc (ERR_JSON_INVTYPE, ERROR_PRI_ERROR, errors);
+
+  throw mlib::erc (ERR_JSON_INVTYPE, ERROR_PRI_ERROR, errors);
 }
 
 /// Remove previous node content

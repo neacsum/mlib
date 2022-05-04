@@ -227,36 +227,36 @@ erc JSONBridge::deserialize_node (const json::node& n, const JSONVAR*& entry, in
       pv = *(char**)pv; //one more level of indirection
       //flow through to JT_STR case. Don't break them apart!
     case JT_STR:
-      strncpy ((char*)pv, n.to_string ().c_str (), entry->sz);
+      strncpy ((char*)pv, (const char*)n, entry->sz);
       if (entry->sz)
         *((char*)pv + entry->sz - 1) = 0; //always null-terminated
       break;
     case JT_INT:
-      *(int*)pv = (int)n.to_number ();
+      *(int*)pv = static_cast<int>(n);
       break;
     case JT_UINT:
-      *(unsigned int*)pv = (unsigned int)n.to_number ();
+      *(unsigned int*)pv = static_cast<int>(n);
       break;
     case JT_SHORT:
-      *(short*)pv = (short)n.to_number ();
+      *(short*)pv = static_cast<int>(n);
       break;
     case JT_USHORT:
-      *(unsigned short*)pv = (unsigned short)n.to_number ();
+      *(unsigned short*)pv = static_cast<int>(n);
       break;
     case JT_LONG:
-      *(long*)pv = (long)n.to_number ();
+      *(long*)pv = static_cast<int>(n);
       break;
     case JT_ULONG:
-      *(unsigned long*)pv = (unsigned long)n.to_number ();
+      *(unsigned long*)pv = static_cast<int>(n);
       break;
     case JT_FLT:
-      *(float*)pv = (float)n.to_number ();
+      *(float*)pv = (float)static_cast<double>(n);
       break;
     case JT_DBL:
-      *(double*)pv = n.to_number ();
+      *(double*)pv = static_cast<double>(n);
       break;
     case JT_BOOL:
-      *(bool*)pv = n.to_bool ();
+      *(bool*)pv = static_cast<bool>(n);
       break;
     default:
       TRACE ("Unexpected entry type: %d", entry->type);

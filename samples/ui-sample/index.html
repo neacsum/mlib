@@ -96,10 +96,10 @@ $(document).ready ( function ()
     <div class="clear"></div>
     <div class="grid_4">
       The interface supports all basic numeric and string types. When a form is
-      submitted, all fields are sent as 
+      submitted, all fields are sent as
       <a href="https://en.wikipedia.org/wiki/Percent-encoding">URL encoded</a>
       values. the interface decodes them and assigns new values to corresponding
-      variables. received values for integer type fields can be decimal, hex or octal.<br/>
+      variables. received values for integer type fields can be decimal, hex or octal.<br />
 
       Keep in mind that check-boxes and radio buttons that are not checked are not
       submitted. The "standard" trick in this case is to use another hidden
@@ -109,64 +109,64 @@ $(document).ready ( function ()
     </div>
     <div class="grid_8">
       <form method="post" action="/var">
-          <table>
-              <tr>
-                  <td>Short integer hvar:</td>
-                  <td><input id="hvar" name="hvar" /></td>
-              </tr>
-              <tr>
-                  <td>Short unsigned huvar (hex):</td>
-                  <td><input id="huvar" name="huvar" /></td>
-              </tr>
-              <tr>
-                  <td>Integer ivar:</td>
-                  <td><input id="ivar" name="ivar" /></td>
-              </tr>
-              <tr>
-                  <td>Unsigned integer iuvar:</td>
-                  <td><input id="iuvar" name="iuvar" /></td>
-              </tr>
-              <tr>
-                  <td>Long lvar:</td>
-                  <td><input id="lvar" name="lvar" /></td>
-              </tr>
-              <tr>
-                  <td>Unsigned long luvar:</td>
-                  <td><input id="luvar" name="luvar" /></td>
-              </tr>
-              <tr>
-                  <td>Float fvar:</td>
-                  <td><input id="fvar" name="fvar" /></td>
-              </tr>
-              <tr>
-                  <td>Double dvar:</td>
-                  <td><input id="dvar" name="dvar" /></td>
-              </tr>
-              <tr>
-                  <td>Pointer to string pstr:</td>
-                  <td><input id="pstr" name="pstr" /></td>
-              </tr>
-              <tr>
-                  <td>String str:</td>
-                  <td><input id="str" name="str" /></td>
-              </tr>
-              <tr>
-                  <td>Boolean bvar:</td>
-                  <td>
-                      <input type="hidden" name="bvar" value="0" />
-                      <input type="checkbox" id="bvar" name="bvar" value="1" />
-                  </td>
-              </tr>
-              <tr>
-                  <td colspan="2" style="text-align:center"><input type="submit" value="SUBMIT" /></td>
-              </tr>
-              <tr>
-                  <td colspan="2" style="text-align:center">
-                  <input type="button" value="SUBMIT AS JSON" onclick="send_json(); return false;"/>
-                  </td>
-              </tr>
+        <table>
+          <tr>
+            <td>Short integer hvar:</td>
+            <td><input id="hvar" name="hvar" /></td>
+          </tr>
+          <tr>
+            <td>Short unsigned huvar (hex):</td>
+            <td><input id="huvar" name="huvar" /></td>
+          </tr>
+          <tr>
+            <td>Integer ivar:</td>
+            <td><input id="ivar" name="ivar" /></td>
+          </tr>
+          <tr>
+            <td>Unsigned integer iuvar:</td>
+            <td><input id="iuvar" name="iuvar" /></td>
+          </tr>
+          <tr>
+            <td>Long lvar:</td>
+            <td><input id="lvar" name="lvar" /></td>
+          </tr>
+          <tr>
+            <td>Unsigned long luvar:</td>
+            <td><input id="luvar" name="luvar" /></td>
+          </tr>
+          <tr>
+            <td>Float fvar:</td>
+            <td><input id="fvar" name="fvar" /></td>
+          </tr>
+          <tr>
+            <td>Double dvar:</td>
+            <td><input id="dvar" name="dvar" /></td>
+          </tr>
+          <tr>
+            <td>Pointer to string pstr:</td>
+            <td><input id="pstr" name="pstr" /></td>
+          </tr>
+          <tr>
+            <td>String str:</td>
+            <td><input id="str" name="str" /></td>
+          </tr>
+          <tr>
+            <td>Boolean bvar:</td>
+            <td>
+              <input type="hidden" name="bvar" value="0" />
+              <input type="checkbox" id="bvar" name="bvar" value="1" />
+            </td>
+          </tr>
+          <tr>
+            <td colspan="2" style="text-align:center"><input type="submit" value="SUBMIT" /></td>
+          </tr>
+          <tr>
+            <td colspan="2" style="text-align:center">
+              <input type="button" value="SUBMIT AS JSON" onclick="send_json(); return false;" />
+            </td>
+          </tr>
 
-          </table>
+        </table>
       </form>
     </div>
     <div class="clear"></div>
@@ -174,9 +174,9 @@ $(document).ready ( function ()
     <div class="clear"></div>
     <div class="grid_4">
       Transferring arrays from program to the user interface page is simple. The
-      interface knows how to format arrays for all basic data types.<br/>
+      interface knows how to format arrays for all basic data types.<br />
       When posting data back from HTML page to the program we have to establish
-      a convention because the browser's posting mechanism has no concept of array.<br/>
+      a convention because the browser's posting mechanism has no concept of array.<br />
       So, by convention, array elements are named <em>&lt;array&gt;_&lt;index&gt;</em>.
       Note that index value is checked against the limit set in the data dictionary
       entry for the array.
@@ -230,7 +230,7 @@ $(document).ready ( function ()
       in this case are arrays of pointers to strings.
     </div>
     <div class="grid_8 psarr">
-      Pointer to string array psarr:<p/>
+      Pointer to string array psarr:<p />
       <table>
         <tr>
           <td>psarr[0]:</td>
@@ -252,6 +252,12 @@ $(document).ready ( function ()
     </div>
     <div class="clear"></div>
     The value of pi is <span id="pi"></span>
+    <div class="clear"></div>
+    <hr />
+    <div class="grid_2, push_2">
+      <input type="button" onclick="exit_server()" value="EXIT PROGRAM" />
+    </div>
   </div>
+
 </body>
 </html>

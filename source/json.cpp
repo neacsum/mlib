@@ -100,7 +100,7 @@ node& node::operator=(const node& rhs)
         obj.emplace (n->first, make_unique<node> (*n->second));
       break;
     case type::array:
-      for (int i = 0; i < rhs.arr.size(); i++)
+      for (size_t i = 0; i < rhs.arr.size(); i++)
         arr.emplace_back (make_unique<node>(*rhs.arr[i]));
       break;
     case type::string:
@@ -154,7 +154,7 @@ node& node::operator[](const std::string& name)
   Return value of an object node element (const version)
   If element doesn't exist it throws an ERR_JSON_MISSING exception.
 */
-node& node::operator[](const std::string& name) const
+const node& node::operator[](const std::string& name) const
 {
   if (t != type::object)
     throw mlib::erc (ERR_JSON_INVTYPE, ERROR_PRI_ERROR, errors);
@@ -166,7 +166,7 @@ node& node::operator[](const std::string& name) const
 }
 
 /// Return value of an array node element
-node& node::operator[](int index)
+node& node::operator[](size_t index)
 {
   if (t == type::null)
   {
@@ -179,14 +179,14 @@ node& node::operator[](int index)
   if (index >= arr.size ())
   {
     //extend array
-    int old_size = (int)arr.size ();
+    auto old_size = arr.size ();
     if (index < max_array_size - 1)
       arr.resize (index + 1);
     else
       throw mlib::erc (ERR_JSON_TOOMANY, ERROR_PRI_ERROR, errors);
 
     //add null nodes
-    for (int i=old_size; i<=index; i++)
+    for (auto i=old_size; i<=index; i++)
       arr[i] = std::make_unique<node> ();
   }
   return *arr[index];
@@ -196,7 +196,7 @@ node& node::operator[](int index)
   Return value of an array node element (const version)
   If element doesn't exist it throws an ERR_JSON_MISSING exception.
 */
-node& node::operator[](int index) const
+const node& node::operator[](size_t index) const
 {
   if (t != type::array)
     throw mlib::erc (ERR_JSON_INVTYPE, ERROR_PRI_ERROR, errors);
@@ -695,7 +695,7 @@ erc node::write (std::ostream& os, int flags, int spaces, int level) const
 
   case type::numeric:
     if (num == floor (num))
-      os << (int)num;
+      os << (long long)num;
     else
       os << num;
     break;
@@ -721,6 +721,42 @@ mlib::erc node::write (std::string& s, int flags, int spaces) const
   return ret;
 }
 
+/*
+  Number conversion function
+*/
+double node::to_num () const
+{
+  switch (t)
+  {
+  case type::numeric:
+    return num;
+  case type::string:
+    {
+      char* end;
+      double d = strtod (str.c_str (), &end);
+      if (!*end)
+        return d;
+    }
+  case type::null:
+      return 0;
+  case type::boolean:
+    return logic ? 1. : 0.;
+  }
+
+  throw mlib::erc (ERR_JSON_INVTYPE, ERROR_PRI_ERROR, errors);
+}
+
+string node::to_str () const
+{
+  if (t == type::string)
+    return str;
+  else if (t == type::numeric)
+    return std::to_string (num);
+  else if (t == type::boolean)
+    return logic ? "true" : "false";
+
+  throw mlib::erc (ERR_JSON_INVTYPE, ERROR_PRI_ERROR, errors);
+}
 void indenter (std::ios_base& os, int spaces)
 {
   os.iword (ostream_flags) &= ~0xff;
