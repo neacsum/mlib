@@ -39,13 +39,13 @@ struct JSONVAR {
   unsigned short sz;    ///< element size (used only for strings)
   unsigned short cnt;   ///< number of elements
 };
-
+typedef std::vector<JSONVAR> JSONDICT;
 
 /// Mark the beginning of JSON dictionary
-#define JSD_STARTDIC(dict) JSONVAR dict[] ={
+#define JSD_STARTDIC(dict) JSONDICT dict ={
 
 /// Mark the end of JSON dictionary
-#define JSD_ENDDIC {std::string(), 0, JT_INT, 0, 0} }
+#define JSD_ENDDIC {"", 0, JT_ENDOBJ, 0, 0} }
 
 /*!
   Generates an entry in JSON dictionary for a variable that has the same
@@ -84,7 +84,7 @@ struct JSONVAR {
 #define JSD_OBJECT(N) {N, 0, JT_OBJECT, 0, 1}
 
 ///Generate entry for end of composite object
-#define JSD_ENDOBJ {"\x01", 0, JT_ENDOBJ, 0, 1}
+#define JSD_ENDOBJ {"", 0, JT_ENDOBJ, 0, 1}
 
 ///Generate entry for POST function call
 #define JSDN_POSTFUNC(F, N) {N, F, JT_POSTFUN, 0, 1}
@@ -95,7 +95,7 @@ typedef void (*post_action)(JSONBridge&);
 /// JSON objects support
 class JSONBridge {
 public:
-  JSONBridge (const char *path, JSONVAR* dict);
+  JSONBridge (const char *path, JSONDICT& dict);
   ~JSONBridge ();
 
   void attach_to (httpd& server);
@@ -121,7 +121,7 @@ private:
   erc deserialize_node (const json::node& n, const JSONVAR*& entry, int index = 0);
 
   std::string path_;
-  JSONVAR* dictionary;
+  std::vector <JSONVAR> dictionary;
   http_connection *client_;
   criticalsection in_use;
   post_action action;

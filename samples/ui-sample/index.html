@@ -39,25 +39,39 @@ function set_fields (json)
   $("#str").val(json.str);
   $("#bvar").prop('checked', json.bvar);
 
+  for (i = 0; $("#iarr_" + i).length; i++)
+  {
+    $("#iarr_" + i).val(i < json.iarr.length?json.iarr[i]: "Out of bounds")
+  }
+
   for (i = 0; i < 4; i++)
   {
-    $("#iarr_" + i).val(json.iarr[i]);
     $("#sarr_" + i).val(json.sarr[i]);
     $("#psarr_" + i).html(json.psarr[i]);
   }
 }
 
-function send_json() {
+/*
+  Shows how to send JSON data in a POST message using .serializeArray function
+*/
+function send_json1() {
+  const data = $("#form1").serializeArray();
+  $.post({url: "/var", data: JSON.stringify(data), contentType: "application/json"});
+}
+
+/*
+  Shows how to send JSON data in a post message. Intentionally here we send
+  more array elements than the size of the corresponding server data.
+*/
+function send_json2 () {
   const data = new Object();
-  data.hvar = parseInt ($("#hvar").val());
-  data.huvar = parseInt($("#huvar").val());
-  data.ivar = parseInt($("#ivar").val());
-  data.str = $("#str").val();
   data.iarr = new Array();
-  for (i = 0; i < 4; i++)
+
+  //loop over all "iarr_..." elements. Server will take care of bounds checking
+  for (i = 0; $("#iarr_"+i).length; i++)
     data.iarr[i] = parseInt($("#iarr_" + i).val());
 
-  $.post({url: "/var", data: JSON.stringify(data), contentType: "application/json"});
+  $.post({ url: "/var", data: JSON.stringify(data), contentType: "application/json" });
 }
 
 $(document).ready ( function ()
@@ -78,6 +92,12 @@ $(document).ready ( function ()
   $.getJSON("/var?no_such_variable", function (r) { }).fail(function () { console.log("Expected 415 reply") })
 });
 
+function exit_server()
+{
+  $.post({ url: "/var?exit_server", data: " "});
+  alert("Thanks for trying the user interface server");
+}
+
 </script>
 <style>
   .psarr table,
@@ -95,20 +115,28 @@ $(document).ready ( function ()
     </div>
     <div class="clear"></div>
     <div class="grid_4">
-      The interface supports all basic numeric and string types. When a form is
-      submitted, all fields are sent as
-      <a href="https://en.wikipedia.org/wiki/Percent-encoding">URL encoded</a>
-      values. the interface decodes them and assigns new values to corresponding
-      variables. received values for integer type fields can be decimal, hex or octal.<br />
-
-      Keep in mind that check-boxes and radio buttons that are not checked are not
-      submitted. The "standard" trick in this case is to use another hidden
-      input field with the same name and a value corresponding to the unchecked.
-      state. Because submitted fields are parsed sequentially, the hidden field
-      must be placed <b>BEFORE</b> the check-box or radio button field.
+      <p>
+        The interface supports all basic numeric and string types. When a form is
+        submitted, all fields are sent as
+        <a href="https://en.wikipedia.org/wiki/Percent-encoding">URL encoded</a>
+        values. The interface decodes them and assigns new values to corresponding
+        variables. Received values for integer type fields can be decimal, hex or octal.
+      </p>
+      <p>
+        Keep in mind that check-boxes and radio buttons that are not checked are not
+        submitted. The "standard" trick in this case is to use another hidden
+        input field with the same name and a value corresponding to the unchecked.
+        state. Because submitted fields are parsed sequentially, the hidden field
+        must be placed <b>BEFORE</b> the check-box or radio button field.
+      </p>
+      <p>
+        Server can also accept JSON-encoded data. In this case the client
+        JavaScript code has to encode the values before sending. The "SUBMIT AS JSON"
+        buttons demonstrate this functionality.
+      </p>
     </div>
     <div class="grid_8">
-      <form method="post" action="/var">
+      <form method="post" id="form1" action="/var">
         <table>
           <tr>
             <td>Short integer hvar:</td>
@@ -162,7 +190,7 @@ $(document).ready ( function ()
           </tr>
           <tr>
             <td colspan="2" style="text-align:center">
-              <input type="button" value="SUBMIT AS JSON" onclick="send_json(); return false;" />
+              <input type="button" value="SUBMIT AS JSON" onclick="send_json1(); return false;" />
             </td>
           </tr>
 
@@ -173,27 +201,37 @@ $(document).ready ( function ()
     <div class="grid_12"><hr /><h4>Arrays</h4></div>
     <div class="clear"></div>
     <div class="grid_4">
-      Transferring arrays from program to the user interface page is simple. The
-      interface knows how to format arrays for all basic data types.<br />
-      When posting data back from HTML page to the program we have to establish
-      a convention because the browser's posting mechanism has no concept of array.<br />
-      So, by convention, array elements are named <em>&lt;array&gt;_&lt;index&gt;</em>.
-      Note that index value is checked against the limit set in the data dictionary
-      entry for the array.
+      <p>
+        Transferring arrays from program to the user interface page is simple. The
+        interface knows how to serialize arrays for all basic data types.
+      </p>
+      <p>
+        When posting data back from HTML page to the program, we have to establish
+        a convention because the browser's posting mechanism has no concept of array.<br />
+        So, by convention, array elements are named <em>&lt;array&gt;_&lt;index&gt;</em>.
+        Note that server checks index values against the limit set in the data dictionary
+        entry for the array.
+      </p>
+      
     </div>
     <div class="grid_8">
       Integer array iarr:<p />
-      <form method="post" action="/var">
+      <form method="post" id="form2" action="/var">
         <table>
           <tr>
             <td><input id="iarr_0" name="iarr_0" size="4" /></td>
             <td><input id="iarr_1" name="iarr_1" size="4" /></td>
             <td><input id="iarr_2" name="iarr_2" size="4" /></td>
             <td><input id="iarr_3" name="iarr_3" size="4" /></td>
-            <td><input id="iarr_4" name="iarr_4" size="4" value="Out of bounds" /></td>
+            <td><input id="iarr_4" name="iarr_4" size="4" /></td>
           </tr>
           <tr>
             <td colspan="4" style="text-align:center"><input type="submit" value="SUBMIT" /></td>
+          </tr>
+          <tr>
+            <td colspan="4" style="text-align:center">
+              <input type="button" value="SUBMIT AS JSON" onclick="send_json2(); return false;" />
+            </td>
           </tr>
         </table>
       </form>

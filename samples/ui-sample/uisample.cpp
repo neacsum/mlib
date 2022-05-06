@@ -86,6 +86,7 @@ double pi = M_PI;
 
 httpd       ui_server;      //HTTP server for user interface
 int submit_sarr (const char* uri, http_connection& client, JSONBridge* ui);
+int exit_server (const char* uri, http_connection& client, JSONBridge* ui);
 
 //Data dictionary for user interface
 JSD_STARTDIC (uivars)
@@ -106,6 +107,7 @@ JSD_STARTDIC (uivars)
     JSD (psarr, JT_PSTR, _countof (psarr), 0),
   JSD_ENDOBJ,
   JSD (submit_sarr, JT_POSTFUN, 1, 0),
+  JSD (exit_server, JT_POSTFUN, 1, 0),
   JSDN (pi, "varpi", JT_DBL, 1, 0), //a variable with a different 'external' name
 JSD_ENDDIC;
 
@@ -401,6 +403,12 @@ int submit_sarr (const char* uri, http_connection& client, JSONBridge* ui)
     "sarr[3] " + string (sarr[3]) + "\n"
   };
   utf8::MessageBox (mainWnd, msg, "UI Sample App", MB_OK);
+  return 0;
+}
+
+int exit_server (const char* uri, http_connection& client, JSONBridge* ui)
+{
+  PostMessage (mainWnd, WM_COMMAND, ID_SAMPLE_EXIT, 0);
   return 0;
 }
 

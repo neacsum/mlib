@@ -128,7 +128,11 @@ node& node::operator =(node&& rhs)
   return *this;
 }
 
-/// Return value of an object node element
+/*!
+  Return value of an object node element.
+
+  If \p name doesn't exist, it is appended to node. 
+*/
 node& node::operator[](const std::string& name)
 {
   if (t == type::null)
@@ -165,7 +169,28 @@ const node& node::operator[](const std::string& name) const
   return *p->second;
 }
 
-/// Return value of an array node element
+/*!
+  Return value of an object node element
+  If element doesn't exist throws an ERR_JSON_MISSING exception.
+*/
+const node& node::at (const std::string& name) const
+{
+  if (t != type::object)
+    throw mlib::erc (ERR_JSON_INVTYPE, ERROR_PRI_ERROR, errors);
+
+  try {
+    return *obj.at (name);
+  }
+  catch (std::out_of_range) {
+    throw mlib::erc (ERR_JSON_MISSING, ERROR_PRI_ERROR, errors);
+  }
+}
+
+/*!
+  Return value of an array node element.
+
+  If element doesn't exist the array is extended with null elements.
+*/
 node& node::operator[](size_t index)
 {
   if (t == type::null)
@@ -194,7 +219,7 @@ node& node::operator[](size_t index)
 
 /*!
   Return value of an array node element (const version)
-  If element doesn't exist it throws an ERR_JSON_MISSING exception.
+  If element doesn't exist throws an ERR_JSON_MISSING exception.
 */
 const node& node::operator[](size_t index) const
 {
@@ -205,6 +230,23 @@ const node& node::operator[](size_t index) const
     throw mlib::erc (ERR_JSON_MISSING, ERROR_PRI_ERROR, errors);
 
   return *arr[index];
+}
+
+/*!
+  Return value of an array node element (const version)
+  If element doesn't exist throws an ERR_JSON_MISSING exception.
+*/
+const node& node::at(size_t index) const
+{
+  if (t != type::array)
+    throw mlib::erc (ERR_JSON_INVTYPE, ERROR_PRI_ERROR, errors);
+
+  try {
+    return *arr.at (index);
+  }
+  catch (std::out_of_range) {
+    throw mlib::erc (ERR_JSON_MISSING, ERROR_PRI_ERROR, errors);
+  }
 }
 
 /// Equality operator
@@ -746,6 +788,9 @@ double node::to_num () const
   throw mlib::erc (ERR_JSON_INVTYPE, ERROR_PRI_ERROR, errors);
 }
 
+/*!
+  String conversion function
+*/
 string node::to_str () const
 {
   if (t == type::string)
@@ -757,6 +802,29 @@ string node::to_str () const
 
   throw mlib::erc (ERR_JSON_INVTYPE, ERROR_PRI_ERROR, errors);
 }
+
+/*!
+  Conversion to boolean value
+*/
+bool node::to_bool () const
+{
+  if (t == type::boolean)
+    return logic;
+  if (t == type::string)
+  {
+    auto s = utf8::tolower(str);
+    if (s == "false" || s== "0" || s == "off")
+      return false;
+    if (s == "true" || s == "1" || s == "on")
+      return true;
+  }
+  else if (t == type::numeric)
+  {
+    return (num != 0);
+  }
+  throw mlib::erc (ERR_JSON_INVTYPE, ERROR_PRI_ERROR, errors);
+}
+
 void indenter (std::ios_base& os, int spaces)
 {
   os.iword (ostream_flags) &= ~0xff;

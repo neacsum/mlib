@@ -309,6 +309,7 @@ public:
     return *this;
   }
 
+  //type conversions
   explicit operator std::string () const;
   explicit operator const char* () const;
   explicit operator double () const;
@@ -317,13 +318,18 @@ public:
 
   double to_num () const;
   std::string to_str () const;
+  bool to_bool () const;
 
   //indexing
   node& operator [](const std::string& name);
   const node& operator [](const std::string& name) const;
+  node& at (const std::string& name);
+  const node& at (const std::string& name) const;
 
   node& operator [](size_t index);
   const node& operator [](size_t index) const;
+  node& at (size_t index);
+  const node& at (size_t index) const;
 
   const_iterator begin () const;
   iterator begin ();
@@ -490,10 +496,7 @@ inline node::operator int () const
 /// Return boolean value of the node
 inline node::operator bool () const
 {
-  if (t == type::boolean)
-    return logic;
-
-  throw mlib::erc (ERR_JSON_INVTYPE, ERROR_PRI_ERROR, errors);
+  return to_bool ();
 }
 
 /// Remove previous node content
@@ -537,6 +540,26 @@ inline int node::size () const
 inline bool node::operator!=(const node& other) const
 {
   return !operator ==(other);
+}
+
+/*!
+  Return value of an object node element
+  If element doesn't exist it throws an ERR_JSON_MISSING exception.
+*/
+inline
+node& node::at (const std::string& name)
+{
+  return const_cast<node&>(static_cast<const node&>(*this).at (name));
+}
+
+/*!
+  Return value of an object node element
+  If element doesn't exist it throws an ERR_JSON_MISSING exception.
+*/
+inline
+node& node::at (size_t index)
+{
+  return const_cast<node&>(static_cast<const node&>(*this).at (index));
 }
 
 // manipulators

@@ -51,7 +51,7 @@ static int hexbyte (char *bin, const char *str);
   attach_to() function. Behind the scene, this function registers a handler function
   for the path associated with the JSONBridge. 
   
-  Assume the HTTP server hs answers requests sent to http://localhost:8080 and 
+  Assume the HTTP server `hs` answers requests sent to `http://localhost:8080` and 
   the JSONBridge object was created
   as:
   \code
@@ -62,7 +62,7 @@ static int hexbyte (char *bin, const char *str);
   \code
     jb.attach_to(hs);
   \endcode
-  will register a handler for requests to http://localhost:8080/var
+  will register a handler for requests to `http://localhost:8080/var`
 
   If this handler is invoked with a GET request for http://localhost:8080/var?data
   it will search in the JSON dictionary a variable called 'data' and return it's
@@ -70,7 +70,7 @@ static int hexbyte (char *bin, const char *str);
 */
 
 ///Creates a JSONBridge object for the given path
-JSONBridge::JSONBridge (const char *path, JSONVAR* dict)
+JSONBridge::JSONBridge (const char *path, JSONDICT& dict)
   : path_ (path)
   , dictionary (dict)
   , client_ (0)
@@ -299,8 +299,9 @@ JSONVAR* JSONBridge::find (const std::string& name, int* pidx)
 
   if (pnum != string::npos)
   {
+    string stail = lookup.substr (pnum + 1).c_str ();
     char *tail;
-    *pidx = strtol (lookup.substr (pnum+1).c_str(), &tail, 10);
+    *pidx = strtol (stail.c_str(), &tail, 10);
 
     if (*tail || *pidx < 0) //if name doesn't match <var>_<number> or index is negative...
     {                       //...search dictionary for whole name
@@ -311,10 +312,8 @@ JSONVAR* JSONBridge::find (const std::string& name, int* pidx)
   }
 
   int lvl = 0;
-  for (entry = dictionary; !entry->name.empty(); entry++)
+  for (entry = dictionary.data(); lvl >= 0; entry++)
   {
-    assert (lvl >= 0); //sanity check
-
     //search only top level entries
     if (entry->type == JT_OBJECT)
       lvl++;
@@ -427,43 +426,73 @@ bool JSONBridge::parse_urlencoded ()
 
 bool JSONBridge::parse_jsonencoded ()
 {
-  json::node n;
+  json::node rcvd;
 
-  n.read (client ().get_body ());
-  if (n.kind () != json::type::object)
-    return false; //only JSON objects can be parsed
-
-  for (auto p = n.begin (); p != n.end (); p++)
+  rcvd.read (client ().get_body ());
+  if (rcvd.kind () == json::type::object)
   {
-    const JSONVAR* k = find (p.name ());
-    if (!k)
+    for (auto p = rcvd.begin (); p != rcvd.end (); p++)
     {
-      TRACE ("Key %s not found in dictionary", p.name().c_str());
-      continue;
-    }
-    if (p->kind () == json::type::object)
-    {
-      //TODO - support multiple level objects
-      TRACE ("Multiple level objects not supported yet! %s", p.name ().c_str ());
-      return false;
-    }
-
-    try {
-      const json::node& n = *p;
-      if (n.kind () == json::type::array)
+      const JSONVAR* k = find (p.name ());
+      if (!k)
       {
-        for (int idx = 0; idx < n.size () && idx < k->cnt; idx++)
-          deserialize_node (n[idx], k, idx);
+        TRACE ("Key %s not found in dictionary", p.name ().c_str ());
+        continue;
       }
-      else
-        deserialize_node (n, k);
+      if (p->kind () == json::type::object)
+      {
+        //TODO - support multiple level objects
+        TRACE ("Multiple level objects not supported yet! %s", p.name ().c_str ());
+        return false;
+      }
+
+      try {
+        const json::node& n = *p;
+        if (n.kind () == json::type::array)
+        {
+          for (int idx = 0; idx < n.size () && idx < k->cnt; idx++)
+            deserialize_node (n[idx], k, idx);
+        }
+        else
+          deserialize_node (n, k);
+      }
+      catch (erc&) {
+        TRACE ("Error %d while processing node %s", p.name ().c_str ());
+        return false;
+      }
     }
-    catch (erc& ) {
-      TRACE ("Error %d while processing node %s", p.name ().c_str ());
-      return false;
-    }
+    return true;
   }
-  return true;
+  else if (rcvd.kind () == json::type::array)
+  {
+    /* array of name / value objects like the result of jQuery serializeArray
+       https://api.jquery.com/serializearray/  */
+    for (auto p=rcvd.begin(); p != rcvd.end(); ++p)
+    {
+      if (p->kind () == json::type::object
+        && p->has ("name")
+        && p->has("value"))
+      {
+        int idx;
+        string name = (string)p->at("name");
+        const JSONVAR* k = find (name, &idx);
+        if (!k)
+        {
+          TRACE ("Key %s not found in dictionary", name);
+          continue;
+        }
+        try {
+          deserialize_node (p->at("value"), k, idx);
+        }
+        catch (erc&) {
+          TRACE ("Error %d while processing node %s", name);
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+  return false; //only objects and some arrays can be parsed
 }
 
 int JSONBridge::callback (const char *uri, http_connection& client, JSONBridge *ctx)
