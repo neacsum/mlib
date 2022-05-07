@@ -32,17 +32,22 @@ enum js_type {
 };
 
 /// JSON data dictionary entry
-struct JSONVAR {
+struct jb_var {
+  jb_var (const std::string& n, void* a, js_type t, unsigned short c=1, unsigned short s=0)
+    : name{ n }, addr{ a }, type{ t }, cnt{ c }, sz{ s } {};
+
   std::string name;     ///< external name of variable
   void *addr;           ///< memory address
   js_type type;         ///< data type (one of JT_... values)
   unsigned short sz;    ///< element size (used only for strings)
   unsigned short cnt;   ///< number of elements
 };
-typedef std::vector<JSONVAR> JSONDICT;
+
+
+typedef std::vector<jb_var> jb_dictionary;
 
 /// Mark the beginning of JSON dictionary
-#define JSD_STARTDIC(dict) JSONDICT dict ={
+#define JSD_STARTDIC(dict) jb_dictionary dict ={
 
 /// Mark the end of JSON dictionary
 #define JSD_ENDDIC {"", 0, JT_ENDOBJ, 0, 0} }
@@ -55,7 +60,7 @@ typedef std::vector<JSONVAR> JSONDICT;
   \param C  Number of elements (for arrays)
   \param S  Element size (only for JT_STR types)
 */
-#define JSD(V, T, C, S) {#V, &##V, T, S, C}
+#define JSD(V, T, ...) {#V, &##V, T, __VA_ARGS__}
 
 
 /*!
@@ -67,27 +72,14 @@ typedef std::vector<JSONVAR> JSONDICT;
   \param C  Number of elements (for arrays)
   \param S  Element size (only for JT_STR and JT_PSTR types)
 */
-#define JSDN(V, N, T, C, S) {N, &##V, T, S, C}
-
-/*!
-  Generates an entry in JSON dictionary for a variable whose address is not
-  yet known. Address must be set using set_var function.
-
-  \param N  External (JSON) name of the variable
-  \param T  Type of variable (one of JT_... values)
-  \param C  Number of elements (for arrays)
-  \param S  Element size (only for JT_STR and JT_PSTR types)
-*/
-#define JSDX(N, T, C, S) {N, nullptr, T, S, C}
+#define JSDN(V, N, T, ...) {N, &##V, T, __VA_ARGS__}
 
 ///Generate entry for a composite object
-#define JSD_OBJECT(N) {N, 0, JT_OBJECT, 0, 1}
+#define JSD_OBJECT(N) {N, nullptr, JT_OBJECT}
 
 ///Generate entry for end of composite object
-#define JSD_ENDOBJ {"", 0, JT_ENDOBJ, 0, 1}
+#define JSD_ENDOBJ {"", nullptr, JT_ENDOBJ}
 
-///Generate entry for POST function call
-#define JSDN_POSTFUNC(F, N) {N, F, JT_POSTFUN, 0, 1}
 
 class JSONBridge;
 typedef void (*post_action)(JSONBridge&);
@@ -95,33 +87,33 @@ typedef void (*post_action)(JSONBridge&);
 /// JSON objects support
 class JSONBridge {
 public:
-  JSONBridge (const char *path, JSONDICT& dict);
+  JSONBridge (const char *path, jb_dictionary& dict);
   ~JSONBridge ();
 
   void attach_to (httpd& server);
   void lock ();
   void unlock ();
-  const std::string& path ();
-  bool set_var (const char *name, void *addr, unsigned short count = 1, unsigned short sz = 0);
+  const std::string& path () const;
+  jb_dictionary& dictionary ();
   void set_action (post_action pfn);
-  http_connection& client ();
+  http_connection* client ();
 
-  bool parse_urlencoded ();
-  bool parse_jsonencoded ();
+  bool parse_urlencoded () const;
+  bool parse_jsonencoded () const;
 
 protected:
-  erc jsonify (json::node& n, const JSONVAR*& entry);
+  erc jsonify (json::node& n, const jb_var*& entry);
   void not_found (const char *varname);
-  JSONVAR* find (const std::string& name, int* idx = 0);
+  const jb_var* find (const std::string& name, int* idx = 0) const;
 
 private:
   erc json_begin (json::node& obj);
   erc json_end (json::node& obj);
-  erc serialize_node (json::node& n, const JSONVAR*& entry, int index=0);
-  erc deserialize_node (const json::node& n, const JSONVAR*& entry, int index = 0);
+  erc serialize_node (json::node& n, const jb_var*& entry, int index=0);
+  erc deserialize_node (const json::node& n, const jb_var*& entry, int index = 0) const;
 
   std::string path_;
-  std::vector <JSONVAR> dictionary;
+  std::vector <jb_var> dict_;
   http_connection *client_;
   criticalsection in_use;
   post_action action;
@@ -133,18 +125,38 @@ private:
 
 /// Enter the critical section associated with this context
 inline
-void JSONBridge::lock (){ in_use.enter (); }
+void JSONBridge::lock ()
+{
+  in_use.enter ();
+}
 
 /// Leave the critical section associated with this context
 inline
-void JSONBridge::unlock (){ in_use.leave (); }
+void JSONBridge::unlock ()
+{
+  in_use.leave ();
+}
 
 /// Return the context path 
 inline
-const std::string& JSONBridge::path () { return path_; }
+const std::string& JSONBridge::path () const 
+{
+  return path_;
+}
 
+/// Return data dictionary
 inline
-http_connection& JSONBridge::client () { return *client_; };
+jb_dictionary& JSONBridge::dictionary () 
+{
+  return dict_;
+}
+
+/// Return currently connected client (if any)
+inline
+http_connection* JSONBridge::client () 
+{
+  return client_;
+};
 
 inline
 void JSONBridge::set_action (post_action pfn)

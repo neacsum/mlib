@@ -41,5 +41,8 @@
     <None Include="main.css">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="about.html">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

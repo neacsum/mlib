@@ -152,6 +152,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="include\mlib\asset.h" />
     <ClInclude Include="include\mlib\base64.h" />
     <ClInclude Include="include\mlib\basename.h" />
     <ClInclude Include="include\mlib\biosuuid.h" />
@@ -200,6 +201,7 @@
     <ClInclude Include="include\mlib\wtimer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="source\asset.cpp" />
     <ClCompile Include="source\base64.cpp" />
     <ClCompile Include="source\basename.cpp" />
     <ClCompile Include="source\biosuuid.cpp" />

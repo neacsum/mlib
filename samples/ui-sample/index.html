@@ -4,11 +4,11 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>Sample User Interface</title>
 <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<link rel="stylesheet" type="text/css" media="all" href="main.css" />
+<link rel="stylesheet" type="text/css" media="all" href="css/main.css" />
 
 <script type="text/javascript">
-var sample_default =
-'{ \
+  var sample_default =
+    '{ \
  "hvar": 111,\n\
  "huvar": 222,\n\
  "ivar": 333,\n\
@@ -25,78 +25,76 @@ var sample_default =
  "psarr": [\"IJ\", \"KL\", \"MN\", \"OP\"]\n\
 }';
 
-function set_fields (json)
-{
-  $("#hvar").val(json.hvar);
-  $("#huvar").val("0x"+json.huvar.toString(16));
-  $("#ivar").val(json.ivar);
-  $("#iuvar").val(json.iuvar.toString());
-  $("#lvar").val(json.lvar);
-  $("#luvar").val(json.luvar.toString());
-  $("#fvar").val(json.fvar);
-  $("#dvar").val(json.dvar);
-  $("#pstr").val(json.pstr);
-  $("#str").val(json.str);
-  $("#bvar").prop('checked', json.bvar);
+  function set_fields(json) {
+    $("#hvar").val(json.hvar);
+    $("#huvar").val("0x" + json.huvar.toString(16));
+    $("#ivar").val(json.ivar);
+    $("#iuvar").val(json.iuvar.toString());
+    $("#lvar").val(json.lvar);
+    $("#luvar").val(json.luvar.toString());
+    $("#fvar").val(json.fvar);
+    $("#dvar").val(json.dvar);
+    $("#pstr").val(json.pstr);
+    $("#str").val(json.str);
+    $("#bvar").prop('checked', json.bvar);
 
-  for (i = 0; $("#iarr_" + i).length; i++)
-  {
-    $("#iarr_" + i).val(i < json.iarr.length?json.iarr[i]: "Out of bounds")
+    for (i = 0; $("#iarr_" + i).length; i++) {
+      $("#iarr_" + i).val(i < json.iarr.length ? json.iarr[i] : "Out of bounds")
+    }
+
+    for (i = 0; i < 4; i++) {
+      $("#sarr_" + i).val(json.sarr[i]);
+      $("#psarr_" + i).html(json.psarr[i]);
+    }
   }
 
-  for (i = 0; i < 4; i++)
-  {
-    $("#sarr_" + i).val(json.sarr[i]);
-    $("#psarr_" + i).html(json.psarr[i]);
+  /*
+    Shows how to send JSON data in a POST message using .serializeArray function
+  */
+  function send_json1() {
+    const data = $("#form1").serializeArray();
+    $.post({ url: "/var", data: JSON.stringify(data), contentType: "application/json" });
+    get_data();
   }
-}
 
-/*
-  Shows how to send JSON data in a POST message using .serializeArray function
-*/
-function send_json1() {
-  const data = $("#form1").serializeArray();
-  $.post({url: "/var", data: JSON.stringify(data), contentType: "application/json"});
-}
+  /*
+    Shows how to send JSON data in a post message. Intentionally here we send
+    more array elements than the size of the corresponding server data.
+  */
+  function send_json2() {
+    const data = new Object();
+    data.iarr = new Array();
 
-/*
-  Shows how to send JSON data in a post message. Intentionally here we send
-  more array elements than the size of the corresponding server data.
-*/
-function send_json2 () {
-  const data = new Object();
-  data.iarr = new Array();
+    //loop over all "iarr_..." elements. Server will take care of bounds checking
+    for (i = 0; $("#iarr_" + i).length; i++)
+      data.iarr[i] = parseInt($("#iarr_" + i).val());
 
-  //loop over all "iarr_..." elements. Server will take care of bounds checking
-  for (i = 0; $("#iarr_"+i).length; i++)
-    data.iarr[i] = parseInt($("#iarr_" + i).val());
+    $.post({ url: "/var", data: JSON.stringify(data), contentType: "application/json" });
+    get_data();
+  }
 
-  $.post({ url: "/var", data: JSON.stringify(data), contentType: "application/json" });
-}
+  function get_data() {
+    $.get("/var?sample", function (r) {
+      set_fields(r)
+    })
+      .fail(function () {
+        set_fields(sample_default)
+      });
+    $.getJSON("/var?varpi", function (r) {
+      $("#pi").html(r);
+    });
 
-$(document).ready ( function ()
-{
-  $.get("/var?sample", function (r)
-  {
-    set_fields(r)
-  })
-  .fail(function ()
-  {
-    set_fields(sample_default)
-  });
-  $.getJSON("/var?varpi", function (r) {
-    $("#pi").html(r);
-  });
+    //request for a non-existent entry
+    $.getJSON("/var?no_such_variable", function (r) { }).fail(function () { console.log("Expected 415 reply") })
+  }
 
-  //request for a non-existent entry
-  $.getJSON("/var?no_such_variable", function (r) { }).fail(function () { console.log("Expected 415 reply") })
-});
+  $(document).ready(get_data());
 
-function exit_server()
-{
-  $.post({ url: "/var?exit_server", data: " "});
-  alert("Thanks for trying the user interface server");
-}
+  function exit_server() {
+    $.post({ url: "/var?exit_server", data: " " });
+    alert("Thanks for trying the user interface server");
+    window.close();
+  }
 
 </script>
 <style>
@@ -120,7 +118,7 @@ function exit_server()
         submitted, all fields are sent as
         <a href="https://en.wikipedia.org/wiki/Percent-encoding">URL encoded</a>
         values. The interface decodes them and assigns new values to corresponding
-        variables. Received values for integer type fields can be decimal, hex or octal.
+        variables.
       </p>
       <p>
         Keep in mind that check-boxes and radio buttons that are not checked are not
@@ -186,10 +184,10 @@ function exit_server()
             </td>
           </tr>
           <tr>
-            <td colspan="2" style="text-align:center"><input type="submit" value="SUBMIT" /></td>
-          </tr>
-          <tr>
-            <td colspan="2" style="text-align:center">
+            <td style="text-align:center">
+              <input type="submit" value="SUBMIT" />
+            </td>
+            <td style="text-align:center">
               <input type="button" value="SUBMIT AS JSON" onclick="send_json1(); return false;" />
             </td>
           </tr>
@@ -226,10 +224,8 @@ function exit_server()
             <td><input id="iarr_4" name="iarr_4" size="4" /></td>
           </tr>
           <tr>
-            <td colspan="4" style="text-align:center"><input type="submit" value="SUBMIT" /></td>
-          </tr>
-          <tr>
-            <td colspan="4" style="text-align:center">
+            <td colspan="2" style="text-align:center"><input type="submit" value="SUBMIT" /></td>
+            <td colspan="2" style="text-align:center">
               <input type="button" value="SUBMIT AS JSON" onclick="send_json2(); return false;" />
             </td>
           </tr>

@@ -70,10 +70,10 @@ static int hexbyte (char *bin, const char *str);
 */
 
 ///Creates a JSONBridge object for the given path
-JSONBridge::JSONBridge (const char *path, JSONDICT& dict)
+JSONBridge::JSONBridge (const char *path, jb_dictionary& dict)
   : path_ (path)
-  , dictionary (dict)
-  , client_ (0)
+  , dict_ (dict)
+  , client_ (nullptr)
   , action (nullptr)
 {
 }
@@ -91,13 +91,13 @@ void JSONBridge::attach_to (httpd& server)
 ///  
 erc JSONBridge::json_begin (json::node& root)
 {
-  TRACE9 ("JSONBridge::json_begin - %s", client ().get_query ());
+  TRACE9 ("JSONBridge::json_begin - %s", client ()->get_query ());
   mlib::lock l(in_use);
   int idx;
-  const JSONVAR *entry = find (client().get_query (), &idx);
+  const jb_var *entry = find (client()->get_query (), &idx);
   if (!entry)
   {
-    TRACE2 ("JSONBridge::json_begin - Cannot find %s", client ().get_query ());
+    TRACE2 ("JSONBridge::json_begin - Cannot find %s", client ()->get_query ());
     return erc (ERR_JSON_NOTFOUND, ERROR_PRI_ERROR);
   }
   return jsonify (root, entry);
@@ -111,7 +111,7 @@ erc JSONBridge::json_end (json::node& obj)
     stringstream ss;
     ss << fixed << obj;
 
-    client ().out ()
+    client ()->out ()
       << "HTTP/1.1 200 OK\r\n"
       "Cache-Control: no-cache, no-store\r\n"
       "Content-Type: application/json\r\n"
@@ -130,7 +130,7 @@ erc JSONBridge::json_end (json::node& obj)
 }
 
 /// Serializes a variable to JSON format
-erc JSONBridge::jsonify (json::node& n, const JSONVAR*& entry)
+erc JSONBridge::jsonify (json::node& n, const jb_var*& entry)
 {
   try {
     if (entry->cnt > 1)
@@ -148,7 +148,7 @@ erc JSONBridge::jsonify (json::node& n, const JSONVAR*& entry)
   }
 }
 
-erc JSONBridge::serialize_node (json::node& n, const JSONVAR*& entry, int index)
+erc JSONBridge::serialize_node (json::node& n, const jb_var*& entry, int index)
 {
   char* addr;
 
@@ -212,7 +212,7 @@ erc JSONBridge::serialize_node (json::node& n, const JSONVAR*& entry, int index)
   return ERR_SUCCESS;
 }
 
-erc JSONBridge::deserialize_node (const json::node& n, const JSONVAR*& entry, int index)
+erc JSONBridge::deserialize_node (const json::node& n, const jb_var*& entry, int index) const
 {
   void* pv;
 
@@ -274,7 +274,7 @@ void JSONBridge::not_found (const char *varname)
   string tmp = "HTTP/1.1 415 Unknown variable %s\r\n";
   tmp += varname;
 
-  client().out() << "HTTP/1.1 415 Unknown variable " << varname << "\r\n"
+  client()->out() << "HTTP/1.1 415 Unknown variable " << varname << "\r\n"
     << "Content-Type: text/plain\r\n"
     << "Content-Length: " << tmp.size() << "\r\n\r\n"
     << tmp
@@ -285,9 +285,8 @@ void JSONBridge::not_found (const char *varname)
   Search a variable in JSON dictionary. The variable name can be a construct
   `<name>_<index>` for an indexed variable.
 */
-JSONVAR* JSONBridge::find (const std::string& name, int* pidx)
+const jb_var* JSONBridge::find (const std::string& name, int* pidx) const
 {
-  JSONVAR *entry;
   int tmpidx;
   string lookup = name;
 
@@ -312,7 +311,7 @@ JSONVAR* JSONBridge::find (const std::string& name, int* pidx)
   }
 
   int lvl = 0;
-  for (entry = dictionary.data(); lvl >= 0; entry++)
+  for (auto entry = dict_.data(); lvl >= 0; entry++)
   {
     //search only top level entries
     if (entry->type == JT_OBJECT)
@@ -334,40 +333,25 @@ JSONVAR* JSONBridge::find (const std::string& name, int* pidx)
   return NULL;
 }
 
-/// Set/change address of a dictionary entry
-bool JSONBridge::set_var (const char *name, void *addr, unsigned short count, unsigned short sz)
-{
-  int idx;
-  JSONVAR *entry = find (name, &idx);
-  if (!entry || idx != 0)
-    return false;
-
-  entry->addr = addr;
-  entry->cnt = count;
-  entry->sz = sz;
-  return true;
-}
-
 /*!
   Parse the URL-encoded body of a POST request assigning new values to all
   variables.
 */
-bool JSONBridge::parse_urlencoded ()
+bool JSONBridge::parse_urlencoded () const
 {
   char val[1024];
   int idx;
   void *pv;
 
-  mlib::lock l (in_use);
   str_pairs vars;
-  parse_urlparams (client().get_body (), vars);
+  parse_urlparams (client_->get_body (), vars);
   for (auto var = vars.begin (); var != vars.end (); var++)
   {
     if (!var->second.length ())
       continue;     // missing '=value' part of 'key=value' construct
 
     strcpy (val, var->second.c_str ());
-    const JSONVAR *k = find (var->first.c_str (), &idx);
+    const jb_var *k = find (var->first.c_str (), &idx);
     if (!k)
     {
       TRACE ("Posted key %s not found in dictionary", var->first.c_str ());
@@ -424,16 +408,16 @@ bool JSONBridge::parse_urlencoded ()
   return true;
 }
 
-bool JSONBridge::parse_jsonencoded ()
+bool JSONBridge::parse_jsonencoded () const
 {
   json::node rcvd;
 
-  rcvd.read (client ().get_body ());
+  rcvd.read (client_->get_body ());
   if (rcvd.kind () == json::type::object)
   {
     for (auto p = rcvd.begin (); p != rcvd.end (); p++)
     {
-      const JSONVAR* k = find (p.name ());
+      const jb_var* k = find (p.name ());
       if (!k)
       {
         TRACE ("Key %s not found in dictionary", p.name ().c_str ());
@@ -475,7 +459,7 @@ bool JSONBridge::parse_jsonencoded ()
       {
         int idx;
         string name = (string)p->at("name");
-        const JSONVAR* k = find (name, &idx);
+        const jb_var* k = find (name, &idx);
         if (!k)
         {
           TRACE ("Key %s not found in dictionary", name);
@@ -522,7 +506,7 @@ int JSONBridge::callback (const char *uri, http_connection& client, JSONBridge *
       [] (char c)->char {return tolower (c); });
 
 
-    const JSONVAR* entry;
+    const jb_var* entry;
     if (strlen (client.get_query ())
       && (entry = ctx->find (client.get_query ()))
       && entry->type == JT_POSTFUN)
@@ -538,6 +522,7 @@ int JSONBridge::callback (const char *uri, http_connection& client, JSONBridge *
     if (ok && ctx->action)
       ctx->action (*ctx);
   }
+  ctx->client_ = nullptr;
   ctx->unlock ();
   return 1;
 }
