@@ -51,7 +51,7 @@ static int hexbyte (char *bin, const char *str);
   attach_to() function. Behind the scene, this function registers a handler function
   for the path associated with the JSONBridge. 
   
-  Assume the HTTP server hs answers requests sent to http://localhost:8080 and 
+  Assume the HTTP server `hs` answers requests sent to `http://localhost:8080` and 
   the JSONBridge object was created
   as:
   \code
@@ -62,7 +62,7 @@ static int hexbyte (char *bin, const char *str);
   \code
     jb.attach_to(hs);
   \endcode
-  will register a handler for requests to http://localhost:8080/var
+  will register a handler for requests to `http://localhost:8080/var`
 
   If this handler is invoked with a GET request for http://localhost:8080/var?data
   it will search in the JSON dictionary a variable called 'data' and return it's
@@ -70,10 +70,10 @@ static int hexbyte (char *bin, const char *str);
 */
 
 ///Creates a JSONBridge object for the given path
-JSONBridge::JSONBridge (const char *path, JSONVAR* dict)
+JSONBridge::JSONBridge (const char *path, jb_dictionary& dict)
   : path_ (path)
-  , dictionary (dict)
-  , client_ (0)
+  , dict_ (dict)
+  , client_ (nullptr)
   , action (nullptr)
 {
 }
@@ -91,13 +91,13 @@ void JSONBridge::attach_to (httpd& server)
 ///  
 erc JSONBridge::json_begin (json::node& root)
 {
-  TRACE9 ("JSONBridge::json_begin - %s", client ().get_query ());
+  TRACE9 ("JSONBridge::json_begin - %s", client ()->get_query ());
   mlib::lock l(in_use);
   int idx;
-  const JSONVAR *entry = find (client().get_query (), &idx);
+  const jb_var *entry = find (client()->get_query (), &idx);
   if (!entry)
   {
-    TRACE2 ("JSONBridge::json_begin - Cannot find %s", client ().get_query ());
+    TRACE2 ("JSONBridge::json_begin - Cannot find %s", client ()->get_query ());
     return erc (ERR_JSON_NOTFOUND, ERROR_PRI_ERROR);
   }
   return jsonify (root, entry);
@@ -111,7 +111,7 @@ erc JSONBridge::json_end (json::node& obj)
     stringstream ss;
     ss << fixed << obj;
 
-    client ().out ()
+    client ()->out ()
       << "HTTP/1.1 200 OK\r\n"
       "Cache-Control: no-cache, no-store\r\n"
       "Content-Type: application/json\r\n"
@@ -130,7 +130,7 @@ erc JSONBridge::json_end (json::node& obj)
 }
 
 /// Serializes a variable to JSON format
-erc JSONBridge::jsonify (json::node& n, const JSONVAR*& entry)
+erc JSONBridge::jsonify (json::node& n, const jb_var*& entry)
 {
   try {
     if (entry->cnt > 1)
@@ -148,7 +148,7 @@ erc JSONBridge::jsonify (json::node& n, const JSONVAR*& entry)
   }
 }
 
-erc JSONBridge::serialize_node (json::node& n, const JSONVAR*& entry, int index)
+erc JSONBridge::serialize_node (json::node& n, const jb_var*& entry, int index)
 {
   char* addr;
 
@@ -212,7 +212,7 @@ erc JSONBridge::serialize_node (json::node& n, const JSONVAR*& entry, int index)
   return ERR_SUCCESS;
 }
 
-erc JSONBridge::deserialize_node (const json::node& n, const JSONVAR*& entry, int index)
+erc JSONBridge::deserialize_node (const json::node& n, const jb_var*& entry, int index) const
 {
   void* pv;
 
@@ -227,36 +227,36 @@ erc JSONBridge::deserialize_node (const json::node& n, const JSONVAR*& entry, in
       pv = *(char**)pv; //one more level of indirection
       //flow through to JT_STR case. Don't break them apart!
     case JT_STR:
-      strncpy ((char*)pv, n.to_string ().c_str (), entry->sz);
+      strncpy ((char*)pv, (const char*)n, entry->sz);
       if (entry->sz)
         *((char*)pv + entry->sz - 1) = 0; //always null-terminated
       break;
     case JT_INT:
-      *(int*)pv = (int)n.to_number ();
+      *(int*)pv = static_cast<int>(n);
       break;
     case JT_UINT:
-      *(unsigned int*)pv = (unsigned int)n.to_number ();
+      *(unsigned int*)pv = static_cast<int>(n);
       break;
     case JT_SHORT:
-      *(short*)pv = (short)n.to_number ();
+      *(short*)pv = static_cast<int>(n);
       break;
     case JT_USHORT:
-      *(unsigned short*)pv = (unsigned short)n.to_number ();
+      *(unsigned short*)pv = static_cast<int>(n);
       break;
     case JT_LONG:
-      *(long*)pv = (long)n.to_number ();
+      *(long*)pv = static_cast<int>(n);
       break;
     case JT_ULONG:
-      *(unsigned long*)pv = (unsigned long)n.to_number ();
+      *(unsigned long*)pv = static_cast<int>(n);
       break;
     case JT_FLT:
-      *(float*)pv = (float)n.to_number ();
+      *(float*)pv = (float)static_cast<double>(n);
       break;
     case JT_DBL:
-      *(double*)pv = n.to_number ();
+      *(double*)pv = static_cast<double>(n);
       break;
     case JT_BOOL:
-      *(bool*)pv = n.to_bool ();
+      *(bool*)pv = static_cast<bool>(n);
       break;
     default:
       TRACE ("Unexpected entry type: %d", entry->type);
@@ -274,7 +274,7 @@ void JSONBridge::not_found (const char *varname)
   string tmp = "HTTP/1.1 415 Unknown variable %s\r\n";
   tmp += varname;
 
-  client().out() << "HTTP/1.1 415 Unknown variable " << varname << "\r\n"
+  client()->out() << "HTTP/1.1 415 Unknown variable " << varname << "\r\n"
     << "Content-Type: text/plain\r\n"
     << "Content-Length: " << tmp.size() << "\r\n\r\n"
     << tmp
@@ -285,9 +285,8 @@ void JSONBridge::not_found (const char *varname)
   Search a variable in JSON dictionary. The variable name can be a construct
   `<name>_<index>` for an indexed variable.
 */
-JSONVAR* JSONBridge::find (const std::string& name, int* pidx)
+const jb_var* JSONBridge::find (const std::string& name, int* pidx) const
 {
-  JSONVAR *entry;
   int tmpidx;
   string lookup = name;
 
@@ -299,8 +298,9 @@ JSONVAR* JSONBridge::find (const std::string& name, int* pidx)
 
   if (pnum != string::npos)
   {
+    string stail = lookup.substr (pnum + 1).c_str ();
     char *tail;
-    *pidx = strtol (lookup.substr (pnum+1).c_str(), &tail, 10);
+    *pidx = strtol (stail.c_str(), &tail, 10);
 
     if (*tail || *pidx < 0) //if name doesn't match <var>_<number> or index is negative...
     {                       //...search dictionary for whole name
@@ -311,10 +311,8 @@ JSONVAR* JSONBridge::find (const std::string& name, int* pidx)
   }
 
   int lvl = 0;
-  for (entry = dictionary; !entry->name.empty(); entry++)
+  for (auto entry = dict_.data(); lvl >= 0; entry++)
   {
-    assert (lvl >= 0); //sanity check
-
     //search only top level entries
     if (entry->type == JT_OBJECT)
       lvl++;
@@ -335,40 +333,25 @@ JSONVAR* JSONBridge::find (const std::string& name, int* pidx)
   return NULL;
 }
 
-/// Set/change address of a dictionary entry
-bool JSONBridge::set_var (const char *name, void *addr, unsigned short count, unsigned short sz)
-{
-  int idx;
-  JSONVAR *entry = find (name, &idx);
-  if (!entry || idx != 0)
-    return false;
-
-  entry->addr = addr;
-  entry->cnt = count;
-  entry->sz = sz;
-  return true;
-}
-
 /*!
   Parse the URL-encoded body of a POST request assigning new values to all
   variables.
 */
-bool JSONBridge::parse_urlencoded ()
+bool JSONBridge::parse_urlencoded () const
 {
   char val[1024];
   int idx;
   void *pv;
 
-  mlib::lock l (in_use);
   str_pairs vars;
-  parse_urlparams (client().get_body (), vars);
+  parse_urlparams (client_->get_body (), vars);
   for (auto var = vars.begin (); var != vars.end (); var++)
   {
     if (!var->second.length ())
       continue;     // missing '=value' part of 'key=value' construct
 
     strcpy (val, var->second.c_str ());
-    const JSONVAR *k = find (var->first.c_str (), &idx);
+    const jb_var *k = find (var->first.c_str (), &idx);
     if (!k)
     {
       TRACE ("Posted key %s not found in dictionary", var->first.c_str ());
@@ -425,45 +408,75 @@ bool JSONBridge::parse_urlencoded ()
   return true;
 }
 
-bool JSONBridge::parse_jsonencoded ()
+bool JSONBridge::parse_jsonencoded () const
 {
-  json::node n;
+  json::node rcvd;
 
-  n.read (client ().get_body ());
-  if (n.kind () != json::type::object)
-    return false; //only JSON objects can be parsed
-
-  for (auto p = n.begin (); p != n.end (); p++)
+  rcvd.read (client_->get_body ());
+  if (rcvd.kind () == json::type::object)
   {
-    const JSONVAR* k = find (p.name ());
-    if (!k)
+    for (auto p = rcvd.begin (); p != rcvd.end (); p++)
     {
-      TRACE ("Key %s not found in dictionary", p.name().c_str());
-      continue;
-    }
-    if (p->kind () == json::type::object)
-    {
-      //TODO - support multiple level objects
-      TRACE ("Multiple level objects not supported yet! %s", p.name ().c_str ());
-      return false;
-    }
-
-    try {
-      const json::node& n = *p;
-      if (n.kind () == json::type::array)
+      const jb_var* k = find (p.name ());
+      if (!k)
       {
-        for (int idx = 0; idx < n.size () && idx < k->cnt; idx++)
-          deserialize_node (n[idx], k, idx);
+        TRACE ("Key %s not found in dictionary", p.name ().c_str ());
+        continue;
       }
-      else
-        deserialize_node (n, k);
+      if (p->kind () == json::type::object)
+      {
+        //TODO - support multiple level objects
+        TRACE ("Multiple level objects not supported yet! %s", p.name ().c_str ());
+        return false;
+      }
+
+      try {
+        const json::node& n = *p;
+        if (n.kind () == json::type::array)
+        {
+          for (int idx = 0; idx < n.size () && idx < k->cnt; idx++)
+            deserialize_node (n[idx], k, idx);
+        }
+        else
+          deserialize_node (n, k);
+      }
+      catch (erc&) {
+        TRACE ("Error %d while processing node %s", p.name ().c_str ());
+        return false;
+      }
     }
-    catch (erc& ) {
-      TRACE ("Error %d while processing node %s", p.name ().c_str ());
-      return false;
-    }
+    return true;
   }
-  return true;
+  else if (rcvd.kind () == json::type::array)
+  {
+    /* array of name / value objects like the result of jQuery serializeArray
+       https://api.jquery.com/serializearray/  */
+    for (auto p=rcvd.begin(); p != rcvd.end(); ++p)
+    {
+      if (p->kind () == json::type::object
+        && p->has ("name")
+        && p->has("value"))
+      {
+        int idx;
+        string name = (string)p->at("name");
+        const jb_var* k = find (name, &idx);
+        if (!k)
+        {
+          TRACE ("Key %s not found in dictionary", name);
+          continue;
+        }
+        try {
+          deserialize_node (p->at("value"), k, idx);
+        }
+        catch (erc&) {
+          TRACE ("Error %d while processing node %s", name);
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+  return false; //only objects and some arrays can be parsed
 }
 
 int JSONBridge::callback (const char *uri, http_connection& client, JSONBridge *ctx)
@@ -493,7 +506,7 @@ int JSONBridge::callback (const char *uri, http_connection& client, JSONBridge *
       [] (char c)->char {return tolower (c); });
 
 
-    const JSONVAR* entry;
+    const jb_var* entry;
     if (strlen (client.get_query ())
       && (entry = ctx->find (client.get_query ()))
       && entry->type == JT_POSTFUN)
@@ -509,6 +522,7 @@ int JSONBridge::callback (const char *uri, http_connection& client, JSONBridge *
     if (ok && ctx->action)
       ctx->action (*ctx);
   }
+  ctx->client_ = nullptr;
   ctx->unlock ();
   return 1;
 }

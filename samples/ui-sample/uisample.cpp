@@ -37,17 +37,21 @@
 #include <utf8/utf8.h>
 #include <utf8/winutf8.h>
 #include <mlib/basename.h>
-#include <mlib/rdir.h>
 #include <assert.h>
 #include <mlib/log.h>
 #include <direct.h>
 #include <mlib/convert.h>
+#include <mlib/asset.h>
 
 #include "resource.h"
 #include <mlib/jbridge.h>
 
 using namespace std;
 using namespace mlib;
+
+//Number to string conversion macro
+#define STR(X) #X
+#define STRINGIZE(X) STR(X)
 
 #define SERVER_PORT   8080           //http port
 #define SERVER_WNDCLASSNAME   L"uisample"
@@ -86,27 +90,29 @@ double pi = M_PI;
 
 httpd       ui_server;      //HTTP server for user interface
 int submit_sarr (const char* uri, http_connection& client, JSONBridge* ui);
+int exit_server (const char* uri, http_connection& client, JSONBridge* ui);
 
 //Data dictionary for user interface
 JSD_STARTDIC (uivars)
   JSD_OBJECT ("sample"),
-    JSD (iarr, JT_INT, _countof (iarr), 0),
-    JSD (hvar, JT_SHORT, 1, 0),
-    JSD (huvar, JT_USHORT, 1, 0),
-    JSD (ivar, JT_INT, 1, 0),
-    JSD (iuvar, JT_UINT, 1, 0),
-    JSD (lvar, JT_LONG, 1, 0),
-    JSD (luvar, JT_ULONG, 1, 0),
-    JSD (fvar, JT_FLT, 1, 0),
-    JSD (dvar, JT_DBL, 1, 0),
+    JSD (iarr, JT_INT, _countof (iarr)),
+    JSD (hvar, JT_SHORT),
+    JSD (huvar, JT_USHORT),
+    JSD (ivar, JT_INT),
+    JSD (iuvar, JT_UINT),
+    JSD (lvar, JT_LONG),
+    JSD (luvar, JT_ULONG),
+    JSD (fvar, JT_FLT),
+    JSD (dvar, JT_DBL),
     JSD (pstr, JT_PSTR, 1, sizeof (str1)),
     JSD (str, JT_STR, 1, sizeof (str)),
-    JSD (bvar, JT_BOOL, 1, 0),
+    JSD (bvar, JT_BOOL),
     JSD (sarr, JT_STR, _countof (sarr), sizeof (sarr[0])),
-    JSD (psarr, JT_PSTR, _countof (psarr), 0),
+    JSD (psarr, JT_PSTR, _countof (psarr)),
   JSD_ENDOBJ,
-  JSD (submit_sarr, JT_POSTFUN, 1, 0),
-  JSDN (pi, "varpi", JT_DBL, 1, 0), //a variable with a different 'external' name
+  JSD (submit_sarr, JT_POSTFUN),
+  JSD (exit_server, JT_POSTFUN),
+  JSDN (pi, "varpi", JT_DBL), //a variable with a different 'external' name
 JSD_ENDDIC;
 
 /*
@@ -119,21 +125,13 @@ variable will be formatted as a JSON string and sent back to the client.
 JSONBridge  user_interface ("var", uivars);
 
 //Assets for HTTP server
-struct asset {
-  asset (const char *name_, int id_) : name (name_), id (id_) {};
-  bool write (const std::string& path);
-  bool remove () { return utf8::remove (fullpath); };
-
-  const std::string name;
-  int id;
-private:
-  std::string fullpath;
-};
 
 std::vector<asset> assets {
   { "index.html", IDR_INDEX_HTML },
+  { "about.html", IDR_ABOUT_HTML },
+  { "favicon.ico", IDR_FAVICON_ICO },
 //  { "jquery.js", IDR_JQUERY_JS },
-  { "main.css", IDR_MAIN_CSS },
+  { "css/main.css", IDR_MAIN_CSS },
 };
 
 
@@ -153,7 +151,6 @@ LRESULT WINAPI WndProc (HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
   int wmId, wmEvent;
   static HMENU menu = 0;
   static char balloon[256];
-  char cmd[256];
 
   switch (message)
   {
@@ -167,8 +164,10 @@ LRESULT WINAPI WndProc (HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     switch (wmId)
     {
     case ID_OPENINTERFACE:
-      sprintf_s (cmd, "http://localhost:%d", SERVER_PORT);
-      utf8::ShellExecute (cmd, "open");
+      utf8::ShellExecute ("http://localhost:" STRINGIZE(SERVER_PORT));
+      break;
+    case ID_SAMPLE_ABOUT:
+      utf8::ShellExecute ("http://localhost:" STRINGIZE (SERVER_PORT) "/about.html");
       break;
 
     case ID_SAMPLE_EXIT:
@@ -247,7 +246,7 @@ int APIENTRY WinMain (HINSTANCE hInstance, HINSTANCE, LPSTR /*lpCmdLine*/, int /
   utf8::mkdir (docroot);
 
   /*Expand all assets in temp folder*/
-  for (auto a : assets)
+  for (auto& a : assets)
     a.write (docroot);
 
   //Configure UI server
@@ -258,7 +257,7 @@ int APIENTRY WinMain (HINSTANCE hInstance, HINSTANCE, LPSTR /*lpCmdLine*/, int /
   user_interface.attach_to (ui_server);
 
   //Set action after receiving user data
-  user_interface.set_action ([](JSONBridge& ui) {ui.client ().redirect ("/"); });
+  user_interface.set_action ([](JSONBridge& ui) {ui.client ()->redirect ("/"); });
 
   //Start the server
   ui_server.start ();
@@ -349,27 +348,11 @@ int APIENTRY WinMain (HINSTANCE hInstance, HINSTANCE, LPSTR /*lpCmdLine*/, int /
   ui_server.terminate ();
 
   //Delete all assets from temp folder
-  for (auto a : assets)
+  for (auto& a : assets)
     a.remove ();
 
   utf8::rmdir (docroot);
   return (int)msg.wParam;
-}
-
-//Load a resource in memory
-static void *mem_resource (int name, int type, DWORD& size)
-{
-  HMODULE handle = GetModuleHandle (NULL);
-  HRSRC rc = FindResource (handle, MAKEINTRESOURCE (name),
-                             MAKEINTRESOURCE (type));
-  if (!rc)
-    return NULL;
-
-  HGLOBAL rcData = LoadResource (handle, rc);
-  if (!rcData)
-    return NULL;
-  size = SizeofResource (handle, rc);
-  return LockResource (rcData);
 }
 
 /*
@@ -404,61 +387,9 @@ int submit_sarr (const char* uri, http_connection& client, JSONBridge* ui)
   return 0;
 }
 
-/*!
-  This function provides a nice mechanism for 'hiding' the different
-  assets needed by the HTTP server (pages, CSS files, images, etc.) inside the
-  EXE file.
-
-  Each asset is stored as a user-defined resource of type TEXTFILE
-  (defined as 256) and is identified by its ID. This function writes the asset
-  to a file.
-
-  The resource file (.rc) should contain some lines like these:
-    IDR_INDEX_HTML TEXTFILE  "index.html"
-    IDR_MAIN_CSS   TEXTFILE  "main.css"
-
-
-  \param  path  root path for all assets (with or without terminating backslash
-  \return _true_ if successful
-*/
-bool asset::write (const std::string& path)
+int exit_server (const char* uri, http_connection& client, JSONBridge* ui)
 {
-  string tmp = path;
-  int rc;
-
-  //Root path must be terminated with '\' or '\\'
-  if (tmp.back () != '/' && tmp.back () != '\\')
-    tmp.push_back ('\\');
-
-  //Name cannot start with '/' or '\\'
-  int pstart = 0;
-  if (name.front() == '/' || name.front() == '\\')
-    pstart++;
-
-
-  //Make sure all folders on path exist. If not we create them now
-  size_t pend = name.find_last_of ("/\\");
-  if (pend != string::npos)
-    tmp += name.substr (pstart, pend);
-  if ((rc = r_mkdir (tmp)) && rc != EEXIST)
-    return false; //could not create path
-
-  //Load resource
-  DWORD size = 0;
-  void* data = mem_resource (id, TEXTFILE, size);         //load resource...
-  if (!data)
-    return false;
-  if (pend != string::npos)
-    tmp += name.substr (pend + 1);
-  else
-    tmp += name;
-  FILE *f;
-  f = utf8::fopen (tmp, "wb");        //... and write it
-  if (!f)
-    return false;
-  fullpath = tmp;
-  TRACE ("Writing resource size %d file %s", size, fullpath.c_str());
-  fwrite (data, sizeof (char), size, f);
-  fclose (f);
-  return true;
+  PostMessage (mainWnd, WM_COMMAND, ID_SAMPLE_EXIT, 0);
+  return 0;
 }
+

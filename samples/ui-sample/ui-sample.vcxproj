@@ -168,6 +168,7 @@
     <Image Include="ui-sample.ico" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="about.html" />
     <None Include="index.html" />
     <None Include="main.css" />
   </ItemGroup>

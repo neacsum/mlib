@@ -51,13 +51,23 @@ TEST (Write_with_quoted_strings)
 TEST (Write_fixed_manip)
 {
   json::node n;
-  n[0] = 123E9;
-  n[1] = 123E9;
+  n[0] = 123E9 + 1e-5;
+  n[1] = 123E9 + 1e-5;
 
   stringstream ss;
-  ss << fixed << n[0] << " " << defaultfloat << n[1];
-  auto s = ss.str ();
-  CHECK_EQUAL ("123000000000.000000 1.23e+11", ss.str ());
+  ss << fixed << setprecision(3) << n[0] << " " << defaultfloat << n[1];
+  CHECK_EQUAL ("123000000000.000 1.23e+11", ss.str ());
+}
+
+TEST (Write_integers)
+{
+  json::node n;
+  n[0] = 123E9;
+  n[1] = -123E9;
+
+  stringstream ss;
+  ss << n[0] << " " << n[1];
+  CHECK_EQUAL ("123000000000 -123000000000", ss.str ());
 }
 
 
@@ -77,7 +87,7 @@ TEST (move_constructor)
   n1.read (R"({"asd":"sdf"})");
   json::node n2 = std::move (n1);
   CHECK_EQUAL (json::type::null, n1.kind ());
-  CHECK_EQUAL ("sdf", n2["asd"].to_string());
+  CHECK_EQUAL ("sdf", static_cast<string>(n2["asd"]));
 }
 
 TEST (move_assignment)
@@ -86,7 +96,7 @@ TEST (move_assignment)
   n1.read (R"({"asd":"sdf"})");
   n2 = std::move (n1);
   CHECK_EQUAL (json::type::null, n1.kind ());
-  CHECK_EQUAL ("sdf", n2["asd"].to_string ());
+  CHECK_EQUAL ("sdf", static_cast<string>(n2["asd"]));
 }
 
 TEST (num_vector_assignment)
@@ -200,10 +210,9 @@ TEST (string_in_supplemental_plane)
   //example from RFC 8259
   json::node n;
   string s = R"(["\ud834\udd1e"])";
-  CHECK_EQUAL (ERR_SUCCESS, n.read(s));
-  CHECK_EQUAL ((char32_t)0x1d11e, utf8::rune (n[0].to_string().c_str()));
+  CHECK_EQUAL (ERR_SUCCESS, n.read (s));
+  CHECK_EQUAL ((char32_t)0x1d11e, utf8::rune (static_cast<const char*>(n[0])));
 }
-
 /*
   test cases from https://github.com/nst/JSONTestSuite
   These are the y_... tests that need to pass
@@ -252,51 +261,52 @@ TEST (y_tests)
   //number double close to 0
   s = R"([-0.000000000000000000000000000000000000000000000000000000000000000000000000000001])";
   CHECK_EQUAL (ERR_SUCCESS, n.read (s));
-  CHECK_CLOSE (-1E-78, n[0].to_number (), DBL_EPSILON);
+  CHECK_CLOSE (-1E-78, static_cast<double>(n[0]), DBL_EPSILON);
 
   //Min positive value
   s = "[" STRINGIZE (DBL_MIN) "]";
   CHECK_EQUAL (ERR_SUCCESS, n.read (s));
-  CHECK_CLOSE (DBL_MIN, n[0].to_number (), DBL_EPSILON);
+  CHECK_CLOSE (DBL_MIN, static_cast<double>(n[0]), DBL_EPSILON);
 
   //smallest such that 1.0+DBL_EPSILON != 1.0
   s = "[" STRINGIZE (DBL_EPSILON) "]";
   CHECK_EQUAL (ERR_SUCCESS, n.read (s));
-  CHECK (1.0 != 1.0 + n[0].to_number ());
+  CHECK (1.0 != 1.0 + static_cast<double>(n[0]));
 
   //number with exp
   s = R"([20e1])";
   CHECK_EQUAL (ERR_SUCCESS, n.read (s));
+  CHECK_EQUAL (200, static_cast<int>(n[0]));
 
   //number minus 0
   s = R"([-0])";
   CHECK_EQUAL (ERR_SUCCESS, n.read (s));
-  CHECK_EQUAL (0, n[0].to_number ());
+  CHECK_EQUAL (0, static_cast<int>(n[0]));
 
   //number negative int
   s = R"([-123])";
   CHECK_EQUAL (ERR_SUCCESS, n.read (s));
-  CHECK_EQUAL (-123, n[0].to_number ());
+  CHECK_EQUAL (-123, static_cast<int>(n[0]));
 
   //number positive int
   s = R"([123])";
   CHECK_EQUAL (ERR_SUCCESS, n.read (s));
-  CHECK_EQUAL (123, n[0].to_number ());
+  CHECK_EQUAL (123, static_cast<int>(n[0]));
 
   //number simple real
   s = R"([123.456789])";
   CHECK_EQUAL (ERR_SUCCESS, n.read (s));
-  CHECK_EQUAL (123.456789, n[0].to_number ());
+  CHECK_EQUAL (123.456789, static_cast<double>(n[0]));
 
   //number real exponent
   s = R"([123e45])";
   CHECK_EQUAL (ERR_SUCCESS, n.read (s));
-  CHECK_EQUAL (123e45, n[0].to_number ());
+  CHECK_EQUAL (123e45, static_cast<double>(n[0]));
 
   //number real fraction exponent
   s = R"([123.456e78])";
   CHECK_EQUAL (ERR_SUCCESS, n.read (s));
-  CHECK_EQUAL (123.456e78, n[0].to_number ());
+  CHECK_EQUAL (123.456e78, static_cast<double>(n[0]));
 
   //number negative 1
   s = R"([-1])";
@@ -305,27 +315,27 @@ TEST (y_tests)
   //number real capital E
   s = R"([1E22])";
   CHECK_EQUAL (ERR_SUCCESS, n.read (s));
-  CHECK_EQUAL (1e22, n[0].to_number ());
+  CHECK_EQUAL (1e22, static_cast<double>(n[0]));
 
   // number real capital E negative exp
   s = R"([1E-2])";
   CHECK_EQUAL (ERR_SUCCESS, n.read (s));
-  CHECK_EQUAL (0.01, n[0].to_number ());
+  CHECK_EQUAL (0.01, static_cast<double>(n[0]));
 
   //number real capital E positive exp
   s = R"([1E+2])";
   CHECK_EQUAL (ERR_SUCCESS, n.read (s));
-  CHECK_EQUAL (100, n[0].to_number ());
+  CHECK_EQUAL (100, static_cast<double>(n[0]));
 
   //number real negative exp
   s = R"([1e-2])";
   CHECK_EQUAL (ERR_SUCCESS, n.read (s));
-  CHECK_EQUAL (0.01, n[0].to_number ());
+  CHECK_EQUAL (0.01, static_cast<double>(n[0]));
 
   //number real exp with + sign
   s = R"([1e+2])";
   CHECK_EQUAL (ERR_SUCCESS, n.read (s));
-  CHECK_EQUAL (100, n[0].to_number ());
+  CHECK_EQUAL (100, static_cast<int>(n[0]));
 
   //object
   s = R"({"asd":"sdf", "dfg":"fgh"})";
@@ -334,29 +344,29 @@ TEST (y_tests)
   //object basic
   s = R"({"asd":"sdf"})";
   CHECK_EQUAL (ERR_SUCCESS, n.read (s));
-  CHECK_EQUAL ("sdf", n["asd"].to_string ());
+  CHECK_EQUAL ("sdf", static_cast<string>(n["asd"]));
 
   //object escaped null in key
   s = R"({"foo\u0000bar": 42})";
   CHECK_EQUAL (ERR_SUCCESS, n.read (s));
   string foo_bar = { 'f','o','o','\0','b', 'a','r' };
-  CHECK_EQUAL (42, n[foo_bar].to_number ());
+  CHECK_EQUAL (42, static_cast<int>(n[foo_bar]));
 
   //object extreme numbers
   s = R"({ "min": -1.0e+28, "max": 1.0e+28 })";
   CHECK_EQUAL (ERR_SUCCESS, n.read (s));
-  CHECK_EQUAL (-1e28, n["min"].to_number ());
-  CHECK_EQUAL (1e28, n["max"].to_number ());
+  CHECK_EQUAL (-1e28, static_cast<double>(n["min"]));
+  CHECK_EQUAL (1e28, static_cast<double>(n["max"]));
 
   //object long strings
   s = R"({"x":[{"id": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"}], "id": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"})";
   CHECK_EQUAL (ERR_SUCCESS, n.read (s));
-  CHECK_EQUAL (n["x"][0]["id"], n["id"]);
+  CHECK_EQUAL (n["x"][0]["id"], static_cast<string>(n["id"]));
 
   //array object string unicode
   s = R"({"title":"\u041f\u043e\u043b\u0442\u043e\u0440\u0430 \u0417\u0435\u043c\u043b\u0435\u043a\u043e\u043f\u0430" })";
   CHECK_EQUAL (ERR_SUCCESS, n.read (s));
-  CHECK_EQUAL (u8"Полтора Землекопа", n["title"].to_string ());
+  CHECK_EQUAL (u8"Полтора Землекопа", static_cast<string>(n["title"]));
 
   //object with newlines
   s = R"({
@@ -371,57 +381,57 @@ TEST (y_tests)
   //string accepted surrogate pair U+1f639, U+1f48d
   s = R"(["\ud83d\ude39\ud83d\udc8d"])";
   CHECK_EQUAL (ERR_SUCCESS, n.read (s));
-  CHECK_EQUAL (u8"😹💍", n[0].to_string ());
+  CHECK_EQUAL (u8"😹💍", static_cast<string>(n[0]));
 
   //string allowed escapes
   s = R"(["\"\\\/\b\f\n\r\t"])";
   CHECK_EQUAL (ERR_SUCCESS, n.read (s));
-  CHECK_EQUAL (8, n[0].to_string ().size ());
+  CHECK_EQUAL (8, static_cast<string>(n[0]).size ());
 
   //backslash and u-escaped 0 (this might be an error in input string)
   s = R"(["\\u0000"])";
   CHECK_EQUAL (ERR_SUCCESS, n.read (s));
-  CHECK_EQUAL (6, n[0].to_string ().size ());
+  CHECK_EQUAL (6, static_cast<string>(n[0]).size ());
 
   //previous test but more meaningful
   s = R"(["\\\u0000"])";
   CHECK_EQUAL (ERR_SUCCESS, n.read (s));
-  CHECK_EQUAL (2, n[0].to_string ().size ());
+  CHECK_EQUAL (2, static_cast<string>(n[0]).size ());
 
   //backslash double quotes
   s = R"(["\""])";
   CHECK_EQUAL (ERR_SUCCESS, n.read (s));
-  CHECK_EQUAL (1, n[0].to_string ().size ());
+  CHECK_EQUAL (1, static_cast<string>(n[0]).size ());
 
   //string comments
   s = R"(["a/*b*/c/*d//e"])";
   CHECK_EQUAL (ERR_SUCCESS, n.read (s));
-  CHECK_EQUAL ("a/*b*/c/*d//e", n[0].to_string ());
+  CHECK_EQUAL ("a/*b*/c/*d//e", static_cast<string>(n[0]));
 
   //string double escape a
   s = R"(["\\a"])";
   CHECK_EQUAL (ERR_SUCCESS, n.read (s));
-  CHECK_EQUAL ("\\a", n[0].to_string ());
+  CHECK_EQUAL ("\\a", static_cast<string>(n[0]));
 
   //string double escape n
   s = R"(["\\n"])";
   CHECK_EQUAL (ERR_SUCCESS, n.read (s));
-  CHECK_EQUAL ("\\n", n[0].to_string ());
+  CHECK_EQUAL ("\\n", static_cast<string>(n[0]));
 
   //string escaped control character
   s = R"(["\u0012"])";
   CHECK_EQUAL (ERR_SUCCESS, n.read (s));
-  CHECK_EQUAL ('\x12', n[0].to_string ()[0]);
+  CHECK_EQUAL ('\x12', static_cast<string>(n[0])[0]);
 
   //string escaped non-character
   s = R"(["\uffff"])";
   CHECK_EQUAL (ERR_SUCCESS, n.read (s));
-  CHECK_EQUAL (0xffff, utf8::rune (n[0].to_string ().begin ()));
+  CHECK_EQUAL (0xffff, utf8::rune (static_cast<string>(n[0]).cbegin ()));
 
   //string last surrogates 1 and 2
   s = R"(["\uDBFF\uDFFF"])";
   CHECK_EQUAL (ERR_SUCCESS, n.read (s));
-  CHECK_EQUAL (0x10ffff, utf8::rune (n[0].to_string ().begin ()));
+  CHECK_EQUAL (0x10ffff, utf8::rune (static_cast<string>(n[0]).cbegin ()));
 
   // string escaped newline
   s = R"(["new\u000aline"])";
@@ -430,7 +440,7 @@ TEST (y_tests)
   //string one byte UTF8
   s = R"(["\u002c"])";
   CHECK_EQUAL (ERR_SUCCESS, n.read (s));
-  CHECK_EQUAL (",", n[0].to_string ());
+  CHECK_EQUAL (",", (string)n[0]);
 
 }
 

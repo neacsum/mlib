@@ -4,11 +4,11 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>Sample User Interface</title>
 <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<link rel="stylesheet" type="text/css" media="all" href="main.css" />
+<link rel="stylesheet" type="text/css" media="all" href="css/main.css" />
 
 <script type="text/javascript">
-var sample_default =
-'{ \
+  var sample_default =
+    '{ \
  "hvar": 111,\n\
  "huvar": 222,\n\
  "ivar": 333,\n\
@@ -25,58 +25,76 @@ var sample_default =
  "psarr": [\"IJ\", \"KL\", \"MN\", \"OP\"]\n\
 }';
 
-function set_fields (json)
-{
-  $("#hvar").val(json.hvar);
-  $("#huvar").val("0x"+json.huvar.toString(16));
-  $("#ivar").val(json.ivar);
-  $("#iuvar").val(json.iuvar.toString());
-  $("#lvar").val(json.lvar);
-  $("#luvar").val(json.luvar.toString());
-  $("#fvar").val(json.fvar);
-  $("#dvar").val(json.dvar);
-  $("#pstr").val(json.pstr);
-  $("#str").val(json.str);
-  $("#bvar").prop('checked', json.bvar);
+  function set_fields(json) {
+    $("#hvar").val(json.hvar);
+    $("#huvar").val("0x" + json.huvar.toString(16));
+    $("#ivar").val(json.ivar);
+    $("#iuvar").val(json.iuvar.toString());
+    $("#lvar").val(json.lvar);
+    $("#luvar").val(json.luvar.toString());
+    $("#fvar").val(json.fvar);
+    $("#dvar").val(json.dvar);
+    $("#pstr").val(json.pstr);
+    $("#str").val(json.str);
+    $("#bvar").prop('checked', json.bvar);
 
-  for (i = 0; i < 4; i++)
-  {
-    $("#iarr_" + i).val(json.iarr[i]);
-    $("#sarr_" + i).val(json.sarr[i]);
-    $("#psarr_" + i).html(json.psarr[i]);
+    for (i = 0; $("#iarr_" + i).length; i++) {
+      $("#iarr_" + i).val(i < json.iarr.length ? json.iarr[i] : "Out of bounds")
+    }
+
+    for (i = 0; i < 4; i++) {
+      $("#sarr_" + i).val(json.sarr[i]);
+      $("#psarr_" + i).html(json.psarr[i]);
+    }
   }
-}
 
-function send_json() {
-  const data = new Object();
-  data.hvar = parseInt ($("#hvar").val());
-  data.huvar = parseInt($("#huvar").val());
-  data.ivar = parseInt($("#ivar").val());
-  data.str = $("#str").val();
-  data.iarr = new Array();
-  for (i = 0; i < 4; i++)
-    data.iarr[i] = parseInt($("#iarr_" + i).val());
+  /*
+    Shows how to send JSON data in a POST message using .serializeArray function
+  */
+  function send_json1() {
+    const data = $("#form1").serializeArray();
+    $.post({ url: "/var", data: JSON.stringify(data), contentType: "application/json" });
+    get_data();
+  }
 
-  $.post({url: "/var", data: JSON.stringify(data), contentType: "application/json"});
-}
+  /*
+    Shows how to send JSON data in a post message. Intentionally here we send
+    more array elements than the size of the corresponding server data.
+  */
+  function send_json2() {
+    const data = new Object();
+    data.iarr = new Array();
 
-$(document).ready ( function ()
-{
-  $.get("/var?sample", function (r)
-  {
-    set_fields(r)
-  })
-  .fail(function ()
-  {
-    set_fields(sample_default)
-  });
-  $.getJSON("/var?varpi", function (r) {
-    $("#pi").html(r);
-  });
+    //loop over all "iarr_..." elements. Server will take care of bounds checking
+    for (i = 0; $("#iarr_" + i).length; i++)
+      data.iarr[i] = parseInt($("#iarr_" + i).val());
 
-  //request for a non-existent entry
-  $.getJSON("/var?no_such_variable", function (r) { }).fail(function () { console.log("Expected 415 reply") })
-});
+    $.post({ url: "/var", data: JSON.stringify(data), contentType: "application/json" });
+    get_data();
+  }
+
+  function get_data() {
+    $.get("/var?sample", function (r) {
+      set_fields(r)
+    })
+      .fail(function () {
+        set_fields(sample_default)
+      });
+    $.getJSON("/var?varpi", function (r) {
+      $("#pi").html(r);
+    });
+
+    //request for a non-existent entry
+    $.getJSON("/var?no_such_variable", function (r) { }).fail(function () { console.log("Expected 415 reply") })
+  }
+
+  $(document).ready(get_data());
+
+  function exit_server() {
+    $.post({ url: "/var?exit_server", data: " " });
+    alert("Thanks for trying the user interface server");
+    window.close();
+  }
 
 </script>
 <style>
@@ -95,105 +113,121 @@ $(document).ready ( function ()
     </div>
     <div class="clear"></div>
     <div class="grid_4">
-      The interface supports all basic numeric and string types. When a form is
-      submitted, all fields are sent as 
-      <a href="https://en.wikipedia.org/wiki/Percent-encoding">URL encoded</a>
-      values. the interface decodes them and assigns new values to corresponding
-      variables. received values for integer type fields can be decimal, hex or octal.<br/>
-
-      Keep in mind that check-boxes and radio buttons that are not checked are not
-      submitted. The "standard" trick in this case is to use another hidden
-      input field with the same name and a value corresponding to the unchecked.
-      state. Because submitted fields are parsed sequentially, the hidden field
-      must be placed <b>BEFORE</b> the check-box or radio button field.
+      <p>
+        The interface supports all basic numeric and string types. When a form is
+        submitted, all fields are sent as
+        <a href="https://en.wikipedia.org/wiki/Percent-encoding">URL encoded</a>
+        values. The interface decodes them and assigns new values to corresponding
+        variables.
+      </p>
+      <p>
+        Keep in mind that check-boxes and radio buttons that are not checked are not
+        submitted. The "standard" trick in this case is to use another hidden
+        input field with the same name and a value corresponding to the unchecked.
+        state. Because submitted fields are parsed sequentially, the hidden field
+        must be placed <b>BEFORE</b> the check-box or radio button field.
+      </p>
+      <p>
+        Server can also accept JSON-encoded data. In this case the client
+        JavaScript code has to encode the values before sending. The "SUBMIT AS JSON"
+        buttons demonstrate this functionality.
+      </p>
     </div>
     <div class="grid_8">
-      <form method="post" action="/var">
-          <table>
-              <tr>
-                  <td>Short integer hvar:</td>
-                  <td><input id="hvar" name="hvar" /></td>
-              </tr>
-              <tr>
-                  <td>Short unsigned huvar (hex):</td>
-                  <td><input id="huvar" name="huvar" /></td>
-              </tr>
-              <tr>
-                  <td>Integer ivar:</td>
-                  <td><input id="ivar" name="ivar" /></td>
-              </tr>
-              <tr>
-                  <td>Unsigned integer iuvar:</td>
-                  <td><input id="iuvar" name="iuvar" /></td>
-              </tr>
-              <tr>
-                  <td>Long lvar:</td>
-                  <td><input id="lvar" name="lvar" /></td>
-              </tr>
-              <tr>
-                  <td>Unsigned long luvar:</td>
-                  <td><input id="luvar" name="luvar" /></td>
-              </tr>
-              <tr>
-                  <td>Float fvar:</td>
-                  <td><input id="fvar" name="fvar" /></td>
-              </tr>
-              <tr>
-                  <td>Double dvar:</td>
-                  <td><input id="dvar" name="dvar" /></td>
-              </tr>
-              <tr>
-                  <td>Pointer to string pstr:</td>
-                  <td><input id="pstr" name="pstr" /></td>
-              </tr>
-              <tr>
-                  <td>String str:</td>
-                  <td><input id="str" name="str" /></td>
-              </tr>
-              <tr>
-                  <td>Boolean bvar:</td>
-                  <td>
-                      <input type="hidden" name="bvar" value="0" />
-                      <input type="checkbox" id="bvar" name="bvar" value="1" />
-                  </td>
-              </tr>
-              <tr>
-                  <td colspan="2" style="text-align:center"><input type="submit" value="SUBMIT" /></td>
-              </tr>
-              <tr>
-                  <td colspan="2" style="text-align:center">
-                  <input type="button" value="SUBMIT AS JSON" onclick="send_json(); return false;"/>
-                  </td>
-              </tr>
+      <form method="post" id="form1" action="/var">
+        <table>
+          <tr>
+            <td>Short integer hvar:</td>
+            <td><input id="hvar" name="hvar" /></td>
+          </tr>
+          <tr>
+            <td>Short unsigned huvar (hex):</td>
+            <td><input id="huvar" name="huvar" /></td>
+          </tr>
+          <tr>
+            <td>Integer ivar:</td>
+            <td><input id="ivar" name="ivar" /></td>
+          </tr>
+          <tr>
+            <td>Unsigned integer iuvar:</td>
+            <td><input id="iuvar" name="iuvar" /></td>
+          </tr>
+          <tr>
+            <td>Long lvar:</td>
+            <td><input id="lvar" name="lvar" /></td>
+          </tr>
+          <tr>
+            <td>Unsigned long luvar:</td>
+            <td><input id="luvar" name="luvar" /></td>
+          </tr>
+          <tr>
+            <td>Float fvar:</td>
+            <td><input id="fvar" name="fvar" /></td>
+          </tr>
+          <tr>
+            <td>Double dvar:</td>
+            <td><input id="dvar" name="dvar" /></td>
+          </tr>
+          <tr>
+            <td>Pointer to string pstr:</td>
+            <td><input id="pstr" name="pstr" /></td>
+          </tr>
+          <tr>
+            <td>String str:</td>
+            <td><input id="str" name="str" /></td>
+          </tr>
+          <tr>
+            <td>Boolean bvar:</td>
+            <td>
+              <input type="hidden" name="bvar" value="0" />
+              <input type="checkbox" id="bvar" name="bvar" value="1" />
+            </td>
+          </tr>
+          <tr>
+            <td style="text-align:center">
+              <input type="submit" value="SUBMIT" />
+            </td>
+            <td style="text-align:center">
+              <input type="button" value="SUBMIT AS JSON" onclick="send_json1(); return false;" />
+            </td>
+          </tr>
 
-          </table>
+        </table>
       </form>
     </div>
     <div class="clear"></div>
     <div class="grid_12"><hr /><h4>Arrays</h4></div>
     <div class="clear"></div>
     <div class="grid_4">
-      Transferring arrays from program to the user interface page is simple. The
-      interface knows how to format arrays for all basic data types.<br/>
-      When posting data back from HTML page to the program we have to establish
-      a convention because the browser's posting mechanism has no concept of array.<br/>
-      So, by convention, array elements are named <em>&lt;array&gt;_&lt;index&gt;</em>.
-      Note that index value is checked against the limit set in the data dictionary
-      entry for the array.
+      <p>
+        Transferring arrays from program to the user interface page is simple. The
+        interface knows how to serialize arrays for all basic data types.
+      </p>
+      <p>
+        When posting data back from HTML page to the program, we have to establish
+        a convention because the browser's posting mechanism has no concept of array.<br />
+        So, by convention, array elements are named <em>&lt;array&gt;_&lt;index&gt;</em>.
+        Note that server checks index values against the limit set in the data dictionary
+        entry for the array.
+      </p>
+      
     </div>
     <div class="grid_8">
       Integer array iarr:<p />
-      <form method="post" action="/var">
+      <form method="post" id="form2" action="/var">
         <table>
           <tr>
             <td><input id="iarr_0" name="iarr_0" size="4" /></td>
             <td><input id="iarr_1" name="iarr_1" size="4" /></td>
             <td><input id="iarr_2" name="iarr_2" size="4" /></td>
             <td><input id="iarr_3" name="iarr_3" size="4" /></td>
-            <td><input id="iarr_4" name="iarr_4" size="4" value="Out of bounds" /></td>
+            <td><input id="iarr_4" name="iarr_4" size="4" /></td>
           </tr>
           <tr>
-            <td colspan="4" style="text-align:center"><input type="submit" value="SUBMIT" /></td>
+            <td colspan="2" style="text-align:center"><input type="submit" value="SUBMIT" /></td>
+            <td colspan="2" style="text-align:center">
+              <input type="button" value="SUBMIT AS JSON" onclick="send_json2(); return false;" />
+            </td>
           </tr>
         </table>
       </form>
@@ -230,7 +264,7 @@ $(document).ready ( function ()
       in this case are arrays of pointers to strings.
     </div>
     <div class="grid_8 psarr">
-      Pointer to string array psarr:<p/>
+      Pointer to string array psarr:<p />
       <table>
         <tr>
           <td>psarr[0]:</td>
@@ -252,6 +286,12 @@ $(document).ready ( function ()
     </div>
     <div class="clear"></div>
     The value of pi is <span id="pi"></span>
+    <div class="clear"></div>
+    <hr />
+    <div class="grid_2, push_2">
+      <input type="button" onclick="exit_server()" value="EXIT PROGRAM" />
+    </div>
   </div>
+
 </body>
 </html>
