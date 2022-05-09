@@ -6,10 +6,10 @@
     </PropertyGroup>
 
     <Target Name="lib" DependsOnTargets="DownloadSQLite">
-        <MSBuild Projects="mlib.vcxproj" Properties="Configuration=Debug;Platform=x64"/>  
-        <MSBuild Projects="mlib.vcxproj" Properties="Configuration=Release;Platform=x64"/> 
-        <MSBuild Projects="mlib.vcxproj" Properties="Configuration=Debug;Platform=x86"/>  
-        <MSBuild Projects="mlib.vcxproj" Properties="Configuration=Release;Platform=x86"/>
+        <MSBuild Projects="src\mlib.vcxproj" Properties="SolutionDir=..\;Configuration=Debug;Platform=x64"/>  
+        <MSBuild Projects="src\mlib.vcxproj" Properties="SolutionDir=..\;Configuration=Release;Platform=x64"/> 
+        <MSBuild Projects="src\mlib.vcxproj" Properties="SolutionDir=..\;Configuration=Debug;Platform=x86"/>  
+        <MSBuild Projects="src\mlib.vcxproj" Properties="SolutionDir=..\;Configuration=Release;Platform=x86"/>
     </Target>
     <Target Name="tests" DependsOnTargets="lib">
         <MSBuild Projects="tests\mlib_test.vcxproj" Properties="SolutionDir=..\;Configuration=Debug;Platform=x64"/>  
@@ -18,10 +18,10 @@
         <MSBuild Projects="tests\mlib_test.vcxproj" Properties="SolutionDir=..\;Configuration=Release;Platform=x86"/>
     </Target>
     <Target Name="DownloadSQLite">
-        <DownloadFile SourceUrl="$(SQLiteUrl)" DestinationFolder="$(MSBuildProjectDirectory)\sqlite" />
-        <Unzip SourceFiles=".\sqlite\$(SQLiteName).zip" DestinationFolder="sqlite" />
-        <Copy SourceFiles=".\sqlite\$(SQLiteName)\sqlite3.c" DestinationFolder="source" SkipUnchangedFiles="true" />
-        <Copy SourceFiles=".\sqlite\$(SQLiteName)\sqlite3.h" DestinationFolder="include\mlib" SkipUnchangedFiles="true" />
-        <Copy SourceFiles=".\sqlite\$(SQLiteName)\sqlite3ext.h" DestinationFolder="include\mlib" SkipUnchangedFiles="true" />
+        <DownloadFile SourceUrl="$(SQLiteUrl)" DestinationFolder="$(MSBuildProjectDirectory)\build\sqlite" />
+        <Unzip SourceFiles="build\sqlite\$(SQLiteName).zip" DestinationFolder="build\sqlite" />
+        <Copy SourceFiles="build\sqlite\$(SQLiteName)\sqlite3.c" DestinationFolder="src" SkipUnchangedFiles="true" />
+        <Copy SourceFiles="build\sqlite\$(SQLiteName)\sqlite3.h" DestinationFolder="include\mlib" SkipUnchangedFiles="true" />
+        <Copy SourceFiles="build\sqlite\$(SQLiteName)\sqlite3ext.h" DestinationFolder="include\mlib" SkipUnchangedFiles="true" />
     </Target>  
 </Project>

@@ -6,14 +6,13 @@
 *.obj
 *.bak
 *.user
-/o
+/build
 *.ipch
 .vs/
 /lib
-exe/
 
 #SQLite stuff
-sqlite/
-source/sqlite3.c
+
+src/sqlite3.c
 include/mlib/sqlite3.h
 include/mlib/sqlite3ext.h

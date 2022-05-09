@@ -407,7 +407,7 @@ node::node (const std::vector<T>& vec)
   : t (type::array)
 {
   new (&obj)nodes_array ();
-  for (int i = 0; i < vec.size (); ++i)
+  for (size_t i = 0; i < vec.size (); ++i)
     arr.emplace_back (make_unique<node>(vec[i]));
 }
 
