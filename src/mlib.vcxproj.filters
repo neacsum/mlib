@@ -18,264 +18,264 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\mlib\defs.h">
+    <ClInclude Include="..\include\mlib\defs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\mlib\dprintf.h">
+    <ClInclude Include="..\include\mlib\dprintf.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\mlib\log.h">
+    <ClInclude Include="..\include\mlib\log.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\mlib\trace.h">
+    <ClInclude Include="..\include\mlib\trace.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\mlib\sqlite3.h">
+    <ClInclude Include="..\include\mlib\sqlite3.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\mlib\sqlite3ext.h">
+    <ClInclude Include="..\include\mlib\sqlite3ext.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\mlib\sqlitepp.h">
+    <ClInclude Include="..\include\mlib\sqlitepp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\mlib\basename.h">
+    <ClInclude Include="..\include\mlib\basename.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\mlib\options.h">
+    <ClInclude Include="..\include\mlib\options.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\mlib\errorcode.h">
+    <ClInclude Include="..\include\mlib\errorcode.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\mlib\crc32.h">
+    <ClInclude Include="..\include\mlib\crc32.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\mlib\critsect.h">
+    <ClInclude Include="..\include\mlib\critsect.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\mlib\event.h">
+    <ClInclude Include="..\include\mlib\event.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\mlib\httpd.h">
+    <ClInclude Include="..\include\mlib\httpd.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\mlib\inaddr.h">
+    <ClInclude Include="..\include\mlib\inaddr.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\mlib\md5.h">
+    <ClInclude Include="..\include\mlib\md5.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\mlib\mutex.h">
+    <ClInclude Include="..\include\mlib\mutex.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\mlib\semaphore.h">
+    <ClInclude Include="..\include\mlib\semaphore.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\mlib\shmem.h">
+    <ClInclude Include="..\include\mlib\shmem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\mlib\syncbase.h">
+    <ClInclude Include="..\include\mlib\syncbase.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\mlib\tcpserv.h">
+    <ClInclude Include="..\include\mlib\tcpserv.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\mlib\thread.h">
+    <ClInclude Include="..\include\mlib\thread.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\mlib\wsockstream.h">
+    <ClInclude Include="..\include\mlib\wsockstream.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\mlib\firewall.h">
+    <ClInclude Include="..\include\mlib\firewall.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\mlib\base64.h">
+    <ClInclude Include="..\include\mlib\base64.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\mlib\convert.h">
+    <ClInclude Include="..\include\mlib\convert.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\mlib\jbridge.h">
+    <ClInclude Include="..\include\mlib\jbridge.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\mlib\wtimer.h">
+    <ClInclude Include="..\include\mlib\wtimer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\mlib\stopwatch.h">
+    <ClInclude Include="..\include\mlib\stopwatch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\mlib\serenum.h">
+    <ClInclude Include="..\include\mlib\serenum.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\mlib\ringbuf.h">
+    <ClInclude Include="..\include\mlib\ringbuf.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\mlib\chull.h">
+    <ClInclude Include="..\include\mlib\chull.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\mlib\border.h">
+    <ClInclude Include="..\include\mlib\border.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\mlib\point.h">
+    <ClInclude Include="..\include\mlib\point.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\mlib\nmea.h">
+    <ClInclude Include="..\include\mlib\nmea.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\mlib\rotmat.h">
+    <ClInclude Include="..\include\mlib\rotmat.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\mlib\bitstream.h">
+    <ClInclude Include="..\include\mlib\bitstream.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\mlib\mlib.h">
+    <ClInclude Include="..\include\mlib\mlib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\mlib\rdir.h">
+    <ClInclude Include="..\include\mlib\rdir.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\mlib\statpars.h">
+    <ClInclude Include="..\include\mlib\statpars.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\mlib\ipow.h">
+    <ClInclude Include="..\include\mlib\ipow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\mlib\tvops.h">
+    <ClInclude Include="..\include\mlib\tvops.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\mlib\poly.h">
+    <ClInclude Include="..\include\mlib\poly.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\mlib\syncque.h">
+    <ClInclude Include="..\include\mlib\syncque.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\mlib\biosuuid.h">
+    <ClInclude Include="..\include\mlib\biosuuid.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\mlib\json.h">
+    <ClInclude Include="..\include\mlib\json.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\mlib\asset.h">
+    <ClInclude Include="..\include\mlib\asset.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="source\base64.cpp">
+    <ClCompile Include="base64.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\basename.cpp">
+    <ClCompile Include="basename.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\convert.cpp">
+    <ClCompile Include="convert.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\crc32.c">
+    <ClCompile Include="crc32.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\errorcode.cpp">
+    <ClCompile Include="errorcode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\event.cpp">
+    <ClCompile Include="event.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\firewall.cpp">
+    <ClCompile Include="firewall.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\httpd.cpp">
+    <ClCompile Include="httpd.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\inaddr.cpp">
+    <ClCompile Include="inaddr.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\jbridge.cpp">
+    <ClCompile Include="jbridge.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\log.cpp">
+    <ClCompile Include="log.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\md5.c">
+    <ClCompile Include="md5.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\mutex.cpp">
+    <ClCompile Include="mutex.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\options.cpp">
+    <ClCompile Include="options.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\semaphore.cpp">
+    <ClCompile Include="semaphore.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\serenum1.cpp">
+    <ClCompile Include="serenum1.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\serenum2.cpp">
+    <ClCompile Include="serenum2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\serenum3.cpp">
+    <ClCompile Include="serenum3.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\shmem.cpp">
+    <ClCompile Include="shmem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\sqlite3.c">
+    <ClCompile Include="sqlite3.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\sqlitepp.cpp">
+    <ClCompile Include="sqlitepp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\stopwatch.cpp">
+    <ClCompile Include="stopwatch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\syncbase.cpp">
+    <ClCompile Include="syncbase.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\tcpserv.cpp">
+    <ClCompile Include="tcpserv.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\thread.cpp">
+    <ClCompile Include="thread.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\wsockstream.cpp">
+    <ClCompile Include="wsockstream.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\wtimer.cpp">
+    <ClCompile Include="wtimer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\geom\border.cpp">
+    <ClCompile Include="geom\border.cpp">
       <Filter>Source Files\geom</Filter>
     </ClCompile>
-    <ClCompile Include="source\geom\chull.cpp">
+    <ClCompile Include="geom\chull.cpp">
       <Filter>Source Files\geom</Filter>
     </ClCompile>
-    <ClCompile Include="source\geom\rotmat.cpp">
+    <ClCompile Include="geom\rotmat.cpp">
       <Filter>Source Files\geom</Filter>
     </ClCompile>
-    <ClCompile Include="source\bitstream.cpp">
+    <ClCompile Include="bitstream.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\nmea.cpp">
+    <ClCompile Include="nmea.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\rdir.cpp">
+    <ClCompile Include="rdir.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\dprintf.cpp">
+    <ClCompile Include="dprintf.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\statpars.cpp">
+    <ClCompile Include="statpars.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\tvops.cpp">
+    <ClCompile Include="tvops.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\biosuuid.cpp">
+    <ClCompile Include="biosuuid.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\json.cpp">
+    <ClCompile Include="json.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\asset.cpp">
+    <ClCompile Include="asset.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
