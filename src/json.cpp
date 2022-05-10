@@ -155,7 +155,8 @@ node& node::operator[](const std::string& name)
 }
 
 /*!
-  Return value of an object node element (const version)
+  Return value of an object node element (const version).
+
   If element doesn't exist it throws an ERR_JSON_MISSING exception.
 */
 const node& node::operator[](const std::string& name) const
@@ -170,7 +171,8 @@ const node& node::operator[](const std::string& name) const
 }
 
 /*!
-  Return value of an object node element
+  Return value of an object node element.
+
   If element doesn't exist throws an ERR_JSON_MISSING exception.
 */
 const node& node::at (const std::string& name) const
@@ -218,7 +220,8 @@ node& node::operator[](size_t index)
 }
 
 /*!
-  Return value of an array node element (const version)
+  Return value of an array node element (const version).
+
   If element doesn't exist throws an ERR_JSON_MISSING exception.
 */
 const node& node::operator[](size_t index) const
@@ -233,7 +236,8 @@ const node& node::operator[](size_t index) const
 }
 
 /*!
-  Return value of an array node element (const version)
+  Return value of an array node element (const version).
+
   If element doesn't exist throws an ERR_JSON_MISSING exception.
 */
 const node& node::at(size_t index) const
@@ -301,9 +305,6 @@ void node::erase (const std::string& name)
       obj.erase (n);
   }
 }
-
-
-
 
 // Parsing helper functions ---------------------------------------------------
 // Check if character is whitespace
@@ -489,7 +490,10 @@ static erc parse_string (istream& is, std::string& s)
   return erc (ERR_JSON_SIZE, ERROR_PRI_ERROR, errors);
 }
 
-erc node::read (istream& is)
+/*!
+  Deserialize the node from an input stream
+*/
+erc node::read (std::istream& is)
 {
   std::string sval;
   double numval;

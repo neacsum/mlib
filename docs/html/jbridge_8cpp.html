@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.18"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>MLIB: C:/development/mlib/source/jbridge.cpp File Reference</title>
+<title>MLIB: C:/development/mlib/src/jbridge.cpp File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -38,7 +38,7 @@ $(function() {
 <div id="main-nav"></div>
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_b2f33c71d4aa5e7af42a1ca61ff5af1b.html">source</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -51,9 +51,12 @@ $(function() {
 <div class="contents">
 <div class="textblock"><code>#include &lt;memory.h&gt;</code><br />
 <code>#include &lt;string.h&gt;</code><br />
+<code>#include &lt;sstream&gt;</code><br />
 <code>#include &lt;<a class="el" href="jbridge_8h_source.html">mlib/jbridge.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="trace_8h_source.html">mlib/trace.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="critsect_8h_source.html">mlib/critsect.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="json_8h_source.html">mlib/json.h</a>&gt;</code><br />
+<code>#include &lt;algorithm&gt;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
@@ -92,7 +95,10 @@ Variables</h2></td></tr>
 <div class="line">  <span class="keyword">sizeof</span> (<span class="keywordtype">double</span>),                </div>
 <div class="line">  <span class="keyword">sizeof</span> (<span class="keywordtype">char</span>*),                 </div>
 <div class="line">  <span class="keyword">sizeof</span>(<span class="keywordtype">char</span>),                   </div>
-<div class="line">  <span class="keyword">sizeof</span>(bool)                    </div>
+<div class="line">  <span class="keyword">sizeof</span>(bool),                   </div>
+<div class="line">  0,                              </div>
+<div class="line">  0,                              </div>
+<div class="line">  0                               </div>
 <div class="line">}</div>
 </div><!-- fragment -->
 </div>

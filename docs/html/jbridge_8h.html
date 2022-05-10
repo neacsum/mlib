@@ -45,19 +45,21 @@ $(function() {
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#define-members">Macros</a> &#124;
+<a href="#typedef-members">Typedefs</a> &#124;
 <a href="#enum-members">Enumerations</a>  </div>
   <div class="headertitle">
 <div class="title">jbridge.h File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><code>#include &quot;<a class="el" href="httpd_8h_source.html">httpd.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="json_8h_source.html">json.h</a>&quot;</code><br />
 </div>
 <p><a href="jbridge_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_j_s_o_n_v_a_r.html">JSONVAR</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">JSON data dictionary entry.  <a href="struct_j_s_o_n_v_a_r.html#details">More...</a><br /></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structmlib_1_1jb__var.html">mlib::jb_var</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">JSON data dictionary entry.  <a href="structmlib_1_1jb__var.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_j_s_o_n_bridge.html">mlib::JSONBridge</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">JSON objects support.  <a href="classmlib_1_1_j_s_o_n_bridge.html#details">More...</a><br /></td></tr>
@@ -65,35 +67,43 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
+<tr class="memitem:a614057fda089f9e86581ff226e07cf6a"><td class="memItemLeft" align="right" valign="top"><a id="a614057fda089f9e86581ff226e07cf6a"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="jbridge_8h.html#a614057fda089f9e86581ff226e07cf6a">ERR_JSON_NOTFOUND</a>&#160;&#160;&#160;-10</td></tr>
+<tr class="memdesc:a614057fda089f9e86581ff226e07cf6a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Entry not found. <br /></td></tr>
+<tr class="separator:a614057fda089f9e86581ff226e07cf6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6e5974d940c3fb5514d9fa182a7b8c20"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="jbridge_8h.html#a6e5974d940c3fb5514d9fa182a7b8c20">ERR_JSON_DICSTRUC</a>&#160;&#160;&#160;-11</td></tr>
+<tr class="separator:a6e5974d940c3fb5514d9fa182a7b8c20"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afab34a9427465c3c3bd38e060ec1d5ff"><td class="memItemLeft" align="right" valign="top"><a id="afab34a9427465c3c3bd38e060ec1d5ff"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="jbridge_8h.html#afab34a9427465c3c3bd38e060ec1d5ff">JSD_STARTDIC</a>(dict)&#160;&#160;&#160;<a class="el" href="struct_j_s_o_n_v_a_r.html">JSONVAR</a> dict[] ={</td></tr>
+#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="jbridge_8h.html#afab34a9427465c3c3bd38e060ec1d5ff">JSD_STARTDIC</a>(dict)&#160;&#160;&#160;jb_dictionary dict ={</td></tr>
 <tr class="memdesc:afab34a9427465c3c3bd38e060ec1d5ff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Mark the beginning of JSON dictionary. <br /></td></tr>
 <tr class="separator:afab34a9427465c3c3bd38e060ec1d5ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2772d6413ec4f414947f9995d0c1a63b"><td class="memItemLeft" align="right" valign="top"><a id="a2772d6413ec4f414947f9995d0c1a63b"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="jbridge_8h.html#a2772d6413ec4f414947f9995d0c1a63b">JSD_ENDDIC</a>&#160;&#160;&#160;{0, 0, JT_INT, 0, 0} }</td></tr>
+#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="jbridge_8h.html#a2772d6413ec4f414947f9995d0c1a63b">JSD_ENDDIC</a>&#160;&#160;&#160;{&quot;&quot;, 0, JT_ENDOBJ, 0, 0} }</td></tr>
 <tr class="memdesc:a2772d6413ec4f414947f9995d0c1a63b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Mark the end of JSON dictionary. <br /></td></tr>
 <tr class="separator:a2772d6413ec4f414947f9995d0c1a63b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6b7ff55a8808649efed9d9755a44f3ec"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="jbridge_8h.html#a6b7ff55a8808649efed9d9755a44f3ec">JSD</a>(V,  T,  C,  S)&#160;&#160;&#160;{#V, &amp;##V, T, S, C}</td></tr>
-<tr class="memdesc:a6b7ff55a8808649efed9d9755a44f3ec"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates an entry in JSON dictionary for a variable that has the same external name (name used in the JSON response) as the variable name.  <a href="jbridge_8h.html#a6b7ff55a8808649efed9d9755a44f3ec">More...</a><br /></td></tr>
-<tr class="separator:a6b7ff55a8808649efed9d9755a44f3ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6bb77f0e8784831589b0245145bd276d"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="jbridge_8h.html#a6bb77f0e8784831589b0245145bd276d">JSDN</a>(V,  N,  T,  C,  S)&#160;&#160;&#160;{N, &amp;##V, T, S, C}</td></tr>
-<tr class="memdesc:a6bb77f0e8784831589b0245145bd276d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates an entry in JSON dictionary for a variable that has a different external name (name used in the JSON response) than the variable name.  <a href="jbridge_8h.html#a6bb77f0e8784831589b0245145bd276d">More...</a><br /></td></tr>
-<tr class="separator:a6bb77f0e8784831589b0245145bd276d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aeecc3b9d65283895031e049bae297f69"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="jbridge_8h.html#aeecc3b9d65283895031e049bae297f69">JSDX</a>(N,  T,  C,  S)&#160;&#160;&#160;{N, nullptr, T, S, C}</td></tr>
-<tr class="memdesc:aeecc3b9d65283895031e049bae297f69"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates an entry in JSON dictionary for a variable whose address is not yet known.  <a href="jbridge_8h.html#aeecc3b9d65283895031e049bae297f69">More...</a><br /></td></tr>
-<tr class="separator:aeecc3b9d65283895031e049bae297f69"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a06a0fc0d3c5fe5289fdedf7039b65258"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="jbridge_8h.html#a06a0fc0d3c5fe5289fdedf7039b65258">JSD</a>(V,  T, ...)&#160;&#160;&#160;{#V, &amp;##V, T, __VA_ARGS__}</td></tr>
+<tr class="memdesc:a06a0fc0d3c5fe5289fdedf7039b65258"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates an entry in JSON dictionary for a variable that has the same external name (name used in the JSON response) as the variable name.  <a href="jbridge_8h.html#a06a0fc0d3c5fe5289fdedf7039b65258">More...</a><br /></td></tr>
+<tr class="separator:a06a0fc0d3c5fe5289fdedf7039b65258"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac8c1f9fcee03c616c7c5dde34ef0d2b3"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="jbridge_8h.html#ac8c1f9fcee03c616c7c5dde34ef0d2b3">JSDN</a>(V,  N,  T, ...)&#160;&#160;&#160;{N, &amp;##V, T, __VA_ARGS__}</td></tr>
+<tr class="memdesc:ac8c1f9fcee03c616c7c5dde34ef0d2b3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates an entry in JSON dictionary for a variable that has a different external name (name used in the JSON response) than the variable name.  <a href="jbridge_8h.html#ac8c1f9fcee03c616c7c5dde34ef0d2b3">More...</a><br /></td></tr>
+<tr class="separator:ac8c1f9fcee03c616c7c5dde34ef0d2b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af21a445290dbf604147d0d5ca57d37cf"><td class="memItemLeft" align="right" valign="top"><a id="af21a445290dbf604147d0d5ca57d37cf"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="jbridge_8h.html#af21a445290dbf604147d0d5ca57d37cf">JSD_OBJECT</a>(N)&#160;&#160;&#160;{N, 0, JT_OBJECT, 0, 1}</td></tr>
+#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="jbridge_8h.html#af21a445290dbf604147d0d5ca57d37cf">JSD_OBJECT</a>(N)&#160;&#160;&#160;{N, nullptr, JT_OBJECT}</td></tr>
 <tr class="memdesc:af21a445290dbf604147d0d5ca57d37cf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate entry for a composite object. <br /></td></tr>
 <tr class="separator:af21a445290dbf604147d0d5ca57d37cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a91838d2ed19fbe15390216ece5e3c407"><td class="memItemLeft" align="right" valign="top"><a id="a91838d2ed19fbe15390216ece5e3c407"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="jbridge_8h.html#a91838d2ed19fbe15390216ece5e3c407">JSD_ENDOBJ</a>&#160;&#160;&#160;{&quot;&quot;, 0, JT_ENDOBJ, 0, 1}</td></tr>
+#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="jbridge_8h.html#a91838d2ed19fbe15390216ece5e3c407">JSD_ENDOBJ</a>&#160;&#160;&#160;{&quot;&quot;, nullptr, JT_ENDOBJ}</td></tr>
 <tr class="memdesc:a91838d2ed19fbe15390216ece5e3c407"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate entry for end of composite object. <br /></td></tr>
 <tr class="separator:a91838d2ed19fbe15390216ece5e3c407"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3a95a5e72829954f91ad42ffdc3e4ecf"><td class="memItemLeft" align="right" valign="top"><a id="a3a95a5e72829954f91ad42ffdc3e4ecf"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="jbridge_8h.html#a3a95a5e72829954f91ad42ffdc3e4ecf">JSDN_POSTFUNC</a>(F,  N)&#160;&#160;&#160;{N, F, JT_POSTFUN, 0, 1}</td></tr>
-<tr class="memdesc:a3a95a5e72829954f91ad42ffdc3e4ecf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate entry for POST function call. <br /></td></tr>
-<tr class="separator:a3a95a5e72829954f91ad42ffdc3e4ecf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
+Typedefs</h2></td></tr>
+<tr class="memitem:a9a3a3308ffa67623074f9fdef3c2ac4e"><td class="memItemLeft" align="right" valign="top"><a id="a9a3a3308ffa67623074f9fdef3c2ac4e"></a>
+typedef std::vector&lt; jb_var &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>mlib::jb_dictionary</b></td></tr>
+<tr class="separator:a9a3a3308ffa67623074f9fdef3c2ac4e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5735cec3e659ce2679f065ca58e1a1f9"><td class="memItemLeft" align="right" valign="top"><a id="a5735cec3e659ce2679f065ca58e1a1f9"></a>
+typedef void(*&#160;</td><td class="memItemRight" valign="bottom"><b>mlib::post_action</b>) (JSONBridge &amp;)</td></tr>
+<tr class="separator:a5735cec3e659ce2679f065ca58e1a1f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
 Enumerations</h2></td></tr>
@@ -124,8 +134,23 @@ Enumerations</h2></td></tr>
 <div class="textblock"><p>Definition of JSONBridge class</p>
 <p>(c) Mircea Neacsu 2017. All rights reserved. </p>
 </div><h2 class="groupheader">Macro Definition Documentation</h2>
-<a id="a6b7ff55a8808649efed9d9755a44f3ec"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6b7ff55a8808649efed9d9755a44f3ec">&#9670;&nbsp;</a></span>JSD</h2>
+<a id="a6e5974d940c3fb5514d9fa182a7b8c20"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6e5974d940c3fb5514d9fa182a7b8c20">&#9670;&nbsp;</a></span>ERR_JSON_DICSTRUC</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define ERR_JSON_DICSTRUC&#160;&#160;&#160;-11</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Bad dictionary structure </p>
+
+</div>
+</div>
+<a id="a06a0fc0d3c5fe5289fdedf7039b65258"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a06a0fc0d3c5fe5289fdedf7039b65258">&#9670;&nbsp;</a></span>JSD</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -146,18 +171,12 @@ Enumerations</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">C, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">S&#160;</td>
+          <td class="paramname"><em>...</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td>&#160;&#160;&#160;{#V, &amp;##V, T, S, C}</td>
+          <td></td><td>&#160;&#160;&#160;{#V, &amp;##V, T, __VA_ARGS__}</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -168,15 +187,15 @@ Enumerations</h2></td></tr>
     <tr><td class="paramname">V</td><td>Name of variable </td></tr>
     <tr><td class="paramname">T</td><td>Type of variable (one of JT_... values) </td></tr>
     <tr><td class="paramname">C</td><td>Number of elements (for arrays) </td></tr>
-    <tr><td class="paramname">S</td><td>Element size (only for JT_STR and JT_PSTR types) </td></tr>
+    <tr><td class="paramname">S</td><td>Element size (only for JT_STR types) </td></tr>
   </table>
   </dd>
 </dl>
 
 </div>
 </div>
-<a id="a6bb77f0e8784831589b0245145bd276d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6bb77f0e8784831589b0245145bd276d">&#9670;&nbsp;</a></span>JSDN</h2>
+<a id="ac8c1f9fcee03c616c7c5dde34ef0d2b3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac8c1f9fcee03c616c7c5dde34ef0d2b3">&#9670;&nbsp;</a></span>JSDN</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -203,18 +222,12 @@ Enumerations</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">C, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">S&#160;</td>
+          <td class="paramname"><em>...</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td>&#160;&#160;&#160;{N, &amp;##V, T, S, C}</td>
+          <td></td><td>&#160;&#160;&#160;{N, &amp;##V, T, __VA_ARGS__}</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -223,58 +236,6 @@ Enumerations</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">V</td><td>variable name </td></tr>
-    <tr><td class="paramname">N</td><td>External (JSON) name of the variable </td></tr>
-    <tr><td class="paramname">T</td><td>Type of variable (one of JT_... values) </td></tr>
-    <tr><td class="paramname">C</td><td>Number of elements (for arrays) </td></tr>
-    <tr><td class="paramname">S</td><td>Element size (only for JT_STR and JT_PSTR types) </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a id="aeecc3b9d65283895031e049bae297f69"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aeecc3b9d65283895031e049bae297f69">&#9670;&nbsp;</a></span>JSDX</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define JSDX</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">N, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">T, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">C, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">S&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td>&#160;&#160;&#160;{N, nullptr, T, S, C}</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Generates an entry in JSON dictionary for a variable whose address is not yet known. </p>
-<p>Address must be set using set_var function.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
     <tr><td class="paramname">N</td><td>External (JSON) name of the variable </td></tr>
     <tr><td class="paramname">T</td><td>Type of variable (one of JT_... values) </td></tr>
     <tr><td class="paramname">C</td><td>Number of elements (for arrays) </td></tr>

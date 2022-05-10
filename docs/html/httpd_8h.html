@@ -60,8 +60,8 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structmlib_1_1ci_less.html">mlib::ciLess</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Case insensitive comparison function.  <a href="structmlib_1_1ci_less.html#details">More...</a><br /></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structmlib_1_1ci__less.html">mlib::ci_less</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Case insensitive comparison function.  <a href="structmlib_1_1ci__less.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1http__connection.html">mlib::http_connection</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Representation of a HTTP client connection request.  <a href="classmlib_1_1http__connection.html#details">More...</a><br /></td></tr>
@@ -100,8 +100,8 @@ Macros</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
-<tr class="memitem:a52f5ca33adf32f8835b528cdcd77cfc9"><td class="memItemLeft" align="right" valign="top">typedef std::map&lt; std::string, std::string, ciLess &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="httpd_8h.html#a52f5ca33adf32f8835b528cdcd77cfc9">mlib::str_pairs</a></td></tr>
-<tr class="separator:a52f5ca33adf32f8835b528cdcd77cfc9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af51aa2dd4980a9ee25108dcafa7b108b"><td class="memItemLeft" align="right" valign="top">typedef std::map&lt; std::string, std::string, ci_less &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="httpd_8h.html#af51aa2dd4980a9ee25108dcafa7b108b">mlib::str_pairs</a></td></tr>
+<tr class="separator:af51aa2dd4980a9ee25108dcafa7b108b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aef8252c86f25a8ca36ec05b3e7431399"><td class="memItemLeft" align="right" valign="top"><a id="aef8252c86f25a8ca36ec05b3e7431399"></a>
 typedef int(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="httpd_8h.html#aef8252c86f25a8ca36ec05b3e7431399">mlib::uri_handler</a>) (const char *uri, http_connection &amp;client, void *info)</td></tr>
 <tr class="memdesc:aef8252c86f25a8ca36ec05b3e7431399"><td class="mdescLeft">&#160;</td><td class="mdescRight">User defined URL handler function. <br /></td></tr>
@@ -110,7 +110,7 @@ typedef int(*&#160;</td><td class="memItemRight" valign="bottom"><a class="el" h
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:afe967d60283b2ce84a1dae08b222df8a"><td class="memItemLeft" align="right" valign="top"><a id="afe967d60283b2ce84a1dae08b222df8a"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="httpd_8h.html#afe967d60283b2ce84a1dae08b222df8a">mlib::parse_urlparams</a> (const char *par_str, <a class="el" href="httpd_8h.html#a52f5ca33adf32f8835b528cdcd77cfc9">str_pairs</a> &amp;params)</td></tr>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="httpd_8h.html#afe967d60283b2ce84a1dae08b222df8a">mlib::parse_urlparams</a> (const char *par_str, <a class="el" href="httpd_8h.html#af51aa2dd4980a9ee25108dcafa7b108b">str_pairs</a> &amp;params)</td></tr>
 <tr class="memdesc:afe967d60283b2ce84a1dae08b222df8a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Parse a URL encoded string of parameters. <br /></td></tr>
 <tr class="separator:afe967d60283b2ce84a1dae08b222df8a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -118,14 +118,14 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="http
 <div class="textblock"><p>Implementation of httpd and http_connection classes</p>
 <p>(c) Mircea Neacsu 2007-2014. All rights reserved. </p>
 </div><h2 class="groupheader">Typedef Documentation</h2>
-<a id="a52f5ca33adf32f8835b528cdcd77cfc9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a52f5ca33adf32f8835b528cdcd77cfc9">&#9670;&nbsp;</a></span>str_pairs</h2>
+<a id="af51aa2dd4980a9ee25108dcafa7b108b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af51aa2dd4980a9ee25108dcafa7b108b">&#9670;&nbsp;</a></span>str_pairs</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef std::map&lt;std::string, std::string, ciLess&gt; <a class="el" href="httpd_8h.html#a52f5ca33adf32f8835b528cdcd77cfc9">mlib::str_pairs</a></td>
+          <td class="memname">typedef std::map&lt;std::string, std::string, ci_less&gt; <a class="el" href="httpd_8h.html#af51aa2dd4980a9ee25108dcafa7b108b">mlib::str_pairs</a></td>
         </tr>
       </table>
 </div><div class="memdoc">

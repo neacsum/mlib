@@ -64,10 +64,10 @@ Inheritance diagram for mlib::async_queue&lt; M, C &gt;:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:aa58b124cc7c75bb650a5f9ff29350702"><td class="memItemLeft" align="right" valign="top"><a id="aa58b124cc7c75bb650a5f9ff29350702"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1async__queue.html#aa58b124cc7c75bb650a5f9ff29350702">async_queue</a> (int limit_=INFINITE)</td></tr>
-<tr class="memdesc:aa58b124cc7c75bb650a5f9ff29350702"><td class="mdescLeft">&#160;</td><td class="mdescRight">Crates a queue with the given maximum size. <br /></td></tr>
-<tr class="separator:aa58b124cc7c75bb650a5f9ff29350702"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad95e58253c766336e960b81bbc0ea746"><td class="memItemLeft" align="right" valign="top"><a id="ad95e58253c766336e960b81bbc0ea746"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1async__queue.html#ad95e58253c766336e960b81bbc0ea746">async_queue</a> (size_t limit_=INFINITE)</td></tr>
+<tr class="memdesc:ad95e58253c766336e960b81bbc0ea746"><td class="mdescLeft">&#160;</td><td class="mdescRight">Crates a queue with the given maximum size. <br /></td></tr>
+<tr class="separator:ad95e58253c766336e960b81bbc0ea746"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad25ac6f844b051f5a6fad0edff437845"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1async__queue.html#ad25ac6f844b051f5a6fad0edff437845">produce</a> (const M &amp;obj, DWORD timeout=INFINITE)</td></tr>
 <tr class="separator:ad25ac6f844b051f5a6fad0edff437845"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a582390dcdd897a61dbe65457bb8aff49"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1async__queue.html#a582390dcdd897a61dbe65457bb8aff49">consume</a> (M &amp;result, int timeout=INFINITE)</td></tr>
@@ -87,9 +87,9 @@ size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cl
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
-<tr class="memitem:a3b9ef57ee21f853d546ea4184a2f9c2d"><td class="memItemLeft" align="right" valign="top"><a id="a3b9ef57ee21f853d546ea4184a2f9c2d"></a>
-int&#160;</td><td class="memItemRight" valign="bottom"><b>limit</b></td></tr>
-<tr class="separator:a3b9ef57ee21f853d546ea4184a2f9c2d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab06bb02f34487d2cb70592bc80549971"><td class="memItemLeft" align="right" valign="top"><a id="ab06bb02f34487d2cb70592bc80549971"></a>
+size_t&#160;</td><td class="memItemRight" valign="bottom"><b>limit</b></td></tr>
+<tr class="separator:ab06bb02f34487d2cb70592bc80549971"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a662d2b27c051b1e65b1cf719ce642094"><td class="memItemLeft" align="right" valign="top"><a id="a662d2b27c051b1e65b1cf719ce642094"></a>
 <a class="el" href="classmlib_1_1semaphore.html">semaphore</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1async__queue.html#a662d2b27c051b1e65b1cf719ce642094">prod_sema</a></td></tr>
 <tr class="memdesc:a662d2b27c051b1e65b1cf719ce642094"><td class="mdescLeft">&#160;</td><td class="mdescRight">producers' semaphore counts down until queue is full <br /></td></tr>

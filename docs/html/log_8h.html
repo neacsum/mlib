@@ -101,7 +101,7 @@ Macros</h2></td></tr>
 <tr class="separator:a6ff63e8955665c4a58b1598f2b07c51a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Masks and Operations</div></td></tr>
 <tr><td colspan="2"><div class="groupText"><p>The following definitions can be used for operations on priorities and facilities.</p>
-<p>See <a class="el" href="group__syslog.html#gad9738ced32624b84aac71be08bd347b0" title="Generate a log message using FMT string and option arguments.">syslog()</a> and <a class="el" href="group__syslog.html#ga79f76e80518dce884dab21fa3f18a1f4" title="Set the log mask level.">setlogmask()</a> for examples. </p>
+<p>See <a class="el" href="group__syslog.html#gabd4d8fe8dc9699a511c5bb290d17180f" title="Generate a log message using FMT string and option arguments.">syslog()</a> and <a class="el" href="group__syslog.html#ga79f76e80518dce884dab21fa3f18a1f4" title="Set the log mask level.">setlogmask()</a> for examples. </p>
 </div></td></tr>
 <tr class="memitem:a709050545b621c5eba19d44e17b5da52"><td class="memItemLeft" align="right" valign="top"><a id="a709050545b621c5eba19d44e17b5da52"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="log_8h.html#a709050545b621c5eba19d44e17b5da52">LOG_PRIMASK</a>&#160;&#160;&#160;0x7</td></tr>
@@ -123,7 +123,32 @@ Macros</h2></td></tr>
 <tr class="separator:adad2d7c1f25f7a94c697894722469c83"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Flags for openlog</div></td></tr>
 <tr><td colspan="2"><div class="groupText"><p>The following flags can be specified in the opt argument of <a class="el" href="group__syslog.html#ga6f1f3704c08cc51ad17680056d67bdf4" title="Open connection to logger.">openlog()</a>:</p>
+<p>BSD stuff </p>
 </div></td></tr>
+<tr class="memitem:a7b264572ee428bb73548226ba5bbe88a"><td class="memItemLeft" align="right" valign="top"><a id="a7b264572ee428bb73548226ba5bbe88a"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="log_8h.html#a7b264572ee428bb73548226ba5bbe88a">LOG_PID</a>&#160;&#160;&#160;0x01	/* log the pid with each message */</td></tr>
+<tr class="memdesc:a7b264572ee428bb73548226ba5bbe88a"><td class="mdescLeft">&#160;</td><td class="mdescRight">log the process id with each message <br /></td></tr>
+<tr class="separator:a7b264572ee428bb73548226ba5bbe88a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeccd30c76c44f407cd9d5441318b6aba"><td class="memItemLeft" align="right" valign="top"><a id="aeccd30c76c44f407cd9d5441318b6aba"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="log_8h.html#aeccd30c76c44f407cd9d5441318b6aba">LOG_CONS</a>&#160;&#160;&#160;0x02	/* log on the console if errors in sending */</td></tr>
+<tr class="memdesc:aeccd30c76c44f407cd9d5441318b6aba"><td class="mdescLeft">&#160;</td><td class="mdescRight">log the process id with each message <br /></td></tr>
+<tr class="separator:aeccd30c76c44f407cd9d5441318b6aba"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aed1240a0e0d7f574a09ea915d4e1af85"><td class="memItemLeft" align="right" valign="top"><a id="aed1240a0e0d7f574a09ea915d4e1af85"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="log_8h.html#aed1240a0e0d7f574a09ea915d4e1af85">LOG_ODELAY</a>&#160;&#160;&#160;0x04	/* delay open until first <a class="el" href="group__syslog.html#gabd4d8fe8dc9699a511c5bb290d17180f">syslog</a>() (default) */</td></tr>
+<tr class="memdesc:aed1240a0e0d7f574a09ea915d4e1af85"><td class="mdescLeft">&#160;</td><td class="mdescRight">log the process id with each message <br /></td></tr>
+<tr class="separator:aed1240a0e0d7f574a09ea915d4e1af85"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a446430791b21a34e7308046826759d25"><td class="memItemLeft" align="right" valign="top"><a id="a446430791b21a34e7308046826759d25"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="log_8h.html#a446430791b21a34e7308046826759d25">LOG_NDELAY</a>&#160;&#160;&#160;0x08	/* don't delay open */</td></tr>
+<tr class="memdesc:a446430791b21a34e7308046826759d25"><td class="mdescLeft">&#160;</td><td class="mdescRight">log the process id with each message <br /></td></tr>
+<tr class="separator:a446430791b21a34e7308046826759d25"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9dff0ca45769bfa276ce3f0080acc397"><td class="memItemLeft" align="right" valign="top"><a id="a9dff0ca45769bfa276ce3f0080acc397"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="log_8h.html#a9dff0ca45769bfa276ce3f0080acc397">LOG_NOWAIT</a>&#160;&#160;&#160;0x10	/* don't wait for console forks: DEPRECATED */</td></tr>
+<tr class="memdesc:a9dff0ca45769bfa276ce3f0080acc397"><td class="mdescLeft">&#160;</td><td class="mdescRight">log the process id with each message <br /></td></tr>
+<tr class="separator:a9dff0ca45769bfa276ce3f0080acc397"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a542160b84335cc94dfb75604fd40d341"><td class="memItemLeft" align="right" valign="top"><a id="a542160b84335cc94dfb75604fd40d341"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="log_8h.html#a542160b84335cc94dfb75604fd40d341">LOG_PERROR</a>&#160;&#160;&#160;0x20	/* log to stderr as well */</td></tr>
+<tr class="memdesc:a542160b84335cc94dfb75604fd40d341"><td class="mdescLeft">&#160;</td><td class="mdescRight">log the process id with each message <br /></td></tr>
+<tr class="separator:a542160b84335cc94dfb75604fd40d341"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa6fea5c01dc3217fcca06beb48cf63cf"><td class="memItemLeft" align="right" valign="top"><a id="aa6fea5c01dc3217fcca06beb48cf63cf"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="log_8h.html#aa6fea5c01dc3217fcca06beb48cf63cf">LOGOPT_PID</a>&#160;&#160;&#160;0x01</td></tr>
 <tr class="memdesc:aa6fea5c01dc3217fcca06beb48cf63cf"><td class="mdescLeft">&#160;</td><td class="mdescRight">log the process id with each message <br /></td></tr>
@@ -133,11 +158,11 @@ Macros</h2></td></tr>
 <tr class="memdesc:a83b5181f6564be529d53ca34a6063eb9"><td class="mdescLeft">&#160;</td><td class="mdescRight">log to Windows debug port (OutputDebugString) <br /></td></tr>
 <tr class="separator:a83b5181f6564be529d53ca34a6063eb9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a85248c18a44a6085d9ac12c5e2b897f7"><td class="memItemLeft" align="right" valign="top"><a id="a85248c18a44a6085d9ac12c5e2b897f7"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="log_8h.html#a85248c18a44a6085d9ac12c5e2b897f7">LOGOPT_NOUDP</a>&#160;&#160;&#160;0x04</td></tr>
+#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="log_8h.html#a85248c18a44a6085d9ac12c5e2b897f7">LOGOPT_NOUDP</a>&#160;&#160;&#160;0x40</td></tr>
 <tr class="memdesc:a85248c18a44a6085d9ac12c5e2b897f7"><td class="mdescLeft">&#160;</td><td class="mdescRight">do not send UDP data <br /></td></tr>
 <tr class="separator:a85248c18a44a6085d9ac12c5e2b897f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4d8f3b9c03b8a17a932c522398c9ac36"><td class="memItemLeft" align="right" valign="top"><a id="a4d8f3b9c03b8a17a932c522398c9ac36"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="log_8h.html#a4d8f3b9c03b8a17a932c522398c9ac36">LOGOPT_FILE</a>&#160;&#160;&#160;0x08</td></tr>
+#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="log_8h.html#a4d8f3b9c03b8a17a932c522398c9ac36">LOGOPT_FILE</a>&#160;&#160;&#160;0x80</td></tr>
 <tr class="memdesc:a4d8f3b9c03b8a17a932c522398c9ac36"><td class="mdescLeft">&#160;</td><td class="mdescRight">log to disk file <br /></td></tr>
 <tr class="separator:a4d8f3b9c03b8a17a932c522398c9ac36"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -155,13 +180,13 @@ Functions</h2></td></tr>
 <tr class="memitem:gaec437cc017de835e256a121cccfc62c0"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__syslog.html#gaec437cc017de835e256a121cccfc62c0">setlogopt</a> (int opt)</td></tr>
 <tr class="memdesc:gaec437cc017de835e256a121cccfc62c0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set option flags.  <a href="group__syslog.html#gaec437cc017de835e256a121cccfc62c0">More...</a><br /></td></tr>
 <tr class="separator:gaec437cc017de835e256a121cccfc62c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gad9738ced32624b84aac71be08bd347b0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__syslog.html#gad9738ced32624b84aac71be08bd347b0">syslog</a> (int facility_priority, char *fmt,...)</td></tr>
-<tr class="memdesc:gad9738ced32624b84aac71be08bd347b0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate a log message using FMT string and option arguments.  <a href="group__syslog.html#gad9738ced32624b84aac71be08bd347b0">More...</a><br /></td></tr>
-<tr class="separator:gad9738ced32624b84aac71be08bd347b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7bdffa79fa774cf3cce43da5f6bae3eb"><td class="memItemLeft" align="right" valign="top"><a id="a7bdffa79fa774cf3cce43da5f6bae3eb"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="log_8h.html#a7bdffa79fa774cf3cce43da5f6bae3eb">syslog_debug</a> (const char *fmt,...)</td></tr>
-<tr class="memdesc:a7bdffa79fa774cf3cce43da5f6bae3eb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate a log message at debug level using FMT string and option arguments. <br /></td></tr>
-<tr class="separator:a7bdffa79fa774cf3cce43da5f6bae3eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gabd4d8fe8dc9699a511c5bb290d17180f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__syslog.html#gabd4d8fe8dc9699a511c5bb290d17180f">syslog</a> (int facility_priority, const char *fmt,...)</td></tr>
+<tr class="memdesc:gabd4d8fe8dc9699a511c5bb290d17180f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate a log message using FMT string and option arguments.  <a href="group__syslog.html#gabd4d8fe8dc9699a511c5bb290d17180f">More...</a><br /></td></tr>
+<tr class="separator:gabd4d8fe8dc9699a511c5bb290d17180f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa82612b19d0ed7323efe032450f1e4da"><td class="memItemLeft" align="right" valign="top"><a id="aa82612b19d0ed7323efe032450f1e4da"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="log_8h.html#aa82612b19d0ed7323efe032450f1e4da">syslog_debug</a> (const char *fmt,...)</td></tr>
+<tr class="memdesc:aa82612b19d0ed7323efe032450f1e4da"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate a log message at debug level using FMT string and option arguments. <br /></td></tr>
+<tr class="separator:aa82612b19d0ed7323efe032450f1e4da"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>

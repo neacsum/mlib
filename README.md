@@ -2,33 +2,25 @@
 This is a collection of bits and pieces crafted over the years. It is released
 with the hope that other people might find it useful or interesting.
 
-## License ##
+Here you will find stuff as diverse as:
+- socket streams that allow you work with C++ io streams over TCP or UDP sockets
+- a very competent JSON parser/generator
+- an embedded HTTP server
+- tools for creating a user interface using HTML
+- a powerful error handling mechanism
+- parsing functions for NMEA-0183 messages
+- serial ports enumeration functions
 
-The MIT License (MIT)
- 
-Copyright (c) 1999-2020 Mircea Neacsu
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+and many more...
 
 ## Contents ##
- - mlib                      - Main Library
- - mlib_test                 - Test Program
+ - mlib - Main Library
+ - mlib_test - Test Program
+  
+  Example programs:
+  - echoserv - An echo server
+  - ui-sample - Sample HTML user interface
+  - yacb (Yet Another Circular Buffer) - Circular buffer sample
 
 ## Building ##
 mlib requires the [UTF-8 Library](https://github.com/neacsum/utf8). The test
@@ -36,8 +28,10 @@ program requires the [UTPP Library](https://github.com/neacsum/utpp).
 
 `BUILD.bat` script will create all libraries and test programs.
 
+You can use the [CPM - C/C++ Package Manager](https://github.com/neacsum/cpm) to fetch all dependent packages and build them. Just issue the `CPM` command
+
 ## Installation ##
-All projects have been tested under Visual Studio 2019. The libraries can be 
+All projects have been tested under Visual Studio 2022. The libraries can be 
 built in 32 or 64 bit version, with or without debug information.
 
 ## Documentation ##
@@ -48,3 +42,8 @@ Also there are some articles on CodeProject detailing some of the features:
  - [Windows Sockets Streams](https://www.codeproject.com/Articles/5252621/Windows-Sockets-Streams)
  - [Windows Sockets Streams Part II - Multi-Threaded TCP Servers](https://www.codeproject.com/Articles/5270886/Windows-Sockets-Streams-Part-II-Multi-Threaded-TCP)
  - [Windows Sockets Streams Part III - HTTP Server](https://www.codeproject.com/Articles/5272994/Windows-Sockets-Streams-Part-III-HTTP-Server)
+ - [YACB - Yet Another Circular Buffer](https://www.codeproject.com/Articles/5292326/YACB-Yet-Another-Circular-Buffer)
+ - [Producer/Consumer Queues in C++](https://www.codeproject.com/Articles/5281878/Producer-Consumer-Queues-in-Cplusplus)
+
+## License ##
+[MIT License](https://github.com/neacsum/mlib/LICENSE)

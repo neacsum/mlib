@@ -15,28 +15,36 @@
 
 namespace json {
 
+/// Maximum number of array elements in a JSON node
 constexpr int max_array_size = 8192;
+
+/// Maximum number of properties for a node
 constexpr int max_object_names = 8192;
+
+/// Maximum string length
 constexpr int max_string_length = 8192;
+
 
 //Formatting flags
 #define JSON_FMT_INDENT     0x01      //!< Indent JSON string when writing
 #define JSON_FMT_QUOTESLASH 0x02      //!< Quote all solidus ('/') characters
 
-// Errors
-#define ERR_JSON_INVTYPE    -1    //invalid node type
-#define ERR_JSON_TOOMANY    -2    //too many descendants
-#define ERR_JSON_ITERTYPE   -3    //invalid iterator type
-#define ERR_JSON_ITERPOS    -4    //invalid iterator position
-#define ERR_JSON_INPUT      -5    //invalid character in input stream
-#define ERR_JSON_SIZE       -7    //invalid element size
-#define ERR_JSON_MISSING    -8    //invalid index or key on const node 
+// JSON error codes
+#define ERR_JSON_INVTYPE    -1    //!< invalid node type
+#define ERR_JSON_TOOMANY    -2    //!< too many descendants
+#define ERR_JSON_ITERTYPE   -3    //!< invalid iterator type
+#define ERR_JSON_ITERPOS    -4    //!< invalid iterator position
+#define ERR_JSON_INPUT      -5    //!< invalid character in input stream
+#define ERR_JSON_SIZE       -7    //!< invalid element size
+#define ERR_JSON_MISSING    -8    //!< invalid index or key on const node 
 
+/// Error facility for JSON errors
 extern mlib::errfac* errors;
 
-class node;
+/// JSON node types
 enum class type { null, object, array, numeric, string, boolean };
 
+/// Representation of a JSON node
 class node {
 public:
   using pnode = std::unique_ptr<node>;
@@ -61,6 +69,7 @@ public:
   node (node&& other);
   ~node ();
 
+  /// node iterator
   template <bool C_>
   class iterator_type {
   public:
@@ -341,7 +350,7 @@ public:
   bool operator != (const node& other) const;
 
   //streaming (encoding/decoding)
-  mlib::erc read (std::istream&);
+  mlib::erc read (std::istream& s);
   mlib::erc read (const std::string& s);
   mlib::erc write (std::ostream& os, int flags = 0, int spaces = 0, int level = 0) const;
   mlib::erc write (std::string& s, int flags = 0, int spaces=0) const;
@@ -543,7 +552,8 @@ inline bool node::operator!=(const node& other) const
 }
 
 /*!
-  Return value of an object node element
+  Return value of an object node element.
+
   If element doesn't exist it throws an ERR_JSON_MISSING exception.
 */
 inline
@@ -553,7 +563,8 @@ node& node::at (const std::string& name)
 }
 
 /*!
-  Return value of an object node element
+  Return value of an object node element.
+
   If element doesn't exist it throws an ERR_JSON_MISSING exception.
 */
 inline

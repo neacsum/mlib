@@ -38,6 +38,9 @@ SOFTWARE.
 - \ref mlib::wtimer "waitable timer"
 - \ref mlib::syncbase "syncbase" - base class for all synchronization objects
 
+## JSON Parser ##
+- \ref json::node an element of a JSON object
+
 ### Networking ###
 - \ref mlib::inaddr "inaddr"
 - \ref mlib::sock "socket"

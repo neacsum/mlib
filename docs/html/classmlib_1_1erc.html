@@ -53,6 +53,8 @@ $(function() {
 
 <p>objects returned as a function result or thrown directly.  
  <a href="classmlib_1_1erc.html#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="errorcode_8h_source.html">errorcode.h</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for mlib::erc:</div>
 <div class="dyncontent">
@@ -69,10 +71,10 @@ Public Member Functions</h2></td></tr>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1erc.html#a8c85c4021ed47fef5231c03c84cb3c63">erc</a> ()</td></tr>
 <tr class="memdesc:a8c85c4021ed47fef5231c03c84cb3c63"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default ctor for erc objects creates an inactive error. <br /></td></tr>
 <tr class="separator:a8c85c4021ed47fef5231c03c84cb3c63"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a10ff173eebe90c3ea9bdcf68aa7705ed"><td class="memItemLeft" align="right" valign="top"><a id="a10ff173eebe90c3ea9bdcf68aa7705ed"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1erc.html#a10ff173eebe90c3ea9bdcf68aa7705ed">erc</a> (int value, short int <a class="el" href="classmlib_1_1erc.html#aacd8e492c5358a5de2116aee526372a7">priority</a>=<a class="el" href="errorcode_8h.html#a045f609c6f81928ed19bec8fa95ce978">ERROR_PRI_ERROR</a>, <a class="el" href="classmlib_1_1errfac.html">errfac</a> *f=0)</td></tr>
-<tr class="memdesc:a10ff173eebe90c3ea9bdcf68aa7705ed"><td class="mdescLeft">&#160;</td><td class="mdescRight">Ctor for a real erc. <br /></td></tr>
-<tr class="separator:a10ff173eebe90c3ea9bdcf68aa7705ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af9a320f96450e4cd33f60de567acbef8"><td class="memItemLeft" align="right" valign="top"><a id="af9a320f96450e4cd33f60de567acbef8"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1erc.html#af9a320f96450e4cd33f60de567acbef8">erc</a> (int value, short int <a class="el" href="classmlib_1_1erc.html#aacd8e492c5358a5de2116aee526372a7">priority</a>=<a class="el" href="errorcode_8h.html#a045f609c6f81928ed19bec8fa95ce978">ERROR_PRI_ERROR</a>, const <a class="el" href="classmlib_1_1errfac.html">errfac</a> *f=0)</td></tr>
+<tr class="memdesc:af9a320f96450e4cd33f60de567acbef8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Ctor for a real erc. <br /></td></tr>
+<tr class="separator:af9a320f96450e4cd33f60de567acbef8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad53189ed92df58baecf1b58124312d6e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1erc.html#ad53189ed92df58baecf1b58124312d6e">erc</a> (const <a class="el" href="classmlib_1_1erc.html">erc</a> &amp;other)</td></tr>
 <tr class="memdesc:ad53189ed92df58baecf1b58124312d6e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy constructor removes the activity flag of the original object.  <a href="classmlib_1_1erc.html#ad53189ed92df58baecf1b58124312d6e">More...</a><br /></td></tr>
 <tr class="separator:ad53189ed92df58baecf1b58124312d6e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -80,8 +82,9 @@ Public Member Functions</h2></td></tr>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1erc.html#a59d730c269be509d1d85ce62f0e566a4">erc</a> (<a class="el" href="classmlib_1_1erc.html">erc</a> &amp;&amp;other)</td></tr>
 <tr class="memdesc:a59d730c269be509d1d85ce62f0e566a4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Move constructor removes the activity flag of the original object. <br /></td></tr>
 <tr class="separator:a59d730c269be509d1d85ce62f0e566a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a684e1e59d6152aeac16553a0628a896c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1erc.html#a684e1e59d6152aeac16553a0628a896c">~erc</a> () noexcept(false)</td></tr>
-<tr class="memdesc:a684e1e59d6152aeac16553a0628a896c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Dtor.  <a href="classmlib_1_1erc.html#a684e1e59d6152aeac16553a0628a896c">More...</a><br /></td></tr>
+<tr class="memitem:a684e1e59d6152aeac16553a0628a896c"><td class="memItemLeft" align="right" valign="top"><a id="a684e1e59d6152aeac16553a0628a896c"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1erc.html#a684e1e59d6152aeac16553a0628a896c">~erc</a> () noexcept(false)</td></tr>
+<tr class="memdesc:a684e1e59d6152aeac16553a0628a896c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor. If we are active, call our facility to see if we get logged or thrown. <br /></td></tr>
 <tr class="separator:a684e1e59d6152aeac16553a0628a896c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad7f22b152ab3aaa2a5077893aa4d9f09"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classmlib_1_1erc.html">erc</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1erc.html#ad7f22b152ab3aaa2a5077893aa4d9f09">operator=</a> (const <a class="el" href="classmlib_1_1erc.html">erc</a> &amp;rhs)</td></tr>
 <tr class="memdesc:ad7f22b152ab3aaa2a5077893aa4d9f09"><td class="mdescLeft">&#160;</td><td class="mdescRight">Principal assignment operator.  <a href="classmlib_1_1erc.html#ad7f22b152ab3aaa2a5077893aa4d9f09">More...</a><br /></td></tr>
@@ -96,13 +99,13 @@ Public Member Functions</h2></td></tr>
 unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1erc.html#aacd8e492c5358a5de2116aee526372a7">priority</a> () const</td></tr>
 <tr class="memdesc:aacd8e492c5358a5de2116aee526372a7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return priority value. <br /></td></tr>
 <tr class="separator:aacd8e492c5358a5de2116aee526372a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6301157c1821643258adab6aa4ccb5ba"><td class="memItemLeft" align="right" valign="top"><a id="a6301157c1821643258adab6aa4ccb5ba"></a>
-<a class="el" href="classmlib_1_1errfac.html">errfac</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1erc.html#a6301157c1821643258adab6aa4ccb5ba">facility</a> () const</td></tr>
-<tr class="memdesc:a6301157c1821643258adab6aa4ccb5ba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return reference to facility. <br /></td></tr>
-<tr class="separator:a6301157c1821643258adab6aa4ccb5ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab7cd4b82f8b71b3ce84292dbac333575"><td class="memItemLeft" align="right" valign="top"><a id="ab7cd4b82f8b71b3ce84292dbac333575"></a>
+const <a class="el" href="classmlib_1_1errfac.html">errfac</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1erc.html#ab7cd4b82f8b71b3ce84292dbac333575">facility</a> () const</td></tr>
+<tr class="memdesc:ab7cd4b82f8b71b3ce84292dbac333575"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return reference to facility. <br /></td></tr>
+<tr class="separator:ab7cd4b82f8b71b3ce84292dbac333575"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:add2e7365d38fa52c3744671f83cdef01"><td class="memItemLeft" align="right" valign="top"><a id="add2e7365d38fa52c3744671f83cdef01"></a>
 <a class="el" href="classmlib_1_1erc.html">erc</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1erc.html#add2e7365d38fa52c3744671f83cdef01">reactivate</a> ()</td></tr>
-<tr class="memdesc:add2e7365d38fa52c3744671f83cdef01"><td class="mdescLeft">&#160;</td><td class="mdescRight">Similar to rethrowing an exception. <br /></td></tr>
+<tr class="memdesc:add2e7365d38fa52c3744671f83cdef01"><td class="mdescLeft">&#160;</td><td class="mdescRight">Similar to re-throwing an exception. <br /></td></tr>
 <tr class="separator:add2e7365d38fa52c3744671f83cdef01"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a95d1b9f9f35c8a0326120d48a3f900c1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classmlib_1_1erc.html">erc</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1erc.html#a95d1b9f9f35c8a0326120d48a3f900c1">deactivate</a> ()</td></tr>
 <tr class="memdesc:a95d1b9f9f35c8a0326120d48a3f900c1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Marks error code as inactive.  <a href="classmlib_1_1erc.html#a95d1b9f9f35c8a0326120d48a3f900c1">More...</a><br /></td></tr>
@@ -123,13 +126,16 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>errfac</b></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>objects returned as a function result or thrown directly. </p>
-<p>If not tested and their level is above facility's logging level they will be logged ( <a class="el" href="classmlib_1_1errfac.html#a2fabef1cb2b68c00fa6f2b39af6f7f3c" title="Logging action. Default is to use dprintf.">errfac::log()</a> ). If the level is above facility's throwing level they will be thrown as exceptions. </p>
+<p>If not tested and their level is above facility's logging level they will be logged (by calling <a class="el" href="classmlib_1_1errfac.html#a43fe5ce46412ba0a196443f62eb90d98" title="Logging action. Default is to use dprintf.">errfac::log()</a> ). If the level is above facility's throwing level they will be thrown as exceptions. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="ad53189ed92df58baecf1b58124312d6e"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ad53189ed92df58baecf1b58124312d6e">&#9670;&nbsp;</a></span>erc()</h2>
 
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">mlib::erc::erc </td>
@@ -139,39 +145,16 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>errfac</b></td></tr>
           <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 <p>Copy constructor removes the activity flag of the original object. </p>
 <p>Having two erc's active at the same time is a big no-no: when one of them is thrown, the stack unwinding process invokes the destructor of the other one, which in turn might throw again. Throwing an exception during stack unwinding will terminate your application. For more details see: <a href="https://isocpp.org/wiki/faq/exceptions#dtors-shouldnt-throw">https://isocpp.org/wiki/faq/exceptions#dtors-shouldnt-throw</a></p>
 <p>However, the whole concept of erc's is based upon destructors throwing exceptions. Here we carefully navigate between a rock and a hard place. </p>
-
-</div>
-</div>
-<a id="a684e1e59d6152aeac16553a0628a896c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a684e1e59d6152aeac16553a0628a896c">&#9670;&nbsp;</a></span>~erc()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">mlib::erc::~erc </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">noexcept</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Dtor. </p>
-<p>If we are active, call our facility to see if we get logged or thrown. </p>
 
 </div>
 </div>
@@ -209,6 +192,9 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>errfac</b></td></tr>
 
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="classmlib_1_1erc.html">erc</a> &amp; mlib::erc::deactivate </td>
@@ -217,6 +203,11 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>errfac</b></td></tr>
           <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 <p>Marks error code as inactive. </p>
@@ -229,6 +220,9 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>errfac</b></td></tr>
 
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname">mlib::erc::operator int </td>
@@ -237,6 +231,11 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>errfac</b></td></tr>
           <td> const</td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 <p>Integer conversion operator. </p>
@@ -249,6 +248,9 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>errfac</b></td></tr>
 
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="classmlib_1_1erc.html">erc</a> &amp; mlib::erc::operator= </td>
@@ -258,6 +260,11 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>errfac</b></td></tr>
           <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 <p>Principal assignment operator. </p>
@@ -271,6 +278,9 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>errfac</b></td></tr>
 
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
           <td class="memname"><a class="el" href="classmlib_1_1erc.html">erc</a> &amp; mlib::erc::operator= </td>
@@ -280,6 +290,11 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>errfac</b></td></tr>
           <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
 <p>Move assignment operator. </p>
@@ -287,9 +302,8 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>errfac</b></td></tr>
 
 </div>
 </div>
-<hr/>The documentation for this class was generated from the following files:<ul>
+<hr/>The documentation for this class was generated from the following file:<ul>
 <li>C:/development/mlib/include/mlib/<a class="el" href="errorcode_8h_source.html">errorcode.h</a></li>
-<li>C:/development/mlib/source/<a class="el" href="errorcode_8cpp.html">errorcode.cpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

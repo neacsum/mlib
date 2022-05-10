@@ -13,16 +13,17 @@
 #include <utf8/utf8.h>
 
 #ifndef RESFILE
+/// Resource type for asset files
 #define RESFILE   256
 #endif
 
 namespace mlib {
 
-/// Class for storing assets in Windows resource data.
+/// Class for storing asset files in Windows resource data.
 class asset
 {
 public:
-  asset (const std::string& name_, int id_) : name (name_), id (id_) , written (false) {};
+  asset (const std::string& name_, int id_);
   ~asset ();
   bool write (const std::string& path);
   bool remove ();
@@ -34,16 +35,16 @@ private:
   std::string fullpath;
 };
 
-/// delete asset file from disk
+/*!
+  Constructor for an asset object
+
+  \param name_ asset file name
+  \param id_ resource ID
+*/
 inline
-bool asset::remove ()
+asset::asset (const std::string& name_, int id_) 
+  : name (name_), id (id_), written (false) 
 {
-  if (written)
-  {
-    written = false;
-    return utf8::remove (fullpath);
-  }
-  return true;
 }
 
 /// Destructor. Deletes asset file if it exists
@@ -54,5 +55,16 @@ asset::~asset ()
     remove ();
 }
 
+/// Delete asset file from disk
+inline
+bool asset::remove ()
+{
+  if (written)
+  {
+    written = false;
+    return utf8::remove (fullpath);
+  }
+  return true;
+}
 
 } //mlib namespace
