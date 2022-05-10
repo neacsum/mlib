@@ -13,9 +13,6 @@
 /// Maximum size of HTTP header
 #define HTTPD_MAX_HEADER      8192
 
-/// Default listening port for HTTP server
-#define HTTPD_DEFAULT_PORT    80
-
 /// \name Error codes
 ///\{
 #define HTTPD_OK              0      ///< Success
@@ -120,7 +117,7 @@ private:
 class httpd : public tcpserver
 {
 public:
-  httpd       (unsigned short port=HTTPD_DEFAULT_PORT, unsigned int maxconn=0);
+  httpd       (unsigned short port=0, unsigned int maxconn=0);
   ~httpd      ();
 
   void        add_ohdr (const char *hdr, const char *value);

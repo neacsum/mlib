@@ -1046,11 +1046,12 @@ void http_connection::respond_next (bool last)
   \param maxconn  maximum number of incoming connections. If 0 the number of
                   connections is unlimited
 
-  The constructed object binds to the listening port and sets a number of defaults:
+  If \p port is 0, when the server is started it will bind to an available port
+  __on local interface only__.
+
   - document root is current folder (".")
   - default url is HTTPD_DEFAULT
-  - server name is HTTPD_SERVER_NAME
-  
+  - server name is HTTPD_SERVER_NAME  
 */
 httpd::httpd (unsigned short port, unsigned int maxconn)
   : tcpserver (maxconn)
@@ -1083,8 +1084,9 @@ bool httpd::init ()
   try {
     if (!is_open ())
       open (SOCK_STREAM);
-    inaddr me (INADDR_ANY, port_num);
+    inaddr me (port_num?INADDR_ANY : INADDR_LOOPBACK, port_num);
     bind (me);
+    port_num = sock::name ().port ();
   }
   catch (erc& x)
   {
