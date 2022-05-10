@@ -163,6 +163,19 @@ void tcpserver::run ()
     }
     TRACE9 ("tcpserver::run %d connections active", count);
   }
+
+  //End of run loop. Terminate all active connections
+  contab_lock.enter ();
+  for (size_t i = 0; i < alloc; i++)
+    if (contab[i])
+    {
+      TRACE9 ("tcpserver::run at end - terminating connection %d", i);
+      termconn (contab[i]->socket, contab[i]->thread);
+      delete contab[i];
+      contab[i] = NULL;
+      count--;
+    }
+  contab_lock.leave ();
 }
 
 /*!
