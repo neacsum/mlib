@@ -14,6 +14,8 @@ namespace mlib {
 class thread : public syncbase
 {
 public:
+  /// Thread state
+  enum class state {ready, starting, running, ending, finished};
   thread (std::function<int ()> func);
   virtual ~thread   ();
 
@@ -24,10 +26,9 @@ public:
   DWORD id () const;
   UINT result () const;
   bool is_running () const;
+  state get_state () const;
   int priority  ();
   void priority  (int pri);
-  virtual void resume    ();
-  virtual void suspend   ();
 
 protected:
   thread (const char *name=0, bool inherit=false, DWORD stack_size=0, PSECURITY_DESCRIPTOR sd=NULL);
@@ -45,7 +46,7 @@ private:
   thread (const thread& t) = delete;
 
   DWORD id_;
-  bool volatile running;
+  state volatile stat;
   bool shouldKill;
   event created, started;
   static UINT _stdcall entryProc( thread *ts );
@@ -105,7 +106,14 @@ UINT thread::result () const
 inline
 bool thread::is_running () const
 {
-  return running;
+  return stat == state::running;
+}
+
+/// Return thread status
+inline
+thread::state thread::get_state () const
+{
+  return stat;
 }
 
 /// Return priority of a thread
@@ -133,7 +141,6 @@ bool thread::init ()
 inline
 void  thread::term ()
 {
-  running = false;
 };
 
 

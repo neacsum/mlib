@@ -7,8 +7,10 @@ using namespace std;
 
 SUITE (threads)
 {
+  event f_run;
   int f (int i)
   {
+    f_run.signal ();
     cout << "f(" << i << ") running." << endl;
     Sleep (200);
     return i;
@@ -31,12 +33,18 @@ SUITE (threads)
 
   TEST (thread_states)
   {
-    thread th (std::bind (f, 1));
+    f_run.reset ();
+    thread th (std::bind (f, 3));
     CHECK (!th.is_running ());
+    CHECK (th.get_state () == thread::state::ready);
     th.start ();
+    CHECK (th.get_state () == thread::state::starting);
+    f_run.wait ();
+    CHECK (th.get_state () == thread::state::running);
     CHECK (th.is_running ());
     th.wait ();
     CHECK (!th.is_running ());
+    CHECK (th.get_state () == thread::state::finished);
   }
 
   TEST (ctor_current_thread)

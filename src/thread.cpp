@@ -57,7 +57,7 @@ current_thread::~current_thread()
 thread::thread (HANDLE h, DWORD i) :
   syncbase (NULL),
   shouldKill (false),
-  running (true),
+  stat (state::running),
   exitcode (0),
   id_ (i)
 {
@@ -71,7 +71,7 @@ thread::thread (const char *name, bool inherit, DWORD stack_size, PSECURITY_DESC
   : syncbase (name)
   , shouldKill (true)
   , started (event::manual)
-  , running (false)
+  , stat (state::ready)
   , exitcode (0)
   , stack (stack_size)
 {
@@ -96,7 +96,7 @@ thread::thread (const char *name, bool inherit, DWORD stack_size, PSECURITY_DESC
 thread::thread (std::function<int ()> func)
   : shouldKill (true)
   , started (event::manual)
-  , running (false)
+  , stat (state::ready)
   , exitcode (0)
   , stack (0)
   , thfunc (func)
@@ -137,12 +137,12 @@ thread::~thread()
   TRACE2 ("Thread %s[%x] in destructor", name().c_str(), id_);
   if (shouldKill)
   {
-    if (running)
+    if (stat == state::running)
     {
       TRACE ("WARNING! thread was still running");
       TerminateThread (handle(), 0);
     }
-    if (!started)
+    else if (stat == state::ready)
     {
       TRACE ("Terminating thread that was not started");
       TerminateThread (handle(), 0);
@@ -160,9 +160,15 @@ UINT _stdcall thread::entryProc (thread *th)
   th->created.signal();
   th->started.wait();
 
-  if (th->init())
+  if (th->init ())
+  {
+    th->stat = state::running;
     th->run ();
+  }
+  th->stat = state::ending;
   th->term ();
+  th->stat = state::finished;
+
   TRACE2 ("Thread %s[%x] is ending", th->name().c_str(), th->id_);
   _endthreadex (th->exitcode);
   return th->exitcode;
@@ -184,30 +190,11 @@ void thread::start ()
 {
   TRACE2 ("Thread %s[%x] is starting", name().c_str(), id_);
   assert (handle ());
-  assert (!running);
+  assert (stat == state::ready);
   started.signal ();
-  running = true;
+  stat = state::starting;
   Sleep (0);
 }
 
-/*!
-  Suspend a running thread
-*/
-void thread::suspend ()
-{
-  assert (handle());
-  assert (running);
-  SuspendThread (handle());
-}
-
-/*!
-  Resume a suspended thread
-*/
-void thread::resume()
-{
-  assert (handle());
-  assert (running);
-  ResumeThread (handle());
-}
 
 }
