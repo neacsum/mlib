@@ -46,4 +46,4 @@ Also there are some articles on CodeProject detailing some of the features:
  - [Producer/Consumer Queues in C++](https://www.codeproject.com/Articles/5281878/Producer-Consumer-Queues-in-Cplusplus)
 
 ## License ##
-[MIT License](https://github.com/neacsum/mlib/LICENSE)
+[MIT License](https://github.com/neacsum/mlib/blob/master/LICENSE)
