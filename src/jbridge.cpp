@@ -363,7 +363,7 @@ bool JSONBridge::parse_urlencoded () const
     else
       pv = (char*)(k->addr) + jsz[k->type] * idx;
 
-    TRACE9 ("Setting %s[%d] = %s\n", k->name, idx, val);
+    TRACE9 ("Setting %s[%d] = %s\n", k->name.c_str(), idx, val);
     switch (k->type)
     {
     case JT_PSTR:

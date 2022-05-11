@@ -214,7 +214,7 @@ public:
         at_end = false;
       else
         throw mlib::erc (ERR_JSON_ITERPOS, ERROR_PRI_ERROR, errors);
-      return tmp;
+      return *this;
     }
 
     ///Equality operator
@@ -417,7 +417,7 @@ node::node (const std::vector<T>& vec)
 {
   new (&obj)nodes_array ();
   for (size_t i = 0; i < vec.size (); ++i)
-    arr.emplace_back (make_unique<node>(vec[i]));
+    arr.emplace_back (std::make_unique<node>(vec[i]));
 }
 
 /// Constructor from an object

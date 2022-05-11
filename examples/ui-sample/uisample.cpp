@@ -1,15 +1,13 @@
 /*!
-  UISAMPLE.CPP - This program demonstrates how to build a HTML user interface
+  UISAMPLE.CPP - This program shows how to build a HTML user interface
   using the HTTP server and the JSONBridge interface.
 
-  The program starts a HTTP server on port 8080 and opens a browser window to
-  "localhost:8080" address. After that it continues living as a small icon in
+  The program starts a HTTP server on a dynamically assigned port and opens a
+  browser window to that address. Then, it continues living as a small icon in
   the systray. To end the program right click on the systray icon and select
   "Exit".
 
   (c) Mircea Neacsu 2017-2022
-
-  The MIT License (MIT)
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
@@ -30,21 +28,12 @@
   SOFTWARE.
 */
 
-#include <mlib/trace.h>
-#include <mlib/wsockstream.h>
-#include <mlib/critsect.h>
-#include <mlib/thread.h>
-#include <utf8/utf8.h>
+#include <mlib/jbridge.h>
 #include <utf8/winutf8.h>
-#include <mlib/basename.h>
 #include <assert.h>
-#include <mlib/log.h>
-#include <direct.h>
-#include <mlib/convert.h>
 #include <mlib/asset.h>
 
 #include "resource.h"
-#include <mlib/jbridge.h>
 
 using namespace std;
 using namespace mlib;
@@ -53,7 +42,6 @@ using namespace mlib;
 #define STR(X) #X
 #define STRINGIZE(X) STR(X)
 
-#define SERVER_PORT   8080           //http port
 #define SERVER_WNDCLASSNAME   L"uisample"
 #define WM_TRAYNOTIFY     (WM_USER+1)
 
@@ -86,7 +74,7 @@ char *psarr[4]
   "As seen above, strings can contain embedded HTML"
 };
 
-double pi = M_PI;
+double pi = atan(1)*4.;
 
 httpd       ui_server;      //HTTP server for user interface
 int submit_sarr (const char* uri, http_connection& client, JSONBridge* ui);
@@ -164,10 +152,10 @@ LRESULT WINAPI WndProc (HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     switch (wmId)
     {
     case ID_OPENINTERFACE:
-      utf8::ShellExecute ("http://localhost:" STRINGIZE(SERVER_PORT));
+      utf8::ShellExecute ("http://localhost:" + to_string(ui_server.port()));
       break;
     case ID_SAMPLE_ABOUT:
-      utf8::ShellExecute ("http://localhost:" STRINGIZE (SERVER_PORT) "/about.html");
+      utf8::ShellExecute ("http://localhost:" + to_string (ui_server.port ()) + "/about.html");
       break;
 
     case ID_SAMPLE_EXIT:
@@ -251,7 +239,6 @@ int APIENTRY WinMain (HINSTANCE hInstance, HINSTANCE, LPSTR /*lpCmdLine*/, int /
 
   //Configure UI server
   ui_server.docroot (docroot.c_str());
-  ui_server.port (SERVER_PORT);
 
   //Attach the "JSON bridge" to server
   user_interface.attach_to (ui_server);
