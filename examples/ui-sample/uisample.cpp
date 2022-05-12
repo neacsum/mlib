@@ -227,10 +227,7 @@ int APIENTRY WinMain (HINSTANCE hInstance, HINSTANCE, LPSTR /*lpCmdLine*/, int /
   hInst = hInstance;
 
   /*Find a temp folder for all HTML assets (the docroot)*/
-  utf8::buffer tmp(_MAX_PATH);
-  GetTempPathW (_MAX_PATH, tmp);
-  docroot = tmp;
-  docroot += "uisample";
+  docroot = utf8::GetTempPath() + "uisample";
   utf8::mkdir (docroot);
 
   /*Expand all assets in temp folder*/
