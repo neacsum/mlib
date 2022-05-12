@@ -58,7 +58,6 @@ public:
 };
 
 HttpServerFixture::HttpServerFixture () :
-  srv (8080),
   uri ("/")
 {
   idx.open("index.html");
@@ -67,15 +66,15 @@ HttpServerFixture::HttpServerFixture () :
   srv.docroot (".");
   srv.start ();
   cfunc = [&] () -> int {
-    sockstream ws(inaddr ("127.0.0.1", 8080));
+    sockstream ws(inaddr ("127.0.0.1", srv.port()));
     ws << "GET " << uri << " HTTP/1.1" << endl;
-    TRACE ("GET %s", uri.c_str ());
+    cout << "GET " << uri.c_str () << endl;
     ws << request.c_str () << endl << flush;
     ws->shutdown (sock::shut_write);
     Sleep (100);
     char text[1024];
     ws.getline (text, sizeof (text));
-    TRACE ("Status line %s", text);
+    cout << "Status line " << text << endl;
     strtok (text, " ");
     status_code = atoi (strtok(NULL, " "));
     while (!ws.eof ())
@@ -83,7 +82,7 @@ HttpServerFixture::HttpServerFixture () :
       ws.getline (text, sizeof (text));
       answer += text;
       answer += '\n';
-      TRACE ("Received line %s", text);
+      cout << "Received line " << text << endl;
     }
 
     return 1;
