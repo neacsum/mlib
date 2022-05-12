@@ -5,6 +5,10 @@
 */
 #pragma once
 
+#if __has_include ("defs.h")
+#include "defs.h"
+#endif
+
 #include <queue>
 #include "semaphore.h"
 #include "critsect.h"
@@ -117,16 +121,16 @@ public:
           prod_sema.wait ();
         update.enter ();
       }
-      push (obj);
+      std::queue<M, C>::push (obj);
       cons_sema.signal ();
       update.leave ();
     }
     else
     {
       // Unbounded queue. Producer will always be successful
-      lock l (update);        //take control of the queue
-      push (obj);             //put a copy of the object at the end
-      cons_sema.signal ();     //and signal the semaphore
+      lock l (update);            //take control of the queue
+      std::queue<M, C>::push (obj); //put a copy of the object at the end
+      cons_sema.signal ();        //and signal the semaphore
     }
     return true;
   }
@@ -166,8 +170,8 @@ public:
         }
       }
     }
-    result = front ();  //get the message
-    pop ();
+    result = std::queue<M, C>::front ();  //get the message
+    std::queue<M, C>::pop ();
     if (limit != INFINITE)
       prod_sema.signal ();  //signal producers there is space available
 
