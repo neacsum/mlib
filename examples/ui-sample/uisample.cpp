@@ -61,7 +61,7 @@ long lvar = -12345678;
 unsigned long luvar = 12345678;
 float fvar = 123.45f;
 double dvar = 123.45;
-char str[80] {"Another string that is 80 chars long"};
+string str{ "Another C++ string that can have any length" };
 bool bvar;
 int iarr[4] {111, 222, 333, 444};
 char sarr[4][80] {"THE", "THE QUICK", "THE QUICK BROWN", "THE QUICK BROWN FOX"};
@@ -218,21 +218,21 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE, LPSTR /*lpCmdLine*/, int /*n
   // Populate UI variables
   auto& sample = user_interface.add_object ("sample");
   sample.add_var (iarr, "iarr");
-  sample.add_var (&hvar, "hvar");
-  sample.add_var (&huvar, "huvar");
-  sample.add_var (&ivar, "ivar");
-  sample.add_var (&iuvar, "iuvar");
-  sample.add_var (&lvar, "lvar");
-  sample.add_var (&luvar, "luvar");
-  sample.add_var (&fvar, "fvar");
-  sample.add_var (&dvar, "dvar");
+  sample.add_var (hvar, "hvar");
+  sample.add_var (huvar, "huvar");
+  sample.add_var (ivar, "ivar");
+  sample.add_var (iuvar, "iuvar");
+  sample.add_var (lvar, "lvar");
+  sample.add_var (luvar, "luvar");
+  sample.add_var (fvar, "fvar");
+  sample.add_var (dvar, "dvar");
   sample.add_var (str1, "str1");
   sample.add_var (str, "str");
   sample.add_var (sarr, "sarr");
-  sample.add_var (&bvar, "bvar");
+  sample.add_var (bvar, "bvar");
   sample.add_var (psarr, "psarr");
 
-  user_interface.add_var (&pi, "varpi");
+  user_interface.add_var (pi, "varpi");
 
   user_interface.add_postfun ("submit_sarr", submit_sarr);
   user_interface.add_postfun ("exit_server", exit_server);

@@ -66,7 +66,7 @@ xhr.send ();
 )";
 
 //variable updated by HTML user interface
-char field[80] = {"Hello world!"};
+string field {"Hello world!"};
 
 int main()
 {
@@ -99,7 +99,7 @@ int main()
   utf8::ShellExecute ("http://localhost:" + to_string(ui_server.port()));
 
   // wait until user types "QUIT"
-  while (_stricmp (field, "quit"))
+  while (_stricmp (field.c_str(), "quit"))
     Sleep (100);
 
   // stop server and clean up

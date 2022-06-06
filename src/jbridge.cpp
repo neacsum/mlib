@@ -21,11 +21,9 @@ namespace mlib {
 
 #define MAX_JSONRESPONSE 8192
 
-bool url_decode (std::string& s);
+static bool url_decode (std::string& s);
 
-static int hexdigit (char *bin, char c);
-
-static std::tuple<std::string, int> index_split (const std::string name);
+static std::tuple<std::string, size_t> index_split (const std::string name);
 
 /*!
   \class JSONBridge
@@ -77,7 +75,7 @@ erc JSONBridge::json_begin (json::node& root)
 {
   TRACE9 ("JSONBridge::json_begin - %s", client ()->get_query ());
   mlib::lock l(in_use);
-  int idx;
+  size_t idx;
   dict_cptr pvar;
 
   if (!find (client ()->get_query (), pvar, &idx))
@@ -120,7 +118,7 @@ erc JSONBridge::jsonify (json::node& n, dict_cptr v)
   try {
     if (v->cnt > 1)
     {
-      for (int i = 0; i < v->cnt; i++)
+      for (size_t i = 0; i < v->cnt; i++)
         serialize_node (n[i],v,i);
       return ERR_SUCCESS;
     }
@@ -133,7 +131,7 @@ erc JSONBridge::jsonify (json::node& n, dict_cptr v)
   }
 }
 
-erc JSONBridge::serialize_node (json::node& n, dict_cptr v, int index)
+erc JSONBridge::serialize_node (json::node& n, dict_cptr v, size_t index)
 {
   char* addr;
 
@@ -143,6 +141,9 @@ erc JSONBridge::serialize_node (json::node& n, dict_cptr v, int index)
   {
   case JT_PSTR:
     n = *(char**)addr;
+    break;
+  case JT_STR:
+    n = *(string*)addr;
     break;
   case JT_CSTR:
     n = (char*)addr;
@@ -187,7 +188,7 @@ erc JSONBridge::serialize_node (json::node& n, dict_cptr v, int index)
   return ERR_SUCCESS;
 }
 
-erc JSONBridge::deserialize_node (const json::node& n, dict_cptr v, int index) const
+erc JSONBridge::deserialize_node (const json::node& n, dict_cptr v, size_t index) const
 {
   void* pv;
 
@@ -197,13 +198,17 @@ erc JSONBridge::deserialize_node (const json::node& n, dict_cptr v, int index) c
     switch (v->type)
     {
     case JT_PSTR:
-      pv = *(char**)pv; //one more level of indirection
-      //flow through to JT_STR case. Don't break them apart!
+      /* We don't know the max size. Treat them as read-only. */
+      break;
+    case JT_STR:
+      *(string*)pv = n.to_str ();
+      break;
     case JT_CSTR:
       strncpy ((char*)pv, (const char*)n, v->sz);
       if (v->sz)
         *((char*)pv + v->sz - 1) = 0; //always null-terminated
       break;
+
     case JT_INT:
       *(int*)pv = static_cast<int>(n);
       break;
@@ -258,9 +263,9 @@ void JSONBridge::not_found (const char *varname)
   Search a variable in JSON dictionary. The variable name can be a construct
   `<name>_<index>` for an indexed variable.
 */
-bool JSONBridge::find (const std::string& name, dict_cptr& found, int* pidx) const
+bool JSONBridge::find (const std::string& name, dict_cptr& found, size_t* pidx) const
 {
-  int tmpidx;
+  size_t tmpidx;
   string lookup;
 
   if (!pidx)
@@ -304,9 +309,9 @@ bool JSONBridge::deep_search (const std::string& var, const dictionary& dict, di
   return false;
 }
 
-bool JSONBridge::deep_find (const std::string& name, dict_cptr& found, int* pidx) const
+bool JSONBridge::deep_find (const std::string& name, dict_cptr& found, size_t* pidx) const
 {
-  int tmpidx;
+  size_t tmpidx;
   string lookup;
 
   if (!pidx)
@@ -333,7 +338,7 @@ bool JSONBridge::deep_find (const std::string& name, dict_cptr& found, int* pidx
 */
 bool JSONBridge::parse_urlencoded () const
 {
-  int idx;
+  size_t idx;
   void *pv;
 
   str_pairs vars;
@@ -351,16 +356,18 @@ bool JSONBridge::parse_urlencoded () const
       TRACE ("Posted key %s not found in dictionary", var->first.c_str ());
       continue;
     }
-    url_decode (value);
+//    url_decode (value);
     pv = (char*)(entry_ptr->addr) + entry_ptr->sz*idx;
 
     TRACE9 ("Setting %s[%d] = %s\n", entry_ptr->name.c_str(), idx, value.c_str());
     switch (entry_ptr->type)
     {
     case JT_PSTR:
-      /* Treat them as read-only as we don't know the max size. */
+      /* We don't know the max size. Treat them as read-only. */
       break;
-
+    case JT_STR:
+      *(string*)pv = value;
+      break;
     case JT_CSTR:
       strncpy ((char *)pv, value.c_str(), entry_ptr->sz);
       *((char *)pv + entry_ptr->sz - 1) = 0; //always null-terminated
@@ -411,7 +418,7 @@ bool JSONBridge::parse_jsonencoded () const
     for (auto p = rcvd.begin (); p != rcvd.end (); p++)
     {
       dict_cptr k;
-      if (deep_find (p.name (), k))
+      if (!deep_find (p.name (), k))
       {
         TRACE ("Key %s not found in dictionary", p.name ().c_str ());
         continue;
@@ -427,7 +434,7 @@ bool JSONBridge::parse_jsonencoded () const
         const json::node& n = *p;
         if (n.kind () == json::type::array)
         {
-          for (int idx = 0; idx < n.size () && idx < k->cnt; idx++)
+          for (size_t idx = 0; idx < (size_t)n.size () && idx < k->cnt; idx++)
             deserialize_node (n[idx], k, idx);
         }
         else
@@ -450,10 +457,10 @@ bool JSONBridge::parse_jsonencoded () const
         && p->has ("name")
         && p->has("value"))
       {
-        int idx;
+        size_t idx;
         string name = (string)p->at("name");
         dict_cptr k;
-        if (deep_find (name, k, &idx))
+        if (!deep_find (name, k, &idx))
         {
           TRACE ("Key %s not found in dictionary", name);
           continue;
@@ -568,7 +575,7 @@ bool url_decode (std::string& s)
 }
 
 //  If input string is of the format <var>_<number>, splits it in components
-std::tuple<std::string, int> index_split (const std::string name)
+std::tuple<std::string, size_t> index_split (const std::string name)
 {
   string var = name;
   int idx = 0;
