@@ -61,12 +61,11 @@ long lvar = -12345678;
 unsigned long luvar = 12345678;
 float fvar = 123.45f;
 double dvar = 123.45;
-char *pstr = str1;
 char str[80] {"Another string that is 80 chars long"};
 bool bvar;
 int iarr[4] {111, 222, 333, 444};
 char sarr[4][80] {"THE", "THE QUICK", "THE QUICK BROWN", "THE QUICK BROWN FOX"};
-char *psarr[4]
+const char *psarr[]
 {
   "A message from our C++ program",
   "<span style=\"color:red\">A red text</span>",
@@ -77,40 +76,19 @@ char *psarr[4]
 double pi = atan(1)*4.;
 
 httpd       ui_server;      //HTTP server for user interface
-int submit_sarr (const char* uri, http_connection& client, JSONBridge* ui);
-int exit_server (const char* uri, http_connection& client, JSONBridge* ui);
 
-//Data dictionary for user interface
-JSD_STARTDIC (uivars)
-  JSD_OBJECT ("sample"),
-    JSD (iarr, JT_INT, _countof (iarr)),
-    JSD (hvar, JT_SHORT),
-    JSD (huvar, JT_USHORT),
-    JSD (ivar, JT_INT),
-    JSD (iuvar, JT_UINT),
-    JSD (lvar, JT_LONG),
-    JSD (luvar, JT_ULONG),
-    JSD (fvar, JT_FLT),
-    JSD (dvar, JT_DBL),
-    JSD (pstr, JT_PSTR, 1, sizeof (str1)),
-    JSD (str, JT_STR, 1, sizeof (str)),
-    JSD (bvar, JT_BOOL),
-    JSD (sarr, JT_STR, _countof (sarr), sizeof (sarr[0])),
-    JSD (psarr, JT_PSTR, _countof (psarr)),
-  JSD_ENDOBJ,
-  JSD (submit_sarr, JT_POSTFUN),
-  JSD (exit_server, JT_POSTFUN),
-  JSDN (pi, "varpi", JT_DBL), //a variable with a different 'external' name
-JSD_ENDDIC;
+int submit_sarr (const std::string& uri, JSONBridge& ui);
+int exit_server (const std::string& uri, JSONBridge& ui);
+
 
 /*
-Declare a JSON bridge to "var" location using 'uivars' dictionary.
+  Declare a JSON bridge to "var" location.
 
-That means every GET request to "http://server/var?xxx" will trigger a search
-for the variable xxx in the 'uivars' JSON dictionary and the content of that
-variable will be formatted as a JSON string and sent back to the client.
+  That means every GET request to "http://server/var?xxx" will trigger a search
+  for the variable xxx and the content of that variable will be formatted as a
+  JSON string and sent back to the client.
 */
-JSONBridge  user_interface ("var", uivars);
+JSONBridge  user_interface ("var");
 
 //Assets for HTTP server
 
@@ -209,7 +187,7 @@ LRESULT WINAPI WndProc (HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 /*
   Entry point.
 */
-int APIENTRY WinMain (HINSTANCE hInstance, HINSTANCE, LPSTR /*lpCmdLine*/, int /*nCmdShow*/)
+int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE, LPSTR /*lpCmdLine*/, int /*nCmdShow*/)
 {
   MSG msg;
   HWND prevWnd;
@@ -237,12 +215,33 @@ int APIENTRY WinMain (HINSTANCE hInstance, HINSTANCE, LPSTR /*lpCmdLine*/, int /
   //Configure UI server
   ui_server.docroot (docroot.c_str());
 
+  // Populate UI variables
+  auto& sample = user_interface.add_object ("sample");
+  sample.add_var (iarr, "iarr");
+  sample.add_var (&hvar, "hvar");
+  sample.add_var (&huvar, "huvar");
+  sample.add_var (&ivar, "ivar");
+  sample.add_var (&iuvar, "iuvar");
+  sample.add_var (&lvar, "lvar");
+  sample.add_var (&luvar, "luvar");
+  sample.add_var (&fvar, "fvar");
+  sample.add_var (&dvar, "dvar");
+  sample.add_var (str1, "str1");
+  sample.add_var (str, "str");
+  sample.add_var (sarr, "sarr");
+  sample.add_var (&bvar, "bvar");
+  sample.add_var (psarr, "psarr");
+
+  user_interface.add_var (&pi, "varpi");
+
+  user_interface.add_postfun ("submit_sarr", submit_sarr);
+  user_interface.add_postfun ("exit_server", exit_server);
+
   //Attach the "JSON bridge" to server
   user_interface.attach_to (ui_server);
 
   //Set action after receiving user data
   user_interface.set_action ([](JSONBridge& ui) {ui.client ()->redirect ("/"); });
-
   //Start the server
   ui_server.start ();
 
@@ -358,9 +357,9 @@ int APIENTRY WinMain (HINSTANCE hInstance, HINSTANCE, LPSTR /*lpCmdLine*/, int /
   It calls the parse_urlencoded function to retrieve the latest values
   and then shows a message box with the new values of the sarr array.
 */
-int submit_sarr (const char* uri, http_connection& client, JSONBridge* ui)
+int submit_sarr (const std::string& uri, JSONBridge& ui)
 {
-  bool ok = ui->parse_urlencoded ();
+  bool ok = ui.parse_urlencoded ();
   string msg{
     "sarr[0] " + string (sarr[0]) + "\n"
     "sarr[1] " + string (sarr[1]) + "\n"
@@ -371,7 +370,7 @@ int submit_sarr (const char* uri, http_connection& client, JSONBridge* ui)
   return 0;
 }
 
-int exit_server (const char* uri, http_connection& client, JSONBridge* ui)
+int exit_server (const std::string& uri, JSONBridge& ui)
 {
   PostMessage (mainWnd, WM_COMMAND, ID_SAMPLE_EXIT, 0);
   return 0;

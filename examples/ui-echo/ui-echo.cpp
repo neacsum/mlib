@@ -68,11 +68,6 @@ xhr.send ();
 //variable updated by HTML user interface
 char field[80] = {"Hello world!"};
 
-// list of variables accessible through the user interface
-JSD_STARTDIC (dictionary)
-  JSD (field, JT_STR, 1, sizeof (field)),
-JSD_ENDDIC;
-
 int main()
 {
   // save HTML page to a file
@@ -85,8 +80,9 @@ int main()
   ui_server.docroot (".");
 
   // create user interface and link it to server
-  JSONBridge ui ("uivars", dictionary);
+  JSONBridge ui ("uivars");
   ui.attach_to (ui_server);
+  ui.add_var (field, "field");
 
   // when receiving a POST message, echo the field, then reload page
   ui.set_action ([](JSONBridge& ui) {

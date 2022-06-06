@@ -12,6 +12,7 @@
 #include <mlib/critsect.h>
 #include <mlib/json.h>
 #include <algorithm>
+#include <utf8/utf8.h>
 
 using namespace std;
 
@@ -20,28 +21,12 @@ namespace mlib {
 
 #define MAX_JSONRESPONSE 8192
 
-// Sizes of data elements (same order as JT_.. values)
-const int jsz[] = { 
-  sizeof (short int),             //JT_SHORT
-  sizeof (unsigned short int),    //JT_USHORT
-  sizeof (int),                   //JT_INT
-  sizeof (unsigned int),          //JT_UINT
-  sizeof (long),                  //JT_LONG
-  sizeof (unsigned long),         //JT_ULONG
-  sizeof (float),                 //JT_FLT
-  sizeof (double),                //JT_DBL
-  sizeof (char*),                 //JT_PSTR
-  sizeof(char),                   //JT_STR
-  sizeof(bool),                   //JT_BOOL
-  0,                              //JT_OBJECT
-  0,                              //JT_ENDOBJ
-  0                               //JT_POSTFUN
-};
+bool url_decode (std::string& s);
 
-
-static int url_decode (const char *in, char *out);
 static int hexdigit (char *bin, char c);
-static int hexbyte (char *bin, const char *str);
+
+static std::tuple<std::string, int> index_split (const std::string name);
+
 /*!
   \class JSONBridge
   \ingroup sockets
@@ -70,9 +55,8 @@ static int hexbyte (char *bin, const char *str);
 */
 
 ///Creates a JSONBridge object for the given path
-JSONBridge::JSONBridge (const char *path, jb_dictionary& dict)
+JSONBridge::JSONBridge (const char *path)
   : path_ (path)
-  , dict_ (dict)
   , client_ (nullptr)
   , action (nullptr)
 {
@@ -94,13 +78,14 @@ erc JSONBridge::json_begin (json::node& root)
   TRACE9 ("JSONBridge::json_begin - %s", client ()->get_query ());
   mlib::lock l(in_use);
   int idx;
-  const jb_var *entry = find (client()->get_query (), &idx);
-  if (!entry)
+  dict_cptr pvar;
+
+  if (!find (client ()->get_query (), pvar, &idx))
   {
     TRACE2 ("JSONBridge::json_begin - Cannot find %s", client ()->get_query ());
     return erc (ERR_JSON_NOTFOUND, ERROR_PRI_ERROR);
   }
-  return jsonify (root, entry);
+  return jsonify (root, pvar);
 }
 
 /// Send out the JSON formatted buffer
@@ -130,17 +115,17 @@ erc JSONBridge::json_end (json::node& obj)
 }
 
 /// Serializes a variable to JSON format
-erc JSONBridge::jsonify (json::node& n, const jb_var*& entry)
+erc JSONBridge::jsonify (json::node& n, dict_cptr v)
 {
   try {
-    if (entry->cnt > 1)
+    if (v->cnt > 1)
     {
-      for (int i = 0; i < entry->cnt; i++)
-        serialize_node (n[i], entry, i);
+      for (int i = 0; i < v->cnt; i++)
+        serialize_node (n[i],v,i);
       return ERR_SUCCESS;
     }
     else
-      return serialize_node (n, entry);
+      return serialize_node (n, v);
   }
   catch (erc& x) {
     x.reactivate ();
@@ -148,21 +133,18 @@ erc JSONBridge::jsonify (json::node& n, const jb_var*& entry)
   }
 }
 
-erc JSONBridge::serialize_node (json::node& n, const jb_var*& entry, int index)
+erc JSONBridge::serialize_node (json::node& n, dict_cptr v, int index)
 {
   char* addr;
 
-  if (entry->type == JT_STR)
-    addr = (char*)entry->addr + entry->sz * index;
-  else
-    addr = (char*)entry->addr + jsz[entry->type] * index;
+  addr = (char*)v->addr + v->sz * index;
 
-  switch (entry->type)
+  switch (v->type)
   {
   case JT_PSTR:
     n = *(char**)addr;
     break;
-  case JT_STR:
+  case JT_CSTR:
     n = (char*)addr;
     break;
   case JT_SHORT:
@@ -193,43 +175,34 @@ erc JSONBridge::serialize_node (json::node& n, const jb_var*& entry, int index)
     n = *(bool*)addr;
     break;
   case JT_OBJECT:
-    //Composite object - go through dictionary 
-    while (!entry->name.empty())
-    {
-      entry++;
-      if (entry->type == JT_ENDOBJ)
-        return ERR_SUCCESS;
-      jsonify (n[entry->name], entry);
-    }
-    //end of dictionary
-    return erc (ERR_JSON_DICSTRUC, ERROR_PRI_ERROR, json::errors);
+    //Composite object - go through dictionary
+    for (auto p = v->children.begin (); p != v->children.end (); ++p)
+      jsonify (n[p->name], p);
     break;
 
   default:
-    TRACE ("Unexpected entry type %d", entry->type);
+    TRACE ("Unexpected entry type %d", v->type);
     return erc (ERR_JSON_DICSTRUC, ERROR_PRI_ERROR, json::errors);
   }
   return ERR_SUCCESS;
 }
 
-erc JSONBridge::deserialize_node (const json::node& n, const jb_var*& entry, int index) const
+erc JSONBridge::deserialize_node (const json::node& n, dict_cptr v, int index) const
 {
   void* pv;
 
-  if (entry->type == JT_STR)
-    pv = (char*)(entry->addr) + entry->sz * index;
-  else
-    pv = (char*)(entry->addr) + jsz[entry->type] * index;
+  pv = (char*)(v->addr) + v->sz * index;
+
   try {
-    switch (entry->type)
+    switch (v->type)
     {
     case JT_PSTR:
       pv = *(char**)pv; //one more level of indirection
       //flow through to JT_STR case. Don't break them apart!
-    case JT_STR:
-      strncpy ((char*)pv, (const char*)n, entry->sz);
-      if (entry->sz)
-        *((char*)pv + entry->sz - 1) = 0; //always null-terminated
+    case JT_CSTR:
+      strncpy ((char*)pv, (const char*)n, v->sz);
+      if (v->sz)
+        *((char*)pv + v->sz - 1) = 0; //always null-terminated
       break;
     case JT_INT:
       *(int*)pv = static_cast<int>(n);
@@ -259,7 +232,7 @@ erc JSONBridge::deserialize_node (const json::node& n, const jb_var*& entry, int
       *(bool*)pv = static_cast<bool>(n);
       break;
     default:
-      TRACE ("Unexpected entry type: %d", entry->type);
+      TRACE ("Unexpected entry type: %d", v->type);
     }
   }
   catch (mlib::erc& x) {
@@ -285,53 +258,74 @@ void JSONBridge::not_found (const char *varname)
   Search a variable in JSON dictionary. The variable name can be a construct
   `<name>_<index>` for an indexed variable.
 */
-const jb_var* JSONBridge::find (const std::string& name, int* pidx) const
+bool JSONBridge::find (const std::string& name, dict_cptr& found, int* pidx) const
 {
   int tmpidx;
-  string lookup = name;
+  string lookup;
 
   if (!pidx)
     pidx = &tmpidx;
 
-  size_t pnum = lookup.find_first_of ('_');
-  *pidx = 0;
+  tie (lookup, *pidx) = index_split (name);
 
-  if (pnum != string::npos)
+  for (auto ptr = dict_.begin(); ptr != dict_.end(); ++ptr)
   {
-    string stail = lookup.substr (pnum + 1).c_str ();
-    char *tail;
-    *pidx = strtol (stail.c_str(), &tail, 10);
-
-    if (*tail || *pidx < 0) //if name doesn't match <var>_<number> or index is negative...
-    {                       //...search dictionary for whole name
-      *pidx = 0;
-    }
-    else
-      lookup.erase (pnum);
-  }
-
-  int lvl = 0;
-  for (auto entry = dict_.data(); lvl >= 0; entry++)
-  {
-    //search only top level entries
-    if (entry->type == JT_OBJECT)
-      lvl++;
-    else if (entry->type == JT_ENDOBJ)
+    if (lookup == ptr->name)
     {
-      lvl--;
-      continue;
-    }
-
-    if (lvl <= 1 && lookup.c_str() == entry->name)
-    {
-      if (*pidx < entry->cnt)
-        return entry;
+      if (*pidx < ptr->cnt)
+      {
+        found = ptr;
+        return true;
+      }
       TRACE ("Out of bounds %s[%d]", lookup.c_str(), *pidx);
-      return NULL;
+      return false;
     }
   }
-  return NULL;
+  return false;
 }
+
+bool JSONBridge::deep_search (const std::string& var, const dictionary& dict, dict_cptr& found)
+{
+  auto ptr = dict.cbegin ();
+  while (ptr != dict.end ())
+  {
+    if (ptr->name == var)
+    {
+      found = ptr;
+      return true;
+    }
+    else if (!ptr->children.empty ())
+    {
+      if (deep_search (var, ptr->children, found))
+        return true;
+    }
+    ++ptr;
+  }
+  return false;
+}
+
+bool JSONBridge::deep_find (const std::string& name, dict_cptr& found, int* pidx) const
+{
+  int tmpidx;
+  string lookup;
+
+  if (!pidx)
+    pidx = &tmpidx;
+
+  tie (lookup, *pidx) = index_split (name);
+
+  if (deep_search (lookup, dict_, found))
+  {
+    if (*pidx >= found->cnt)
+    {
+      TRACE ("Out of bounds %s[%d]", lookup.c_str (), *pidx);
+      return false;
+    }
+    return true;
+  }
+  return false;
+}
+
 
 /*!
   Parse the URL-encoded body of a POST request assigning new values to all
@@ -339,70 +333,69 @@ const jb_var* JSONBridge::find (const std::string& name, int* pidx) const
 */
 bool JSONBridge::parse_urlencoded () const
 {
-  char val[1024];
   int idx;
   void *pv;
 
   str_pairs vars;
   parse_urlparams (client_->get_body (), vars);
-  for (auto var = vars.begin (); var != vars.end (); var++)
+  for (auto var = vars.begin (); var != vars.end (); ++var)
   {
     if (!var->second.length ())
       continue;     // missing '=value' part of 'key=value' construct
 
-    strcpy (val, var->second.c_str ());
-    const jb_var *k = find (var->first.c_str (), &idx);
-    if (!k)
+    dict_cptr entry_ptr;
+    string& value = var->second;
+
+    if (!deep_find (var->first, entry_ptr, &idx))
     {
       TRACE ("Posted key %s not found in dictionary", var->first.c_str ());
       continue;
     }
-    url_decode (val, val);
-    if (k->type == JT_STR)
-      pv = (char*)(k->addr) + k->sz*idx;
-    else
-      pv = (char*)(k->addr) + jsz[k->type] * idx;
+    url_decode (value);
+    pv = (char*)(entry_ptr->addr) + entry_ptr->sz*idx;
 
-    TRACE9 ("Setting %s[%d] = %s\n", k->name.c_str(), idx, val);
-    switch (k->type)
+    TRACE9 ("Setting %s[%d] = %s\n", entry_ptr->name.c_str(), idx, value.c_str());
+    switch (entry_ptr->type)
     {
     case JT_PSTR:
-      pv = *(char**)pv; //one more level of indirection
-      //flow through to JT_STR case. Don't break them apart!
-    case JT_STR:
-      strncpy ((char *)pv, val, k->sz);
-      if (k->sz)
-        *((char *)pv + k->sz - 1) = 0; //always null-terminated
+      /* Treat them as read-only as we don't know the max size. */
+      break;
+
+    case JT_CSTR:
+      strncpy ((char *)pv, value.c_str(), entry_ptr->sz);
+      *((char *)pv + entry_ptr->sz - 1) = 0; //always null-terminated
       break;
     case JT_INT:
-      *(int*)pv = (int)strtol (val, NULL, 0);
+      *(int*)pv = (int)stol (value, nullptr, 0);
       break;
     case JT_UINT:
-      *(unsigned int*)pv = (unsigned int)strtoul (val, NULL, 0);
+      *(unsigned int*)pv = (unsigned int)stoul (value, nullptr, 0);
       break;
     case JT_SHORT:
-      *(short*)pv = (short)strtol (val, NULL, 0);
+      *(short*)pv = (short)stol (value, nullptr, 0);
       break;
     case JT_USHORT:
-      *(unsigned short*)pv = (unsigned short)strtoul (val, NULL, 0);
+      *(unsigned short*)pv = (unsigned short)stoul (value, nullptr, 0);
       break;
     case JT_LONG:
-      *(long *)pv = strtol (val, NULL, 0);
+      *(long *)pv = stol (value, nullptr, 0);
       break;
     case JT_ULONG:
-      *(unsigned long *)pv = strtoul (val, NULL, 0);
+      *(unsigned long *)pv = stoul (value, nullptr, 0);
       break;
     case JT_FLT:
-      *(float *)pv = (float)atof (val);
+      *(float *)pv = (float)stod (value);
       break;
     case JT_DBL:
-      *(double *)pv = atof (val);
+      *(double *)pv = stod (value);
       break;
     case JT_BOOL:
-      *(bool *)pv = (atoi (val) != 0);
+      utf8::tolower (value);
+      *(bool*)pv = (value == "true" || value == "1" || value == "on");
       break;
+
     default:
-      TRACE ("Unexpected entry type: %d", k->type);
+      TRACE ("Unexpected entry type: %d", entry_ptr->type);
     }
   }
   return true;
@@ -417,8 +410,8 @@ bool JSONBridge::parse_jsonencoded () const
   {
     for (auto p = rcvd.begin (); p != rcvd.end (); p++)
     {
-      const jb_var* k = find (p.name ());
-      if (!k)
+      dict_cptr k;
+      if (deep_find (p.name (), k))
       {
         TRACE ("Key %s not found in dictionary", p.name ().c_str ());
         continue;
@@ -459,8 +452,8 @@ bool JSONBridge::parse_jsonencoded () const
       {
         int idx;
         string name = (string)p->at("name");
-        const jb_var* k = find (name, &idx);
-        if (!k)
+        dict_cptr k;
+        if (deep_find (name, k, &idx))
         {
           TRACE ("Key %s not found in dictionary", name);
           continue;
@@ -505,19 +498,22 @@ int JSONBridge::callback (const char *uri, http_connection& client, JSONBridge *
     std::transform (content.begin (), content.end (), content.begin(), 
       [] (char c)->char {return tolower (c); });
 
-
-    const jb_var* entry;
-    if (strlen (client.get_query ())
-      && (entry = ctx->find (client.get_query ()))
-      && entry->type == JT_POSTFUN)
+    if (strlen (client.get_query ()))
     {
-      uri_handler (entry->addr)(uri, client, ctx);
-      ok = true;
+      auto ph = ctx->post_handlers.find (client.get_query ());
+      if (ph != ctx->post_handlers.end ())
+      {
+        (ph->second)(uri, *ctx);
+        ok = true;
+      }
     }
-    else if (content.find("application/x-www-form-urlencoded") != string::npos)
-      ok = ctx->parse_urlencoded ();
-    else if (content.find ("application/json", 0) != string::npos)
-      ok = ctx->parse_jsonencoded ();
+    if (!ok)
+    {
+      if (content.find ("application/x-www-form-urlencoded") != string::npos)
+        ok = ctx->parse_urlencoded ();
+      if (content.find ("application/json", 0) != string::npos)
+        ok = ctx->parse_jsonencoded ();
+    }
 
     if (ok && ctx->action)
       ctx->action (*ctx);
@@ -527,54 +523,68 @@ int JSONBridge::callback (const char *uri, http_connection& client, JSONBridge *
   return 1;
 }
 
-int hexdigit (char *bin, char c)
-{
-  c = toupper (c);
-  if (c >= '0' && c <= '9')
-    *bin = c - '0';
-  else if (c >= 'A' && c <= 'F')
-    *bin = c - 'A' + 10;
-  else
-    return 0;
-
-  return 1;
-}
-
-int hexbyte (char *bin, const char *str)
-{
-  char d1, d2;
-
-  //first digit
-  if (!hexdigit (&d1, *str++) || !hexdigit (&d2, *str++))
-    return 0;
-  *bin = (d1 << 4) | d2;
-  return 1;
-}
-
 /*!
-Decoding of URL-encoded data.
-We can do it in place because resulting string is shorter or equal than input.
+  Decoding of URL-encoded data.
+  We can do it in place because resulting string is shorter or equal than input.
 
-\return 1 if successful, 0 otherwise
+  \return `true` if successful, `false` otherwise
 */
-int url_decode (const char *in, char *out)
+bool url_decode (std::string& s)
 {
-  while (*in)
+  size_t in = 0, out = 0;
+
+  auto hexdigit = [](char* bin, char c) -> bool
   {
-    if (*in == '%')
-    {
-      if (!hexbyte (out++, ++in))
-        return 0;
-      in++;
-    }
-    else if (*in == '+')
-      *out++ = ' ';
+    if (c >= '0' && c <= '9')
+      *bin = c - '0';
+    else if (c >= 'A' && c <= 'F')
+      *bin = c - 'A' + 10;
+    else if (c >= 'a' && c <= 'f')
+      *bin = c - 'a' + 10;
     else
-      *out++ = *in;
+      return false;
+
+    return true;
+  };
+
+  while (in < s.size())
+  {
+    if (s[in] == '%')
+    {
+      in++;
+      char d1, d2; //hex digits
+      if (!hexdigit (&d1, s[in++]) || !hexdigit (&d2, s[in]))
+        return false;
+      s[out++] = (d1 << 4) | d2;
+    }
+    else if (s[in] == '+')
+      s[out++] = ' ';
+    else
+      s[out++] = s[in];
     in++;
   }
-  *out = 0;
-  return 1;
+  s.erase (out);
+  return true;
 }
+
+//  If input string is of the format <var>_<number>, splits it in components
+std::tuple<std::string, int> index_split (const std::string name)
+{
+  string var = name;
+  int idx = 0;
+
+  size_t pnum = var.find_first_of ('_');
+  if (pnum != string::npos)
+  {
+    string stail = var.substr (pnum + 1).c_str ();
+    char* tail;
+    idx = strtol (stail.c_str (), &tail, 10);
+
+    if (!*tail && idx >= 0)
+      var.erase (pnum); //name matches <var>_<number> pattern
+  }
+  return { var, idx };
+}
+
 
 }

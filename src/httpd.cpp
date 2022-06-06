@@ -63,6 +63,8 @@ static struct smime
 
 static bool file_exists (char* path);
 static int fmt2type (const char *fmt);
+
+//TODO - replace with string versions. Make visible and add tests
 static int url_decode (char *buf);
 static int match (const char *str1, const char *str2);
 static int hexbyte (char *bin, const char *str);
