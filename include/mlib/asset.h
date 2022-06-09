@@ -25,13 +25,20 @@ class asset
 public:
   asset (const std::string& name_, int id_);
   ~asset ();
+  const void* data ();
+  size_t size ();
   bool write (const std::string& path);
   bool remove ();
 
   const std::string name;
+
 private:
+  void load ();
   int id;
   bool written;
+  bool loaded;
+  size_t sz;
+  void* ptr;
   std::string fullpath;
 };
 
@@ -43,11 +50,11 @@ private:
 */
 inline
 asset::asset (const std::string& name_, int id_) 
-  : name (name_), id (id_), written (false) 
+  : name (name_), id (id_), written (false), loaded(false), sz (0), ptr (nullptr)
 {
 }
 
-/// Destructor. Deletes asset file if it exists
+/// Destructor. Delete asset file if it exists
 inline
 asset::~asset ()
 {
@@ -67,4 +74,10 @@ bool asset::remove ()
   return true;
 }
 
+/// Return size of asset (in bytes)
+inline
+size_t asset::size ()
+{
+  return sz;
+}
 } //mlib namespace

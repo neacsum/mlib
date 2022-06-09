@@ -13,30 +13,50 @@ using namespace std;
 
 namespace mlib {
 
-static void* mem_resource (int name, int type, DWORD& size);
-
 /*!
   \class asset
 
-  This class provides a nice mechanism for 'hiding' the different
-  assets needed by a HTTP server (pages, CSS files, images, etc.) inside the
+  This class provides a mechanism for 'hiding' the different assets
+  needed by a HTTP server (pages, CSS files, images, etc.) inside the
   EXE file.
 
   Each asset is stored as a user-defined resource of type RESFILE
-  (defined as 256) and is identified by its ID. This function writes the asset
-  to a file.
+  (defined as 256) and is identified by its ID. An asset can be written
+  to a file. When the asset object goes out of scope the file is deleted.
 
   The resource file (.rc) should contain some lines like these:
     IDR_INDEX_HTML RESFILE  "index.html"
     IDR_MAIN_CSS   RESFILE  "main.css"
-
-  \param  path  root path for all assets (with or without terminating backslash
-  \return _true_ if successful
 */
 
-/// write the asset to a folder
+/*!
+   Load asset data
+   \return pointer to asset data or 0 if an error occurs.
+*/
+const void* asset::data ()
+{
+  if (!loaded)
+    load ();
+
+  return ptr;
+}
+
+/*!
+  Write the asset to a folder
+  \param  path  root path for asset file (with or without terminating backslash)
+  \return `true` if successful, `false` otherwise
+
+  Asset filename is obtained by appending the asset name to the root path.
+*/
 bool asset::write (const std::string& path)
 {
+  //Load resource
+  if (!loaded)
+    load ();
+
+  if (!loaded)
+    return false; //load failed
+
   string tmp = path;
   int rc;
 
@@ -57,42 +77,43 @@ bool asset::write (const std::string& path)
   if ((rc = r_mkdir (tmp)) && rc != EEXIST)
     return false; //could not create path
 
-  //Load resource
-  DWORD size = 0;
-  void* data = mem_resource (id, RESFILE, size);         //load resource...
-  if (!data)
-    return false;
   if (pend != string::npos)
     tmp += name.substr (pend);
   else
     tmp += name;
   FILE* f;
-  f = utf8::fopen (tmp, "wb");        //... and write it
+  f = utf8::fopen (tmp, "wb");
   if (!f)
-    return false;
+    return false; // cannot open output file
+
   fullpath = tmp;
-  TRACE ("Writing resource size %d file %s", size, fullpath.c_str ());
-  fwrite (data, sizeof (char), size, f);
+  TRACE ("Writing resource size %d file %s", sz, fullpath.c_str ());
+  fwrite (ptr, sizeof (char), sz, f);
   fclose (f);
 
   written = true;
   return true;
 }
 
-//Load a resource in memory
-static void* mem_resource (int name, int type, DWORD& size)
+/// Load a resource in memory
+void asset::load ()
 {
+  ptr = nullptr;
+  sz = 0;
+
   HMODULE handle = GetModuleHandle (NULL);
-  HRSRC rc = FindResource (handle, MAKEINTRESOURCE (name),
-    MAKEINTRESOURCE (type));
+  HRSRC rc = FindResource (handle, MAKEINTRESOURCE (id),
+    MAKEINTRESOURCE (RESFILE));
   if (!rc)
-    return NULL;
+    return;
 
   HGLOBAL rcData = LoadResource (handle, rc);
   if (!rcData)
-    return NULL;
-  size = SizeofResource (handle, rc);
-  return LockResource (rcData);
+    return;
+
+  sz = SizeofResource (handle, rc);
+  ptr = LockResource (rcData);
+  loaded = true;
 }
 
 
