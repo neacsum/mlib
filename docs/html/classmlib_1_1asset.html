@@ -63,11 +63,17 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a0aede837f7caadcd5185b5276c05eeab"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6497f535f92515af6e1093fa8f6ebc08"><td class="memItemLeft" align="right" valign="top"><a id="a6497f535f92515af6e1093fa8f6ebc08"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1asset.html#a6497f535f92515af6e1093fa8f6ebc08">~asset</a> ()</td></tr>
-<tr class="memdesc:a6497f535f92515af6e1093fa8f6ebc08"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor. Deletes asset file if it exists. <br /></td></tr>
+<tr class="memdesc:a6497f535f92515af6e1093fa8f6ebc08"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor. Delete asset file if it exists. <br /></td></tr>
 <tr class="separator:a6497f535f92515af6e1093fa8f6ebc08"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8dde1d07c6cc5889eaf51edb322c0113"><td class="memItemLeft" align="right" valign="top"><a id="a8dde1d07c6cc5889eaf51edb322c0113"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1asset.html#a8dde1d07c6cc5889eaf51edb322c0113">write</a> (const std::string &amp;path)</td></tr>
-<tr class="memdesc:a8dde1d07c6cc5889eaf51edb322c0113"><td class="mdescLeft">&#160;</td><td class="mdescRight">write the asset to a folder <br /></td></tr>
+<tr class="memitem:ac97b267356d55f3274832ab9e51283ad"><td class="memItemLeft" align="right" valign="top">const void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1asset.html#ac97b267356d55f3274832ab9e51283ad">data</a> ()</td></tr>
+<tr class="memdesc:ac97b267356d55f3274832ab9e51283ad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Load asset data.  <a href="classmlib_1_1asset.html#ac97b267356d55f3274832ab9e51283ad">More...</a><br /></td></tr>
+<tr class="separator:ac97b267356d55f3274832ab9e51283ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa56e7ff24fbfea73f098b934e4cec0b5"><td class="memItemLeft" align="right" valign="top"><a id="aa56e7ff24fbfea73f098b934e4cec0b5"></a>
+size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1asset.html#aa56e7ff24fbfea73f098b934e4cec0b5">size</a> ()</td></tr>
+<tr class="memdesc:aa56e7ff24fbfea73f098b934e4cec0b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return size of asset (in bytes) <br /></td></tr>
+<tr class="separator:aa56e7ff24fbfea73f098b934e4cec0b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8dde1d07c6cc5889eaf51edb322c0113"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1asset.html#a8dde1d07c6cc5889eaf51edb322c0113">write</a> (const std::string &amp;path)</td></tr>
+<tr class="memdesc:a8dde1d07c6cc5889eaf51edb322c0113"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write the asset to a folder.  <a href="classmlib_1_1asset.html#a8dde1d07c6cc5889eaf51edb322c0113">More...</a><br /></td></tr>
 <tr class="separator:a8dde1d07c6cc5889eaf51edb322c0113"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ade0e6388ad16fa80b470af601721d3a9"><td class="memItemLeft" align="right" valign="top"><a id="ade0e6388ad16fa80b470af601721d3a9"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1asset.html#ade0e6388ad16fa80b470af601721d3a9">remove</a> ()</td></tr>
@@ -82,16 +88,9 @@ const std::string&#160;</td><td class="memItemRight" valign="bottom"><b>name</b>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Class for storing asset files in Windows resource data. </p>
-<p>This class provides a nice mechanism for 'hiding' the different assets needed by a HTTP server (pages, CSS files, images, etc.) inside the EXE file.</p>
-<p>Each asset is stored as a user-defined resource of type RESFILE (defined as 256) and is identified by its ID. This function writes the asset to a file.</p>
-<p>The resource file (.rc) should contain some lines like these: IDR_INDEX_HTML RESFILE "index.html" IDR_MAIN_CSS RESFILE "main.css"</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">path</td><td>root path for all assets (with or without terminating backslash </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd><em>true</em> if successful </dd></dl>
+<p>This class provides a mechanism for 'hiding' the different assets needed by a HTTP server (pages, CSS files, images, etc.) inside the EXE file.</p>
+<p>Each asset is stored as a user-defined resource of type RESFILE (defined as 256) and is identified by its ID. An asset can be written to a file. When the asset object goes out of scope the file is deleted.</p>
+<p>The resource file (.rc) should contain some lines like these: IDR_INDEX_HTML RESFILE "index.html" IDR_MAIN_CSS RESFILE "main.css" </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a0aede837f7caadcd5185b5276c05eeab"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a0aede837f7caadcd5185b5276c05eeab">&#9670;&nbsp;</a></span>asset()</h2>
@@ -135,6 +134,55 @@ const std::string&#160;</td><td class="memItemRight" valign="bottom"><b>name</b>
   </table>
   </dd>
 </dl>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a id="ac97b267356d55f3274832ab9e51283ad"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac97b267356d55f3274832ab9e51283ad">&#9670;&nbsp;</a></span>data()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const void * mlib::asset::data </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Load asset data. </p>
+<dl class="section return"><dt>Returns</dt><dd>pointer to asset data or 0 if an error occurs. </dd></dl>
+
+</div>
+</div>
+<a id="a8dde1d07c6cc5889eaf51edb322c0113"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8dde1d07c6cc5889eaf51edb322c0113">&#9670;&nbsp;</a></span>write()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool mlib::asset::write </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>path</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Write the asset to a folder. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">path</td><td>root path for asset file (with or without terminating backslash) </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code> if successful, <code>false</code> otherwise</dd></dl>
+<p>Asset filename is obtained by appending the asset name to the root path. </p>
 
 </div>
 </div>

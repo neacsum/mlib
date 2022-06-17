@@ -43,6 +43,7 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a> &#124;
 <a href="#pro-attribs">Protected Attributes</a> &#124;
@@ -71,11 +72,25 @@ Inheritance diagram for mlib::thread:</div>
   </map>
 </div></div>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
+Public Types</h2></td></tr>
+<tr class="memitem:a8dd460afd2b73b1f231ae028d2add410"><td class="memItemLeft" align="right" valign="top"><a id="a8dd460afd2b73b1f231ae028d2add410"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1thread.html#a8dd460afd2b73b1f231ae028d2add410">state</a> { <br />
+&#160;&#160;<b>ready</b>, 
+<b>starting</b>, 
+<b>running</b>, 
+<b>ending</b>, 
+<br />
+&#160;&#160;<b>finished</b>
+<br />
+ }</td></tr>
+<tr class="memdesc:a8dd460afd2b73b1f231ae028d2add410"><td class="mdescLeft">&#160;</td><td class="mdescRight">Thread state. <br /></td></tr>
+<tr class="separator:a8dd460afd2b73b1f231ae028d2add410"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a9e670c51c075b7fe83cb7bd6c57f9f69"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1thread.html#a9e670c51c075b7fe83cb7bd6c57f9f69">thread</a> (std::function&lt; int()&gt; func)</td></tr>
-<tr class="memdesc:a9e670c51c075b7fe83cb7bd6c57f9f69"><td class="mdescLeft">&#160;</td><td class="mdescRight">Make a thread from a function.  <a href="classmlib_1_1thread.html#a9e670c51c075b7fe83cb7bd6c57f9f69">More...</a><br /></td></tr>
-<tr class="separator:a9e670c51c075b7fe83cb7bd6c57f9f69"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adbc071e156d801a7515a03e80710ec2c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1thread.html#adbc071e156d801a7515a03e80710ec2c">thread</a> (std::function&lt; unsigned int()&gt; func)</td></tr>
+<tr class="memdesc:adbc071e156d801a7515a03e80710ec2c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Make a thread from a function.  <a href="classmlib_1_1thread.html#adbc071e156d801a7515a03e80710ec2c">More...</a><br /></td></tr>
+<tr class="separator:adbc071e156d801a7515a03e80710ec2c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa628a385d15b1a426ab696a0b60bdc76"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1thread.html#aa628a385d15b1a426ab696a0b60bdc76">~thread</a> ()</td></tr>
 <tr class="memdesc:aa628a385d15b1a426ab696a0b60bdc76"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor.  <a href="classmlib_1_1thread.html#aa628a385d15b1a426ab696a0b60bdc76">More...</a><br /></td></tr>
 <tr class="separator:aa628a385d15b1a426ab696a0b60bdc76"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -91,6 +106,15 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1thread.html#aa93bac01919b574611a7a18f02855ad2">join</a> ()</td></tr>
 <tr class="memdesc:aa93bac01919b574611a7a18f02855ad2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Another name for wait () function. <br /></td></tr>
 <tr class="separator:aa93bac01919b574611a7a18f02855ad2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5cdce9bd4fb6508a299099c077d1bd8e"><td class="memItemLeft" align="right" valign="top">DWORD&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1thread.html#a5cdce9bd4fb6508a299099c077d1bd8e">wait</a> (DWORD time_limit=INFINITE)</td></tr>
+<tr class="memdesc:a5cdce9bd4fb6508a299099c077d1bd8e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Wait for thread to finish execution.  <a href="classmlib_1_1thread.html#a5cdce9bd4fb6508a299099c077d1bd8e">More...</a><br /></td></tr>
+<tr class="separator:a5cdce9bd4fb6508a299099c077d1bd8e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6aac6ac8740e5fbd6f9bcd288cd5318d"><td class="memItemLeft" align="right" valign="top">DWORD&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1thread.html#a6aac6ac8740e5fbd6f9bcd288cd5318d">wait_alertable</a> (DWORD time_limit=INFINITE)</td></tr>
+<tr class="memdesc:a6aac6ac8740e5fbd6f9bcd288cd5318d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Wait for thread to finish or an APC or IO completion routine to occur.  <a href="classmlib_1_1thread.html#a6aac6ac8740e5fbd6f9bcd288cd5318d">More...</a><br /></td></tr>
+<tr class="separator:a6aac6ac8740e5fbd6f9bcd288cd5318d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a056f4604c1b6c602876aea72908cf9e2"><td class="memItemLeft" align="right" valign="top">DWORD&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1thread.html#a056f4604c1b6c602876aea72908cf9e2">wait_msg</a> (DWORD time_limit=INFINITE, DWORD mask=QS_ALLINPUT)</td></tr>
+<tr class="memdesc:a056f4604c1b6c602876aea72908cf9e2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Wait for thread to finish or a message to be queued.  <a href="classmlib_1_1thread.html#a056f4604c1b6c602876aea72908cf9e2">More...</a><br /></td></tr>
+<tr class="separator:a056f4604c1b6c602876aea72908cf9e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab8ce3b852987ea38225fd45972885946"><td class="memItemLeft" align="right" valign="top"><a id="ab8ce3b852987ea38225fd45972885946"></a>
 DWORD&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1thread.html#ab8ce3b852987ea38225fd45972885946">id</a> () const</td></tr>
 <tr class="memdesc:ab8ce3b852987ea38225fd45972885946"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return thread's ID. <br /></td></tr>
@@ -103,6 +127,10 @@ UINT&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1thread.html#a6193c4d87bb9e9f53063e61717884521">is_running</a> () const</td></tr>
 <tr class="memdesc:a6193c4d87bb9e9f53063e61717884521"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return <em>true</em> if thread is running. <br /></td></tr>
 <tr class="separator:a6193c4d87bb9e9f53063e61717884521"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2980a7a6633b80718f400198bcdb76a8"><td class="memItemLeft" align="right" valign="top"><a id="a2980a7a6633b80718f400198bcdb76a8"></a>
+<a class="el" href="classmlib_1_1thread.html#a8dd460afd2b73b1f231ae028d2add410">state</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1thread.html#a2980a7a6633b80718f400198bcdb76a8">get_state</a> () const</td></tr>
+<tr class="memdesc:a2980a7a6633b80718f400198bcdb76a8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return thread status. <br /></td></tr>
+<tr class="separator:a2980a7a6633b80718f400198bcdb76a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7121a1aaf0e184b970e08873b63863cb"><td class="memItemLeft" align="right" valign="top"><a id="a7121a1aaf0e184b970e08873b63863cb"></a>
 int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1thread.html#a7121a1aaf0e184b970e08873b63863cb">priority</a> ()</td></tr>
 <tr class="memdesc:a7121a1aaf0e184b970e08873b63863cb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return priority of a thread. <br /></td></tr>
@@ -111,14 +139,6 @@ int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1thread.html#a52cdfa4d09089b6a0257bf14d745532e">priority</a> (int pri)</td></tr>
 <tr class="memdesc:a52cdfa4d09089b6a0257bf14d745532e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set priority of a thread. <br /></td></tr>
 <tr class="separator:a52cdfa4d09089b6a0257bf14d745532e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aac31af0ef5f148943e1ee7e9eed34964"><td class="memItemLeft" align="right" valign="top"><a id="aac31af0ef5f148943e1ee7e9eed34964"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1thread.html#aac31af0ef5f148943e1ee7e9eed34964">resume</a> ()</td></tr>
-<tr class="memdesc:aac31af0ef5f148943e1ee7e9eed34964"><td class="mdescLeft">&#160;</td><td class="mdescRight">Resume a suspended thread. <br /></td></tr>
-<tr class="separator:aac31af0ef5f148943e1ee7e9eed34964"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a46a0d50faa8b7a4ff831323881d38aff"><td class="memItemLeft" align="right" valign="top"><a id="a46a0d50faa8b7a4ff831323881d38aff"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1thread.html#a46a0d50faa8b7a4ff831323881d38aff">suspend</a> ()</td></tr>
-<tr class="memdesc:a46a0d50faa8b7a4ff831323881d38aff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Suspend a running thread. <br /></td></tr>
-<tr class="separator:a46a0d50faa8b7a4ff831323881d38aff"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classmlib_1_1syncbase"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classmlib_1_1syncbase')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classmlib_1_1syncbase.html">mlib::syncbase</a></td></tr>
 <tr class="memitem:a53d7265f70ab184894a9b7acf72270ed inherit pub_methods_classmlib_1_1syncbase"><td class="memItemLeft" align="right" valign="top"><a id="a53d7265f70ab184894a9b7acf72270ed"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1syncbase.html#a53d7265f70ab184894a9b7acf72270ed">syncbase</a> ()</td></tr>
@@ -148,16 +168,6 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1syncbase.html#ac234da6fda029f7b5dc4da701a674110">operator==</a> (const <a class="el" href="classmlib_1_1syncbase.html">syncbase</a> &amp;rhs) const</td></tr>
 <tr class="memdesc:ac234da6fda029f7b5dc4da701a674110 inherit pub_methods_classmlib_1_1syncbase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Equality operator. <br /></td></tr>
 <tr class="separator:ac234da6fda029f7b5dc4da701a674110 inherit pub_methods_classmlib_1_1syncbase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a99433891d3ccd92884b2e003c4c5e7ca inherit pub_methods_classmlib_1_1syncbase"><td class="memItemLeft" align="right" valign="top"><a id="a99433891d3ccd92884b2e003c4c5e7ca"></a>
-virtual DWORD&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1syncbase.html#a99433891d3ccd92884b2e003c4c5e7ca">wait</a> (DWORD time_limit=INFINITE)</td></tr>
-<tr class="memdesc:a99433891d3ccd92884b2e003c4c5e7ca inherit pub_methods_classmlib_1_1syncbase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Wait for the object to become signaled. <br /></td></tr>
-<tr class="separator:a99433891d3ccd92884b2e003c4c5e7ca inherit pub_methods_classmlib_1_1syncbase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a96f190fef9906dbc9641ff73859a3ef7 inherit pub_methods_classmlib_1_1syncbase"><td class="memItemLeft" align="right" valign="top">virtual DWORD&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1syncbase.html#a96f190fef9906dbc9641ff73859a3ef7">wait_alertable</a> (DWORD time_limit=INFINITE)</td></tr>
-<tr class="separator:a96f190fef9906dbc9641ff73859a3ef7 inherit pub_methods_classmlib_1_1syncbase"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1b5ac0ea188cd5ae7c71fd29c0bbcf95 inherit pub_methods_classmlib_1_1syncbase"><td class="memItemLeft" align="right" valign="top"><a id="a1b5ac0ea188cd5ae7c71fd29c0bbcf95"></a>
-virtual DWORD&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1syncbase.html#a1b5ac0ea188cd5ae7c71fd29c0bbcf95">wait_msg</a> (DWORD time_limit=INFINITE, DWORD mask=QS_ALLINPUT)</td></tr>
-<tr class="memdesc:a1b5ac0ea188cd5ae7c71fd29c0bbcf95 inherit pub_methods_classmlib_1_1syncbase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Wait for object to become signaled or a message to be queued. <br /></td></tr>
-<tr class="separator:a1b5ac0ea188cd5ae7c71fd29c0bbcf95 inherit pub_methods_classmlib_1_1syncbase"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a91ff6bb88625c70d65c7c546ccc70646 inherit pub_methods_classmlib_1_1syncbase"><td class="memItemLeft" align="right" valign="top"><a id="a91ff6bb88625c70d65c7c546ccc70646"></a>
 virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1syncbase.html#a91ff6bb88625c70d65c7c546ccc70646">operator bool</a> ()</td></tr>
 <tr class="memdesc:a91ff6bb88625c70d65c7c546ccc70646 inherit pub_methods_classmlib_1_1syncbase"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if object is signaled. <br /></td></tr>
@@ -206,10 +216,10 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
-<tr class="memitem:afdcc3a070b07d277c43e68d54f97e23a"><td class="memItemLeft" align="right" valign="top"><a id="afdcc3a070b07d277c43e68d54f97e23a"></a>
-UINT&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1thread.html#afdcc3a070b07d277c43e68d54f97e23a">exitcode</a></td></tr>
-<tr class="memdesc:afdcc3a070b07d277c43e68d54f97e23a"><td class="mdescLeft">&#160;</td><td class="mdescRight">exit code <br /></td></tr>
-<tr class="separator:afdcc3a070b07d277c43e68d54f97e23a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae83593703957eaf4b8cc203dd89c1bae"><td class="memItemLeft" align="right" valign="top"><a id="ae83593703957eaf4b8cc203dd89c1bae"></a>
+unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1thread.html#ae83593703957eaf4b8cc203dd89c1bae">exitcode</a></td></tr>
+<tr class="memdesc:ae83593703957eaf4b8cc203dd89c1bae"><td class="mdescLeft">&#160;</td><td class="mdescRight">exit code <br /></td></tr>
+<tr class="separator:ae83593703957eaf4b8cc203dd89c1bae"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
 Friends</h2></td></tr>
@@ -222,8 +232,8 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>current_thread</b></
 <p>This class is abstract and the user has to derive another object and implement the <a class="el" href="classmlib_1_1thread.html#a7364e7fb5e90830d68e820f8de910181" title="Default run function.">run()</a> function. Thread objects are created in a "suspended animation" state. To start them use the <a class="el" href="classmlib_1_1thread.html#ae14ce5ccdb7ec7a41fe6e8d8ce385867" title="Begin execution of a newly created thread.">start()</a> function.</p>
 <p>When combining objects and multi-threading it is useful to define what member functions are <em>foreign</em> (i.e. can be called by another execution thread) and what functions are <em>owned</em> (i.e. can be called only by the same execution thread. If possible, "owned" functions should be made private or protected. The object's constructors and destructor are inherently <em>foreign</em> while the run function is inherently <em>owned</em>. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a9e670c51c075b7fe83cb7bd6c57f9f69"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9e670c51c075b7fe83cb7bd6c57f9f69">&#9670;&nbsp;</a></span>thread()</h2>
+<a id="adbc071e156d801a7515a03e80710ec2c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adbc071e156d801a7515a03e80710ec2c">&#9670;&nbsp;</a></span>thread()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -231,7 +241,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>current_thread</b></
         <tr>
           <td class="memname">mlib::thread::thread </td>
           <td>(</td>
-          <td class="paramtype">std::function&lt; int()&gt;&#160;</td>
+          <td class="paramtype">std::function&lt; unsigned int()&gt;&#160;</td>
           <td class="paramname"><em>func</em></td><td>)</td>
           <td></td>
         </tr>
@@ -300,6 +310,140 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>current_thread</b></
 <p>Calls user supplied function if there is one </p>
 
 <p>Reimplemented in <a class="el" href="classmlib_1_1http__connection.html#aab57ff5ac7425f2a838c32a8a098453e">mlib::http_connection</a>, <a class="el" href="classmlib_1_1current__thread.html#aa004a12d6b41fe9947b80a4f9b2aa4b4">mlib::current_thread</a>, and <a class="el" href="classmlib_1_1tcpserver.html#ab605e3fc1e27da5503bb8c09d8debbf4">mlib::tcpserver</a>.</p>
+
+</div>
+</div>
+<a id="a5cdce9bd4fb6508a299099c077d1bd8e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5cdce9bd4fb6508a299099c077d1bd8e">&#9670;&nbsp;</a></span>wait()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">DWORD mlib::thread::wait </td>
+          <td>(</td>
+          <td class="paramtype">DWORD&#160;</td>
+          <td class="paramname"><em>time_limit</em> = <code>INFINITE</code></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Wait for thread to finish execution. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">time_limit</td><td>time-out interval, in milliseconds </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><code>WAIT_OBJECT_0</code> thread finished </dd>
+<dd>
+<code>WAIT_TIMEOUT</code> time-out interval expired</dd></dl>
+<p>If an exception occurred during thread execution, it is re-thrown now. </p>
+
+<p>Reimplemented from <a class="el" href="classmlib_1_1syncbase.html#a99433891d3ccd92884b2e003c4c5e7ca">mlib::syncbase</a>.</p>
+
+</div>
+</div>
+<a id="a6aac6ac8740e5fbd6f9bcd288cd5318d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6aac6ac8740e5fbd6f9bcd288cd5318d">&#9670;&nbsp;</a></span>wait_alertable()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">DWORD mlib::thread::wait_alertable </td>
+          <td>(</td>
+          <td class="paramtype">DWORD&#160;</td>
+          <td class="paramname"><em>time_limit</em> = <code>INFINITE</code></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Wait for thread to finish or an APC or IO completion routine to occur. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">time_limit</td><td>time-out interval, in milliseconds </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><code>WAIT_OBJECT_0</code> thread finished </dd>
+<dd>
+<code>WAIT_TIMEOUT</code> time-out interval expired </dd>
+<dd>
+<code>WAIT_IO_COMPLETION</code> wait ended by one or more APC-es queued.</dd></dl>
+<p>If an exception occurred during thread execution, it is re-thrown now. </p>
+
+<p>Reimplemented from <a class="el" href="classmlib_1_1syncbase.html#a96f190fef9906dbc9641ff73859a3ef7">mlib::syncbase</a>.</p>
+
+</div>
+</div>
+<a id="a056f4604c1b6c602876aea72908cf9e2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a056f4604c1b6c602876aea72908cf9e2">&#9670;&nbsp;</a></span>wait_msg()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">DWORD mlib::thread::wait_msg </td>
+          <td>(</td>
+          <td class="paramtype">DWORD&#160;</td>
+          <td class="paramname"><em>time_limit</em> = <code>INFINITE</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">DWORD&#160;</td>
+          <td class="paramname"><em>mask</em> = <code>QS_ALLINPUT</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Wait for thread to finish or a message to be queued. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">time_limit</td><td>time-out interval, in milliseconds </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><code>WAIT_OBJECT_0</code> thread finished </dd>
+<dd>
+<code>WAIT_TIMEOUT</code> time-out interval expired </dd>
+<dd>
+<code>WAIT_OBJECT_0+1</code> Input message received.</dd></dl>
+<p>If an exception occurred during thread execution, it is re-thrown now. </p>
+
+<p>Reimplemented from <a class="el" href="classmlib_1_1syncbase.html#a1b5ac0ea188cd5ae7c71fd29c0bbcf95">mlib::syncbase</a>.</p>
 
 </div>
 </div>

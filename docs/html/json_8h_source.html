@@ -243,7 +243,7 @@ $(function() {
 <div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;        at_end = <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;      <span class="keywordflow">else</span></div>
 <div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;        <span class="keywordflow">throw</span> <a class="code" href="classmlib_1_1erc.html">mlib::erc</a> (<a class="code" href="json_8h.html#a86fec282f8a16e26a269730a9323f98e">ERR_JSON_ITERPOS</a>, <a class="code" href="errorcode_8h.html#a045f609c6f81928ed19bec8fa95ce978">ERROR_PRI_ERROR</a>, <a class="code" href="json_8h.html#acc844f474fef31f05856d5f37f6f5f33">errors</a>);</div>
-<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;      <span class="keywordflow">return</span> tmp;</div>
+<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;      <span class="keywordflow">return</span> *<span class="keyword">this</span>;</div>
 <div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;    }</div>
 <div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160; </div>
 <div class="line"><a name="l00221"></a><span class="lineno"><a class="line" href="classjson_1_1node_1_1iterator__type.html#a8bbb1ff8fe63f0aa79da254692bdb1b9">  221</a></span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="classjson_1_1node_1_1iterator__type.html#a8bbb1ff8fe63f0aa79da254692bdb1b9">operator == </a>(<span class="keyword">const</span> <a class="code" href="classjson_1_1node_1_1iterator__type.html">iterator_type&lt;C_&gt;</a>&amp; other)<span class="keyword"> const</span></div>
@@ -433,7 +433,7 @@ $(function() {
 <div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160;{</div>
 <div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;  <span class="keyword">new</span> (&amp;obj)nodes_array ();</div>
 <div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;  <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i = 0; i &lt; vec.size (); ++i)</div>
-<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;    arr.emplace_back (make_unique&lt;node&gt;(vec[i]));</div>
+<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;    arr.emplace_back (std::make_unique&lt;node&gt;(vec[i]));</div>
 <div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;}</div>
 <div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160; </div>
 <div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">class</span> T&gt;</div>
