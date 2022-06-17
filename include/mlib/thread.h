@@ -16,19 +16,23 @@ class thread : public syncbase
 public:
   /// Thread state
   enum class state {ready, starting, running, ending, finished};
-  thread (std::function<int ()> func);
-  virtual ~thread   ();
+  thread (std::function<unsigned int ()> func);
+  virtual ~thread ();
 
   virtual void start ();
   void fork();
   void join ();
+  DWORD wait (DWORD time_limit = INFINITE);
+  DWORD wait_alertable (DWORD time_limit = INFINITE);
+  DWORD wait_msg (DWORD time_limit = INFINITE, DWORD mask = QS_ALLINPUT);
+
 
   DWORD id () const;
   UINT result () const;
   bool is_running () const;
   state get_state () const;
-  int priority  ();
-  void priority  (int pri);
+  int priority ();
+  void priority (int pri);
 
 protected:
   thread (const char *name=0, bool inherit=false, DWORD stack_size=0, PSECURITY_DESCRIPTOR sd=NULL);
@@ -37,7 +41,7 @@ protected:
   virtual void term ();
   virtual void run ();
 
-  UINT exitcode;                                 ///< exit code
+  unsigned int exitcode;                          ///< exit code
 
 private:
   thread (HANDLE handle, DWORD id);               ///< ctor used by current %thread.
@@ -49,11 +53,12 @@ private:
   state volatile stat;
   bool shouldKill;
   event created, started;
-  static UINT _stdcall entryProc( thread *ts );
+  static unsigned int _stdcall entryProc (thread *ts);
   friend class current_thread;
   SECURITY_ATTRIBUTES sa;
   DWORD stack;
-  std::function<int ()> thfunc;
+  std::function<unsigned int ()> thfunc;
+  std::exception_ptr pex;
 };
 
 /// Currently executing %thread object

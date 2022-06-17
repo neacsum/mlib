@@ -28,7 +28,18 @@ SUITE (threads)
     std::vector<syncbase> p{ th1, th2 };
     multiwait (p);
     CHECK_EQUAL (1, th1.result ());
+  }
 
+  TEST (thread_exception)
+  {
+    auto bad_func = []()->unsigned int {
+      char t = std::string ().at (1); // this generates an std::out_of_range
+      return 0;
+    };
+
+    thread th (bad_func);
+    th.start ();
+    CHECK_THROW (std::out_of_range, th.wait ());
   }
 
   TEST (thread_states)

@@ -93,7 +93,7 @@ thread::thread (const char *name, bool inherit, DWORD stack_size, PSECURITY_DESC
 
   The return value of the run function becomes the exit code of the thread.
 */
-thread::thread (std::function<int ()> func)
+thread::thread (std::function<unsigned int ()> func)
   : shouldKill (true)
   , started (event::manual)
   , stat (state::ready)
@@ -159,15 +159,22 @@ UINT _stdcall thread::entryProc (thread *th)
 {
   th->created.signal();
   th->started.wait();
-
-  if (th->init ())
+  try
   {
-    th->stat = state::running;
-    th->run ();
+    if (th->init ())
+    {
+      th->stat = state::running;
+      th->run ();
+    }
+    th->stat = state::ending;
+    th->term ();
+    th->stat = state::finished;
   }
-  th->stat = state::ending;
-  th->term ();
-  th->stat = state::finished;
+  catch (...)
+  {
+    th->pex = std::current_exception ();
+    TRACE ("Thread %s[%x] exception !!", th->name ().c_str (), th->id_);
+  }
 
   TRACE2 ("Thread %s[%x] is ending", th->name().c_str(), th->id_);
   _endthreadex (th->exitcode);
@@ -196,5 +203,67 @@ void thread::start ()
   Sleep (0);
 }
 
+/*!
+  Wait for thread to finish execution
 
+  \param time_limit time-out interval, in milliseconds
+  \return `WAIT_OBJECT_0` thread finished
+  \return `WAIT_TIMEOUT` time-out interval expired
+
+  If an exception occurred during thread execution, it is re-thrown now.
+*/
+DWORD thread::wait (DWORD time_limit)
+{
+  DWORD ret = syncbase::wait (time_limit);
+  if (ret == WAIT_OBJECT_0)
+  {
+    if (pex)
+      std::rethrow_exception (pex);
+  }
+  return ret;
 }
+
+/*!
+  Wait for thread to finish or an APC or IO completion routine to occur
+
+  \param time_limit time-out interval, in milliseconds
+  \return `WAIT_OBJECT_0` thread finished
+  \return `WAIT_TIMEOUT` time-out interval expired
+  \return `WAIT_IO_COMPLETION` wait ended by one or more APC-es queued.
+
+  If an exception occurred during thread execution, it is re-thrown now.
+*/
+DWORD thread::wait_alertable (DWORD time_limit)
+{
+  DWORD ret = syncbase::wait_alertable (time_limit);
+  if (ret == WAIT_OBJECT_0)
+  {
+    if (pex)
+      std::rethrow_exception (pex);
+  }
+  return ret;
+}
+
+/*!
+  Wait for thread to finish or a message to be queued
+
+  \param time_limit time-out interval, in milliseconds
+  \return `WAIT_OBJECT_0` thread finished
+  \return `WAIT_TIMEOUT` time-out interval expired
+  \return `WAIT_OBJECT_0+1` Input message received.
+
+  If an exception occurred during thread execution, it is re-thrown now.
+*/
+DWORD thread::wait_msg (DWORD time_limit, DWORD mask)
+{
+  DWORD ret = syncbase::wait_msg (time_limit, mask);
+  if (ret == WAIT_OBJECT_0)
+  {
+    if (pex)
+      std::rethrow_exception (pex);
+  }
+  return ret;
+}
+
+
+} //end namespace
