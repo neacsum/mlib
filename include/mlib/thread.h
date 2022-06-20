@@ -35,7 +35,7 @@ public:
   void priority (int pri);
 
 protected:
-  thread (const char *name=0, bool inherit=false, DWORD stack_size=0, PSECURITY_DESCRIPTOR sd=NULL);
+  thread (const char *name=0, DWORD stack_size=0, PSECURITY_DESCRIPTOR sd=NULL, bool inherit = false);
 
   virtual bool init ();
   virtual void term ();
@@ -44,36 +44,32 @@ protected:
   unsigned int exitcode;                          ///< exit code
 
 private:
-  thread (HANDLE handle, DWORD id);               ///< ctor used by current %thread.
-  void initialize ();
+  void initialize (PSECURITY_DESCRIPTOR sd, BOOL inherit);
   thread& operator= (const thread& t) = delete;
   thread (const thread& t) = delete;
 
   DWORD id_;
   state volatile stat;
-  bool shouldKill;
   event created, started;
   static unsigned int _stdcall entryProc (thread *ts);
-  friend class current_thread;
-  SECURITY_ATTRIBUTES sa;
   DWORD stack;
   std::function<unsigned int ()> thfunc;
   std::exception_ptr pex;
 };
 
-/// Currently executing %thread object
-class current_thread : protected thread
+/*!
+  Currently executing %thread object
+  \ingroup syncro
+
+  Useful for accessing properties like id, handle, priority etc.
+*/
+class current_thread
 {
 public:
-  current_thread();
-  ~current_thread ();
-  thread::id;
-  thread::handle;
-  thread::is_running;
-  thread::priority;
-
-protected:
-  void run() {};
+  DWORD id () const;
+  HANDLE handle() const;
+  int priority ();
+  void priority (int pri);
 };
 
 
@@ -146,7 +142,35 @@ bool thread::init ()
 inline
 void  thread::term ()
 {
-};
+}
 
+// ----------- current_thread inline functions ------------------------------
+
+/// Return ID of current thread
+inline
+DWORD current_thread::id () const
+{
+  return GetCurrentThreadId ();
+}
+
+inline
+HANDLE current_thread::handle () const
+{
+  return GetCurrentThread ();
+}
+
+/// Return priority current thread
+inline
+int current_thread::priority ()
+{
+  return GetThreadPriority (GetCurrentThread ());
+}
+
+/// Set priority of current thread
+inline
+void current_thread::priority (int pri)
+{
+  SetThreadPriority (GetCurrentThread (), pri);
+}
 
 }

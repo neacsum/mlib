@@ -25,8 +25,7 @@ SUITE (threads)
     thread th2 (f2);
     th1.start ();
     th2.start ();
-    std::vector<syncbase> p{ th1, th2 };
-    multiwait (p);
+    wait_all ({&th1, &th2});
     CHECK_EQUAL (1, th1.result ());
   }
 
@@ -62,15 +61,6 @@ SUITE (threads)
   {
     current_thread me;
     cout << "Current thread id=0x" << hex << me.id () << endl;
-    CHECK (me.is_running ());
+    CHECK_EQUAL (GetCurrentThread(), me.handle ());
   }
-
-  class my_thread : public thread
-  {
-  public:
-    my_thread (int arg1, int arg2);
-  private:
-    void run () { f (m1); };
-    int m1, m2;
-  };
 }

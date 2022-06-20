@@ -13,25 +13,6 @@
 
 namespace mlib {
 
-//----------------- current_thread member functions -------------------
-/*!
-  \class current_thread 
-  \ingroup syncro
-
-  Useful for accessing properties like id, handle, priority etc.
-*/
-
-///Constructor
-current_thread::current_thread() :
-  thread( GetCurrentThread(), GetCurrentThreadId() )
-{
-}
-
-///Destructor
-current_thread::~current_thread()
-{
-  TRACE2 ("Current thread destructor");
-}
 
 //----------------- thread member functions ---------------------------
 
@@ -39,9 +20,10 @@ current_thread::~current_thread()
   \class thread 
   \ingroup syncro
 
-  This class is abstract and the user has to derive another object and implement
-  the run() function. Thread objects are created in a "suspended animation" 
-  state. To start them use the start() function.
+  There objects can be created by providing a function that will be run in a
+  separate thread or by deriving an new object that reimplements the
+  thread::run() function. Either way, thread objects are created in a 
+  "suspended animation" state. To start them use the thread::start() function.
 
   When combining objects and multi-threading it is useful to define what 
   member functions are \e foreign (i.e. can be called by another execution
@@ -49,37 +31,29 @@ current_thread::~current_thread()
   execution %thread. If possible, "owned" functions should be made private or
   protected. The object's constructors and destructor are inherently \e foreign 
   while the run function is inherently \e owned.
+
+  Exceptions thrown while executing a thread that are not caught by user 
+  handlers are caught by a try...catch block that encompasses the thread::run()
+  function and re-thrown by the thread::wait() function (considered a _foreign_
+  function).
 */
 
-/*!
-  Private constructor used only by current_thread class
-*/
-thread::thread (HANDLE h, DWORD i) :
-  syncbase (NULL),
-  shouldKill (false),
-  stat (state::running),
-  exitcode (0),
-  id_ (i)
-{
-  set_handle (h);
-}
 
 /*!
-  Constructor for another thread
+  Protected constructor for use of thread-derived objects
+
+  \param name       thread name (mostly for debugging purposes)
+  \param stack_size thread stack size or 0 for default size
+  \param sd         pointer to a security descriptor or NULL 
+  \param inherit    if true, thread handle is inherited by child processes
 */
-thread::thread (const char *name, bool inherit, DWORD stack_size, PSECURITY_DESCRIPTOR sd)
+thread::thread (const char *name, DWORD stack_size, PSECURITY_DESCRIPTOR sd, bool inherit)
   : syncbase (name)
-  , shouldKill (true)
-  , started (event::manual)
   , stat (state::ready)
   , exitcode (0)
   , stack (stack_size)
 {
-  //setup SECURITY_ATTRIBUTES structure
-  sa.nLength = sizeof(SECURITY_ATTRIBUTES);
-  sa.lpSecurityDescriptor = sd;
-  sa.bInheritHandle = inherit;
-  initialize ();
+  initialize (sd, inherit);
   TRACE2 ("Created thread %s[%x]", name?name:"", id());
 }
 
@@ -94,26 +68,21 @@ thread::thread (const char *name, bool inherit, DWORD stack_size, PSECURITY_DESC
   The return value of the run function becomes the exit code of the thread.
 */
 thread::thread (std::function<unsigned int ()> func)
-  : shouldKill (true)
-  , started (event::manual)
-  , stat (state::ready)
+  : stat (state::ready)
   , exitcode (0)
   , stack (0)
   , thfunc (func)
 {
-  //setup SECURITY_ATTRIBUTES structure
-  sa.nLength = sizeof(SECURITY_ATTRIBUTES);
-  sa.lpSecurityDescriptor = NULL;
-  sa.bInheritHandle = false;
-  initialize ();
+  initialize (nullptr, false);
   TRACE2 ("Created thread [%x]", id());
 }
 
-/*!
-  Do the real work of creating and starting the thread
-*/
-void thread::initialize ()
+///  Does the real work of creating and starting the thread
+void thread::initialize (PSECURITY_DESCRIPTOR sd, BOOL inherit)
 {
+  //setup SECURITY_ATTRIBUTES structure
+  SECURITY_ATTRIBUTES sa { sizeof (SECURITY_ATTRIBUTES), sd, inherit};
+
   //create thread in suspended state
   HANDLE handle = (HANDLE)_beginthreadex (&sa, stack, (unsigned int (__stdcall *)(void*))entryProc, this,
                    CREATE_SUSPENDED, (UINT*)&id_);
@@ -135,18 +104,15 @@ void thread::initialize ()
 thread::~thread()
 {
   TRACE2 ("Thread %s[%x] in destructor", name().c_str(), id_);
-  if (shouldKill)
+  if (stat == state::running)
   {
-    if (stat == state::running)
-    {
-      TRACE ("WARNING! thread was still running");
-      TerminateThread (handle(), 0);
-    }
-    else if (stat == state::ready)
-    {
-      TRACE ("Terminating thread that was not started");
-      TerminateThread (handle(), 0);
-    }
+    TRACE ("WARNING! thread was still running");
+    TerminateThread (handle (), 0);
+  }
+  else if (stat == state::ready)
+  {
+    TRACE ("Terminating thread that was not started");
+    TerminateThread (handle (), 0);
   }
   id_ = 0;
 }
@@ -181,25 +147,22 @@ UINT _stdcall thread::entryProc (thread *th)
   return th->exitcode;
 }
 
-/*!
-  Default run function. Calls user supplied function if there is one
-*/
+///  Default run function. Calls user supplied function if there is one
 void thread::run()
 {
   if (thfunc)
     exitcode = thfunc ();
 }
 
-/*!
-  Begin execution of a newly created thread
-*/
+///  Begin execution of a newly created thread
 void thread::start ()
 {
-  TRACE2 ("Thread %s[%x] is starting", name().c_str(), id_);
   assert (handle ());
   assert (stat == state::ready);
-  started.signal ();
+
+  TRACE2 ("Thread %s[%x] is starting", name ().c_str (), id_);
   stat = state::starting;
+  started.signal ();
   Sleep (0);
 }
 
