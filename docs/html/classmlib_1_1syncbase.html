@@ -67,10 +67,9 @@ Inheritance diagram for mlib::syncbase:</div>
 <area href="classmlib_1_1semaphore.html" title="Wrapper for Windows semaphore objects. A semaphore is a counter incremented by signal and decremented..." alt="mlib::semaphore" shape="rect" coords="278,56,407,80"/>
 <area href="classmlib_1_1thread.html" title="Wrapper for a Windows thread." alt="mlib::thread" shape="rect" coords="417,56,546,80"/>
 <area href="classmlib_1_1wtimer.html" title="Waitable timer." alt="mlib::wtimer" shape="rect" coords="556,56,685,80"/>
-<area href="classmlib_1_1current__thread.html" title="Currently executing thread object." alt="mlib::current_thread" shape="rect" coords="278,112,407,136"/>
-<area href="classmlib_1_1http__connection.html" title="Representation of a HTTP client connection request." alt="mlib::http_connection" shape="rect" coords="417,112,546,136"/>
-<area href="classmlib_1_1tcpserver.html" title="multi-threaded TCP server." alt="mlib::tcpserver" shape="rect" coords="556,112,685,136"/>
-<area href="classmlib_1_1httpd.html" title="Small multi-threaded HTTP server." alt="mlib::httpd" shape="rect" coords="556,168,685,192"/>
+<area href="classmlib_1_1http__connection.html" title="Representation of a HTTP client connection request." alt="mlib::http_connection" shape="rect" coords="347,112,476,136"/>
+<area href="classmlib_1_1tcpserver.html" title="multi-threaded TCP server." alt="mlib::tcpserver" shape="rect" coords="486,112,615,136"/>
+<area href="classmlib_1_1httpd.html" title="Small multi-threaded HTTP server." alt="mlib::httpd" shape="rect" coords="486,168,615,192"/>
   </map>
 </div></div>
 <table class="memberdecls">
@@ -104,16 +103,16 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1syncbase.html#ac234da6fda029f7b5dc4da701a674110">operator==</a> (const <a class="el" href="classmlib_1_1syncbase.html">syncbase</a> &amp;rhs) const</td></tr>
 <tr class="memdesc:ac234da6fda029f7b5dc4da701a674110"><td class="mdescLeft">&#160;</td><td class="mdescRight">Equality operator. <br /></td></tr>
 <tr class="separator:ac234da6fda029f7b5dc4da701a674110"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a99433891d3ccd92884b2e003c4c5e7ca"><td class="memItemLeft" align="right" valign="top"><a id="a99433891d3ccd92884b2e003c4c5e7ca"></a>
-virtual DWORD&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1syncbase.html#a99433891d3ccd92884b2e003c4c5e7ca">wait</a> (DWORD time_limit=INFINITE)</td></tr>
-<tr class="memdesc:a99433891d3ccd92884b2e003c4c5e7ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Wait for the object to become signaled. <br /></td></tr>
-<tr class="separator:a99433891d3ccd92884b2e003c4c5e7ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a96f190fef9906dbc9641ff73859a3ef7"><td class="memItemLeft" align="right" valign="top">virtual DWORD&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1syncbase.html#a96f190fef9906dbc9641ff73859a3ef7">wait_alertable</a> (DWORD time_limit=INFINITE)</td></tr>
-<tr class="separator:a96f190fef9906dbc9641ff73859a3ef7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1b5ac0ea188cd5ae7c71fd29c0bbcf95"><td class="memItemLeft" align="right" valign="top"><a id="a1b5ac0ea188cd5ae7c71fd29c0bbcf95"></a>
-virtual DWORD&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1syncbase.html#a1b5ac0ea188cd5ae7c71fd29c0bbcf95">wait_msg</a> (DWORD time_limit=INFINITE, DWORD mask=QS_ALLINPUT)</td></tr>
-<tr class="memdesc:a1b5ac0ea188cd5ae7c71fd29c0bbcf95"><td class="mdescLeft">&#160;</td><td class="mdescRight">Wait for object to become signaled or a message to be queued. <br /></td></tr>
-<tr class="separator:a1b5ac0ea188cd5ae7c71fd29c0bbcf95"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9fdccde1252eed979d3949d002543d0d"><td class="memItemLeft" align="right" valign="top"><a id="a9fdccde1252eed979d3949d002543d0d"></a>
+virtual DWORD&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1syncbase.html#a9fdccde1252eed979d3949d002543d0d">wait</a> (DWORD limit_msec=INFINITE)</td></tr>
+<tr class="memdesc:a9fdccde1252eed979d3949d002543d0d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Wait for the object to become signaled. <br /></td></tr>
+<tr class="separator:a9fdccde1252eed979d3949d002543d0d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abc4534bffc156a48b39cdd8b2879b4f4"><td class="memItemLeft" align="right" valign="top">virtual DWORD&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1syncbase.html#abc4534bffc156a48b39cdd8b2879b4f4">wait_alertable</a> (DWORD limit_msec=INFINITE)</td></tr>
+<tr class="separator:abc4534bffc156a48b39cdd8b2879b4f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aee809562de0a634012c53565fdd4eb1f"><td class="memItemLeft" align="right" valign="top"><a id="aee809562de0a634012c53565fdd4eb1f"></a>
+virtual DWORD&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1syncbase.html#aee809562de0a634012c53565fdd4eb1f">wait_msg</a> (DWORD limit_msec=INFINITE, DWORD mask=QS_ALLINPUT)</td></tr>
+<tr class="memdesc:aee809562de0a634012c53565fdd4eb1f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Wait for object to become signaled or a message to be queued. <br /></td></tr>
+<tr class="separator:aee809562de0a634012c53565fdd4eb1f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a91ff6bb88625c70d65c7c546ccc70646"><td class="memItemLeft" align="right" valign="top"><a id="a91ff6bb88625c70d65c7c546ccc70646"></a>
 virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1syncbase.html#a91ff6bb88625c70d65c7c546ccc70646">operator bool</a> ()</td></tr>
 <tr class="memdesc:a91ff6bb88625c70d65c7c546ccc70646"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if object is signaled. <br /></td></tr>
@@ -208,8 +207,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 
 </div>
 </div>
-<a id="a96f190fef9906dbc9641ff73859a3ef7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a96f190fef9906dbc9641ff73859a3ef7">&#9670;&nbsp;</a></span>wait_alertable()</h2>
+<a id="abc4534bffc156a48b39cdd8b2879b4f4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abc4534bffc156a48b39cdd8b2879b4f4">&#9670;&nbsp;</a></span>wait_alertable()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -221,7 +220,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
           <td class="memname">DWORD mlib::syncbase::wait_alertable </td>
           <td>(</td>
           <td class="paramtype">DWORD&#160;</td>
-          <td class="paramname"><em>time_limit</em> = <code>INFINITE</code></td><td>)</td>
+          <td class="paramname"><em>limit_msec</em> = <code>INFINITE</code></td><td>)</td>
           <td></td>
         </tr>
       </table>
