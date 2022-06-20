@@ -124,18 +124,18 @@ int syncbase::operator ==(const syncbase& rhs) const
 }
 
 /// Wait for the object to become signaled
-DWORD syncbase::wait (DWORD time_limit)
+DWORD syncbase::wait (DWORD limit_msec)
 {
   assert (hl && hl->handle_);
-  return WaitForSingleObject (hl->handle_, time_limit);
+  return WaitForSingleObject (hl->handle_, limit_msec);
 }
 
 /// Wait for object to become signaled or an APC or IO completion routine 
 /// to occur
-DWORD syncbase::wait_alertable (DWORD time_limit)
+DWORD syncbase::wait_alertable (DWORD limit_msec)
 {
   assert (hl && hl->handle_);
-  return WaitForSingleObjectEx (hl->handle_, time_limit, TRUE);
+  return WaitForSingleObjectEx (hl->handle_, limit_msec, TRUE);
 }
 
 /// Change object's handle. Closes the previous one.
@@ -167,23 +167,9 @@ syncbase::operator bool ()
 }
 
 /// Wait for object to become signaled or a message to be queued
-DWORD syncbase::wait_msg (DWORD time_limit, DWORD mask)
+DWORD syncbase::wait_msg (DWORD limit_msec, DWORD mask)
 {
-  return MsgWaitForMultipleObjects (1, &hl->handle_, FALSE, time_limit, mask);
-}
-
-/// Busy waiting for a number of microseconds
-void udelay (unsigned short usec)
-{
-  LARGE_INTEGER interval, crt;
-  static LARGE_INTEGER freq;
-  if (!freq.QuadPart)
-    QueryPerformanceFrequency (&freq);
-  QueryPerformanceCounter (&interval);
-  interval.QuadPart += (LONGLONG)usec * 1000000L / freq.QuadPart;
-  do {
-    QueryPerformanceCounter (&crt);
-  } while (crt.QuadPart < interval.QuadPart);
+  return MsgWaitForMultipleObjects (1, &hl->handle_, FALSE, limit_msec, mask);
 }
 
 }
