@@ -374,7 +374,7 @@ void http_connection::process_valid_request ()
 void http_connection::serve404 (const char* text)
 {
   static const char* std404 = "<html><head><title>Page not found</title></head>"
-    "<body><h1>Oops! 404 error: File not found</h1>"
+    "<body><h1>Oops! 404 - File not found</h1>"
     "<p>The page you requested was not found.</body></html>";
 
   char len[10];
