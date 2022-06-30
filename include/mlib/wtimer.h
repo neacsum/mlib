@@ -15,7 +15,7 @@ public:
   ///Timer mode
   enum mode { manual, automatic };
 
-  wtimer (mode m=automatic, const char *name=NULL, bool use_apc=false);
+  wtimer (mode m = automatic, const std::string& name = std::string (), bool use_apc = false);
   void start (DWORD interval_ms, DWORD period_ms=0);
   void at (FILETIME& utctime, DWORD period_ms=0);
   void stop ();

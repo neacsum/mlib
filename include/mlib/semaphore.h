@@ -15,7 +15,7 @@ namespace mlib {
 class semaphore : public syncbase
 {
 public:
-  semaphore (int limit=INT_MAX, const char *name=NULL);
+  semaphore (int limit=INT_MAX, const std::string& name=std::string());
   int signal (int count=1);
   operator bool ();
 };

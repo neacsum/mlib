@@ -10,7 +10,11 @@
 
 #include <mlib/wtimer.h>
 #include <assert.h>
+
+#if __has_include(<utf8/utf8.h>)
+#define HAS_UTF8
 #include <utf8/utf8.h>
+#endif
 
 namespace mlib {
 
@@ -32,7 +36,7 @@ namespace mlib {
   When signaled, waitable timers can call the #at_timer function as an APC 
   (Asynchronous Procedure Call) to be executed in the context of the %thread
   that created the timer. To use this feature you need to derive another class
-  that reimplements the #at_timer function.
+  that re-implements the #at_timer function.
 */
 
 /*!
@@ -40,14 +44,17 @@ namespace mlib {
   \param  name    object's name
   \param  use_apc \b true if object's at_timer function should be called
 */
-wtimer::wtimer(mode m, const char *name, bool use_apc) :
-  syncbase( name ),
+wtimer::wtimer (mode m, const std::string& name, bool use_apc) :
+  syncbase (name),
   apc_ (use_apc)
 {
-  HANDLE h=CreateWaitableTimerW( NULL, (m==manual), name?utf8::widen(name).c_str():0 );
-
+#ifdef HAS_UTF8
+  HANDLE h = CreateWaitableTimerW (NULL, (m == manual), !name.empty () ? utf8::widen (name).c_str () : NULL);
+#else
+  HANDLE h = CreateWaitableTimerA (NULL, (m == manual), !name.empty () ? name.c_str () : NULL);
+#endif
   assert (h);
-  set_handle( h );
+  set_handle (h);
 }
 
 /*!
@@ -55,13 +62,13 @@ wtimer::wtimer(mode m, const char *name, bool use_apc) :
   \param  interval time in milliseconds from now when object should be signaled
   \param  period  timer's period (0 if it's a one-shot)
 */
-void wtimer::start( DWORD interval, DWORD period )
+void wtimer::start (DWORD interval, DWORD period)
 {
   LARGE_INTEGER time;
-  interval = -abs((int)interval);    //make sure it's a negative value;
-  time.QuadPart = Int32x32To64( interval, 10000 );
-  SetWaitableTimer( handle(), &time, period, 
-    apc_?(PTIMERAPCROUTINE)timerProc:0, this, FALSE );
+  interval = -abs ((int)interval);    //make sure it's a negative value;
+  time.QuadPart = Int32x32To64 (interval, 10000);
+  SetWaitableTimer (handle (), &time, period,
+    apc_ ? (PTIMERAPCROUTINE)timerProc : 0, this, FALSE);
 }
 
 /*!
@@ -71,8 +78,8 @@ void wtimer::start( DWORD interval, DWORD period )
 */
 void wtimer::at (FILETIME& utctime, DWORD period)
 {
-  SetWaitableTimer( handle(), (LARGE_INTEGER *)&utctime, period, 
-    apc_?(PTIMERAPCROUTINE)timerProc:0, this, FALSE );
+  SetWaitableTimer (handle (), (LARGE_INTEGER*)&utctime, period,
+    apc_ ? (PTIMERAPCROUTINE)timerProc : 0, this, FALSE);
 }
 
 /*!
@@ -86,9 +93,9 @@ void wtimer::stop ()
 /*!
   glue function that calls the at_timer function.
 */
-void CALLBACK wtimer::timerProc( wtimer *obj, DWORD loval, DWORD hival )
+void CALLBACK wtimer::timerProc (wtimer* obj, DWORD loval, DWORD hival)
 {
-  obj->at_timer( loval, hival );
+  obj->at_timer (loval, hival);
 }
 
 };

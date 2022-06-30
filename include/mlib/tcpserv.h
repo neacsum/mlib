@@ -19,7 +19,7 @@ typedef void (*conn_iter_func)(sock& conn, void *param);
 class tcpserver : public sock, public thread
 {
 public:
-  tcpserver (unsigned int max_conn=0, DWORD idle_time = INFINITE, const char *name = 0);
+  tcpserver (unsigned int max_conn=0, DWORD idle_time = INFINITE, const std::string& name = std::string());
   ~tcpserver ();
   
   void foreach (conn_iter_func f, void *param);

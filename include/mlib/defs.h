@@ -23,7 +23,7 @@
 #define MLIB_LOGFAC (25<<3)
 
 /// set to 1 to send trace output to syslog
-#define MLIB_SYSLOG_TRACE 1
+//#define MLIB_SYSLOG_TRACE 1
 
 /*!
   Active trace level. A rough description would be:

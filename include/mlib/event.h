@@ -16,7 +16,7 @@ public:
   ///Event modes
   enum mode { manual, automatic };
 
-  event   (mode m=automatic, bool signaled=false, const char *name=NULL);
+  event (mode m = automatic, bool signaled = false, const std::string& name = std::string());
   event& operator =(const event& rhs);
 
   ///Set event to signaled state
@@ -28,7 +28,9 @@ public:
   ///Set event to non-signaled state
   void   reset   ()        {ResetEvent (handle ());};
 
-  operator bool ();
+  ///Check if event is signaled
+  bool is_signaled ();
+
 private:
   mode m;     ///< event mode (manual or automatic)
 };

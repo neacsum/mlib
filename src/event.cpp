@@ -11,7 +11,7 @@
 #include <mlib/event.h>
 #include <assert.h>
 
-#if __has_include(<utf/utf8.h>)
+#if __has_include(<utf8/utf8.h>)
 #define HAS_UTF8
 #include <utf8/utf8.h>
 #endif
@@ -30,14 +30,14 @@ namespace mlib {
 */
 
 ///Constructor for event objects
-event::event (mode md, bool signaled, const char *name) :
+event::event (mode md, bool signaled, const std::string& name) :
   syncbase (name),
   m (md)
 {
 #ifdef HAS_UTF8
-  HANDLE h = CreateEventW (NULL, m==manual, signaled, name?utf8::widen(name).c_str():0);
+  HANDLE h = CreateEventW (NULL, m == manual, signaled, !name.empty () ? utf8::widen (name).c_str () : NULL);
 #else
-  HANDLE h = CreateEventA (NULL, m == manual, signaled, name);
+  HANDLE h = CreateEventA (NULL, m == manual, signaled, !name.empty () ? name.c_str () : NULL);
 #endif
   assert (h);
   set_handle (h);
@@ -53,13 +53,11 @@ event& event::operator =(const event& rhs)
 
 
 /*!
-  Check if event is signaled.
-
   Automatic events are set back to signaled state because testing resets them.
 */
-event::operator bool ()
+bool event::is_signaled ()
 {
-  bool result = syncbase::operator bool();
+  bool result = syncbase::is_signaled();
   if (result && m==automatic ) signal();
   return result;
 }

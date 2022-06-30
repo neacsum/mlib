@@ -32,7 +32,7 @@ namespace mlib {
 /*!
   Opens the socket and initializes the connections table
 */
-tcpserver::tcpserver (unsigned int max_conn, DWORD idle_timeout, const char *name) 
+tcpserver::tcpserver (unsigned int max_conn, DWORD idle_timeout, const std::string& name) 
   : sock (SOCK_STREAM)
   , thread (name)
   , limit (max_conn)

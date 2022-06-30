@@ -43,8 +43,7 @@ shmem_base::shmem_base () :
   \param nam    name of SMA
   \param sz_    size of SMA (not including size of synchronization stuff)
 */
-shmem_base::shmem_base (const char * nam, size_t sz_) :
- name_ (NULL),
+shmem_base::shmem_base (const std::string& nam, size_t sz_) :
  file (NULL),
  mem (NULL),
  wrex (INVALID_HANDLE_VALUE),
@@ -82,13 +81,11 @@ shmem_base::~shmem_base()
   - Mutex `<nam>.MUT`
 
 */
-bool shmem_base::open (const char * nam, size_t sz_)
+bool shmem_base::open (const std::string& nam, size_t sz_)
 {
-  
   close ();
-  assert (nam);
-  name_ = new char[strlen (nam) + 1];
-  strcpy (name_, nam);
+  assert (!nam.empty());
+  name_= nam;
 
   std::wstring wname = utf8::widen(name_);
   std::wstring tmp;
@@ -103,7 +100,7 @@ bool shmem_base::open (const char * nam, size_t sz_)
     DWORD ret = GetLastError ();
     if (!file)
     {
-      TRACE2 ("shmem_base::open(%s) CreateFileMapping failed!", name_);
+      TRACE2 ("shmem_base::open(%s) CreateFileMapping failed!", name_.c_str());
       throw ret;
     }
   
@@ -112,7 +109,7 @@ bool shmem_base::open (const char * nam, size_t sz_)
     syn = (syncblk*)MapViewOfFile (file, FILE_MAP_ALL_ACCESS, 0, 0, 0);
     if (!syn)
     {
-      TRACE2 ("shmem_base::open(%s) MapViewOfFile failed!", name_);
+      TRACE2 ("shmem_base::open(%s) MapViewOfFile failed!", name_.c_str());
       throw GetLastError();
     }
 
@@ -132,7 +129,7 @@ bool shmem_base::open (const char * nam, size_t sz_)
       memset (mem, 0, sz);
     }
   } catch (DWORD& x) {
-    TRACE2 ("shmem_base::open(%s) Error %ld", name_, x);
+    TRACE2 ("shmem_base::open(%s) Error %ld", name_.c_str(), x);
     close ();
     return false;
   }
@@ -145,8 +142,8 @@ bool shmem_base::open (const char * nam, size_t sz_)
 bool shmem_base::close ()
 {
   assert (!in_rdlock && !in_wrlock);
-  if (name_)
-    TRACE9 ("shmem_base::close (%s)", name_);
+  if (!name_.empty())
+    TRACE9 ("shmem_base::close (%s)", name_.c_str());
   if (syn)
     UnmapViewOfFile (syn);
   if (file)
@@ -159,19 +156,18 @@ bool shmem_base::close ()
     CloseHandle (rdgate);
   rdgate = wrex = INVALID_HANDLE_VALUE;
   mem_created = false;
-  delete name_;
-  name_ = 0;
+  name_.clear ();
   return true;
 }
 
 /*!
   Obtain a reader lock on SMA.
 
-  \return true if successful, false otherwise
+  \return `true` if successful, `false` otherwise
 
   If a write operation is in progress, the function waits for it to complete
   before acquiring read lock. If it cannot obtain the lock in read timeout set,
-  the function returns false.
+  the function returns `false`.
 */
 bool shmem_base::rdlock ()
 {

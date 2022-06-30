@@ -33,11 +33,14 @@ public:
   syncbase& operator = (syncbase&& rhs) noexcept;
   int operator == (const syncbase& rhs) const;
 
-  virtual DWORD wait (DWORD limit_msec=INFINITE);
+  virtual void wait ();
+  virtual DWORD wait (DWORD limit_msec);
+  virtual DWORD wait (std::chrono::milliseconds limit);
+
   virtual DWORD wait_alertable (DWORD limit_msec=INFINITE);
   virtual DWORD wait_msg (DWORD limit_msec=INFINITE, DWORD mask=QS_ALLINPUT);
-  virtual operator bool ();
-  virtual bool try_wait ();
+  operator bool ();
+  virtual bool is_signaled ();
 
   /// Return OS handle of this object
   HANDLE handle () const { return hl->handle_; };
@@ -45,12 +48,10 @@ public:
   /// Return object's name
   virtual const std::string& name () const { return name_; };
   
-  /// Sets object's name
-  virtual void name (const char* nam);
-
 protected:
-  syncbase (const char *name);        //protected constructor
+  syncbase (const std::string& name);        //protected constructor
   void set_handle (HANDLE h);
+  virtual void name (const std::string& nam);
 
 private:
   struct handle_life {
@@ -60,16 +61,83 @@ private:
   std::string name_;
 };
 
+/// Change object's name
+inline
+void syncbase::name (const std::string& nam)
+{
+  name_ = nam;
+}
+
+/// Wait for object to become signaled
+inline
+void syncbase::wait ()
+{
+  assert (hl && hl->handle_);
+  WaitForSingleObject (hl->handle_, INFINITE);
+}
+
+/*!
+   Wait a number of milliseconds for the object to become signaled.
+   \param limit_msec maximum wait time in milliseconds
+   \return `WAIT_OBJECT0` if object becomes signaled
+   \return `WAIT_TIMEOUT` if timeout has expired
+*/
+inline
+DWORD syncbase::wait (DWORD limit_msec)
+{
+  assert (hl && hl->handle_);
+  return WaitForSingleObject (hl->handle_, limit_msec);
+}
+
+/*!
+   Wait a number of milliseconds for the object to become signaled.
+   \param limit maximum wait time
+   \return `WAIT_OBJECT0` if object becomes signaled
+   \return `WAIT_TIMEOUT` if timeout has expired
+*/
+inline
+DWORD syncbase::wait (std::chrono::milliseconds limit)
+{
+  assert (hl && hl->handle_);
+  auto limit_msec = limit.count ();
+  assert (0 < limit_msec && limit_msec < INFINITE); //must be a 32 bit value
+  return WaitForSingleObject (hl->handle_, (DWORD)limit_msec);
+}
+
+/// Wait for object to become signaled or an APC or IO completion routine 
+/// to occur
+inline
+DWORD syncbase::wait_alertable (DWORD limit_msec)
+{
+  assert (hl && hl->handle_);
+  return WaitForSingleObjectEx (hl->handle_, limit_msec, TRUE);
+}
+
+/// Wait for object to become signaled or a message to be queued
+inline
+DWORD syncbase::wait_msg (DWORD limit_msec, DWORD mask)
+{
+  return MsgWaitForMultipleObjects (1, &hl->handle_, FALSE, limit_msec, mask);
+}
+
+/// Check if object is signaled
+inline
+syncbase::operator bool ()
+{
+  return is_signaled();
+}
+
 /*!
   Try to wait on the object.
 
   Returns \b true if the object was in a signaled state.
 */
 inline
-bool syncbase::try_wait ()
+bool syncbase::is_signaled ()
 {
-  return (wait(0) == WAIT_OBJECT_0);
+  return (WaitForSingleObject (hl->handle_, 0) == WAIT_OBJECT_0);
 }
+
 
 /*!
   Wait for multiple objects until <u>all</u> become signaled.
@@ -99,7 +167,7 @@ DWORD wait_all (const T* objs, int count, DWORD time_limit = INFINITE)
 
   Wrapper for [WaitForMultipleObjects](https://docs.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-waitformultipleobjects)
   Windows API function.
-  \param  objs   vector of objects to wait for
+  \param  objs   objects to wait for
 
   \ingroup syncro
 */
@@ -121,7 +189,7 @@ DWORD wait_all (std::initializer_list<const T*> objs)
 
   Wrapper for [WaitForMultipleObjects](https://docs.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-waitformultipleobjects)
   Windows API function.
-  \param  objs   vector of objects to wait for
+  \param  objs   objects to wait for
   \param  limit  time limit in milliseconds
 
   \ingroup syncro
@@ -166,8 +234,7 @@ DWORD wait_any (const T* objs, int count, DWORD time_limit = INFINITE)
 
   Wrapper for [WaitForMultipleObjects](https://docs.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-waitformultipleobjects)
   Windows API function.
-  \param  objs   vector of objects to wait for
-  \param  time_limit  time limit in milliseconds
+  \param  objs   objects to wait for
 
   \ingroup syncro
 */
@@ -189,8 +256,8 @@ DWORD wait_any (std::initializer_list<const T*> objs)
 
   Wrapper for [WaitForMultipleObjects](https://docs.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-waitformultipleobjects)
   Windows API function.
-  \param  objs   vector of objects to wait for
-  \param  limit  time limit in milliseconds
+  \param  objs   objects to wait for
+  \param  limit  time limit
 
   \ingroup syncro
 */
@@ -237,7 +304,7 @@ DWORD wait_msg (const T* objs, int count, bool all=true, DWORD time_limit = INFI
 
   Wrapper for [MsgWaitForMultipleObjects](https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-msgwaitformultipleobjects)
   Windows API function.
-  \param  objs    array of objects to wait for
+  \param  objs    objects to wait for
   \param  all     if `true`, wait for all objects to become signaled
   \param  time_limit  time limit in milliseconds
   \param  mask    message mask (combination of QS_... constants)

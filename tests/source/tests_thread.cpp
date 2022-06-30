@@ -22,7 +22,11 @@ SUITE (threads)
     auto f2 = std::bind (f, 2);
 
     thread th1 (f1);
+    th1.name ("f(1)");
     thread th2 (f2);
+    th2.name ("f(2)");
+    // if a breakpoint set on the next line, the "Threads" window of VS should 
+    // show thread names as "f(1)" and "f(2)"
     th1.start ();
     th2.start ();
     wait_all ({&th1, &th2});

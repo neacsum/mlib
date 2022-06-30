@@ -9,7 +9,7 @@
 #include <assert.h>
 #include <mlib/trace.h>
 #include <mlib/thread.h>
-
+#include <utf8/utf8.h>
 
 namespace mlib {
 
@@ -47,14 +47,16 @@ namespace mlib {
   \param sd         pointer to a security descriptor or NULL 
   \param inherit    if true, thread handle is inherited by child processes
 */
-thread::thread (const char *name, DWORD stack_size, PSECURITY_DESCRIPTOR sd, bool inherit)
+thread::thread (const std::string& name, DWORD stack_size, PSECURITY_DESCRIPTOR sd, bool inherit)
   : syncbase (name)
   , stat (state::ready)
   , exitcode (0)
   , stack (stack_size)
 {
   initialize (sd, inherit);
-  TRACE2 ("Created thread %s[%x]", name?name:"", id());
+  if (!name.empty ())
+    SetThreadDescription (handle (), utf8::widen (name).c_str ());
+  TRACE2 ("Created thread %s[0x%x]", name.c_str(), id ());
 }
 
 /*!
@@ -74,7 +76,7 @@ thread::thread (std::function<unsigned int ()> func)
   , thfunc (func)
 {
   initialize (nullptr, false);
-  TRACE2 ("Created thread [%x]", id());
+  TRACE2 ("Created thread [0x%x]", id());
 }
 
 ///  Does the real work of creating and starting the thread
@@ -103,7 +105,7 @@ void thread::initialize (PSECURITY_DESCRIPTOR sd, BOOL inherit)
 */
 thread::~thread()
 {
-  TRACE2 ("Thread %s[%x] in destructor", name().c_str(), id_);
+  TRACE2 ("Thread %s[0x%x] in destructor", name().c_str(), id_);
   if (stat == state::running)
   {
     TRACE ("WARNING! thread was still running");
@@ -139,10 +141,10 @@ UINT _stdcall thread::entryProc (thread *th)
   catch (...)
   {
     th->pex = std::current_exception ();
-    TRACE ("Thread %s[%x] exception !!", th->name ().c_str (), th->id_);
+    TRACE ("Thread %s[0x%x] exception !!", th->name ().c_str (), th->id_);
   }
 
-  TRACE2 ("Thread %s[%x] is ending", th->name().c_str(), th->id_);
+  TRACE2 ("Thread %s[0x%x] is ending", th->name().c_str(), th->id_);
   _endthreadex (th->exitcode);
   return th->exitcode;
 }
@@ -154,13 +156,19 @@ void thread::run()
     exitcode = thfunc ();
 }
 
+void thread::name (const std::string& nam)
+{
+  SetThreadDescription (handle(), utf8::widen (nam).c_str ());
+  syncbase::name (nam);
+}
+
 ///  Begin execution of a newly created thread
 void thread::start ()
 {
   assert (handle ());
   assert (stat == state::ready);
 
-  TRACE2 ("Thread %s[%x] is starting", name ().c_str (), id_);
+  TRACE2 ("Thread %s[0x%x] is starting", name ().c_str (), id_);
   stat = state::starting;
   started.signal ();
   Sleep (0);

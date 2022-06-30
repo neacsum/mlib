@@ -27,13 +27,13 @@ namespace mlib {
   \param limit  maximum limit for counter
   \param name   object's name
 */
-semaphore::semaphore (int limit, const char *name)
+semaphore::semaphore (int limit, const std::string& name)
   : syncbase (name)
 {
 #ifdef HAS_UTF8
-  HANDLE h = CreateSemaphoreW (NULL, 0, limit, name?utf8::widen(name).c_str():0);
+  HANDLE h = CreateSemaphoreW (NULL, 0, limit, !name.empty () ? utf8::widen (name).c_str () : NULL);
 #else
-  HANDLE h = CreateSemaphoreA (NULL, 0, limit, name);
+  HANDLE h = CreateSemaphoreA (NULL, 0, limit, !name.empty () ? name.c_str () : NULL);
 #endif
 
   assert (h);

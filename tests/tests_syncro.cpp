@@ -103,4 +103,12 @@ TEST (move_assignment)
   CHECK_EQUAL (initial_handle_count, final_handle_count);
 }
 
+TEST (wait_duration)
+{
+  event evt;
+  auto ret = evt.wait (50ms);
+  CHECK_EQUAL (WAIT_TIMEOUT, ret);
+}
+
+
 }

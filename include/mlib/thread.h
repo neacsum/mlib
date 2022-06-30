@@ -33,9 +33,12 @@ public:
   state get_state () const;
   int priority ();
   void priority (int pri);
+  using syncbase::name;
+  virtual void name (const std::string& nam);
 
 protected:
-  thread (const char *name=0, DWORD stack_size=0, PSECURITY_DESCRIPTOR sd=NULL, bool inherit = false);
+  thread (const std::string& name = std::string (), DWORD stack_size = 0, 
+    PSECURITY_DESCRIPTOR sd = NULL, bool inherit = false);
 
   virtual bool init ();
   virtual void term ();

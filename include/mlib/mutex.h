@@ -13,7 +13,7 @@ namespace mlib {
 class mutex : public syncbase
 {
 public:
-  mutex (const char *name=NULL);
+  mutex (const std::string& name = std::string ());
   operator bool ();
   void signal ();
 };

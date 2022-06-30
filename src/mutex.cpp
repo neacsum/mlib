@@ -24,13 +24,13 @@ namespace mlib {
 */
 
 ///Constructor
-mutex::mutex (const char *name) :
+mutex::mutex (const std::string& name) :
   syncbase (name)
 {
 #ifdef HAS_UTF8
-  HANDLE h=CreateMutexW (NULL, FALSE, name?utf8::widen(name).c_str():NULL);
+  HANDLE h = CreateMutexW (NULL, FALSE, !name.empty () ? utf8::widen (name).c_str () : NULL);
 #else
-  HANDLE h = CreateMutexA (NULL, FALSE, name);
+  HANDLE h = CreateMutexA (NULL, FALSE, !name.empty () ? name.c_str () : NULL);
 #endif
   assert (h);
   set_handle (h);

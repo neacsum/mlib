@@ -39,9 +39,9 @@ syncbase::syncbase ()
 }
 
 /// Protected constructor
-syncbase::syncbase (const char *a_name)
+syncbase::syncbase (const std::string&  a_name)
   : hl (new handle_life)
-  , name_ (a_name?a_name:std::string())
+  , name_ (a_name)
 {
   hl->handle_ = nullptr;
   hl->lives = 1;
@@ -123,20 +123,6 @@ int syncbase::operator ==(const syncbase& rhs) const
     || ((hl && rhs.hl) && (hl->handle_ == rhs.hl->handle_));
 }
 
-/// Wait for the object to become signaled
-DWORD syncbase::wait (DWORD limit_msec)
-{
-  assert (hl && hl->handle_);
-  return WaitForSingleObject (hl->handle_, limit_msec);
-}
-
-/// Wait for object to become signaled or an APC or IO completion routine 
-/// to occur
-DWORD syncbase::wait_alertable (DWORD limit_msec)
-{
-  assert (hl && hl->handle_);
-  return WaitForSingleObjectEx (hl->handle_, limit_msec, TRUE);
-}
 
 /// Change object's handle. Closes the previous one.
 void syncbase::set_handle (HANDLE h)
@@ -152,24 +138,6 @@ void syncbase::set_handle (HANDLE h)
     hl->lives = 1;
   }
   hl->handle_ = h;
-}
-
-/// Change object's name
-void syncbase::name (const char* nam)
-{
-  name_ = nam ? nam : std::string ();
-}
-
-/// Check if object is signaled
-syncbase::operator bool ()
-{
-  return (WaitForSingleObject (hl->handle_, 0) == WAIT_OBJECT_0);
-}
-
-/// Wait for object to become signaled or a message to be queued
-DWORD syncbase::wait_msg (DWORD limit_msec, DWORD mask)
-{
-  return MsgWaitForMultipleObjects (1, &hl->handle_, FALSE, limit_msec, mask);
 }
 
 }

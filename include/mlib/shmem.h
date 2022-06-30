@@ -20,17 +20,17 @@ class shmem_base
 public:
   //constructors/destructor
   shmem_base ();
-  shmem_base (const char * name, size_t size);
+  shmem_base (const std::string& name, size_t size);
   virtual ~shmem_base();
 
   //open/close
-  virtual bool open (const char *name, size_t size);
+  virtual bool open (const std::string& name, size_t size);
   virtual bool close ();
 
   bool    created () const      {return mem_created;};
   bool    is_opened () const    {return mem != NULL;};
   size_t  size () const         {return sz;};
-  const char *name () const     { return name_; };
+  const std::string& name () const     { return name_; };
   
   //get/set function for read/write timeout
   void    wtmo (DWORD msec)     {wtmo_ = msec;};
@@ -68,7 +68,7 @@ private:
   };
 #pragma pack (pop)
 
-  char* name_;
+  std::string name_;
   LONG in_rdlock;
   LONG in_wrlock;
   bool mem_created;
