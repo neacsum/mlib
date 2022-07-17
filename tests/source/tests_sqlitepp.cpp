@@ -1,6 +1,7 @@
 #include <mlib/sqlitepp.h>
 #include <utpp/utpp.h>
 #include <iostream>
+#include <utf8/utf8.h>
 
 using namespace mlib;
 
@@ -317,5 +318,31 @@ TEST (database_name2)
 }
 #endif
 
+TEST (method_schema)
+{
+  remove ("disk1.db");
+  Database db1 ("disk1.db");
+  db1.exec (R"(
+    CREATE TABLE tab (col);
+    INSERT INTO tab VALUES (1);
+    INSERT INTO tab VALUES (2);
+  )");
+  remove ("disk2.db");
+  Database db2 ("disk2.db");
+  db2.exec (R"(
+    CREATE TABLE tab2 (col);
+    INSERT INTO tab2 VALUES (11);
+    INSERT INTO tab2 VALUES (12);
+  )");
+  db2.close ();
 
+  CHECK_EQUAL(0, db1.exec ("ATTACH 'disk2.db' AS schema2"));
+  CHECK_EQUAL ("main", db1.schema (0));
+  CHECK_EQUAL ("schema2", db1.schema (2));
+  CHECK_EQUAL (utf8::fullpath("disk2.db"), db1.filename (db1.schema (2)));
+ 
+  db1.close ();
+  remove ("disk1.db");
+  remove ("disk2.db");
+}
 }

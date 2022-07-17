@@ -129,14 +129,31 @@ Database& Database::operator=(const Database& rhs)
 /*!
   Return an empty string if database is not opened or there is no database
   connection with that name or if the database is a temporary or in-memory
-  database.
+  database. Otherwise returns the filename of the database that was attached
+  using an SQL ATTACH statement.
 */
-string Database::filename (const string& conn) const
+string Database::filename (const string& schema) const
 {
   const char *pfn = 0;
   if (db)
-    pfn = sqlite3_db_filename (db, conn.c_str());
+    pfn = sqlite3_db_filename (db, schema.c_str());
   return pfn ? pfn : string ();
+}
+
+/*!
+  Return schema name for a database connection.
+  \return "main" if n==0 (the schema name for the main database connection)
+  \return "temp" if n==1 (schema name for temporary tables)
+  \return schema names for other ATTACHED databases if n>1
+
+  \note this is a wrapper for the [sqlite3_db_name](https://sqlite.org/c3ref/db_name.html)function
+*/
+std::string Database::schema (int n) const
+{
+  const char* psch = 0;
+  if (db)
+    psch = sqlite3_db_name (db, n);
+  return psch? psch : string ();
 }
 
 /*!

@@ -35,7 +35,8 @@ public:
     fullmutex     = SQLITE_OPEN_FULLMUTEX,    ///<database connection opens in the serialized mode
     sharedcache   = SQLITE_OPEN_SHAREDCACHE,  ///<database connection is eligible to use shared cache mode
     privatecache  = SQLITE_OPEN_PRIVATECACHE, ///<database connection does not participate in shared cache mode
-    memory        = SQLITE_OPEN_MEMORY | SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE  ///<database opened in memory
+    memory        = SQLITE_OPEN_MEMORY | SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE,  ///<database opened in memory
+    nofollow      = SQLITE_OPEN_NOFOLLOW      ///<filename cannot be a symlink
   };
 
   ///Default constructor
@@ -81,8 +82,11 @@ public:
   erc make_query (Query& q, const std::string& sql);
 
   ///Return filename of a database connection
-  std::string filename (const std::string& conn = "main") const;
+  std::string filename (const std::string& schema = "main") const;
 
+  ///Return schema name for a database connection
+  std::string schema (int n) const;
+  
   /// Return extended result code
   int extended_error ();
 

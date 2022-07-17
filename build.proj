@@ -1,7 +1,7 @@
 <Project DefaultTargets="all">
     <PropertyGroup>
-      <SQLiteVersion>3380100</SQLiteVersion>
-      <SQLiteName>sqlite-amalgamation-3380100</SQLiteName>
+      <SQLiteVersion>3390100</SQLiteVersion>
+      <SQLiteName>sqlite-amalgamation-3390100</SQLiteName>
       <SQLiteUrl>https://www.sqlite.org/2022/$(SQLiteName).zip</SQLiteUrl>
     </PropertyGroup>
     <Target Name="all" DependsOnTargets="DownloadSQLite">
