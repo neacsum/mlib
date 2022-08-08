@@ -17,22 +17,25 @@ and many more...
  - mlib - Main Library
  - mlib_test - Test Program
   
-  Example programs:
-  - echoserv - An echo server
-  - ui-sample - Sample HTML user interface
-  - yacb (Yet Another Circular Buffer) - Circular buffer sample
+Example programs:
+- echoserv - An echo server
+- ui-sample - Sample HTML user interface
+- prodcons - Sample producer/consumer processes 
+- yacb (Yet Another Circular Buffer) - Circular buffer sample
 
 ## Building ##
-mlib requires the [UTF-8 Library](https://github.com/neacsum/utf8). The test
-program requires the [UTPP Library](https://github.com/neacsum/utpp).
+mlib requires the [UTF-8 Library](https://github.com/neacsum/utf8). in addition The test program requires the [UTPP Library](https://github.com/neacsum/utpp).
 
-`BUILD.bat` script will create all libraries and test programs.
+The preferred method is to use the [CPM - C/C++ Package Manager](https://github.com/neacsum/cpm/releases/latest/download/cpm.exe) to fetch all dependent packages and build them. Just issue the `CPM` command:
+```
+c:\mlib>cpm
+```
 
-You can use the [CPM - C/C++ Package Manager](https://github.com/neacsum/cpm) to fetch all dependent packages and build them. Just issue the `CPM` command
+You can also use the `BUILD.bat` script will create all libraries and test programs:
+```
+c:\mlib>build all
+```
 
-## Installation ##
-All projects have been tested under Visual Studio 2022. The libraries can be 
-built in 32 or 64 bit version, with or without debug information.
 
 ## Documentation ##
 You can find Doxygen generated documentation [here](https://neacsum.github.io/mlib/html/index.html).
