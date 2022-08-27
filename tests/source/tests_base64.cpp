@@ -11,8 +11,9 @@ const char *expect[] = {
   "Zm9vYg==",
   "Zm9vYmE=",
   "Zm9vYmFy" };
-
-TEST (Base64_Encode)
+SUITE (Base64)
+{
+TEST (Encode)
 {
   const char *v = "foobar";
 
@@ -35,7 +36,7 @@ TEST (Base64_Encode)
   }
 }
 
-TEST (Base64_Encode_Zero_Length)
+TEST (Encode_Zero_Length)
 {
   char result[256];
   size_t len;
@@ -51,7 +52,7 @@ TEST (Base64_Encode_Zero_Length)
   CHECK_EQUAL (in, out);
 }
 
-TEST (Base64_Decode)
+TEST (Decode)
 {
   char out[256];
   size_t len;
@@ -77,5 +78,6 @@ TEST (Base64_Decode)
     outstr = base64dec (expect[i]);
     CHECK_EQUAL (std::string(foobar, i+1), outstr);
   }
-
 }
+
+} //end suite
