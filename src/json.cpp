@@ -55,10 +55,16 @@ node::node (const node& other)
       obj.emplace (n->first, make_unique<node> (n->second.get()));
     break;
   case type::array:
-    new (&arr) nodes_array (other.arr.size ());
-    for (auto n = other.arr.begin (); n != other.arr.end (); ++n)
-      arr.emplace_back (make_unique<node> (n->get()));
-    break;
+    {
+      new (&arr) nodes_array (other.arr.size ());
+      size_t i = 0;
+      for (auto n = other.arr.begin (); n != other.arr.end (); ++n, ++i)
+      {
+        auto v = n->get ();
+        arr[i] = make_unique<node> (*v);
+      }
+      break;
+    }
   case type::numeric:
     num = other.num;
     break;

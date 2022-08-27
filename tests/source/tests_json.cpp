@@ -2,6 +2,8 @@
 #include <mlib/json.h>
 #include <utf8/utf8.h>
 #include <float.h>
+#include <mlib/base64.h>
+
 
 #pragma warning (disable:4566)
 
@@ -635,5 +637,49 @@ TEST (StreamRead)
 
 }
 
+TEST (Code_project)
+{
+  string in = R"(
+{
+  "city_data":[
+     {
+       "t":"m",
+       "l":[12.0,10.3,0.0,1.0]
+     },
+     {
+       "t":"l",
+       "l":[10.1,20.37,0.0,1.0]
+     },
+     {
+       "t":"l",
+       "l":[47.82,4.63,0.0,1.0]
+     },
+     {
+       "t":"m",
+       "l":[67.66,43.33,0.0,1.0]
+     }
+  ],
+  "map_data":"JZDKZTCaTyWQymUwmk8lkMplMJpPJZDKZTCaTyWQymUwmk/8/+n8AVAZ1WCxk8rYAAAAASUVORK5CYII="
+})";
+  json::node data;
+  data.read (in);
 
+  json::node& cityInfo = data["city_data"];
+  int i;
+  for (i = 0; i < cityInfo.size (); i++)
+  {
+    json::node& cityType = cityInfo[i];
+    std::string ctyTyp = (std::string)cityType["t"];
+    json::node& cityLoc = cityType["l"];
+    std::float_t x = (float)cityLoc[0];
+    std::float_t y = (float)cityLoc[1];
+    // do something with the retrieved values
+    cityInfo[i]["newval"] = to_string (i + 1);
+  }
+  json::node new_node;
+  new_node.read(R"({"t":"x", "l" : [0.0, 0.0, 0.0, 0.0] })");
+  cityInfo[i] = new_node ;
+  CHECK_EQUAL (5, data["city_data"].size ());
 }
+
+}  //end suite

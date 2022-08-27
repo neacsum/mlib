@@ -322,6 +322,7 @@ public:
   explicit operator std::string () const;
   explicit operator const char* () const;
   explicit operator double () const;
+  explicit operator float () const;
   explicit operator int () const;
   explicit operator bool () const;
 
@@ -495,6 +496,12 @@ inline node::operator const char* () const
 inline node::operator double () const
 {
   return to_num ();
+}
+
+/// Return numeric value of a node
+inline node::operator float () const
+{
+  return (float)to_num ();
 }
 
 inline node::operator int () const
