@@ -81,6 +81,12 @@ bool asset::write (const std::string& path)
     tmp += name.substr (pend);
   else
     tmp += name;
+  if (keep && utf8::access (tmp, 0))
+  {
+    //permanent asset exists. Don't overwrite it (just pretend)
+    written = true;
+    return true;
+  }
   FILE* f;
   f = utf8::fopen (tmp, "wb");
   if (!f)
