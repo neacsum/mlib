@@ -23,7 +23,7 @@ namespace mlib {
 class asset
 {
 public:
-  asset (const std::string& name_, int id_);
+  asset (const std::string& name_, int id_, bool keep=false);
   ~asset ();
   const void* data ();
   size_t size ();
@@ -37,6 +37,7 @@ private:
   int id;
   bool written;
   bool loaded;
+  bool keep; // do not delete asset file in destructor
   size_t sz;
   void* ptr;
   std::string fullpath;
@@ -49,8 +50,8 @@ private:
   \param id_ resource ID
 */
 inline
-asset::asset (const std::string& name_, int id_) 
-  : name (name_), id (id_), written (false), loaded(false), sz (0), ptr (nullptr)
+asset::asset (const std::string& name_, int id_, bool keep_) 
+  : name (name_), id (id_), written (false), keep(keep_), loaded(false), sz (0), ptr (nullptr)
 {
 }
 
@@ -58,7 +59,7 @@ asset::asset (const std::string& name_, int id_)
 inline
 asset::~asset ()
 {
-  if (written)
+  if (written && !keep)
     remove ();
 }
 
