@@ -23,7 +23,7 @@ namespace mlib {
 class asset
 {
 public:
-  asset (const std::string& name_, int id_, bool keep=false);
+  asset (int id_, const std::string& name_ = std::string (), bool persist = false);
   ~asset ();
   const void* data ();
   size_t size ();
@@ -48,12 +48,14 @@ private:
 
   \param name_ asset file name
   \param id_ resource ID
+  \param persist if `true` do not delete disk file when asset object is destructed
 */
 inline
-asset::asset (const std::string& name_, int id_, bool keep_) 
-  : name (name_), id (id_), written (false), keep(keep_), loaded(false), sz (0), ptr (nullptr)
+asset::asset (int id_, const std::string& name_, bool persist)
+  : name (name_), id (id_), written (false), keep(persist), loaded(false), sz (0), ptr (nullptr)
 {
 }
+
 
 /// Destructor. Delete asset file if it exists
 inline
@@ -63,7 +65,11 @@ asset::~asset ()
     remove ();
 }
 
-/// Delete asset file from disk
+/*
+  Delete asset file from disk.
+
+  File is deleted even if this is a persistent asset.
+*/
 inline
 bool asset::remove ()
 {

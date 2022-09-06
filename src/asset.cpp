@@ -47,9 +47,13 @@ const void* asset::data ()
   \return `true` if successful, `false` otherwise
 
   Asset filename is obtained by appending the asset name to the root path.
+  For persistent assets, if file already exists, it is not overwritten.
 */
 bool asset::write (const std::string& path)
 {
+  if (name.empty ())
+    return false; //cannot write assets without a filename
+
   //Load resource
   if (!loaded)
     load ();

@@ -93,11 +93,11 @@ JSONBridge  user_interface ("var");
 //Assets for HTTP server
 
 std::vector<asset> assets {
-  { "index.html", IDR_INDEX_HTML },
-  { "about.html", IDR_ABOUT_HTML },
-  { "favicon.ico", IDR_FAVICON_ICO },
-//  { "jquery.js", IDR_JQUERY_JS },
-  { "css/main.css", IDR_MAIN_CSS },
+  {IDR_INDEX_HTML   ,"index.html"   },
+  {IDR_ABOUT_HTML   ,"about.html"   },
+  {IDR_FAVICON_ICO  ,"favicon.ico"  },
+//{IDR_JQUERY_JS    ,"jquery.js"    },
+  {IDR_MAIN_CSS     ,"css/main.css" },
 };
 
 
