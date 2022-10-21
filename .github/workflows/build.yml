@@ -30,4 +30,9 @@ jobs:
         run: cpm -v --proto https -r . mlib
         
       - name: Build and run tests
-        run: mlib/build.bat tests      
+        run: mlib/build.bat tests
+        
+      - name: Save tests result
+        uses: actions/upload-artifact@v3
+        with:
+          path: mlib\tests\mlib-tests.xml
