@@ -10,8 +10,12 @@ TEST_MAIN (int argc, char **argv)
     auto p = fname.rfind ('\\') + 1;
     fname.erase (p);
     fname.append ("mlib_tests.xml");
+#if 0
     std::ofstream os (fname);
-    UnitTest::ReporterXml xml (os);
+#else
+    cout << "Results file: " << fname << endl;
+    UnitTest::ReporterXml xml (std::cout);
+#endif
     return UnitTest::RunAllTests (xml);
   }
   else
