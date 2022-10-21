@@ -6,7 +6,11 @@ TEST_MAIN (int argc, char **argv)
 {
   if (argc == 1)
   {
-    std::ofstream os ("mlib_tests.xml");
+    string fname = argv[0];
+    auto p = fname.rfind ('\\') + 1;
+    fname.erase (p);
+    fname.append ("mlib_tests.xml");
+    std::ofstream os (fname);
     UnitTest::ReporterXml xml (os);
     return UnitTest::RunAllTests (xml);
   }
