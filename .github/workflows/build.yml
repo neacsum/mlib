@@ -35,4 +35,4 @@ jobs:
       - name: Save tests result
         uses: actions/upload-artifact@v3
         with:
-          path: mlib\build\exe\x86\release\mlib-tests.xml
+          path: mlib/build/exe/x86/Release/mlib-tests.xml
