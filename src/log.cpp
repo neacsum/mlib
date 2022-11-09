@@ -64,7 +64,7 @@ struct LOG {
 
 static LOG *proclog = 0;    //default process log
 
-static char *month[] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun",
+static const char *month[] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun",
   "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
 
 //prototypes

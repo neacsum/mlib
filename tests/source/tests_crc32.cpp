@@ -4,7 +4,7 @@
 
 TEST (CRC32_QuickBrownFox)
 {
-  char *fox = "The quick brown fox jumps over the lazy dog";
+  const char *fox = "The quick brown fox jumps over the lazy dog";
   DWORD crc= crc32 (fox, strlen(fox));
 
   CHECK_EQUAL (0x414fa339, crc);

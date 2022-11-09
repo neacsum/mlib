@@ -77,10 +77,10 @@ void crc32_update(BYTE byte, DWORD *crc)
 	*crc = ((*crc) >> 8) ^ crc32tab[(*crc & 0xff) ^ byte];
 }
 
-DWORD crc32(void *block, size_t sz)
+DWORD crc32(const void *block, size_t sz)
 {
   DWORD result = 0xffffffff;
-  BYTE *pb = (BYTE*)block;
+  const BYTE *pb = (BYTE*)block;
   while (sz--)
     crc32_update (*pb++, &result);
 

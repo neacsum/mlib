@@ -21,9 +21,9 @@ SUITE (threads)
     auto f1 = std::bind (f, 1);
     auto f2 = std::bind (f, 2);
 
-    thread th1 (f1);
+    mlib::thread th1 (f1);
     th1.name ("f(1)");
-    thread th2 (f2);
+    mlib::thread th2 (f2);
     th2.name ("f(2)");
     // if a breakpoint set on the next line, the "Threads" window of VS should 
     // show thread names as "f(1)" and "f(2)"
@@ -40,7 +40,7 @@ SUITE (threads)
       return 0;
     };
 
-    thread th (bad_func);
+    mlib::thread th (bad_func);
     th.start ();
     CHECK_THROW (std::out_of_range, th.wait ());
   }
@@ -48,17 +48,17 @@ SUITE (threads)
   TEST (thread_states)
   {
     f_run.reset ();
-    thread th (std::bind (f, 3));
+    mlib::thread th (std::bind (f, 3));
     CHECK (!th.is_running ());
-    CHECK (th.get_state () == thread::state::ready);
+    CHECK (th.get_state () == mlib::thread::state::ready);
     th.start ();
-    CHECK (th.get_state () == thread::state::starting);
+    CHECK (th.get_state () == mlib::thread::state::starting);
     f_run.wait ();
-    CHECK (th.get_state () == thread::state::running);
+    CHECK (th.get_state () == mlib::thread::state::running);
     CHECK (th.is_running ());
     th.wait ();
     CHECK (!th.is_running ());
-    CHECK (th.get_state () == thread::state::finished);
+    CHECK (th.get_state () == mlib::thread::state::finished);
   }
 
   TEST (ctor_current_thread)

@@ -213,7 +213,7 @@ TEST (string_in_supplemental_plane)
   json::node n;
   string s = R"(["\ud834\udd1e"])";
   CHECK_EQUAL (ERR_SUCCESS, n.read (s));
-  CHECK_EQUAL ((char32_t)0x1d11e, utf8::rune (static_cast<const char*>(n[0])));
+  CHECK_EQUAL (0x1d11e, (unsigned int)utf8::rune (static_cast<const char*>(n[0])));
 }
 /*
   test cases from https://github.com/nst/JSONTestSuite
@@ -428,12 +428,12 @@ TEST (y_tests)
   //string escaped non-character
   s = R"(["\uffff"])";
   CHECK_EQUAL (ERR_SUCCESS, n.read (s));
-  CHECK_EQUAL (0xffff, utf8::rune (static_cast<string>(n[0]).cbegin ()));
+  CHECK_EQUAL (0xffff, (unsigned int)utf8::rune (static_cast<string>(n[0]).cbegin ()));
 
   //string last surrogates 1 and 2
   s = R"(["\uDBFF\uDFFF"])";
   CHECK_EQUAL (ERR_SUCCESS, n.read (s));
-  CHECK_EQUAL (0x10ffff, utf8::rune (static_cast<string>(n[0]).cbegin ()));
+  CHECK_EQUAL (0x10ffff, (unsigned int)utf8::rune (static_cast<string>(n[0]).cbegin ()));
 
   // string escaped newline
   s = R"(["new\u000aline"])";

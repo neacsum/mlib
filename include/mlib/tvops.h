@@ -14,8 +14,6 @@
 #include <assert.h>
 #include <ostream>
 
-namespace mlib {
-
 /// \addtogroup tvops
 /// @{
 
@@ -220,5 +218,4 @@ operator << (::std::ostream& os, const timeval& tv)
 
 /// @}
 
-}
 

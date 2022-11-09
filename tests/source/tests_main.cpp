@@ -21,7 +21,7 @@ TEST_MAIN (int argc, char **argv)
 
 TEST (dprintf_ok)
 {
-  char *greek = u8"ελληνικό αλφάβητο";
+  const char *greek = u8"ελληνικό αλφάβητο";
 
   CHECK (dprintf ("This is OK"));
   CHECK (dprintf ("A Greek text sample: %s", greek));

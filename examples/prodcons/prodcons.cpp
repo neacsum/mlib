@@ -86,7 +86,7 @@ void primes_queue (int queue_size)
   async_queue<int> nums (queue_size); //numbers to be tested
   async_queue<result> primes; //output results
 
-  thread* consumers[NTHREADS];
+  mlib::thread* consumers[NTHREADS];
   for (int thnum = 0; thnum < NTHREADS; thnum++)
   {
     //body of consumer thread
@@ -106,13 +106,13 @@ void primes_queue (int queue_size)
     };
 
     // create a number of consumer threads...
-    consumers[thnum] = new thread (checker);
+    consumers[thnum] = new mlib::thread (checker);
 
     // ... and start them
     consumers[thnum]->start ();
   }
 
-  thread producer ([&nums]()->int {
+  mlib::thread producer ([&nums]()->int {
     //producer thread places all numbers in the input queue...
     for (int i = 2; i < checks[CASE].limit; i++)
       nums.produce (i);

@@ -8,7 +8,6 @@
 #include <mlib/tvops.h>
 #include <assert.h>
 
-namespace mlib {
 
 /// \addtogroup tvops Operations with timeval structures
 /// @{
@@ -112,4 +111,3 @@ void normalize (timeval& tv)
 }
 
 /// @}
-}

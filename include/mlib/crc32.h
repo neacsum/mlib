@@ -12,7 +12,7 @@ extern "C" {
 
 void crc32_update (BYTE byte, DWORD *crc);
 
-DWORD crc32 (void *block, size_t sz);
+DWORD crc32 (const void *block, size_t sz);
 
 #ifdef  __cplusplus
 }
