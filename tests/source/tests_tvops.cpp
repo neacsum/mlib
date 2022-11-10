@@ -20,6 +20,26 @@ SUITE (tvops)
     CHECK_EQUAL (sum, tv1 * 3);
   }
 
+  TEST(compare)
+  {
+    timeval t1{ 100, 100 };
+    timeval t2{ 101, 100 };
+    timeval t3{ 100,101 };
+    CHECK(t1 < t2);
+    CHECK(t1 < t3);
+    CHECK(t2 >= t1);
+    CHECK(t1 <= t2);
+
+    timeval t4{ 200,200 };
+    timeval t5{ 200,200 };
+    CHECK(t4 == t5);
+    CHECK(t4 <= t5);
+    CHECK(t4 >= t5);
+
+    CHECK(t1 != t2);
+    CHECK(t1 != t3);
+  }
+  
   TEST (overflow)
   {
     timeval tv1 {100, 999999};

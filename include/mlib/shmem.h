@@ -111,11 +111,11 @@ bool shmem<S, B>::open (const char *name, size_t sz) { return B::open (name, sz)
 
 /// Read the content of shared memory area
 template<class S, class B>
-void shmem<S, B>::operator >>(S& data) {read (&data);};
+void shmem<S, B>::operator >>(S& data) {this->read (&data);};
 
 /// Update (write) the content of a shared memory area
 template<class S, class B>
-void shmem<S, B>::operator <<(const S& data) {write (&data);};
+void shmem<S, B>::operator <<(const S& data) {this->write (&data);};
 
 /*!
   Smart read pointer for a shared memory area.

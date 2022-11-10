@@ -19,23 +19,23 @@ TEST (ballroom)
 
   sync_queue<int> pairing;
 
-  thread* producer[pairs];
-  thread* consumer[pairs];
+  mlib::thread* producer[pairs];
+  mlib::thread* consumer[pairs];
   criticalsection use_cout;
 
   for (int i = 0; i < pairs; i++)
   {
-    producer[i] = new thread ([&, i]()->int {
+    producer[i] = new mlib::thread ([&, i]()->int {
       ball_start.wait ();
       pairing.produce (i);
       return 0;
       });
-    consumer[i] = new thread ([&, i]()->int {
+    consumer[i] = new mlib::thread ([&, i]()->int {
       ball_start.wait ();
       int v;
       pairing.consume (v);
       {
-        lock l (use_cout);
+        mlib::lock l (use_cout);
         cout << "Dancing " << i << " - " << v << endl;
       }
       InterlockedIncrement (&finished);
@@ -67,7 +67,7 @@ TEST (water_drops)
   const int wait_time = 50;
   int missed = 0;
   async_queue<int> faucet;
-  thread producer ([&]()->int {
+  mlib::thread producer ([&]()->int {
     for (int i = 0; i < drops; i++)
     {
       faucet.produce (i+1);
@@ -77,7 +77,7 @@ TEST (water_drops)
     return 0;
   });
 
-  thread consumer ([&]()->int {
+  mlib::thread consumer ([&]()->int {
     int v=1;
     while (v >= 0)
     {
@@ -104,7 +104,7 @@ TEST (silo_filling)
 
   async_queue<int> silo(5);
 
-  thread producer ([&]()->int {
+  mlib::thread producer ([&]()->int {
     for (int i = 0; i < bushels; i++)
     {
       while (!silo.produce (i + 1, fill_rate))
@@ -114,7 +114,7 @@ TEST (silo_filling)
     return 0;
     });
 
-  thread consumer ([&]()->int {
+  mlib::thread consumer ([&]()->int {
     int v = 1;
     while (v >= 0)
     {

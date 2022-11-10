@@ -26,7 +26,7 @@ struct counted_int {
     val = rhs.val;
     return *this;
   }
-  bool operator == (const counted_int& rhs) {
+  bool operator == (const counted_int& rhs) const {
     return val == rhs.val;
   }
   ~counted_int () {

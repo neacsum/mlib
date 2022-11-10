@@ -7,14 +7,14 @@ using namespace mlib;
 SUITE (Options)
 {
 
-char *optlist[]  = {"a? optional_arg",
-                    "b: required_arg",
-                    "c+ one_or_more_args",
-                    "d* 0_or_more_args",
-                    "e|",
-                    "f?longorshort optional",
-                    ":onlylong required",
-                    0};
+const char *optlist[]  = {"a? optional_arg",
+                          "b: required_arg",
+                          "c+ one_or_more_args",
+                          "d* 0_or_more_args",
+                          "e|",
+                          "f?longorshort optional",
+                          ":onlylong required",
+                          0};
 
 TEST (CostructorWithOptlist)
 {
@@ -44,7 +44,7 @@ TEST (CopyConstructor)
 
 TEST (Usage)
 {
-  char *cmd[] ={"program"};
+  const char *cmd[] ={"program"};
   Options o (optlist);
 
   CHECK_EQUAL (0, o.parse (1, cmd));
@@ -53,7 +53,7 @@ TEST (Usage)
 
 TEST (UnknownOpt)
 {
-  char *cmd[] ={"programname", "-x"};
+  const char *cmd[] ={"programname", "-x"};
 
   Options o (optlist);
   CHECK_EQUAL (1, o.parse (2, cmd));
@@ -62,7 +62,7 @@ TEST (UnknownOpt)
 TEST (GetMissingOpt)
 {
   string argval;
-  char *cmd[] ={"programname", "-a"};
+  const char *cmd[] ={"programname", "-a"};
 
   Options o (optlist);
   CHECK_EQUAL (0, o.parse (2, cmd));
@@ -73,7 +73,7 @@ TEST (GetMissingOpt)
 TEST (OptionalArgNoArg)
 {
   string argval;
-  char *cmd[] ={"programname", "-a"};
+  const char *cmd[] ={"programname", "-a"};
 
   Options o (optlist);
   CHECK_EQUAL (0, o.parse (2, cmd));
@@ -84,7 +84,7 @@ TEST (OptionalArgNoArg)
 TEST (OptionalArg)
 {
   string argval;
-  char *cmd[] ={"programname", "-a", "abcd"};
+  const char *cmd[] ={"programname", "-a", "abcd"};
 
   Options o (optlist);
   CHECK_EQUAL (0, o.parse (3, cmd));
@@ -96,7 +96,7 @@ TEST (OptionalArg)
 TEST (RequiredArgValue)
 {
   string argval;
-  char *cmd[] ={"programname", "-b", "abcd"};
+  const char *cmd[] ={"programname", "-b", "abcd"};
 
   Options o (optlist);
   CHECK_EQUAL (0, o.parse (3, cmd));
@@ -107,7 +107,7 @@ TEST (RequiredArgValue)
 
 TEST (RequiredArgMissing)
 {
-  char *cmd[] ={"programname", "-b"};
+  const char *cmd[] ={"programname", "-b"};
 
   Options o (optlist);
   CHECK_EQUAL (2, o.parse (2, cmd));
@@ -116,7 +116,7 @@ TEST (RequiredArgMissing)
 TEST (OneOrMoreWithOne)
 {
   string argval;
-  char *cmd[] ={"programname", "-c", "abcd"};
+  const char *cmd[] ={"programname", "-c", "abcd"};
 
   Options o (optlist);
   CHECK_EQUAL (0, o.parse (3, cmd));
@@ -128,7 +128,7 @@ TEST (OneOrMoreWithOne)
 TEST (OneOrMoreWithMore)
 {
   string argval;
-  char *cmd[] ={"programname", "-c", "abcd", "efgh", "ijkl"};
+  const char *cmd[] ={"programname", "-c", "abcd", "efgh", "ijkl"};
 
   Options o (optlist);
   CHECK_EQUAL (0, o.parse (5, cmd));
@@ -140,7 +140,7 @@ TEST (OneOrMoreWithMore)
 TEST (OneOrMoreWithNone)
 {
   string argval;
-  char *cmd[] ={"programname", "-c"};
+  const char *cmd[] ={"programname", "-c"};
 
   Options o (optlist);
   CHECK_EQUAL (2, o.parse (2, cmd));
@@ -149,7 +149,7 @@ TEST (OneOrMoreWithNone)
 TEST (ZeroOrMoreWithOne)
 {
   string argval;
-  char *cmd[] ={"programname", "-d", "abcd"};
+  const char *cmd[] ={"programname", "-d", "abcd"};
 
   Options o (optlist);
   CHECK_EQUAL (0, o.parse (3, cmd));
@@ -161,7 +161,7 @@ TEST (ZeroOrMoreWithOne)
 TEST (ZeroOrMoreWithMore)
 {
   string argval;
-  char *cmd[] ={"programname", "-d", "abcd", "efgh", "ijkl"};
+  const char *cmd[] ={"programname", "-d", "abcd", "efgh", "ijkl"};
 
   Options o (optlist);
   CHECK_EQUAL (0, o.parse (5, cmd));
@@ -173,7 +173,7 @@ TEST (ZeroOrMoreWithMore)
 TEST (ZeroOrMoreWithNone)
 {
   string argval;
-  char *cmd[] ={"programname", "-d"};
+  const char *cmd[] ={"programname", "-d"};
 
   Options o (optlist);
   CHECK_EQUAL (0, o.parse (2, cmd));
@@ -184,7 +184,7 @@ TEST (ZeroOrMoreWithNone)
 TEST (NoArg)
 {
   string argval;
-  char *cmd[] ={"programname", "-e"};
+  const char *cmd[] ={"programname", "-e"};
 
   Options o (optlist);
   CHECK_EQUAL (0, o.parse (2, cmd));
@@ -195,7 +195,7 @@ TEST (NoArg)
 TEST (LongOptShortForm)
 {
   string argval;
-  char *cmd[] ={"programname", "-f", "abcd"};
+  const char *cmd[] ={"programname", "-f", "abcd"};
 
   Options o (optlist);
   CHECK_EQUAL (0, o.parse (3, cmd));
@@ -207,7 +207,7 @@ TEST (LongOptShortForm)
 TEST (LongOptShortFormAsString)
 {
   string argval;
-  char *cmd[] ={"programname", "-f", "abcd"};
+  const char *cmd[] ={"programname", "-f", "abcd"};
 
   Options o (optlist);
   CHECK_EQUAL (0, o.parse (3, cmd));
@@ -220,7 +220,7 @@ TEST (LongOptShortFormAsString)
 TEST (LongOptLongForm)
 {
   string argval;
-  char *cmd[] ={"programname", "--longorshort", "abcd"};
+  const char *cmd[] ={"programname", "--longorshort", "abcd"};
 
   Options o (optlist);
   CHECK_EQUAL (0, o.parse (3, cmd));
@@ -232,7 +232,7 @@ TEST (LongOptLongForm)
 TEST (LongOptGetByLongName)
 {
   string argval;
-  char *cmd[] ={"programname", "--longorshort", "abcd"};
+  const char *cmd[] ={"programname", "--longorshort", "abcd"};
 
   Options o (optlist);
   CHECK_EQUAL (0, o.parse (3, cmd));
@@ -244,7 +244,7 @@ TEST (LongOptGetByLongName)
 TEST (LongOptNoShortForm)
 {
   string argval;
-  char *cmd[] ={"programname", "--onlylong", "abcd"};
+  const char *cmd[] ={"programname", "--onlylong", "abcd"};
 
   Options o (optlist);
   CHECK_EQUAL (0, o.parse (3, cmd));
@@ -257,7 +257,7 @@ TEST (NonOptionParam)
 {
   int nextarg;
   string argval;
-  char *cmd[] ={"programname", "-a", "abcd", "nonopt"};
+  const char *cmd[] ={"programname", "-a", "abcd", "nonopt"};
 
   Options o (optlist);
   CHECK_EQUAL (0, o.parse (4, cmd, &nextarg));
@@ -269,7 +269,7 @@ TEST (EndOfParams)
 {
   int nextarg;
   string argval;
-  char *cmd[] ={"programname", "-a", "abcd"};
+  const char *cmd[] ={"programname", "-a", "abcd"};
 
   Options o (optlist);
   CHECK_EQUAL (0, o.parse (3, cmd, &nextarg));
@@ -290,7 +290,7 @@ TEST (Next)
 {
   int nextarg;
   string argval, argopt;
-  char *cmd[] ={"programname", "-a", "abcd"};
+  const char *cmd[] ={"programname", "-a", "abcd"};
 
   Options o (optlist);
   CHECK_EQUAL (0, o.parse (3, cmd, &nextarg));
@@ -304,7 +304,7 @@ TEST (NextGetsLongForm)
 {
   int nextarg;
   string argval, argopt;
-  char *cmd[] ={"programname", "-f", "abcd"};
+  const char *cmd[] ={"programname", "-f", "abcd"};
 
   Options o (optlist);
   CHECK_EQUAL (0, o.parse (3, cmd, &nextarg));
@@ -318,7 +318,7 @@ TEST (NextAdvances)
 {
   int nextarg;
   string argval, argopt;
-  char *cmd[] ={"programname", "-a", "abcd", "-b", "efgh"};
+  const char *cmd[] ={"programname", "-a", "abcd", "-b", "efgh"};
 
   Options o (optlist);
   CHECK_EQUAL (0, o.parse (5, cmd, &nextarg));

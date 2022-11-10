@@ -24,9 +24,74 @@ timeval& operator -=(timeval& lhs, const timeval& rhs);
 timeval  operator *(const timeval& op1, int op2);
 timeval  operator *(int op1, const timeval& op2);
 timeval  operator /(const timeval& op1, int op2);
-int      operator <(const timeval& t1, const timeval& t2);
-int      operator ==(const timeval& t1, const timeval& t2);
-int      operator !=(const timeval& t1, const timeval& t2);
+
+/// Equality operator
+inline bool
+operator ==(const timeval& t1, const timeval& t2)
+{
+  if (t1.tv_sec == t2.tv_sec)
+    return  (t1.tv_usec == t2.tv_usec);
+  return 0;
+}
+
+//MSVC - make sure you compile with /Zc:__cplusplus option
+#if __cplusplus < 202002L
+//C++11 or C++17
+
+/// "Less than" operator
+inline bool
+operator <(const timeval& t1, const timeval& t2)
+{
+  if (t1.tv_sec != t2.tv_sec)
+    return (t1.tv_sec < t2.tv_sec);
+  else
+    return  (t1.tv_usec < t2.tv_usec);
+}
+
+/// "Greater than" operator
+inline bool
+operator >(const timeval& t1, const timeval& t2)
+{
+  if (t1.tv_sec != t2.tv_sec)
+    return (t1.tv_sec > t2.tv_sec);
+  else
+    return  (t1.tv_usec > t2.tv_usec);
+}
+
+/// "Greater or equal than" operator
+inline bool
+operator >=(const timeval& t1, const timeval& t2)
+{
+  return !(t1 < t2);
+}
+
+/// "Less or equal than" operator
+inline bool
+operator <=(const timeval& t1, const timeval& t2)
+{
+  return !(t1 > t2);
+}
+
+/// "Not equal" operator
+inline bool
+operator != (const timeval & t1, const timeval & t2)
+{
+  return !(t1 == t2);
+}
+#else
+// for C++20 use spaceship operator
+
+/// 'spaceship' operator
+inline
+auto operator <=> (const timeval & t1, const timeval & t2)
+{
+  if (t1.tv_sec == t2.tv_sec)
+    return  (t1.tv_usec <=> t2.tv_usec);
+  else
+    return (t1.tv_sec <=> t2.tv_sec);
+}
+
+#endif
 
 #if 0
 //conversion to/from milliseconds since midnight
@@ -157,56 +222,6 @@ operator /(const timeval& op1, int op2)
   tv.tv_sec = op1.tv_sec / op2;
   normalize (tv);
   return tv;
-}
-
-/// "Less than" operator
-inline int 
-operator <(const timeval& t1, const timeval& t2)
-{
-  if (t1.tv_sec != t2.tv_sec)
-    return (t1.tv_sec < t2.tv_sec);
-  else
-    return  (t1.tv_usec < t2.tv_usec);
-}
-
-/// "Greater than" operator
-inline int
-operator >(const timeval& t1, const timeval& t2)
-{
-  if (t1.tv_sec != t2.tv_sec)
-    return (t1.tv_sec > t2.tv_sec);
-  else
-    return  (t1.tv_usec > t2.tv_usec);
-}
-
-/// Equality operator
-inline int 
-operator ==(const timeval& t1, const timeval& t2)
-{
-  if (t1.tv_sec == t2.tv_sec)
-    return  (t1.tv_usec == t2.tv_usec);
-  return 0;
-}
-
-/// Inequality operator
-inline int
-operator !=(const timeval& t1, const timeval& t2)
-{
-  return !operator==(t1, t2);
-}
-
-/// "Greater or equal" operator
-inline int
-operator >=(const timeval& t1, const timeval& t2)
-{
-  return (t1 > t2) || (t1 == t2);
-}
-
-/// "Less or equal" operator
-inline int
-operator <=(const timeval& t1, const timeval& t2)
-{
-  return (t1 < t2) || (t1 == t2);
 }
 
 inline ::std::ostream&
