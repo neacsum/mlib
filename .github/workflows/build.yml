@@ -33,6 +33,7 @@ jobs:
         run: mlib/build.bat tests
         
       - name: Save tests result
+        if: ${{ success() || failure() }}
         uses: actions/upload-artifact@v3
         with:
           path: mlib/build/exe/x86/Release/mlib_tests.xml
