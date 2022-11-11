@@ -347,7 +347,7 @@ erc& erc::operator= (erc&& rhs)
     TRACE9 ("erc move assignment");
     bool rhs_active = rhs.active;
     rhs.active = 0; //prevent rhs from throwing if we throw
-    if (active && priority_)
+    if (active && value && priority_)
       facility_->raise (*this);
     value = rhs.value;
     priority_ = rhs.priority_;
