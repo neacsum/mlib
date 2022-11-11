@@ -26,7 +26,7 @@ class Database
 public:
 
   ///Flags for database opening mode
-  enum openflags {
+  enum class openflags {
     readonly      = SQLITE_OPEN_READONLY,     ///< Read-only access
     readwrite     = SQLITE_OPEN_READWRITE,    ///< Read/write access on existing database
     create        = SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, ///<Read/write/create access
@@ -43,7 +43,7 @@ public:
   Database ();
 
   ///Open a database specified by name
-  Database (const std::string& name, int flags=create);
+  Database (const std::string& name, openflags flags=openflags::create);
 
   ///Destructor
   ~Database ();
@@ -70,16 +70,19 @@ public:
   __int64 total_changes ();
 
   ///Open database connection
-  erc open (const std::string& name, int flags=create);
+  erc open (const std::string& name, openflags flags=openflags::create);
 
   ///Close database connection
-  void close ();
+  erc close ();
 
   ///Execute multiple SQL sentences
   erc exec (const std::string& sql);
 
-  ///Change or set the prepared statement of a Query object
-  erc make_query (Query& q, const std::string& sql);
+  ///Return a Query object containing a prepared statement with the given SQL text
+  std::pair<Query, erc> make_query (const std::string& sql);
+
+  ///Return a Query object containing a prepared statement with the given SQL text
+  std::pair<Query, erc> make_query (std::string& sql);
 
   ///Return filename of a database connection
   std::string filename (const std::string& schema = "main") const;
@@ -89,6 +92,9 @@ public:
   
   /// Return extended result code
   int extended_error ();
+
+  /// Flush 
+  erc flush();
 
 private:
   /// prohibit default function 
@@ -111,6 +117,12 @@ public:
 
   ///Build a prepared statement from SQL text
   Query (Database& db, const std::string& sql);
+
+  /// Move constructor
+  Query(Query&& other);
+
+  /// Move assignment operator
+  Query& operator =(Query&& rhs);
 
   ~Query ();
 
@@ -194,7 +206,8 @@ public:
 
 private:
   /// prohibit default function 
-  Query (const Query& t) = delete;
+  Query(const Query& t) = delete;
+
   /// prohibit default function 
   Query& operator= (const Query& rhs) = delete;
 
@@ -265,6 +278,13 @@ inline
 Query::operator std::string () const
 {
   return sql ();
+}
+
+inline
+Database::openflags operator |(const Database::openflags& f1, const Database::openflags& f2)
+{
+  return static_cast<Database::openflags>(
+    static_cast<int>(f1) | static_cast<int>(f2));
 }
 
 };

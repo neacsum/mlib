@@ -49,15 +49,16 @@ protected:
 class sqerc : public erc
 {
 public:
-  sqerc (int value, sqlite3* db, short int priority = ERROR_PRI_ERROR);
+  sqerc(int value, sqlite3* db, short int priority = ERROR_PRI_ERROR);
 };
+
 
 ///Error facility used by Database and Query objects
 sqlitefac errors;
 
 /*!
   Pointer to error facility. All errors are dispatched using this pointer so users
-  can redirect the errors by assigning another error facility it.
+  can redirect the errors by assigning another error facility to it. 
 */
 errfac *sqlite_errors = &errors;
 
@@ -83,16 +84,16 @@ Database::Database()
   \param  name      database name
   \param  flags     open flags
 */
-Database::Database(const std::string& name, int flags)
+Database::Database(const std::string& name, openflags flags)
   : db(0)
 {
   int rc;
-  if ((rc=sqlite3_open_v2 (name.c_str(), &db, flags, 0)) != SQLITE_OK)
+  if ((rc=sqlite3_open_v2 (name.c_str(), &db, static_cast<int>(flags), 0)) != SQLITE_OK)
     sqlite_errors->raise (sqerc (rc, db));
 }
 
 /*!
-  If the wrapper owns the database handle, it closes it.
+  Closes database connection
 */
 Database::~Database ()
 {
@@ -103,7 +104,7 @@ Database::~Database ()
 /*!
   Perform a copy operation using the [SQLITE Backup API](https://sqlite.org/backup.html).
   
-  Both databases should be opened or closed.
+  Both databases should be opened.
 */
 Database& Database::operator=(const Database& rhs)
 {
@@ -114,14 +115,14 @@ Database& Database::operator=(const Database& rhs)
   {
     auto bkp = sqlite3_backup_init (db, "main", rhs.db, "main");
     if (!bkp)
-      sqlite_errors->raise (sqerc (SQLITE_ERROR, db));
+      sqlite_errors->raise (sqerc (sqlite3_errcode(db), db));
     int rc;
     if ((rc = sqlite3_backup_step (bkp, -1)) != SQLITE_DONE)
       sqlite_errors->raise (sqerc (rc, db));
     sqlite3_backup_finish (bkp);
   }
   else
-    sqlite_errors->raise (sqerc (SQLITE_ERROR, db)); //one db is not opened
+    sqlite_errors->raise (sqerc (SQLITE_MISUSE, db)); //one db is not opened
 
   return *this;
 }
@@ -176,23 +177,32 @@ Database::is_readonly ()
   \param name     Database name
   \param flags    Combination of openflags flags
 */
-erc Database::open (const string &name, int flags)
+erc Database::open (const string &name, openflags flags)
 {
   int rc;
-
   if (db)
-    sqlite3_close (db);
-  if ((rc=sqlite3_open_v2 (name.c_str(), &db, flags, 0)) != SQLITE_OK)
+  {
+    rc = sqlite3_close(db);
+    if (rc != SQLITE_OK)
+      return sqerc(rc, db);
+  }
+  rc = sqlite3_open_v2(name.c_str(), &db, static_cast<int>(flags), 0);
+  if (rc != SQLITE_OK)
     return sqerc (rc, db);
   else 
     return ERR_SUCCESS;
 }
 
-void Database::close ()
+erc Database::close ()
 {
   if (db)
-    sqlite3_close (db);
-  db = 0;
+  {
+    int rc = sqlite3_close(db);
+    if (rc != SQLITE_OK)
+      return sqerc (rc, db);
+    db = 0;
+  }
+  return ERR_SUCCESS;
 }
 
 erc Database::exec (const string& sql)
@@ -205,31 +215,54 @@ erc Database::exec (const string& sql)
 }
 
 /*!
-  If the query is associated with a prepared statement, the previous one is 
-  finalized before creating a new query.
-*/
-erc Database::make_query (Query &q, const std::string &sql)
-{
-  if (q.stmt)
-  {
-    sqlite3_finalize (q.stmt);
-    q.stmt = 0;
-    q.index.clear ();
-  }
+  This function compiles only the first statement in the \p sql string.
 
+  While the Query constructor throws an erc exception if query cannot be
+  prepared, this function returns an erc object that can be tested.
+*/
+std::pair<Query, erc> Database::make_query (const std::string &sql)
+{
+  pair<Query, erc> result{ *this, ERR_SUCCESS};
+  erc& ret = result.second;
+  Query& q = result.first;
   int rc;
   if ((rc = sqlite3_prepare_v2 (db, sql.c_str(), -1, &q.stmt, 0)) != SQLITE_OK)
-    return sqerc (rc, db);
+    ret = sqerc (rc, db);
+  return result;
+}
 
-  q.dbase = db;
-  q.col_mapped = false;
-  return ERR_SUCCESS;
+/*!
+  This function compiles only the first statement in the \p sql string.
+  It updates \p sql string with what's left after teh end of the query.
+
+  While the Query constructor throws an erc exception if query cannot be
+  prepared, this function returns an erc object that can be tested.
+*/
+std::pair<Query, erc> Database::make_query (std::string& sql)
+{
+  pair<Query, erc> result{ *this, ERR_SUCCESS };
+  erc& ret = result.second;
+  Query& q = result.first;
+  int rc;
+  const char* tail;
+  if ((rc = sqlite3_prepare_v2 (db, sql.c_str(), -1, &q.stmt, &tail)) != SQLITE_OK)
+    ret = sqerc (rc, db);
+  else
+    sql = tail;
+  return result;
 }
 
 int Database::extended_error ()
 {
   assert (db);
   return sqlite3_extended_errcode (db);
+}
+
+erc Database::flush()
+{
+  assert(db);
+  int rc = sqlite3_db_cacheflush(db);
+  return sqerc(rc, db);
 }
 
 //-----------------------------------------------------------------------------
@@ -282,6 +315,35 @@ Query::Query(Database &db) :
   dbase(db),
   col_mapped (false)
 {
+}
+
+Query::Query(Query&& other)
+  : stmt (other.stmt)
+  , dbase (other.dbase)
+  , col_mapped (other.col_mapped)
+  , index (other.index)
+{
+  other.stmt = 0;
+  other.dbase = 0;
+  other.col_mapped = false;
+  other.index.clear();
+}
+
+Query& Query::operator=(Query&& rhs)
+{
+  if (stmt)
+    sqlite3_finalize(stmt);
+
+  stmt = rhs.stmt;
+  rhs.stmt = nullptr;
+
+  dbase = rhs.dbase;
+  
+  col_mapped = rhs.col_mapped;
+  index = rhs.index;
+  rhs.index.clear();
+
+  return *this;
 }
 
 Query::~Query()

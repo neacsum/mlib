@@ -29,20 +29,99 @@ TEST (DbReadonly)
 {
   Database db;
   CHECK_EX (db.is_readonly (), "Not connected database should be read-only");
-  db.open ("", Database::readonly);
+  db.open ("", Database::openflags::readonly);
   CHECK ((sqlite3*)db != 0);
   CHECK_EX (db.is_readonly (), "Read-only database should be read-only");
   db.close ();
   db.open ("");
-  CHECK_EX (!db.is_readonly (), "Read-write database shouls not be read-only");
+  CHECK_EX (!db.is_readonly (), "Read-write database should not be read-only");
+}
+
+//check Database::filename returns correct name
+TEST(DbFilename)
+{
+  Database db("testdb.sqlite");
+  auto s = db.filename();
+  auto ss = s.substr(s.rfind('\\') + 1);
+  CHECK_EQUAL(ss, "testdb.sqlite");
+  db.close();
+  utf8::remove(s);
+}
+
+
+TEST(Db_make_query_ok)
+{
+  Database db("");
+  db.exec("CREATE TABLE tab (col);"
+    "INSERT INTO tab VALUES (123)");
+  auto [q, ret] = db.make_query("SELECT * FROM tab");
+  CHECK_EQUAL(ERROR_SUCCESS, ret);
+  q.step();
+  CHECK_EQUAL(123, q.column_int(0));
+  q.finalize();
+  db.close();
+}
+
+TEST(Db_make_query_err)
+{
+  Database db("");
+  db.exec("CREATE TABLE tab (col);"
+    "INSERT INTO tab VALUES (123)");
+  auto [q, ret] = db.make_query("SELECT * MROM tab"); //syntax error
+  CHECK_EQUAL(SQLITE_ERROR, ret);
+  db.close();
+}
+
+TEST(Db_make_query_throw)
+{
+  Database db("");
+  bool thrown = false;
+  db.exec("CREATE TABLE tab (col);"
+    "INSERT INTO tab VALUES (123)");
+  try {
+    auto [q, ret] = db.make_query("SELECT * MROM tab"); //syntax error
+  }
+  catch (erc& x) {
+    CHECK_EQUAL(SQLITE_ERROR, x);
+    thrown = true;
+  }
+  CHECK(thrown);
+}
+
+//parse multiple queries from sql string
+TEST(db_make_query_multiple)
+{
+  Database db("");
+  std::string sql{ "CREATE TABLE tab (col);INSERT INTO tab VALUES (123)" };
+  int count = 0;
+  do {
+    auto [q, ret] = db.make_query(sql);
+    if (ret)
+      break;
+    q.step();
+    ++count;
+  } while (!sql.empty());
+  CHECK_EQUAL(2, count);
+
+  auto [q, ret] = db.make_query("SELECT * FROM tab");
+  CHECK_EQUAL(ERROR_SUCCESS, ret);
+  q.step();
+  CHECK_EQUAL(123, q.column_int(0));
 }
 
 TEST (DbExecStatements)
 {
-  Database db("");
+  Database db("testdb.sqlite");
   db.exec ("CREATE TABLE tab (col);"
            "INSERT INTO tab VALUES (123)");
   db.close ();
+  db.open("testdb.sqlite");
+  Query q(db, "SELECT * FROM tab");
+  q.step();
+  CHECK_EQUAL(123, q.column_int(0));
+  q.finalize();
+  db.close();
+  utf8::remove ("testdb.sqlite");
 }
 
 //Assign an existing database
@@ -56,7 +135,7 @@ TEST (DbAssign_Existing)
     INSERT INTO tab VALUES (2);
   )");
 
-  Database db_to ("memory.db", Database::memory);
+  Database db_to ("memory.db", Database::openflags::memory);
   db_to = db_from;
   db_from.close ();
   remove ("disk.db");
@@ -87,13 +166,13 @@ TEST (DbAssign_Fail)
 //cannot copy database if a query is active
 TEST (DbAssign_Busy)
 {
-  Database db_to ("to.db", Database::memory);
+  Database db_to ("to.db", Database::openflags::memory);
   db_to.exec (R"(
     CREATE TABLE tab (col);
     INSERT INTO tab VALUES (1);
     INSERT INTO tab VALUES (2);
   )");
-  Database db_from ("from.db", Database::memory);
+  Database db_from ("from.db", Database::openflags::memory);
   Query q (db_to, "SELECT * FROM tab");
   q.step ();
 
