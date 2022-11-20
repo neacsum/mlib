@@ -419,13 +419,15 @@ void Query::finalize ()
 }
 
 //  ---------------------------------------------------------------------------
-/*!  \name Bind functions
-    SQL statement can have parameters specified by number (? or ?nnn) or
-    by name (:aaa or \@aaa or \$aaa) where 'nnn' is a number and 'aaa' is an alphanumeric
-    identifier. Bind functions assign values to these parameters.
+/*! 
+  \name Bind functions
+  SQL statement can have parameters specified by number (`?` or `?nnn`) or
+  by name (`:aaa` or `@aaa` or `$aaa`) where `nnn` is a number (starting from 1)
+  and `aaa` is an alphanumeric identifier. Bind functions assign values to
+  these parameters.
 
-    If the parameter with that name or number is not found the functions throw 
-    an \ref erc with code `SQLITE_RANGE`.
+  If the parameter with that name or number is not found the functions throw 
+  an \ref erc with code `SQLITE_RANGE`.
 */
 ///@{  
 
@@ -755,11 +757,14 @@ std::string Query::database_name (const std::string& colname) const
 
 
 //-----------------------------------------------------------------------------
-/*!  \name Result functions
-  All result functions return the value of a column specified by name or number
+/*!  \name Data retrieval functions
+  `columm_...` functions retrieve data from a column specified by name or number
   (starting from 0). Data type of the result is determined by the result function
-  called (column_int returns an integer, column_double returns a double, etc.).
+  called (`column_int` returns an integer, `column_double` returns a double, and so on).
 
+  Note that column name *does not* include table name. If you need to disambiguate
+  column names, use an `AS` clause in the `SELECT` statement.
+  
   If a column with that name cannot be found, the functions throw an \ref erc
   with code `SQLITE_RANGE`.
 
