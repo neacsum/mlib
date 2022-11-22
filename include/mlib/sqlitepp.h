@@ -196,6 +196,8 @@ public:
   std::string   database_name (const std::string& colname) const;
 #endif
 
+  std::string   column_name(int nc) const;
+
   /// Return number of columns in the result set
   int           columns ();
 

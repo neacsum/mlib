@@ -751,6 +751,27 @@ std::string Query::database_name (const std::string& colname) const
 {
   return sqlite3_column_database_name (stmt, find_col (colname));
 }
+
+/*!
+  Return column name.
+
+  \param nc - column number
+  
+  If the query is a SELECT statement and \p nc is a valid column number, 
+  the function returns the name of the column. Otherwise the function returns
+  an empty string. The name of a result column is the value of the `AS` clause
+  for that column, if there is an `AS` clause. If there is no `AS` clause then
+  the name of the column is unspecified and may change from one release of SQLite
+  to the next. 
+  
+  The returned string is always UTF-8 encoded.
+*/
+  std::string Query::column_name(int nc) const
+{
+  if (0 < nc && nc < sqlite3_column_count(stmt))
+    return sqlite3_column_name(stmt, nc);
+  return std::string();
+}
 #endif
 
 ///@}
