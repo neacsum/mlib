@@ -1006,6 +1006,14 @@ std::string sqlitefac::message (const erc &e) const
 sqerc::sqerc (int value, sqlite3* db, short int pri) : 
   erc (value, pri, sqlite_errors)
 {
+  static bool sqerc_init_flag = false;
+  if (!sqerc_init_flag)
+  {
+    //first time around make sure error facility is initialized
+    new (&errors)sqlitefac;
+    sqlite_errors = &errors;
+    sqerc_init_flag = true;
+  }
   sqlitefac *f = dynamic_cast<sqlitefac *>(sqlite_errors);
   if (f)
     f->db = db;
