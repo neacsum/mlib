@@ -71,23 +71,25 @@ constexpr double DMS (double dd, double mm, double ss)
 /// Conversion to decimal degrees from DDMM.mmm
 constexpr double DMD2deg (double value)
 {
-  int deg, min;
-
-  deg = (int)(value / 10000.);
-  value -= (double)deg * 10000.;
-  min = (int)(value / 100.);
+  int sign = value >= 0 ? 1 : -1;
+  if (value < 0)
+    value = -value;
+  int deg = (int)(value / 10000.);
+  value -= -(double)deg * 10000;
+  int min = (int)(value / 100.);
   value -= (double)min * 100.;
-  return deg + min / 60. + value / 3600.;
+  return sign*(deg + min / 60. + value / 3600.);
 }
 
 ///Conversion to decimal degrees from DDMMSS.ssss
 constexpr double DMS2deg (double value)
 {
-  int deg;
-
-  deg = (int)(value / 100.);
+  int sign = value >= 0 ? 1 : -1;
+  if (value < 0)
+    value = -value;
+  int deg = (int)(value / 100.);
   value -= (double)deg * 100.;
-  return deg + value / 60.;
+  return sign*(deg + value / 60.);
 }
 
 
