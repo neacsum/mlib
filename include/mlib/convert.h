@@ -28,6 +28,11 @@ constexpr double operator "" _deg (long double deg)
   return deg * D2R;
 }
 
+constexpr double operator "" _deg (unsigned long long deg)
+{
+  return deg * D2R;
+}
+
 /// Milli-arcseconds literal operator converts a value to radians
 constexpr double operator "" _mas (long double mas)
 {
@@ -47,34 +52,63 @@ constexpr double operator "" _nmi (long double nmi)
 }
 
 /// Convert decimal degrees to radians
-#define DEG(dd) ((dd)*D2R)
+constexpr double DEG (double dd) {
+  return dd * D2R;
+}
 
 ///Convert degrees, minutes to radians
-#define DM(dd,mm) (((dd)+(mm)/60.)*D2R)
+constexpr double DM (double dd, double mm)
+{
+  return (dd + mm / 60.) * D2R;
+}
 
 ///Convert degrees, minutes seconds to radians
-#define DMS(dd,mm,ss) (((dd)+(mm)/60.+(ss)/3600.)*D2R)
+constexpr double DMS (double dd, double mm, double ss)
+{
+  return (dd + mm / 60. + ss / 3600.) * D2R;
+}
 
 /// Conversion to decimal degrees from DDMM.mmm
-double DMD2deg (double);
+constexpr double DMD2deg (double value)
+{
+  int deg, min;
+
+  deg = (int)(value / 10000.);
+  value -= (double)deg * 10000.;
+  min = (int)(value / 100.);
+  value -= (double)min * 100.;
+  return deg + min / 60. + value / 3600.;
+}
 
 ///Conversion to decimal degrees from DDMMSS.ssss
-double DMS2deg (double);
+constexpr double DMS2deg (double value)
+{
+  int deg;
+
+  deg = (int)(value / 100.);
+  value -= (double)deg * 100.;
+  return deg + value / 60.;
+}
+
 
 ///Conversion from decimal degrees to degrees, minutes (DDMM.mmm)
-double deg2DMD (double value);
+constexpr double deg2DMD (double value)
+{
+  int deg = (int)value;
+  return (value - deg) * 60. + deg * 100.;
+}
 
 /// Conversion from degrees to radians
-inline double D2rad (double val) { return val * D2R; }
+constexpr double D2rad (double val) { return val * D2R; }
 
 /// Conversion from degrees, minutes (DDMM.mmm) to radians
-inline double DMD2rad (double val) { return DMD2deg(val) * D2R; }
+constexpr double DMD2rad (double val) { return DMD2deg(val) * D2R; }
 
 /// Conversion from degrees, minutes, seconds (DDMMSS.sss) to radians
-inline double DMS2rad (double val) { return DMS2deg(val) * D2R; }
+constexpr double DMS2rad (double val) { return DMS2deg(val) * D2R; }
 
 /// Conversion from radians to degrees, minutes (DDMM.mmm)
-inline double rad2DMD (double val) { return deg2DMD (val/D2R); }
+constexpr double rad2DMD (double val) { return deg2DMD (val/D2R); }
 
 /// Reduces a degrees value to [0,360) interval
 double deg_reduce (double value);
