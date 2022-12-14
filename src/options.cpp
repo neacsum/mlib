@@ -54,6 +54,8 @@
 #include <mlib/options.h>
 #include <ctype.h>
 
+using namespace std;
+
 namespace mlib {
   
 /*!
@@ -70,7 +72,7 @@ Options::Options ()
 
   See Options::set_optlist for details
 */
-Options::Options (const char* const *list)
+Options::Options (std::vector<const char*> list)
 {
   set_optlist (list);
 }
@@ -106,7 +108,7 @@ Options::Options (const char* const *list)
 
   The array is terminated by a NULL string.
 */
-void Options::set_optlist (const char* const *list)
+void Options::set_optlist (std::vector<const char*> list)
 {
   char tmp[256];
 
@@ -114,9 +116,9 @@ void Options::set_optlist (const char* const *list)
   optlist.clear ();
   cmd.clear ();
   nextop = cmd.begin ();
-  while (*list)
+  for (auto& t :list)
   {
-    strcpy (tmp, *list);
+    strcpy (tmp, t);
     opt option;
     char *ptr = tmp;
 
@@ -132,7 +134,6 @@ void Options::set_optlist (const char* const *list)
     }
     option.olong = ptr;
     optlist.push_back (option);
-    list++;
   }
 }
 
@@ -174,7 +175,7 @@ int Options::parse(int argc, const char* const *argv, int *stop)
     ptr = argv[i];
     if (*ptr++ == '-')
     {
-      deque<opt>::iterator op = optlist.begin ();
+      auto op = optlist.begin ();
       opt option;
       option.oshort = 0;
       if (*ptr == '-')
@@ -307,34 +308,25 @@ int Options::next (string& opt, string& optarg)
 */
 int Options::getopt(const string &option, string& optarg)
 {
-  deque<opt>::iterator op = cmd.begin ();
-  
-  while (op != cmd.end ())
+  auto op = find_option(option);
+
+  if (op != cmd.end())
   {
-    if ((option.length () > 1 && op->olong == option)
-     || (option.length () == 1 && op->oshort == option[0]))
-    {
-      optarg = op->arg;
-      return 0;
-    }
-    op++;
+    optarg = op->arg;
+    return 0;
   }
   return -1;
 }
 
 int Options::getopt (char option, string& optarg)
 {
-  deque<opt>::iterator op = cmd.begin ();
-  
-  while (op != cmd.end ())
+  auto op = find_option (option);
+  if (op != cmd.end())
   {
-    if (op->oshort == option)
-    {
-      optarg = op->arg;
-      return 0;
-    }
-    op++;
+    optarg = op->arg;
+    return 0;
   }
+  
   return -1;
 }
 
@@ -344,16 +336,7 @@ int Options::getopt (char option, string& optarg)
 */
 bool Options::hasopt (const string& option)
 {
-  deque<opt>::iterator op = cmd.begin ();
-  
-  while (op != cmd.end ())
-  {
-    if ((option.length () > 1 && op->olong == option)
-     || (option.length () == 1 && op->oshort == option[0]))
-      return true;
-    op++;
-  }
-  return false;
+  return find_option(option) != cmd.end();
 }
 
 /*!
@@ -362,16 +345,9 @@ bool Options::hasopt (const string& option)
 */
 bool Options::hasopt (char option)
 {
-  deque<opt>::iterator op = cmd.begin ();
-  
-  while (op != cmd.end ())
-  {
-    if (op->oshort == option)
-      return true;
-    op++;
-  }
-  return false;
+  return find_option(option) != cmd.end();
 }
+
 
 /*!
   Generate a nicely formatted usage string.
@@ -384,25 +360,25 @@ const string& Options::usage(char sep)
     return usage_;
 
   string term;
-  deque<opt>::iterator op = optlist.begin ();
+  auto op = optlist.begin ();
 
   usage_ = app + sep;
-  while (op != optlist.end ())
+  for (auto& op : optlist)
   {
-    if (op->oshort)
+    if (op.oshort)
     {
       usage_ += '-';
-      usage_ += op->oshort;
-      if (!op->olong.empty())
+      usage_ += op.oshort;
+      if (!op.olong.empty())
         usage_ += '|';
     }
-    if (!op->olong.empty())
+    if (!op.olong.empty())
     {
       usage_ += "--";
-      usage_ += op->olong;
+      usage_ += op.olong;
     }
 
-    switch (op->flag)
+    switch (op.flag)
     {
     case '?':
       usage_ += " [";
@@ -424,13 +400,37 @@ const string& Options::usage(char sep)
       term = "";
       break;
     }
-    usage_ += op->arg;
+    usage_ += op.arg;
     usage_ += term;
     usage_ += sep;
-
-    op++;
   }
+
   return usage_;
+}
+
+// Find an option (can be long)
+std::vector<Options::opt>::iterator Options::find_option(const std::string& option)
+{
+  std::vector<Options::opt>::iterator ptr;
+  if (option.length() > 1)
+    ptr = std::find_if(cmd.begin(), cmd.end(),
+      [&option](auto& op) {return  op.olong == option; });
+  else
+  {
+    char ch = option[0];
+    ptr = std::find_if(cmd.begin(), cmd.end(),
+      [&ch](auto& op) {return  op.oshort == ch; });
+  }
+  return ptr;
+}
+
+// Find a short option
+std::vector<Options::opt>::iterator Options::find_option(char option)
+{
+  auto ptr = std::find_if(cmd.begin(), cmd.end(),
+    [&option](auto& op) {return op.oshort == option; });
+
+  return ptr;
 }
 
 }

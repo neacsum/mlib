@@ -3,18 +3,19 @@
 #include <iostream>
 
 using namespace mlib;
+using std::string;
 
 SUITE (Options)
 {
 
-const char *optlist[]  = {"a? optional_arg",
-                          "b: required_arg",
-                          "c+ one_or_more_args",
-                          "d* 0_or_more_args",
-                          "e|",
-                          "f?longorshort optional",
-                          ":onlylong required",
-                          0};
+std::vector<const char*>  optlist
+  {"a? optional_arg",
+   "b: required_arg",
+   "c+ one_or_more_args",
+   "d* 0_or_more_args",
+   "e|",
+   "f?longorshort optional",
+   ":onlylong required"};
 
 TEST (CostructorWithOptlist)
 {
@@ -48,7 +49,7 @@ TEST (Usage)
   Options o (optlist);
 
   CHECK_EQUAL (0, o.parse (1, cmd));
-  cout << o.usage ('\n') << endl;
+  std::cout << o.usage ('\n') << std::endl;
 }
 
 TEST (UnknownOpt)
@@ -334,7 +335,7 @@ TEST (NextAdvances)
 
 TEST (SampleOptionsCode)
 {
-  const char *optlist[] {
+  Options optparser ( {
     "a? optional_arg",        // option -a can have an argument
                               // example: -a 1 or -a xyz
     "b: required_arg",        // option -b must be followed by an argument
@@ -347,9 +348,8 @@ TEST (SampleOptionsCode)
     "f?longorshort optional", // option -f can be also written as --longorshort
                               // and can have an argument
     ":longopt required",      // option --longopt must have an argument
-    0 };
-
-  Options optparser (optlist);
+    }
+  );
 
   //sample command line
   const char *samp_argv[]{ "program", "-a", "1", "-e", "--longopt", "par" };

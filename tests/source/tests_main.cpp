@@ -2,6 +2,8 @@
 #include <fstream>
 #include <mlib/mlib.h>
 
+using namespace std;
+
 TEST_MAIN (int argc, char **argv)
 {
   if (argc == 1)
