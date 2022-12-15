@@ -63,7 +63,7 @@
     <ClCompile Include="source\tests_statpars.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="tests_bitstream.cpp">
+    <ClCompile Include="source\tests_bitstream.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\tests_tvops.cpp">
@@ -75,10 +75,13 @@
     <ClCompile Include="source\tests_thread.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="tests_syncro.cpp">
+    <ClCompile Include="source\tests_syncro.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\tests_json.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\tests_convert.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

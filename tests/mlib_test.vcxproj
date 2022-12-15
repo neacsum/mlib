@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClCompile Include="source\tests_base64.cpp" />
     <ClCompile Include="source\tests_basename.cpp" />
+    <ClCompile Include="source\tests_convert.cpp" />
     <ClCompile Include="source\tests_crc32.cpp" />
     <ClCompile Include="source\tests_errorcode.cpp" />
     <ClCompile Include="source\tests_httpd.cpp" />
@@ -39,8 +40,8 @@
     <ClCompile Include="source\tests_thread.cpp" />
     <ClCompile Include="source\tests_tvops.cpp" />
     <ClCompile Include="source\test_point.cpp" />
-    <ClCompile Include="tests_bitstream.cpp" />
-    <ClCompile Include="tests_syncro.cpp" />
+    <ClCompile Include="source\tests_bitstream.cpp" />
+    <ClCompile Include="source\tests_syncro.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{F32484D8-7598-4833-BE1A-27A35CF8E5DE}</ProjectGuid>

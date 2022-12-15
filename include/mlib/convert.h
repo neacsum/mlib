@@ -11,6 +11,7 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 #endif
+#include <string>
 
 // Useful constants
 #define D2R       0.01745329251994      ///< Degrees to radians conversion factor
@@ -71,7 +72,7 @@ constexpr double DMS (double dd, double mm, double ss)
 /// Conversion to decimal degrees from DDMM.mmm
 constexpr double DMD2deg (double value)
 {
-  int sign = value >= 0 ? 1 : -1;
+  int sign = (value >= 0) ? 1 : -1;
   if (value < 0)
     value = -value;
   int deg = (int)(value / 10000.);
@@ -84,7 +85,7 @@ constexpr double DMD2deg (double value)
 ///Conversion to decimal degrees from DDMMSS.ssss
 constexpr double DMS2deg (double value)
 {
-  int sign = value >= 0 ? 1 : -1;
+  int sign = (value >= 0) ? 1 : -1;
   if (value < 0)
     value = -value;
   int deg = (int)(value / 100.);
@@ -112,8 +113,22 @@ constexpr double DMS2rad (double val) { return DMS2deg(val) * D2R; }
 /// Conversion from radians to degrees, minutes (DDMM.mmm)
 constexpr double rad2DMD (double val) { return deg2DMD (val/D2R); }
 
+namespace mlib {
 /// Reduces a degrees value to [0,360) interval
 double deg_reduce (double value);
 
+//formatting flags for degtoa function
+# define LL_MIN  0x01   ///< Degrees, minutes format (DD°MM.mmmm')
+# define LL_SEC  0x02   ///< Degrees, minutes, seconds format (DD°MM'SS.sss")
+# define LL_LAT  0x04   ///< Latitude angle
+
+std::string degtoa (double degrees, int flags, int precision);
+
+double  atodeg (const std::string& str);
 ///@}
+
+
+
+} //end namespace
+
 
