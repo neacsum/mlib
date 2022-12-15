@@ -42,10 +42,9 @@ public:
   void set_optlist (std::vector<const char*> list);
 
   int parse (int argc, const char* const *argv, int *stop=0);
-  int next (std::string& opt, std::string& optarg);
-
-  int getopt (const std::string& opt, std::string& optarg);
-  int getopt (char opt, std::string& optarg);
+  bool next (std::string& opt, std::string& optarg, char sep='|');
+  bool getopt (const std::string& opt, std::string& optarg, char sep = '|');
+  bool getopt (char opt, std::string& optarg, char sep = '|');
   bool hasopt (const std::string& opt);
   bool hasopt (char opt);
   const std::string& usage (char sep=' ');
@@ -53,14 +52,16 @@ public:
 
 private:
   struct opt {
-    char oshort;
-    std::string olong;
-    char flag;
-    std::string arg;
+    char oshort;                    //short form
+    std::string olong;              //long form
+    char flag;                      //argument type
+    std::string arg_descr;          //argument description
+    std::vector<std::string> arg;   //actual argument(s)
   };
+
   std::vector<opt>::iterator find_option(const std::string& opt);
   std::vector<opt>::iterator find_option(char opt);
-
+  void format_arg (std::string& str, opt& option, char sep);
   std::vector<opt> optlist;
   std::vector<opt> cmd; 
   std::vector<opt>::iterator nextop;

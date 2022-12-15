@@ -130,7 +130,7 @@ void Options::set_optlist (std::vector<const char*> list)
       *p1++ = 0;
       while (*p1 && isspace (*p1))
         p1++;
-      option.arg = p1;
+      option.arg_descr = p1;
     }
     option.olong = ptr;
     optlist.push_back (option);
@@ -145,8 +145,9 @@ Options::~Options()
   Parse a command line
   \param argc   number of arguments
   \param argv   array of arguments
-  \param stop   pointer to an integer that receives the number of the first non-option
-  argument
+  \param stop   pointer to an integer that receives the index of the first non-option
+                argument if function is successful, or the index of the invalid
+                option in case of failure
 
   \return   0   success
   \return   1   unknown option found
@@ -208,15 +209,16 @@ int Options::parse(int argc, const char* const *argv, int *stop)
       {
       case '?':   //optional arg
         if (i<argc && *argv[i] != '-')
-          option.arg = argv[i++];
+          option.arg. push_back (argv[i++]);
         break;
 
       case ':': //required arg
         if (i<argc && *argv[i] != '-')
-          option.arg = argv[i++];
+          option.arg.push_back (argv[i++]);
         else
         {
           ret = 2;   //required arg missing
+          --i;
           goto done;
         }
         break;
@@ -224,27 +226,21 @@ int Options::parse(int argc, const char* const *argv, int *stop)
       case '+':   //one or more
         if (i<argc && *argv[i] != '-')
         {
-          option.arg = argv[i++];
-          while (i<argc && *argv[i] != '-')
-          {
-            option.arg += '|';
-            option.arg += argv[i++];
-          }
+          option.arg.push_back (argv[i++]);
+          while (i < argc && *argv[i] != '-')
+            option.arg.push_back(argv[i++]);
         }
         else
         {
           ret = 2;   //required arg missing
+          --i;
           goto done;
         }
         break;
 
       case '*':     //zero or more
         while (i<argc && *argv[i] != '-')
-        {
-          if (!option.arg.empty ())
-            option.arg += '|';
-          option.arg += argv[i++];
-        }
+          option.arg.push_back(argv[i++]);
         break;
 
       case '|':   //no argument
@@ -267,30 +263,34 @@ done:
   Return next option in the command
 
   \param  opt   option
-  \param  optarg  option argument
+  \param  optarg  option argument(s)
+  \param  sep     separator character to insert between arguments if option has multiple arguments
 
-  \return   0   success
-  \return   -1  no more options
+  \return   `true` if successful, `false` if there are no more options
 
-  If the next option has a long form, returns the long form. Otherwise return
-  the short form.
+  The internal position counter is initialized to the first option when command
+  line is parsed and is incremented after each call to this function. Note that
+  the internal counter is not thread-safe. Calls to `next` function from any
+  thread increment the same counter.
 
-  If the option has multiple arguments, optarg contains the arguments separated
-  by '|'.
+  If the next option has both a long form and a short form, the function returns
+  the long form.
+
+  If the option has multiple arguments, `optarg` contains the arguments separated
+  by separator character.
  */
-int Options::next (string& opt, string& optarg)
+bool Options::next (string& opt, string& optarg, char sep)
 {
   if (cmd.empty () || nextop == cmd.end ())
-    return -1;
+    return false;
 
   if (!nextop->olong.empty ())
     opt = nextop->olong;
   else
     opt = nextop->oshort;
-  optarg = nextop->arg;
+  format_arg (optarg, *nextop++, sep);
 
-  nextop++;
-  return 0;
+  return true;
 }
 
 
@@ -298,36 +298,39 @@ int Options::next (string& opt, string& optarg)
   Return a specific option from the command
 
   \param  option  the requested option
-  \param  optarg  option argument
+  \param  optarg  option argument(s)
+  \param  sep     separator character to insert between arguments if option has multiple arguments
 
-  \return   0   success
-  \return   -1  option not found
+  \return   `true` if successful, `false` otherwise
 
-  If the option has multiple arguments, optarg contains the arguments separated
-  by '|'.
+  If the option has multiple arguments, `optarg` contains the arguments separated
+  by separator character.
 */
-int Options::getopt(const string &option, string& optarg)
+bool Options::getopt(const string &option, string& optarg, char sep)
 {
   auto op = find_option(option);
+  optarg.clear ();
 
   if (op != cmd.end())
   {
-    optarg = op->arg;
-    return 0;
+    format_arg (optarg, *op, sep);
+    return true;
   }
-  return -1;
+  return false;
 }
 
-int Options::getopt (char option, string& optarg)
+bool Options::getopt (char option, string& optarg, char sep)
 {
   auto op = find_option (option);
+  optarg.clear ();
+
   if (op != cmd.end())
   {
-    optarg = op->arg;
-    return 0;
+    format_arg (optarg, *op, sep);
+    return true;
   }
   
-  return -1;
+  return false;
 }
 
 /*!
@@ -400,7 +403,7 @@ const string& Options::usage(char sep)
       term = "";
       break;
     }
-    usage_ += op.arg;
+    usage_ += op.arg_descr;
     usage_ += term;
     usage_ += sep;
   }
@@ -431,6 +434,18 @@ std::vector<Options::opt>::iterator Options::find_option(char option)
     [&option](auto& op) {return op.oshort == option; });
 
   return ptr;
+}
+
+void Options::format_arg (std::string& str, opt& option, char sep)
+{
+  str.clear ();
+  auto p = option.arg.begin ();
+  while (p != option.arg.end ())
+  {
+    str += *p++;
+    if (p != option.arg.end ())
+      str.push_back (sep);
+  }
 }
 
 }
