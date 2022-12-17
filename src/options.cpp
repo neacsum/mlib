@@ -9,15 +9,30 @@
   and GNU Standard for Command line Interface at
   http://www.gnu.org/prep/standards/html_node/Command_002dLine-Interfaces.html
 
+  Options can be either short options composed of an '-' followed by a letter,
+  or long option composed of '--' followed by the option name. Options can have
+  arguments that are either required or optional. If an option can have multiple
+  arguments, all program arguments following the option are considered option
+  arguments until the next option argument (argument preceded by '-' or '--')
+  or until the last argument.
+
+  It is possible to specify several short options after one '-', as long as all
+  (except possibly the last) do not have required or optional arguments.
+
   ## Usage Instructions ##
-  1. Construct an options parsing object with it's list of valid options.
+  1. Construct an options parsing object with its list of valid options. See
+     below for the syntax of an option descriptor.
   2. Call the Options::parse() function to process the command line arguments.
-  3. Call Options::getopt() function to retrieve the status of the varios options
+  3. Call Options::getopt() function to retrieve the status of the various options
+
+  See Options::add_option() function for the syntax of the option descriptor.
 
   ## Example ##
-  The following example shows the different formats available for options.
-````
+  The following example shows how to use an Options object and the different
+  formats available for options.
+````CPP
   const char *optlist[] {
+    "h|help",                 // option -h or --help
     "a? optional_arg",        // option -a can have an argument
                               // example: -a 1 or -a xyz
     "b: required_arg",        // option -b must be followed by an argument
@@ -53,88 +68,120 @@
 */
 #include <mlib/options.h>
 #include <ctype.h>
+#include <utf8/utf8.h>
 
 using namespace std;
 
 namespace mlib {
   
-/*!
-  Initialize parser
-*/
+///  Initialize parser
 Options::Options ()
 {
 }
 
 /*!
   Initializes parser and sets the list of valid options.
-
   \param  list array of option definitions strings
 
-  See Options::set_optlist for details
+  See Options::set_options for details
 */
-Options::Options (std::vector<const char*> list)
+Options::Options (std::vector<const char*>& list)
 {
-  set_optlist (list);
+  set_options (list);
+}
+
+Options::Options (std::initializer_list<const char*> list)
+{
+  for (auto& o : list)
+    add_option (o);
+}
+
+/*!
+  Initializes parser and sets the list of valid options.
+  \param  list option definitions strings
+
+  The list must be terminated with a null pointer.
+*/
+Options::Options (const char** list)
+{
+  while (*list)
+    add_option (*list++);
 }
 
 /*!
   Set list of valid options
-  \param list  - array of option definition strings
+  \param list  - array of option descriptor strings
 
-  Each valid option is described by a string in the list array. Each string is
-  composed of an option syntax part followed by a space and the option argument
-  description
+  Each valid option is described by a string in the list array.
+*/
+void Options::set_options (std::vector<const char*>& list)
+{
+  //remove previous optlist and parsed command
+  optlist.clear ();
+  cmd.clear ();
+  nextop = cmd.begin ();
+  for (auto& t : list)
+    add_option (t);
+}
 
-  Example:
-  ` "l?list option_argument" `
+/*!
+  Add a new option descriptor to the list of options.
+  \param option descriptor string
 
-  In this example the option syntax part is \c "l?list" and the argument description
-  is \c "option_argument"
+  The descriptor string is has the following syntax:
+````
+  `[<short_form>]<flag>[<long_form>]<spaces><description>`
+````
+  `short_form` is a letter giving the short form of the option.
 
-  The option syntax string has the following syntax:
-  `[<short_form>]<arg_char>[<long_form>]`
-
-  \e short_form is a letter giving the short form of the option ('l' in the example
-  above).
-
-  arg_char is one of:
+  `flag` is one of:
   - ? option has one optional parameter
   - : option requires one argument
   - + option has one or more arguments
   - * option has 0 or more arguments
   - | option doesn't have any arguments
 
-  \e long_form is the long form of the option ('list' in the example above).
+  `long_form` is the long form of the option.
 
-  The array is terminated by a NULL string.
+  The `description` part is used to generate the usage string.
+
+  Example:
+  ` "l?list option_argument" `
+
+  In this example the option syntax part is `l?list` and the argument description
+  is `option_argument`. The option can appear on the command line as:
+````
+  -l stuff
+````
+  or
+````
+  --list stuff
+````
+  or, simply:
+````
+  -l
+````
+  because the argument is optional.
 */
-void Options::set_optlist (std::vector<const char*> list)
+void Options::add_option (const char* option)
 {
-  char tmp[256];
+  char *tmp = strdup (option);
+  char* ptr = tmp;
+  opt entry;
 
-  //remove previous optlist and parsed command
-  optlist.clear ();
-  cmd.clear ();
-  nextop = cmd.begin ();
-  for (auto& t :list)
+  entry.oshort = (isalnum (*ptr)) ? *ptr++ : 0;
+  entry.flag = *ptr++;
+  char* p1 = strchr (ptr, ' ');
+  if (p1)
   {
-    strcpy (tmp, t);
-    opt option;
-    char *ptr = tmp;
-
-    option.oshort = (isalnum (*ptr))? *ptr++ : 0;
-    option.flag = *ptr++;
-    char *p1 = strchr (ptr, ' ');
-    if (p1)
-    {
-      *p1++ = 0;
-      while (*p1 && isspace (*p1))
-        p1++;
-      option.arg_descr = p1;
-    }
-    option.olong = ptr;
-    optlist.push_back (option);
+    *p1++ = 0;
+    while (*p1 && isspace (*p1))
+      p1++;
+    entry.arg_descr = p1;
   }
+  entry.olong = ptr;
+  optlist.push_back (entry);
+  free (tmp);
 }
 
 Options::~Options()
@@ -152,106 +199,117 @@ Options::~Options()
   \return   0   success
   \return   1   unknown option found
   \return   2   required argument is missing
+  \return   3   invalid multiple options string
 */
-int Options::parse(int argc, const char* const *argv, int *stop)
+int Options::parse (int argc, const char* const* argv, int* stop)
 {
-  int i=1;
   int ret = 0;
-  const char *ptr = strrchr (argv[0], '\\');
-  if (ptr)
-    ptr++;
-  else
-    ptr = argv[0];
-  const char *ptr1 = strchr(ptr, '.');
-  size_t sz;
-  if (ptr1)
-    sz = ptr1 - ptr;
-  else
-    sz = strlen(ptr);
-  app = string (ptr, sz);
+  string d, p, e; //unused
+  const char* ptr;
+
+  utf8::splitpath (argv[0], d, p, app, e);
+
   cmd.clear ();
 
+  int i = 1;
   while (i<argc)
   {
     ptr = argv[i];
-    if (*ptr++ == '-')
+    if (*ptr++ != '-')
+      break;
+    auto op = optlist.begin ();
+    opt option;
+    option.oshort = 0;
+    if (*ptr == '-')
     {
-      auto op = optlist.begin ();
-      opt option;
-      option.oshort = 0;
-      if (*ptr == '-')
-      {
-        //long option
-        ptr++;
-        while (op != optlist.end () && strcmpi (ptr, op->olong.c_str()))
-          op++;
-        option.olong = ptr;
-        if (op != optlist.end ())
-          option.oshort = op->oshort;
-      }
+      //long option
+      ptr++;
+      op = find_if (op, optlist.end (), [&ptr](auto& o) {return !strcmp (ptr, o.olong.c_str ()); });
+      option.olong = ptr;
+      if (op != optlist.end ())
+        option.oshort = op->oshort;
       else
       {
-        //short option
-        while (op != optlist.end () && op->oshort != *ptr)
-          op++;
-        option.oshort = *ptr;
-        if (op != optlist.end ())
-          option.olong = op->olong;
+        ret = 1;  //unknown option
+        goto done;
       }
+    }
+    else
+    {
+      //short option(s)
+      op = find_if (op, optlist.end (), [&ptr](auto& o) {return o.oshort == *ptr; });
       if (op == optlist.end ())
       {
         ret = 1;  //unknown option
         goto done;
       }
-
-      i++;
-      switch (op->flag)
+      option.oshort = *ptr;
+      option.olong = op->olong;
+      while (*++ptr)
       {
-      case '?':   //optional arg
-        if (i<argc && *argv[i] != '-')
-          option.arg. push_back (argv[i++]);
-        break;
-
-      case ':': //required arg
-        if (i<argc && *argv[i] != '-')
-          option.arg.push_back (argv[i++]);
-        else
+        //could be multiple short options. All of them must have no arguments
+        if (op->flag != '|')
         {
-          ret = 2;   //required arg missing
-          --i;
+          ret = 3; 
           goto done;
         }
-        break;
-
-      case '+':   //one or more
-        if (i<argc && *argv[i] != '-')
+        cmd.push_back (option);
+        op = find_if (optlist.begin(), optlist.end (), [&ptr](auto& o) {return o.oshort == *ptr; });
+        if (op == optlist.end ())
         {
-          option.arg.push_back (argv[i++]);
-          while (i < argc && *argv[i] != '-')
-            option.arg.push_back(argv[i++]);
-        }
-        else
-        {
-          ret = 2;   //required arg missing
-          --i;
+          ret = 1;  //unknown option
           goto done;
         }
-        break;
-
-      case '*':     //zero or more
-        while (i<argc && *argv[i] != '-')
-          option.arg.push_back(argv[i++]);
-        break;
-
-      case '|':   //no argument
-        break;
+        option.oshort = *ptr;
+        option.olong = op->olong;
       }
-      cmd.push_back (option);
     }
-    else
-      break;  //end of options
+
+    i++;
+    switch (op->flag)
+    {
+    case '?':   //optional arg
+      if (i < argc && *argv[i] != '-')
+        option.arg.push_back (argv[i++]);
+      break;
+
+    case ':': //required arg
+      if (i < argc && *argv[i] != '-')
+        option.arg.push_back (argv[i++]);
+      else
+      {
+        ret = 2;   //required arg missing
+        --i;
+        goto done;
+      }
+      break;
+
+    case '+':   //one or more
+      if (i < argc && *argv[i] != '-')
+      {
+        option.arg.push_back (argv[i++]);
+        while (i < argc && *argv[i] != '-')
+          option.arg.push_back (argv[i++]);
+      }
+      else
+      {
+        ret = 2;   //required arg missing
+        --i;
+        goto done;
+      }
+      break;
+
+    case '*':     //zero or more
+      while (i < argc && *argv[i] != '-')
+        option.arg.push_back (argv[i++]);
+      break;
+
+    case '|':   //no argument
+      break;
+    }
+    cmd.push_back (option);
   }
-  nextop = cmd.begin ();
+  nextop = cmd.begin (); //init options iterator
 
 done:
   if (stop)
@@ -270,7 +328,7 @@ done:
 
   The internal position counter is initialized to the first option when command
   line is parsed and is incremented after each call to this function. Note that
-  the internal counter is not thread-safe. Calls to `next` function from any
+  the internal counter is not thread-safe. Calls to `next()` function from any
   thread increment the same counter.
 
   If the next option has both a long form and a short form, the function returns
@@ -293,7 +351,7 @@ bool Options::next (string& opt, string& optarg, char sep)
   return true;
 }
 
-
+///@{
 /*!
   Return a specific option from the command
 
@@ -306,7 +364,7 @@ bool Options::next (string& opt, string& optarg, char sep)
   If the option has multiple arguments, `optarg` contains the arguments separated
   by separator character.
 */
-bool Options::getopt(const string &option, string& optarg, char sep)
+bool Options::getopt(const std::string &option, std::string& optarg, char sep) const
 {
   auto op = find_option(option);
   optarg.clear ();
@@ -319,7 +377,7 @@ bool Options::getopt(const string &option, string& optarg, char sep)
   return false;
 }
 
-bool Options::getopt (char option, string& optarg, char sep)
+bool Options::getopt (char option, std::string& optarg, char sep) const
 {
   auto op = find_option (option);
   optarg.clear ();
@@ -332,24 +390,7 @@ bool Options::getopt (char option, string& optarg, char sep)
   
   return false;
 }
-
-/*!
-  Check if command line has an option
-  \param  option  long or short form of the option
-*/
-bool Options::hasopt (const string& option)
-{
-  return find_option(option) != cmd.end();
-}
-
-/*!
-  Check if command line has an option
-  \param  option  short form of the option
-*/
-bool Options::hasopt (char option)
-{
-  return find_option(option) != cmd.end();
-}
+///@}
 
 
 /*!
@@ -412,14 +453,14 @@ const string& Options::usage(char sep)
 }
 
 // Find an option (can be long)
-std::vector<Options::opt>::iterator Options::find_option(const std::string& option)
+std::vector<Options::opt>::const_iterator Options::find_option(const std::string& option) const
 {
-  std::vector<Options::opt>::iterator ptr;
+  std::vector<Options::opt>::const_iterator ptr;
   if (option.length() > 1)
     ptr = std::find_if(cmd.begin(), cmd.end(),
       [&option](auto& op) {return  op.olong == option; });
   else
-  {
+  { 
     char ch = option[0];
     ptr = std::find_if(cmd.begin(), cmd.end(),
       [&ch](auto& op) {return  op.oshort == ch; });
@@ -428,7 +469,7 @@ std::vector<Options::opt>::iterator Options::find_option(const std::string& opti
 }
 
 // Find a short option
-std::vector<Options::opt>::iterator Options::find_option(char option)
+std::vector<Options::opt>::const_iterator Options::find_option(char option) const
 {
   auto ptr = std::find_if(cmd.begin(), cmd.end(),
     [&option](auto& op) {return op.oshort == option; });
@@ -436,7 +477,8 @@ std::vector<Options::opt>::iterator Options::find_option(char option)
   return ptr;
 }
 
-void Options::format_arg (std::string& str, opt& option, char sep)
+//combine all option parameters in one string separated by 'sep'
+void Options::format_arg (std::string& str, const opt& option, char sep) const
 {
   str.clear ();
   auto p = option.arg.begin ();

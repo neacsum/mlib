@@ -52,7 +52,7 @@ SUITE (threads)
     CHECK (!th.is_running ());
     CHECK (th.get_state () == mlib::thread::state::ready);
     th.start ();
-    CHECK (th.get_state () == mlib::thread::state::starting);
+    CHECK (th.get_state () == mlib::thread::state::starting || th.get_state () == mlib::thread::state::running);
     f_run.wait ();
     CHECK (th.get_state () == mlib::thread::state::running);
     CHECK (th.is_running ());

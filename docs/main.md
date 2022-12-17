@@ -59,7 +59,7 @@ SOFTWARE.
 - \ref trace.h "TRACE macros"
 
 ### Geometry ###
-- \ref convex_hull() "convex_hull" - convex hull calculator
+- \ref mlib::convex_hull() "convex_hull" - convex hull calculator
 - \ref mlib::Border "border"
 - \ref mlib::RotMat "rotmat" - Rotations calculator
 - \ref mlib::Point "2D Point"
@@ -79,7 +79,7 @@ SOFTWARE.
 - \ref mlib::statpars "statpars" - Statistical parameters
 - \ref mlib::stopwatch "stopwatch" - Another stopwatch timer
 - \ref tvops "tvops" - Operations with timeval structures
-- \ref biosuuid() - Retrieve BIOS UUID value
+- \ref mlib::biosuuid() - Retrieve BIOS UUID value
  
 
 

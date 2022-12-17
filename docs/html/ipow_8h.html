@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.5"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>MLIB: C:/development/mlib/include/mlib/ipow.h File Reference</title>
+<title>MLIB: D:/development/mlib/include/mlib/ipow.h File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -51,7 +51,8 @@ $(function() {
 
 <p>Integer exponentiation function template.  
 <a href="#details">More...</a></p>
-
+<div class="textblock"><code>#include &lt;assert.h&gt;</code><br />
+</div>
 <p><a href="ipow_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
@@ -59,8 +60,13 @@ Functions</h2></td></tr>
 <tr class="memitem:a3d572ff42210fe47a158a168a662768f"><td class="memTemplParams" colspan="2"><a id="a3d572ff42210fe47a158a168a662768f" name="a3d572ff42210fe47a158a168a662768f"></a>
 template&lt;typename T &gt; </td></tr>
 <tr class="memitem:a3d572ff42210fe47a158a168a662768f"><td class="memTemplItemLeft" align="right" valign="top">T&#160;</td><td class="memTemplItemRight" valign="bottom"><b>mlib::ipow</b> (T base, int exp)</td></tr>
-<tr class="memdesc:a3d572ff42210fe47a158a168a662768f"><td class="mdescLeft">&#160;</td><td class="mdescRight">integer exponentiation function <br /></td></tr>
+<tr class="memdesc:a3d572ff42210fe47a158a168a662768f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Integer exponentiation function. <br /></td></tr>
 <tr class="separator:a3d572ff42210fe47a158a168a662768f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7841985519dc8e5be291a2e8c1f6418a"><td class="memItemLeft" align="right" valign="top"><a id="a7841985519dc8e5be291a2e8c1f6418a" name="a7841985519dc8e5be291a2e8c1f6418a"></a>
+template&lt;&gt; </td></tr>
+<tr class="memitem:a7841985519dc8e5be291a2e8c1f6418a"><td class="memTemplItemLeft" align="right" valign="top">double&#160;</td><td class="memTemplItemRight" valign="bottom"><b>mlib::ipow</b> (double base, int exp)</td></tr>
+<tr class="memdesc:a7841985519dc8e5be291a2e8c1f6418a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Specialization for double, can handle negative exponents. <br /></td></tr>
+<tr class="separator:a7841985519dc8e5be291a2e8c1f6418a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p >Integer exponentiation function template. </p>

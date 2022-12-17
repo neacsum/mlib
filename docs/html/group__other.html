@@ -83,18 +83,18 @@ Macros</h2></td></tr>
 #define&#160;</td><td class="memItemRight" valign="bottom"><b>MAS</b>&#160;&#160;&#160;(M_PI/(180*3600000.))</td></tr>
 <tr class="memdesc:ga823df606ea20ab2115986d064347b3b2"><td class="mdescLeft">&#160;</td><td class="mdescRight">milli-arcsecond <br /></td></tr>
 <tr class="separator:ga823df606ea20ab2115986d064347b3b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaa69880a651036164c988d8f8951e0ccc"><td class="memItemLeft" align="right" valign="top"><a id="gaa69880a651036164c988d8f8951e0ccc" name="gaa69880a651036164c988d8f8951e0ccc"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>DEG</b>(dd)&#160;&#160;&#160;((dd)*<a class="el" href="group__other.html#ga0a3cc1d5cde549e408f825ddd7f5853d">D2R</a>)</td></tr>
-<tr class="memdesc:gaa69880a651036164c988d8f8951e0ccc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert decimal degrees to radians. <br /></td></tr>
-<tr class="separator:gaa69880a651036164c988d8f8951e0ccc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gac8a8d465197b4a16faa3004e8f43c7df"><td class="memItemLeft" align="right" valign="top"><a id="gac8a8d465197b4a16faa3004e8f43c7df" name="gac8a8d465197b4a16faa3004e8f43c7df"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>DM</b>(dd,  mm)&#160;&#160;&#160;(((dd)+(mm)/60.)*<a class="el" href="group__other.html#ga0a3cc1d5cde549e408f825ddd7f5853d">D2R</a>)</td></tr>
-<tr class="memdesc:gac8a8d465197b4a16faa3004e8f43c7df"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert degrees, minutes to radians. <br /></td></tr>
-<tr class="separator:gac8a8d465197b4a16faa3004e8f43c7df"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga93117ac16afcd316aa2caf372031d303"><td class="memItemLeft" align="right" valign="top"><a id="ga93117ac16afcd316aa2caf372031d303" name="ga93117ac16afcd316aa2caf372031d303"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>DMS</b>(dd,  mm,  ss)&#160;&#160;&#160;(((dd)+(mm)/60.+(ss)/3600.)*<a class="el" href="group__other.html#ga0a3cc1d5cde549e408f825ddd7f5853d">D2R</a>)</td></tr>
-<tr class="memdesc:ga93117ac16afcd316aa2caf372031d303"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert degrees, minutes seconds to radians. <br /></td></tr>
-<tr class="separator:ga93117ac16afcd316aa2caf372031d303"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaf74daf00282bd252f984442428f68804"><td class="memItemLeft" align="right" valign="top"><a id="gaf74daf00282bd252f984442428f68804" name="gaf74daf00282bd252f984442428f68804"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>LL_MIN</b>&#160;&#160;&#160;0x01</td></tr>
+<tr class="memdesc:gaf74daf00282bd252f984442428f68804"><td class="mdescLeft">&#160;</td><td class="mdescRight">Degrees, minutes format (DD°MM.mmmm') <br /></td></tr>
+<tr class="separator:gaf74daf00282bd252f984442428f68804"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga3aa9fb8a7bdeb3069d1dc61d5cfc95f1"><td class="memItemLeft" align="right" valign="top"><a id="ga3aa9fb8a7bdeb3069d1dc61d5cfc95f1" name="ga3aa9fb8a7bdeb3069d1dc61d5cfc95f1"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>LL_SEC</b>&#160;&#160;&#160;0x02</td></tr>
+<tr class="memdesc:ga3aa9fb8a7bdeb3069d1dc61d5cfc95f1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Degrees, minutes, seconds format (DD°MM'SS.sss") <br /></td></tr>
+<tr class="separator:ga3aa9fb8a7bdeb3069d1dc61d5cfc95f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gac5361191ced0213dbbc3c5bebff3b743"><td class="memItemLeft" align="right" valign="top"><a id="gac5361191ced0213dbbc3c5bebff3b743" name="gac5361191ced0213dbbc3c5bebff3b743"></a>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>LL_LAT</b>&#160;&#160;&#160;0x04</td></tr>
+<tr class="memdesc:gac5361191ced0213dbbc3c5bebff3b743"><td class="mdescLeft">&#160;</td><td class="mdescRight">Latitude angle. <br /></td></tr>
+<tr class="separator:gac5361191ced0213dbbc3c5bebff3b743"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
@@ -102,6 +102,9 @@ Functions</h2></td></tr>
 constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>operator&quot;&quot;_deg</b> (long double deg)</td></tr>
 <tr class="memdesc:ga94c8703dff231b8e2e8a6e4fc9d72bdd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Degrees literal operator converts a value to radians. <br /></td></tr>
 <tr class="separator:ga94c8703dff231b8e2e8a6e4fc9d72bdd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gae64242eca2699bfdd4d9ec5fdc395ba6"><td class="memItemLeft" align="right" valign="top"><a id="gae64242eca2699bfdd4d9ec5fdc395ba6" name="gae64242eca2699bfdd4d9ec5fdc395ba6"></a>
+constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>operator&quot;&quot;_deg</b> (unsigned long long deg)</td></tr>
+<tr class="separator:gae64242eca2699bfdd4d9ec5fdc395ba6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gaf77f10db874056be70d7efa3a370378b"><td class="memItemLeft" align="right" valign="top"><a id="gaf77f10db874056be70d7efa3a370378b" name="gaf77f10db874056be70d7efa3a370378b"></a>
 constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>operator&quot;&quot;_mas</b> (long double mas)</td></tr>
 <tr class="memdesc:gaf77f10db874056be70d7efa3a370378b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Milli-arcseconds literal operator converts a value to radians. <br /></td></tr>
@@ -114,40 +117,123 @@ constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>operator&
 constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>operator&quot;&quot;_nmi</b> (long double nmi)</td></tr>
 <tr class="memdesc:gafe2e3971d232bf31a8147dc1a78b93f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Nautical miles literal operator converts a value to meters. <br /></td></tr>
 <tr class="separator:gafe2e3971d232bf31a8147dc1a78b93f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga1df04847afda9deea012ddc8501f32b0"><td class="memItemLeft" align="right" valign="top"><a id="ga1df04847afda9deea012ddc8501f32b0" name="ga1df04847afda9deea012ddc8501f32b0"></a>
-double&#160;</td><td class="memItemRight" valign="bottom"><b>DMD2deg</b> (double)</td></tr>
-<tr class="memdesc:ga1df04847afda9deea012ddc8501f32b0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Conversion to decimal degrees from DDMM.mmm. <br /></td></tr>
-<tr class="separator:ga1df04847afda9deea012ddc8501f32b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga8f3925b28aaa84705b92156e38e08802"><td class="memItemLeft" align="right" valign="top"><a id="ga8f3925b28aaa84705b92156e38e08802" name="ga8f3925b28aaa84705b92156e38e08802"></a>
-double&#160;</td><td class="memItemRight" valign="bottom"><b>DMS2deg</b> (double)</td></tr>
-<tr class="memdesc:ga8f3925b28aaa84705b92156e38e08802"><td class="mdescLeft">&#160;</td><td class="mdescRight">Conversion to decimal degrees from DDMMSS.ssss. <br /></td></tr>
-<tr class="separator:ga8f3925b28aaa84705b92156e38e08802"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga83116b35f4cda25acf147c87b70c7670"><td class="memItemLeft" align="right" valign="top"><a id="ga83116b35f4cda25acf147c87b70c7670" name="ga83116b35f4cda25acf147c87b70c7670"></a>
-double&#160;</td><td class="memItemRight" valign="bottom"><b>deg2DMD</b> (double value)</td></tr>
-<tr class="memdesc:ga83116b35f4cda25acf147c87b70c7670"><td class="mdescLeft">&#160;</td><td class="mdescRight">Conversion from decimal degrees to degrees, minutes (DDMM.mmm) <br /></td></tr>
-<tr class="separator:ga83116b35f4cda25acf147c87b70c7670"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga586589b7b6e3f61316aa6ac9e5acb719"><td class="memItemLeft" align="right" valign="top"><a id="ga586589b7b6e3f61316aa6ac9e5acb719" name="ga586589b7b6e3f61316aa6ac9e5acb719"></a>
-double&#160;</td><td class="memItemRight" valign="bottom"><b>D2rad</b> (double val)</td></tr>
-<tr class="memdesc:ga586589b7b6e3f61316aa6ac9e5acb719"><td class="mdescLeft">&#160;</td><td class="mdescRight">Conversion from degrees to radians. <br /></td></tr>
-<tr class="separator:ga586589b7b6e3f61316aa6ac9e5acb719"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga7a87af3f2a5e8856582bfe96316c18b4"><td class="memItemLeft" align="right" valign="top"><a id="ga7a87af3f2a5e8856582bfe96316c18b4" name="ga7a87af3f2a5e8856582bfe96316c18b4"></a>
-double&#160;</td><td class="memItemRight" valign="bottom"><b>DMD2rad</b> (double val)</td></tr>
-<tr class="memdesc:ga7a87af3f2a5e8856582bfe96316c18b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Conversion from degrees, minutes (DDMM.mmm) to radians. <br /></td></tr>
-<tr class="separator:ga7a87af3f2a5e8856582bfe96316c18b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gadcdd2c9a9be2bda63c0f98d51fb20b74"><td class="memItemLeft" align="right" valign="top"><a id="gadcdd2c9a9be2bda63c0f98d51fb20b74" name="gadcdd2c9a9be2bda63c0f98d51fb20b74"></a>
-double&#160;</td><td class="memItemRight" valign="bottom"><b>DMS2rad</b> (double val)</td></tr>
-<tr class="memdesc:gadcdd2c9a9be2bda63c0f98d51fb20b74"><td class="mdescLeft">&#160;</td><td class="mdescRight">Conversion from degrees, minutes, seconds (DDMMSS.sss) to radians. <br /></td></tr>
-<tr class="separator:gadcdd2c9a9be2bda63c0f98d51fb20b74"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gae618e8779262ce32f6748dd794d69681"><td class="memItemLeft" align="right" valign="top"><a id="gae618e8779262ce32f6748dd794d69681" name="gae618e8779262ce32f6748dd794d69681"></a>
-double&#160;</td><td class="memItemRight" valign="bottom"><b>rad2DMD</b> (double val)</td></tr>
-<tr class="memdesc:gae618e8779262ce32f6748dd794d69681"><td class="mdescLeft">&#160;</td><td class="mdescRight">Conversion from radians to degrees, minutes (DDMM.mmm) <br /></td></tr>
-<tr class="separator:gae618e8779262ce32f6748dd794d69681"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga85b8b29738e70c3b3ab6c96be833b0cb"><td class="memItemLeft" align="right" valign="top"><a id="ga85b8b29738e70c3b3ab6c96be833b0cb" name="ga85b8b29738e70c3b3ab6c96be833b0cb"></a>
-double&#160;</td><td class="memItemRight" valign="bottom"><b>deg_reduce</b> (double value)</td></tr>
-<tr class="memdesc:ga85b8b29738e70c3b3ab6c96be833b0cb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reduces a degrees value to [0,360) interval. <br /></td></tr>
-<tr class="separator:ga85b8b29738e70c3b3ab6c96be833b0cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga973b1a2586f4add882bc38c505774def"><td class="memItemLeft" align="right" valign="top"><a id="ga973b1a2586f4add882bc38c505774def" name="ga973b1a2586f4add882bc38c505774def"></a>
+constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>DEG</b> (double dd)</td></tr>
+<tr class="memdesc:ga973b1a2586f4add882bc38c505774def"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert decimal degrees to radians. <br /></td></tr>
+<tr class="separator:ga973b1a2586f4add882bc38c505774def"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga7da1275a68c26443da7656c5605e3cb9"><td class="memItemLeft" align="right" valign="top"><a id="ga7da1275a68c26443da7656c5605e3cb9" name="ga7da1275a68c26443da7656c5605e3cb9"></a>
+constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>DM</b> (double dd, double mm)</td></tr>
+<tr class="memdesc:ga7da1275a68c26443da7656c5605e3cb9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert degrees, minutes to radians. <br /></td></tr>
+<tr class="separator:ga7da1275a68c26443da7656c5605e3cb9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gafca3d256bac0a63ef21b9f0ab4eb6274"><td class="memItemLeft" align="right" valign="top"><a id="gafca3d256bac0a63ef21b9f0ab4eb6274" name="gafca3d256bac0a63ef21b9f0ab4eb6274"></a>
+constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>DMS</b> (double dd, double mm, double ss)</td></tr>
+<tr class="memdesc:gafca3d256bac0a63ef21b9f0ab4eb6274"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert degrees, minutes seconds to radians. <br /></td></tr>
+<tr class="separator:gafca3d256bac0a63ef21b9f0ab4eb6274"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaa66d514578a4b7583ccc81f0c5336d8c"><td class="memItemLeft" align="right" valign="top"><a id="gaa66d514578a4b7583ccc81f0c5336d8c" name="gaa66d514578a4b7583ccc81f0c5336d8c"></a>
+constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>DMD2deg</b> (double value)</td></tr>
+<tr class="memdesc:gaa66d514578a4b7583ccc81f0c5336d8c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Conversion to decimal degrees from DDMM.mmm. <br /></td></tr>
+<tr class="separator:gaa66d514578a4b7583ccc81f0c5336d8c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaa68f73744e834f5fbdba4ef4ecec9276"><td class="memItemLeft" align="right" valign="top"><a id="gaa68f73744e834f5fbdba4ef4ecec9276" name="gaa68f73744e834f5fbdba4ef4ecec9276"></a>
+constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>DMS2deg</b> (double value)</td></tr>
+<tr class="memdesc:gaa68f73744e834f5fbdba4ef4ecec9276"><td class="mdescLeft">&#160;</td><td class="mdescRight">Conversion to decimal degrees from DDMMSS.ssss. <br /></td></tr>
+<tr class="separator:gaa68f73744e834f5fbdba4ef4ecec9276"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gada1545c7d763c22cad08c2c6a7f7daaf"><td class="memItemLeft" align="right" valign="top"><a id="gada1545c7d763c22cad08c2c6a7f7daaf" name="gada1545c7d763c22cad08c2c6a7f7daaf"></a>
+constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>deg2DMD</b> (double value)</td></tr>
+<tr class="memdesc:gada1545c7d763c22cad08c2c6a7f7daaf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Conversion from decimal degrees to degrees, minutes (DDMM.mmm) <br /></td></tr>
+<tr class="separator:gada1545c7d763c22cad08c2c6a7f7daaf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga2e9751d071a3e295e56cf34b8db13e54"><td class="memItemLeft" align="right" valign="top"><a id="ga2e9751d071a3e295e56cf34b8db13e54" name="ga2e9751d071a3e295e56cf34b8db13e54"></a>
+constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>D2rad</b> (double val)</td></tr>
+<tr class="memdesc:ga2e9751d071a3e295e56cf34b8db13e54"><td class="mdescLeft">&#160;</td><td class="mdescRight">Conversion from degrees to radians. <br /></td></tr>
+<tr class="separator:ga2e9751d071a3e295e56cf34b8db13e54"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gac91e388dab5907afc78a3dcc9e161039"><td class="memItemLeft" align="right" valign="top"><a id="gac91e388dab5907afc78a3dcc9e161039" name="gac91e388dab5907afc78a3dcc9e161039"></a>
+constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>DMD2rad</b> (double val)</td></tr>
+<tr class="memdesc:gac91e388dab5907afc78a3dcc9e161039"><td class="mdescLeft">&#160;</td><td class="mdescRight">Conversion from degrees, minutes (DDMM.mmm) to radians. <br /></td></tr>
+<tr class="separator:gac91e388dab5907afc78a3dcc9e161039"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga0113be5e75194160de9e3c63725927be"><td class="memItemLeft" align="right" valign="top"><a id="ga0113be5e75194160de9e3c63725927be" name="ga0113be5e75194160de9e3c63725927be"></a>
+constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>DMS2rad</b> (double val)</td></tr>
+<tr class="memdesc:ga0113be5e75194160de9e3c63725927be"><td class="mdescLeft">&#160;</td><td class="mdescRight">Conversion from degrees, minutes, seconds (DDMMSS.sss) to radians. <br /></td></tr>
+<tr class="separator:ga0113be5e75194160de9e3c63725927be"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaadb5d2d4f9aa590cb75549d23ba11f28"><td class="memItemLeft" align="right" valign="top"><a id="gaadb5d2d4f9aa590cb75549d23ba11f28" name="gaadb5d2d4f9aa590cb75549d23ba11f28"></a>
+constexpr double&#160;</td><td class="memItemRight" valign="bottom"><b>rad2DMD</b> (double val)</td></tr>
+<tr class="memdesc:gaadb5d2d4f9aa590cb75549d23ba11f28"><td class="mdescLeft">&#160;</td><td class="mdescRight">Conversion from radians to degrees, minutes (DDMM.mmm) <br /></td></tr>
+<tr class="separator:gaadb5d2d4f9aa590cb75549d23ba11f28"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaf84b92bf5fac91e56018bf0d487128fe"><td class="memItemLeft" align="right" valign="top"><a id="gaf84b92bf5fac91e56018bf0d487128fe" name="gaf84b92bf5fac91e56018bf0d487128fe"></a>
+double&#160;</td><td class="memItemRight" valign="bottom"><b>mlib::deg_reduce</b> (double value)</td></tr>
+<tr class="memdesc:gaf84b92bf5fac91e56018bf0d487128fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reduces a degrees value to [0,360) interval. <br /></td></tr>
+<tr class="separator:gaf84b92bf5fac91e56018bf0d487128fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga57d2d5d53bdd2069a4de7bd3ea84df7f"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__other.html#ga57d2d5d53bdd2069a4de7bd3ea84df7f">mlib::degtoa</a> (double degrees, int flags, int precision)</td></tr>
+<tr class="memdesc:ga57d2d5d53bdd2069a4de7bd3ea84df7f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Conversion from degrees to ASCII string.  <a href="group__other.html#ga57d2d5d53bdd2069a4de7bd3ea84df7f">More...</a><br /></td></tr>
+<tr class="separator:ga57d2d5d53bdd2069a4de7bd3ea84df7f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga7bf66a7a3b95877e544b4e07a304ce35"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__other.html#ga7bf66a7a3b95877e544b4e07a304ce35">mlib::atodeg</a> (const std::string &amp;str)</td></tr>
+<tr class="memdesc:ga7bf66a7a3b95877e544b4e07a304ce35"><td class="mdescLeft">&#160;</td><td class="mdescRight">Conversion from string to decimal degrees.  <a href="group__other.html#ga7bf66a7a3b95877e544b4e07a304ce35">More...</a><br /></td></tr>
+<tr class="separator:ga7bf66a7a3b95877e544b4e07a304ce35"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="ga7bf66a7a3b95877e544b4e07a304ce35" name="ga7bf66a7a3b95877e544b4e07a304ce35"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga7bf66a7a3b95877e544b4e07a304ce35">&#9670;&#160;</a></span>atodeg()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">double mlib::atodeg </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>str</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Conversion from string to decimal degrees. </p>
+<p >Some valid strings are:</p><ul>
+<li>130°45'25.34566W</li>
+<li>130D45'25.34566E</li>
+<li>65D45M25.34567S</li>
+<li>130.56789W</li>
+<li>85°30.45678N </li>
+</ul>
+
+</div>
+</div>
+<a id="ga57d2d5d53bdd2069a4de7bd3ea84df7f" name="ga57d2d5d53bdd2069a4de7bd3ea84df7f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga57d2d5d53bdd2069a4de7bd3ea84df7f">&#9670;&#160;</a></span>degtoa()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string mlib::degtoa </td>
+          <td>(</td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>degrees</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>flags</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>precision</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Conversion from degrees to ASCII string. </p>
+<p >Format is controlled by flags settings and precision. </p>
+
+</div>
+</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

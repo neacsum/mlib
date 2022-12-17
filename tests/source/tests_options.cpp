@@ -8,21 +8,30 @@ using std::string;
 SUITE (Options)
 {
 
-std::vector<const char*>  optlist
+std::vector<const char*> optvec
   {"a? optional_arg",
    "b: required_arg",
    "c+ one_or_more_args",
    "d* 0_or_more_args",
-   "e|",
+   "e|", "g|", "h|",
    "f?longorshort optional",
    ":onlylong required"};
+
+const char* optlist[] =
+{ "a? optional_arg",
+ "b: required_arg",
+ "c+ one_or_more_args",
+ "d* 0_or_more_args",
+ "e|", "g|", "h|",
+ "f?longorshort optional",
+ ":onlylong required", 0};
 
 TEST (CostructorWithOptlist)
 {
   Options o1;
   Options o2 (optlist);
 
-  o1.set_optlist (optlist);
+  o1.set_options (optvec);
 
   string usage1 = o1.usage ();
   string usage2 = o2.usage ();
@@ -334,6 +343,42 @@ TEST (NextAdvances)
   CHECK_EQUAL ("b", argopt);
   CHECK_EQUAL ("efgh", argval);
 }
+
+TEST (MultiOptionOK)
+{
+  Options o (optlist);
+  const char* cmd[] = { "programname", "-egh" };
+
+  CHECK_EQUAL (0, o.parse (_countof (cmd), cmd));
+  CHECK (o.hasopt ('e'));
+  CHECK (o.hasopt ('g'));
+  CHECK (o.hasopt ('h'));
+}
+
+TEST (MultiOptionLastArg)
+{
+  Options o (optlist);
+  const char* cmd[] = { "programname", "-egf", "f_arg"};
+
+  CHECK_EQUAL (0, o.parse (_countof (cmd), cmd));
+  CHECK (o.hasopt ('e'));
+  CHECK (o.hasopt ('g'));
+  CHECK (o.hasopt ('f'));
+  string v;
+  CHECK (o.getopt ('f', v));
+  CHECK_EQUAL ("f_arg", v);
+}
+
+TEST (MultiOptionArgInMiddle)
+{
+  Options o (optlist);
+  //incorrect command. Option with argument not last
+  const char* cmd[] = { "programname", "-efg", "f_arg" };
+
+  CHECK_EQUAL (3, o.parse (_countof (cmd), cmd));
+}
+
+
 
 TEST (SampleOptionsCode)
 {

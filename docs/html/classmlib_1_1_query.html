@@ -239,6 +239,9 @@ SYSTEMTIME&#160;</td><td class="memItemRight" valign="bottom"><b>column_time</b>
 <tr class="memitem:af9dff4f8a839df1c35bcf13b15f6c764"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_query.html#af9dff4f8a839df1c35bcf13b15f6c764">database_name</a> (const std::string &amp;colname) const</td></tr>
 <tr class="memdesc:af9dff4f8a839df1c35bcf13b15f6c764"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return originating schema name.  <a href="classmlib_1_1_query.html#af9dff4f8a839df1c35bcf13b15f6c764">More...</a><br /></td></tr>
 <tr class="separator:af9dff4f8a839df1c35bcf13b15f6c764"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9a47add41ef4949f007fb268b198c67d"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_query.html#a9a47add41ef4949f007fb268b198c67d">column_name</a> (int nc) const</td></tr>
+<tr class="memdesc:a9a47add41ef4949f007fb268b198c67d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return column name.  <a href="classmlib_1_1_query.html#a9a47add41ef4949f007fb268b198c67d">More...</a><br /></td></tr>
+<tr class="separator:a9a47add41ef4949f007fb268b198c67d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="friends" name="friends"></a>
 Friends</h2></td></tr>
@@ -255,7 +258,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>Database</b></td></t
 <div class="line">  .bind (<span class="stringliteral">&quot;:param1&quot;</span>, value1)</div>
 <div class="line">  .bind (<span class="stringliteral">&quot;:param2&quot;</span>, value2)</div>
 <div class="line">  .step ();</div>
-<div class="ttc" id="aclassmlib_1_1_query_html_a7ee97cc5ed429ef7a420c4549e9fd6f0"><div class="ttname"><a href="classmlib_1_1_query.html#a7ee97cc5ed429ef7a420c4549e9fd6f0">mlib::Query::Query</a></div><div class="ttdeci">Query()</div><div class="ttdoc">Default constructor.</div><div class="ttdef"><b>Definition:</b> sqlitepp.h:252</div></div>
+<div class="ttc" id="aclassmlib_1_1_query_html_a7ee97cc5ed429ef7a420c4549e9fd6f0"><div class="ttname"><a href="classmlib_1_1_query.html#a7ee97cc5ed429ef7a420c4549e9fd6f0">mlib::Query::Query</a></div><div class="ttdeci">Query()</div><div class="ttdoc">Default constructor.</div><div class="ttdef"><b>Definition:</b> sqlitepp.h:254</div></div>
 </div><!-- fragment --><p >For data extraction, the class provides <code>column_xxx</code> functions that return the value of a column specified either by name or by index (first column index is 0). </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="abbf4ddcb778885223d11bc35030e5b1c" name="abbf4ddcb778885223d11bc35030e5b1c"></a>
@@ -659,6 +662,34 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>Database</b></td></t
 <li><code>REAL</code> value is rounded to nearest integer</li>
 <li><code>TEXT</code> or <code>BLOB</code> value is converted to number. Longest possible prefix of the value that can be interpreted as an integer number is extracted and the remainder ignored. Any leading spaces are ignored. </li>
 </ul>
+
+</div>
+</div>
+<a id="a9a47add41ef4949f007fb268b198c67d" name="a9a47add41ef4949f007fb268b198c67d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9a47add41ef4949f007fb268b198c67d">&#9670;&#160;</a></span>column_name()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string mlib::Query::column_name </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>nc</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Return column name. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">nc</td><td>- column number</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>If the query is a SELECT statement and <code>nc</code> is a valid column number, the function returns the name of the column. Otherwise the function returns an empty string. The name of a result column is the value of the <code>AS</code> clause for that column, if there is an <code>AS</code> clause. If there is no <code>AS</code> clause then the name of the column is unspecified and may change from one release of SQLite to the next.</p>
+<p >The returned string is always UTF-8 encoded. </p>
 
 </div>
 </div>
@@ -1178,8 +1209,8 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>Database</b></td></t
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li>C:/development/mlib/include/mlib/<a class="el" href="sqlitepp_8h_source.html">sqlitepp.h</a></li>
-<li>C:/development/mlib/src/<a class="el" href="sqlitepp_8cpp.html">sqlitepp.cpp</a></li>
+<li>D:/development/mlib/include/mlib/<a class="el" href="sqlitepp_8h_source.html">sqlitepp.h</a></li>
+<li>D:/development/mlib/src/<a class="el" href="sqlitepp_8cpp.html">sqlitepp.cpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
