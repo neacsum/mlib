@@ -1,4 +1,4 @@
-#include <utpp/utpp.h>
+ï»¿#include <utpp/utpp.h>
 #include <mlib/convert.h>
 
 using namespace mlib;
@@ -29,7 +29,7 @@ SUITE (Convert)
     CHECK_EQUAL (-DMS (12, 34, 56.78)/D2R, atodeg ("12D34M56.78S"));
 
     //alternate separators
-    CHECK_EQUAL (DMS (12, 34, 56)/D2R, atodeg (u8"12°34'56"));
+    CHECK_EQUAL (DMS (12, 34, 56)/D2R, atodeg (u8"12Â°34'56"));
 
     //empty string
     CHECK_EQUAL (0, atodeg (""));
@@ -46,11 +46,11 @@ SUITE (Convert)
 
   TEST (degtoa)
   {
-    CHECK_EQUAL (u8"12°34'56.00\"N", degtoa (DMS (12, 34, 56) / D2R, LL_SEC | LL_LAT, 2));
-    CHECK_EQUAL (u8"12°34'56.00\"S", degtoa (-DMS (12, 34, 56) / D2R, LL_SEC | LL_LAT, 2));
-    CHECK_EQUAL (u8"012°34.50'E", degtoa (DMS (12, 34, 30) / D2R, LL_MIN, 2));
-    CHECK_EQUAL (u8"012°34.50'W", degtoa (-DMS (12, 34, 30) / D2R, LL_MIN, 2));
-    CHECK_EQUAL (u8"012.3457°E", degtoa (12.345678, 0, 4));
-    CHECK_EQUAL (u8"12.3457°N", degtoa (12.345678, LL_LAT, 4));
+    CHECK_EQUAL (u8"12Â°34'56.00\"N", degtoa (DMS (12, 34, 56) / D2R, LL_SEC | LL_LAT, 2));
+    CHECK_EQUAL (u8"12Â°34'56.00\"S", degtoa (-DMS (12, 34, 56) / D2R, LL_SEC | LL_LAT, 2));
+    CHECK_EQUAL (u8"012Â°34.50'E", degtoa (DMS (12, 34, 30) / D2R, LL_MIN, 2));
+    CHECK_EQUAL (u8"012Â°34.50'W", degtoa (-DMS (12, 34, 30) / D2R, LL_MIN, 2));
+    CHECK_EQUAL (u8"012.3457Â°E", degtoa (12.345678, 0, 4));
+    CHECK_EQUAL (u8"12.3457Â°N", degtoa (12.345678, LL_LAT, 4));
   }
 }

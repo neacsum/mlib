@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 /*!
   \file convert.h Conversion functions and frequently used constants
 
@@ -118,8 +118,8 @@ namespace mlib {
 double deg_reduce (double value);
 
 //formatting flags for degtoa function
-# define LL_MIN  0x01   ///< Degrees, minutes format (DD°MM.mmmm')
-# define LL_SEC  0x02   ///< Degrees, minutes, seconds format (DD°MM'SS.sss")
+# define LL_MIN  0x01   ///< Degrees, minutes format (DDÂ°MM.mmmm')
+# define LL_SEC  0x02   ///< Degrees, minutes, seconds format (DDÂ°MM'SS.sss")
 # define LL_LAT  0x04   ///< Latitude angle
 
 std::string degtoa (double degrees, int flags, int precision);

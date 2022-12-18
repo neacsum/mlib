@@ -612,7 +612,7 @@ int sock::gettype () const
   Clear the socket error flag.
   \return Error flag status
 
-  The per socket–based error code is different from the per thread error
+  The per socket-based error code is different from the per thread error
   code that is handled using the WSAGetLastError function call. 
   A successful call using the socket does not reset the socket based error code
   returned by this function.

@@ -1,4 +1,4 @@
-/*!
+ï»¿/*!
   \file convert.cpp Conversion functions
 
   (c) Mircea Neacsu 2017
@@ -64,19 +64,19 @@ std::string degtoa (double degrees, int flags, int precision)
   {
     double  dd, mm;
     degrees = modf (modf (degrees + .5 * pow10 (-precision - 1) / 3600., &dd) * 60., &mm) * 60.;
-    strprintf (str, u8"%0*.0lf°%02.0lf'%0*.*lf\"%c", deg_width, dd, mm, width, precision,
+    strprintf (str, u8"%0*.0lfÂ°%02.0lf'%0*.*lf\"%c", deg_width, dd, mm, width, precision,
       degrees, sign);
   }
   else if (flags & LL_MIN)
   {
     double  dd;
     degrees = modf (degrees + .5 * pow10 (-precision - 1) / 60., &dd) * 60.;
-    strprintf (str, u8"%0*.lf°%0*.*lf\'%c", deg_width, dd, width, precision, degrees, sign);
+    strprintf (str, u8"%0*.lfÂ°%0*.*lf\'%c", deg_width, dd, width, precision, degrees, sign);
   }
   else
   {
     width = deg_width + precision + 1;
-    strprintf (str, u8"%0*.*lf°%c", width, precision, degrees + .5 * pow10 (-precision - 1),
+    strprintf (str, u8"%0*.*lfÂ°%c", width, precision, degrees + .5 * pow10 (-precision - 1),
       sign);
   }
 
@@ -86,11 +86,11 @@ std::string degtoa (double degrees, int flags, int precision)
 /*!
   Conversion from string to decimal degrees.
     Some valid strings are:
-    - 130°45'25.34566W
+    - 130Â°45'25.34566W
     - 130D45'25.34566E
     - 65D45M25.34567S
     - 130.56789W
-    - 85°30.45678N
+    - 85Â°30.45678N
 */
 double atodeg (const std::string& str)
 {
@@ -107,7 +107,7 @@ double atodeg (const std::string& str)
   int sign = (dd < 0) ? -1 : 1;
   dd = abs (dd);
 
-  if (toupper (*ptrm) == 'D' || utf8::rune (ptrm) == U'°')
+  if (toupper (*ptrm) == 'D' || utf8::rune (ptrm) == U'Â°')
   {
     utf8::next (ptrm);
     char* ptrs;
