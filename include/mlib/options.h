@@ -46,11 +46,15 @@ public:
 
   int parse (int argc, const char* const *argv, int *stop=0);
   bool next (std::string& opt, std::string& optarg, char sep='|');
+  bool next (std::string& opt, std::vector<std::string>& optarg);
   bool getopt (const std::string& option, std::string& optarg, char sep = '|') const;
+  bool getopt (const std::string& option, std::vector<std::string>& optarg) const;
   bool getopt (char option, std::string& optarg, char sep = '|') const;
+  bool getopt (char option, std::vector<std::string>& optarg) const;
   bool hasopt (const std::string& option) const;
   bool hasopt (char option) const;
-  const std::string& usage (char sep=' ');
+  const std::string synopsis () const;
+  const std::string description () const;
   const std::string& appname () const;
 
 private:
@@ -70,7 +74,6 @@ private:
   std::vector<opt> cmd; 
   std::vector<opt>::iterator nextop;
   std::string app;
-  std::string usage_;
 };
 
 /*!
@@ -106,5 +109,39 @@ bool Options::hasopt (char option) const
 }
 ///@}
 
+///@{
+/*!
+  Return a specific option from the command
+
+  \param  option  the requested option
+  \param  optarg  option argument(s)
+
+  \return   `true` if successful, `false` otherwise
+*/
+
+inline
+bool Options::getopt(const std::string& option, std::vector<std::string>& optarg) const
+{
+  optarg.clear();
+  auto p = find_option(option);
+  if (p == cmd.end())
+    return false;
+
+  optarg = p->arg;
+  return true;
+}
+
+inline
+bool Options::getopt(char option, std::vector<std::string>& optarg) const
+{
+  optarg.clear();
+  auto p = find_option(option);
+  if (p == cmd.end())
+    return false;
+
+  optarg = p->arg;
+  return true;
+}
+///@}
 
 }

@@ -33,8 +33,8 @@ TEST (CostructorWithOptlist)
 
   o1.set_options (optvec);
 
-  string usage1 = o1.usage ();
-  string usage2 = o2.usage ();
+  string usage1 = o1.synopsis ();
+  string usage2 = o2.synopsis ();
 
   CHECK (usage1 == usage2);
 }
@@ -45,20 +45,10 @@ TEST (CopyConstructor)
   Options o2 (o1);
 
 
-  string usage1 = o1.usage ();
-  string usage2 = o2.usage ();
+  string usage1 = o1.synopsis ();
+  string usage2 = o2.synopsis ();
 
   CHECK (usage1 == usage2);
-}
-
-
-TEST (Usage)
-{
-  const char *cmd[] ={"program"};
-  Options o (optlist);
-
-  CHECK_EQUAL (0, o.parse (_countof (cmd), cmd));
-  std::cout << o.usage ('\n') << std::endl;
 }
 
 TEST (UnknownOpt)
@@ -289,6 +279,30 @@ TEST (EndOfParams)
   CHECK_EQUAL (_countof (cmd), nextarg);
 }
 
+TEST(EndOfOptions)
+{
+  int nextarg;
+  string argval;
+  const char* cmd[] = { "programname", "-d", "abcd", "--", "--not_an_option" };
+
+  Options o(optlist);
+  CHECK_EQUAL(0, o.parse(_countof(cmd), cmd, &nextarg));
+
+  CHECK_EQUAL("--not_an_option", cmd[nextarg]);
+}
+
+TEST(HyphenHyphenAtEnd)
+{
+  int nextarg;
+  string argval;
+  const char* cmd[] = { "programname", "-d", "abcd", "--" };
+
+  Options o(optlist);
+  CHECK_EQUAL(0, o.parse(_countof(cmd), cmd, &nextarg));
+
+  CHECK_EQUAL(_countof(cmd), nextarg);
+}
+
 TEST (NextOnEmpytParser)
 {
   Options o;
@@ -302,7 +316,7 @@ TEST (Next)
 {
   int nextarg;
   string argval, argopt;
-  const char *cmd[] ={"programname", "-a", "abcd"};
+  const char *cmd[] ={"programname", "-a", "abcd", "-b", "efgh"};
 
   Options o (optlist);
   CHECK_EQUAL (0, o.parse (_countof (cmd), cmd, &nextarg));
@@ -310,6 +324,11 @@ TEST (Next)
 
   CHECK_EQUAL ("a", argopt);
   CHECK_EQUAL ("abcd", argval);
+
+  CHECK(o.next(argopt, argval));
+
+  CHECK_EQUAL("b", argopt);
+  CHECK_EQUAL("efgh", argval);
 }
 
 TEST (NextGetsLongForm)
@@ -326,22 +345,24 @@ TEST (NextGetsLongForm)
   CHECK_EQUAL ("abcd", argval);
 }
 
-TEST (NextAdvances)
+TEST (NextWithStringArray)
 {
   int nextarg;
-  string argval, argopt;
-  const char *cmd[] ={"programname", "-a", "abcd", "-b", "efgh"};
+  string argopt;
+  std::vector<string> argval;
+  const char *cmd[] ={"programname", "-a", "abcd", "-c", "efgh", "ijkl"};
 
   Options o (optlist);
   CHECK_EQUAL (0, o.parse (_countof (cmd), cmd, &nextarg));
   CHECK (o.next (argopt, argval));
 
   CHECK_EQUAL ("a", argopt);
-  CHECK_EQUAL ("abcd", argval);
+  CHECK_EQUAL ("abcd", argval[0]);
 
   CHECK (o.next (argopt, argval));
-  CHECK_EQUAL ("b", argopt);
-  CHECK_EQUAL ("efgh", argval);
+  CHECK_EQUAL ("c", argopt);
+  CHECK_EQUAL ("efgh", argval[0]);
+  CHECK_EQUAL ("ijkl", argval[1]);
 }
 
 TEST (MultiOptionOK)
@@ -378,7 +399,15 @@ TEST (MultiOptionArgInMiddle)
   CHECK_EQUAL (3, o.parse (_countof (cmd), cmd));
 }
 
-
+TEST(AccumulatedArgs)
+{
+  Options o(optlist);
+  const char* cmd[] = { "programname", "-a", "arg1", "-b", "arg_b", "-a", "arg2"};
+  CHECK_EQUAL(0, o.parse(_countof(cmd), cmd));
+  string str;
+  CHECK(o.getopt('a', str));
+  CHECK_EQUAL("arg1|arg2", str);
+}
 
 TEST (SampleOptionsCode)
 {

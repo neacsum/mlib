@@ -43,6 +43,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "prodcons", "examples\prodco
 		{F9E11AA9-FAB8-40D8-96D9-F92C5725762B} = {F9E11AA9-FAB8-40D8-96D9-F92C5725762B}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "opt-sample", "examples\opt-sample\opt-sample.vcxproj", "{22DE7A88-8069-4DD6-8A76-AF96EDA9F950}"
+	ProjectSection(ProjectDependencies) = postProject
+		{F9E11AA9-FAB8-40D8-96D9-F92C5725762B} = {F9E11AA9-FAB8-40D8-96D9-F92C5725762B}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -107,6 +112,14 @@ Global
 		{88E973EF-701A-4306-955B-39073CC4AA3D}.Release|x64.Build.0 = Release|x64
 		{88E973EF-701A-4306-955B-39073CC4AA3D}.Release|x86.ActiveCfg = Release|Win32
 		{88E973EF-701A-4306-955B-39073CC4AA3D}.Release|x86.Build.0 = Release|Win32
+		{22DE7A88-8069-4DD6-8A76-AF96EDA9F950}.Debug|x64.ActiveCfg = Debug|x64
+		{22DE7A88-8069-4DD6-8A76-AF96EDA9F950}.Debug|x64.Build.0 = Debug|x64
+		{22DE7A88-8069-4DD6-8A76-AF96EDA9F950}.Debug|x86.ActiveCfg = Debug|Win32
+		{22DE7A88-8069-4DD6-8A76-AF96EDA9F950}.Debug|x86.Build.0 = Debug|Win32
+		{22DE7A88-8069-4DD6-8A76-AF96EDA9F950}.Release|x64.ActiveCfg = Release|x64
+		{22DE7A88-8069-4DD6-8A76-AF96EDA9F950}.Release|x64.Build.0 = Release|x64
+		{22DE7A88-8069-4DD6-8A76-AF96EDA9F950}.Release|x86.ActiveCfg = Release|Win32
+		{22DE7A88-8069-4DD6-8A76-AF96EDA9F950}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -117,6 +130,7 @@ Global
 		{1E05EAD9-9C78-4FF2-A4E0-006BEB57DF44} = {D05927DA-0F18-4D5A-8936-7CBC8E75CB66}
 		{9CE2843D-A8D2-4648-8A0F-57B433EC0295} = {D05927DA-0F18-4D5A-8936-7CBC8E75CB66}
 		{88E973EF-701A-4306-955B-39073CC4AA3D} = {D05927DA-0F18-4D5A-8936-7CBC8E75CB66}
+		{22DE7A88-8069-4DD6-8A76-AF96EDA9F950} = {D05927DA-0F18-4D5A-8936-7CBC8E75CB66}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D39A9FF6-3402-4FC0-8F60-32F9F75F7A95}

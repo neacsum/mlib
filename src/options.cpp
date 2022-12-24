@@ -76,6 +76,7 @@ namespace mlib {
   
 ///  Initialize parser
 Options::Options ()
+  : nextop (cmd.end ())
 {
 }
 
@@ -86,11 +87,13 @@ Options::Options ()
   See Options::set_options for details
 */
 Options::Options (std::vector<const char*>& list)
+  : nextop(cmd.begin())
 {
   set_options (list);
 }
 
 Options::Options (std::initializer_list<const char*> list)
+  : nextop(cmd.begin())
 {
   for (auto& o : list)
     add_option (o);
@@ -143,7 +146,7 @@ void Options::set_options (std::vector<const char*>& list)
 
   `long_form` is the long form of the option.
 
-  The `description` part is used to generate the usage string.
+  The `description` part is used to generate the syntax string.
 
   Example:
   ` "l?list option_argument" `
@@ -175,7 +178,7 @@ void Options::add_option (const char* option)
   if (p1)
   {
     *p1++ = 0;
-    while (*p1 && isspace (*p1))
+    while (*p1 && *p1 == ' ')
       p1++;
     entry.arg_descr = p1;
   }
@@ -216,7 +219,7 @@ int Options::parse (int argc, const char* const* argv, int* stop)
   {
     ptr = argv[i];
     if (*ptr++ != '-')
-      break;
+      break; //end of options
     auto op = optlist.begin ();
     opt option;
     option.oshort = 0;
@@ -224,6 +227,12 @@ int Options::parse (int argc, const char* const* argv, int* stop)
     {
       //long option
       ptr++;
+      if (*ptr == 0)
+      {
+        //explicit end of options
+        i++;
+        break;
+      }
       op = find_if (op, optlist.end (), [&ptr](auto& o) {return !strcmp (ptr, o.olong.c_str ()); });
       option.olong = ptr;
       if (op != optlist.end ())
@@ -307,7 +316,13 @@ int Options::parse (int argc, const char* const* argv, int* stop)
     case '|':   //no argument
       break;
     }
-    cmd.push_back (option);
+    //check for a previous instance of this option
+    auto prev = find_if(cmd.begin(), cmd.end(),
+      [&option](auto& c) {return (c.oshort == option.oshort) && (c.olong == option.olong); });
+    if (prev == cmd.end())
+      cmd.push_back(option);
+    else
+      prev->arg.insert(prev->arg.end(), option.arg.begin(), option.arg.end());
   }
   nextop = cmd.begin (); //init options iterator
 
@@ -339,7 +354,7 @@ done:
  */
 bool Options::next (string& opt, string& optarg, char sep)
 {
-  if (cmd.empty () || nextop == cmd.end ())
+  if (nextop == cmd.end ())
     return false;
 
   if (!nextop->olong.empty ())
@@ -347,7 +362,20 @@ bool Options::next (string& opt, string& optarg, char sep)
   else
     opt = nextop->oshort;
   format_arg (optarg, *nextop++, sep);
+  return true;
+}
 
+bool Options::next(std::string& opt, std::vector<std::string>& optarg)
+{
+  optarg.clear ();
+  if (cmd.empty() || nextop == cmd.end())
+    return false;
+  if (!nextop->olong.empty())
+    opt = nextop->olong;
+  else
+    opt = nextop->oshort;
+  optarg = nextop->arg;
+  nextop++;
   return true;
 }
 
@@ -366,91 +394,177 @@ bool Options::next (string& opt, string& optarg, char sep)
 */
 bool Options::getopt(const std::string &option, std::string& optarg, char sep) const
 {
-  auto op = find_option(option);
-  optarg.clear ();
+  optarg.clear();
 
-  if (op != cmd.end())
-  {
-    format_arg (optarg, *op, sep);
-    return true;
-  }
-  return false;
+  auto op = find_option(option);
+
+  if (op == cmd.end())
+    return false;
+  format_arg(optarg, *op, sep);
+  return true;
 }
 
 bool Options::getopt (char option, std::string& optarg, char sep) const
 {
-  auto op = find_option (option);
-  optarg.clear ();
+  optarg.clear();
 
-  if (op != cmd.end())
-  {
-    format_arg (optarg, *op, sep);
-    return true;
-  }
-  
-  return false;
+  auto op = find_option (option);
+  if (op == cmd.end())
+    return false;
+
+  format_arg(optarg, *op, sep);
+  return true;
 }
 ///@}
 
 
 /*!
-  Generate a nicely formatted usage string.
-
-  \param  sep separator to be inserted between option descriptions
+  Generate a nicely formatted syntax string.
 */
-const string& Options::usage(char sep)
+const string Options::synopsis () const
 {
-  if (!usage_.empty())
-    return usage_;
-
-  string term;
+  string result, term;
   auto op = optlist.begin ();
 
-  usage_ = app + sep;
+  result = app;
   for (auto& op : optlist)
   {
+    result += ' ';
     if (op.oshort)
     {
-      usage_ += '-';
-      usage_ += op.oshort;
+      result += '-';
+      result += op.oshort;
       if (!op.olong.empty())
-        usage_ += '|';
+        result += '|';
     }
     if (!op.olong.empty())
     {
-      usage_ += "--";
-      usage_ += op.olong;
+      result += "--";
+      result += op.olong;
+    }
+
+    if (op.flag == '|')
+      continue;
+
+    switch (op.flag)
+    {
+    case '?':
+      result += " [";
+      term = "]";
+      break;
+    case ':':
+      result += " <";
+      term = ">";
+      break;
+    case '*':
+      result += " [";
+      term = " ...]";
+      break;
+    case '+':
+      result += " <";
+      term = ">...";
+      break;
+    }
+    string param = op.arg_descr;
+    auto tabpos = param.find('\t');
+    if (tabpos != string::npos)
+    {
+      param.erase(tabpos);
+      param.erase(
+        find_if(param.rbegin(), param.rend(),
+          [](char& ch) {return !isspace(ch); }).base(), param.end());
+    }
+    result += param;
+    result += term;
+  }
+
+  return result;
+}
+
+/*!
+  Generate options description
+*/
+const std::string Options::description () const
+{
+  string descr;
+  vector<string> lines;
+  size_t maxlen = 0;
+  for (auto& op : optlist)
+  {
+    string line, term;
+    line = "  ";
+    if (op.oshort)
+    {
+      line += '-';
+      line += op.oshort;
+      if (!op.olong.empty())
+        line += '|';
+    }
+    if (!op.olong.empty())
+    {
+      line += "--";
+      line += op.olong;
     }
 
     switch (op.flag)
     {
     case '?':
-      usage_ += " [";
+      line += " [";
       term = "]";
       break;
     case ':':
-      usage_ += " <";
+      line += " <";
       term = ">";
       break;
     case '*':
-      usage_ += " [";
+      line += " [";
       term = " ...]";
       break;
     case '+':
-      usage_ += " <";
+      line += " <";
       term = ">...";
       break;
-    case '|':
-      term = "";
-      break;
     }
-    usage_ += op.arg_descr;
-    usage_ += term;
-    usage_ += sep;
+
+    if (op.flag != '|')
+    {
+      auto tabpos = op.arg_descr.find('\t');
+      string param = op.arg_descr;
+      if (tabpos != string::npos)
+      {
+        param.erase(tabpos);
+        param.erase(
+          find_if(param.rbegin(), param.rend(),
+            [](char& ch) {return !isspace(ch); }).base(), param.end());
+      }
+      line += param;
+      line += term;
+    }
+    if (line.size() > maxlen)
+      maxlen = line.size();
+    lines.push_back(line);
   }
 
-  return usage_;
+  maxlen += 2;
+  int i = 0;
+  for (auto& op : optlist)
+  {
+    descr += lines[i];
+    auto tabpos = op.arg_descr.find('\t');
+    if (tabpos != string::npos)
+    {
+      //lineup all descriptions
+      descr.append(maxlen - lines[i].size(), ' ');
+      while (isspace(op.arg_descr[++tabpos]))
+        ;
+      descr += op.arg_descr.substr(tabpos);
+    }
+    descr += '\n';
+    i++;
+  }
+  return descr;
 }
+
 
 // Find an option (can be long)
 std::vector<Options::opt>::const_iterator Options::find_option(const std::string& option) const
