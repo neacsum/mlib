@@ -5,13 +5,53 @@
   Copyright (c) Mircea Neacsu 2000
   Based on an idea from Marc Guillermont (CUJ 05/2000)
 
+  \defgroup errors Error Error Handling
+  \brief Unified error handling.
+
+  erc objects are a cross between exceptions and return values. A function
+  can return an erc object and the caller can check it just like a regular
+  return value as in this example:
+
+```CPP
+  erc func ()
+  {
+    return erc(1);
+  }
+
+  main () {
+    if (func() != 1) {
+      ...
+    }
+  }
+```
+
+  However with ercs, if the return result is not checked, it might be
+  thrown as an exception as in the following example.
+
+```CPP
+  erc func ()
+  {
+    return erc(1);
+  }
+  main () {
+    try {
+      func ();
+      ...
+    }
+    catch (erc& err) {
+     printf ("func result %d", (int)err);
+    }
+  }
+```
+
+  This dual behavior is obtained by having erc objects throwing an exception
+  in their destructor if the object is "active". An object is marked as "inactive"
+  every time the integer conversion operator is invoked like in the first example.
 */
 
 #if __has_include ("defs.h")
 #include "defs.h"
 #endif
-
-#include <mlib/trace.h>
 
 #include <string>
 
@@ -121,6 +161,12 @@ friend class errfac;
 
 //-----------------------  errfac inlines -------------------------------------
 
+/// The default facility
+inline errfac deffac;
+
+/// Pointer to default facility
+inline errfac *errfac::default_facility = &deffac;
+
 /*!
   \class errfac
   \ingroup errors
@@ -199,6 +245,16 @@ errfac& errfac::Default ()
 }
 
 /*!
+  Change the default error facility.
+  If called with a NULL argument reverts to generic error facility
+*/
+inline
+void errfac::Default (errfac *facility)
+{
+  default_facility = facility ? facility : &deffac;
+}
+
+/*!
   Check if error must be logged or thrown.
   This function is called by an active error (in destructor of erc objects
   or assignment operator).
@@ -219,13 +275,12 @@ void errfac::raise (const erc& e) const
   }
 }
 
-/// Logging action. Default is to use dprintf
+/// Logging action. Default is to use stderr
 inline
 void errfac::log (const erc& e) const
 {
-  dprintf (message (e).c_str ());
+  fprintf (stderr, "%s\n", message (e).c_str ());
 }
-
 
 //--------------------------- erc inlines -------------------------------------
 
@@ -277,7 +332,6 @@ erc::erc (const erc& other) :
   active (other.active),
   facility_ (other.facility_)
 {
-  TRACE9 ("erc copy ctor");
   //we are the active error now, the other is deactivated
   other.active = 0;
 }
@@ -290,7 +344,6 @@ erc::erc (erc&& other) :
   active (other.active),
   facility_ (other.facility_)
 {
-  TRACE9 ("erc move ctor");
   //we are the active error now, the other is deactivated
   other.active = 0;
 }
@@ -319,7 +372,6 @@ erc& erc::operator= (const erc& rhs)
 {
   if (&rhs != this)
   {
-    TRACE9 ("erc assignment");
     int rhs_active = rhs.active;
     rhs.active = 0; //prevent rhs from throwing if we throw
     if (active && priority_)
@@ -344,7 +396,6 @@ erc& erc::operator= (erc&& rhs)
 {
   if (&rhs != this)
   {
-    TRACE9 ("erc move assignment");
     bool rhs_active = rhs.active;
     rhs.active = 0; //prevent rhs from throwing if we throw
     if (active && value && priority_)

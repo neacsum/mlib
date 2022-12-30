@@ -223,7 +223,6 @@
     <ClCompile Include="dprintf.cpp" />
     <ClCompile Include="json.cpp" />
     <ClCompile Include="rdir.cpp" />
-    <ClCompile Include="errorcode.cpp" />
     <ClCompile Include="event.cpp" />
     <ClCompile Include="firewall.cpp" />
     <ClCompile Include="geom\border.cpp" />
