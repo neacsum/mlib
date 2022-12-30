@@ -1,7 +1,20 @@
 /*!
   \file options.h Command line parser class
 
-  (c) Mircea Neacsu 2017
+  (c) Mircea Neacsu 2017-2022
+
+  Can parse a command line based on options descriptions like these:
+```C
+    const char *optlist[] {
+      "a? optional_arg \t -a can have an argument example: -a 1 or -a xyz",
+      "b: required_arg \t -b must be followed by an argument example: -b mmm",
+      "c+ one_or_more_args \t -c can be followed by one or more arguments example: -c 12 ab cd",
+      "d* 0_or_more_args \t -d can have zero or more arguments",
+      "e| \t -e doesn't have any arguments",
+      "f?longorshort optional \t -f can be also written as --longorshort",
+      ":longopt required \t --longopt must have an argument",
+      0 };
+```
 */
 #pragma once
 
@@ -21,26 +34,7 @@ public:
   Options (std::vector<const char*>& list);
   Options (std::initializer_list<const char*> list);
   Options (const char** list);
-  ~Options ();
 
-  /*
-   Sample option list entries:
-      const char *optlist[] {
-        "a? optional_arg",        // option -a can have an argument
-                                  // example: -a 1 or -a xyz
-        "b: required_arg",        // option -b must be followed by an argument
-                                  // example: -b mmm
-        "c+ one_or_more_args",    // option -c can be followed by one or more arguments
-                                  // example: -c 12 ab cd.
-                                  // The arguments finish at the next option
-        "d* 0_or_more_args",      // option -d can have zero or more arguments
-        "e|",                     // option -e doesn't have any arguments
-        "f?longorshort optional", // option -f can be also written as --longorshort
-                                  // and can have an argument
-        ":longopt required",      // option --longopt must have an argument
-    0 };
-
-  */
   void set_options (std::vector<const char*>& list);
   void add_option (const char* option);
 
@@ -54,7 +48,7 @@ public:
   bool hasopt (const std::string& option) const;
   bool hasopt (char option) const;
   const std::string synopsis () const;
-  const std::string description () const;
+  const std::string description (size_t indent_size = 2) const;
   const std::string& appname () const;
 
 private:

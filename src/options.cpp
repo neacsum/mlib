@@ -68,15 +68,15 @@
 */
 #include <mlib/options.h>
 #include <ctype.h>
-#include <utf8/utf8.h>
+#include <filesystem>
 
 using namespace std;
 
 namespace mlib {
-  
+
 ///  Initialize parser
 Options::Options ()
-  : nextop (cmd.end ())
+  : nextop (cmd.begin ())
 {
 }
 
@@ -119,10 +119,8 @@ Options::Options (const char** list)
 */
 void Options::set_options (std::vector<const char*>& list)
 {
-  //remove previous optlist and parsed command
+  //remove previous optlist
   optlist.clear ();
-  cmd.clear ();
-  nextop = cmd.begin ();
   for (auto& t : list)
     add_option (t);
 }
@@ -187,10 +185,6 @@ void Options::add_option (const char* option)
   free (tmp);
 }
 
-Options::~Options()
-{
-}
-
 /*!
   Parse a command line
   \param argc   number of arguments
@@ -210,7 +204,7 @@ int Options::parse (int argc, const char* const* argv, int* stop)
   string d, p, e; //unused
   const char* ptr;
 
-  utf8::splitpath (argv[0], d, p, app, e);
+  app = std::filesystem::path (argv[0]).stem ().string();
 
   cmd.clear ();
 
@@ -365,12 +359,12 @@ bool Options::next (string& opt, string& optarg, char sep)
   return true;
 }
 
-bool Options::next(std::string& opt, std::vector<std::string>& optarg)
+bool Options::next (std::string &opt, std::vector<std::string> &optarg)
 {
   optarg.clear ();
-  if (cmd.empty() || nextop == cmd.end())
+  if (cmd.empty () || nextop == cmd.end ())
     return false;
-  if (!nextop->olong.empty())
+  if (!nextop->olong.empty ())
     opt = nextop->olong;
   else
     opt = nextop->oshort;
@@ -483,16 +477,19 @@ const string Options::synopsis () const
 
 /*!
   Generate options description
+  \param indent_size number of spaces to indent each option description line
+
+  Each option and its synopsis is shown on a separate line indented by 
+  `indent_size' spaces, followed by the option description (if any).
 */
-const std::string Options::description () const
+const std::string Options::description (size_t indent_size) const
 {
   string descr;
   vector<string> lines;
   size_t maxlen = 0;
   for (auto& op : optlist)
   {
-    string line, term;
-    line = "  ";
+    string line (indent_size, ' '), term;
     if (op.oshort)
     {
       line += '-';
@@ -528,36 +525,36 @@ const std::string Options::description () const
 
     if (op.flag != '|')
     {
-      auto tabpos = op.arg_descr.find('\t');
+      auto tabpos = op.arg_descr.find ('\t');
       string param = op.arg_descr;
       if (tabpos != string::npos)
       {
-        param.erase(tabpos);
-        param.erase(
-          find_if(param.rbegin(), param.rend(),
-            [](char& ch) {return !isspace(ch); }).base(), param.end());
+        param.erase (tabpos);
+        param.erase (
+          find_if (param.rbegin (), param.rend (), [] (char &ch) { return !isspace (ch); }).base (),
+          param.end ());
       }
       line += param;
       line += term;
     }
-    if (line.size() > maxlen)
-      maxlen = line.size();
-    lines.push_back(line);
+    if (line.size () > maxlen)
+      maxlen = line.size ();
+    lines.push_back (line);
   }
 
-  maxlen += 2;
+  maxlen += indent_size;
   int i = 0;
-  for (auto& op : optlist)
+  for (auto &op : optlist)
   {
     descr += lines[i];
-    auto tabpos = op.arg_descr.find('\t');
+    auto tabpos = op.arg_descr.find ('\t');
     if (tabpos != string::npos)
     {
-      //lineup all descriptions
-      descr.append(maxlen - lines[i].size(), ' ');
-      while (isspace(op.arg_descr[++tabpos]))
+      // lineup all descriptions
+      descr.append (maxlen - lines[i].size (), ' ');
+      while (isspace (op.arg_descr[++tabpos]))
         ;
-      descr += op.arg_descr.substr(tabpos);
+      descr += op.arg_descr.substr (tabpos);
     }
     descr += '\n';
     i++;
@@ -583,10 +580,10 @@ std::vector<Options::opt>::const_iterator Options::find_option(const std::string
 }
 
 // Find a short option
-std::vector<Options::opt>::const_iterator Options::find_option(char option) const
+std::vector<Options::opt>::const_iterator Options::find_option (char option) const
 {
-  auto ptr = std::find_if(cmd.begin(), cmd.end(),
-    [&option](auto& op) {return op.oshort == option; });
+  auto ptr =
+    std::find_if (cmd.begin (), cmd.end (), [&option] (auto &op) { return op.oshort == option; });
 
   return ptr;
 }

@@ -399,36 +399,30 @@ TEST (MultiOptionArgInMiddle)
   CHECK_EQUAL (3, o.parse (_countof (cmd), cmd));
 }
 
-TEST(AccumulatedArgs)
+TEST (AccumulatedArgs)
 {
-  Options o(optlist);
-  const char* cmd[] = { "programname", "-a", "arg1", "-b", "arg_b", "-a", "arg2"};
-  CHECK_EQUAL(0, o.parse(_countof(cmd), cmd));
+  Options o (optlist);
+  const char *cmd[] = {"programname", "-a", "arg1", "-b", "arg_b", "-a", "arg2"};
+  CHECK_EQUAL (0, o.parse (_countof (cmd), cmd));
   string str;
-  CHECK(o.getopt('a', str));
-  CHECK_EQUAL("arg1|arg2", str);
+  CHECK (o.getopt ('a', str));
+  CHECK_EQUAL ("arg1|arg2", str);
 }
 
 TEST (SampleOptionsCode)
 {
   Options optparser ( {
-    "a? optional_arg",        // option -a can have an argument
-                              // example: -a 1 or -a xyz
-    "b: required_arg",        // option -b must be followed by an argument
-                              // example: -b mmm
-    "c+ one_or_more_args",    // option -c can be followed by one or more arguments
-                              // example: -c 12 ab cd.
-                              // The arguments finish at the next option
-    "d* 0_or_more_args",      // option -d can have zero or more arguments
-    "e|",                     // option -e doesn't have any arguments
-    "f?longorshort optional", // option -f can be also written as --longorshort
-                              // and can have an argument
-    ":longopt required",      // option --longopt must have an argument
-    }
-  );
+      "a? optional_arg \t -a can have an argument example: -a 1 or -a xyz",
+      "b: required_arg \t -b must be followed by an argument example: -b mmm",
+      "c+ one_or_more_args \t -c can be followed by one or more arguments example: -c 12 ab cd",
+      "d* 0_or_more_args \t -d can have zero or more arguments",
+      "e| \t -e doesn't have any arguments",
+      "f?longorshort optional \t -f can be also written as --longorshort",
+      ":longopt required \t --longopt must have an argument"
+      });
 
   //sample command line
-  const char *samp_argv[]{ "program", "-a", "1", "-e", "--longopt", "par" };
+  const char *samp_argv[]{ "c:\\path\\to\\file\\program.exe", "-a", "1", "-e", "--longopt", "par" };
 
   optparser.parse (_countof (samp_argv), samp_argv);
   string lo;
@@ -444,6 +438,10 @@ TEST (SampleOptionsCode)
   }
   else
     CHECK ("Missing option");
+
+  std::cout << optparser.synopsis () << std::endl
+            << "WHere:" << std::endl
+            << optparser.description () << std::endl;
 }
 }
 
