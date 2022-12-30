@@ -13,7 +13,7 @@ int main(int argc, char** argv)
     cout << "argv[" << i << "]=" << argv[i] << endl;
   cout << endl << endl;
 
-  Options cmd{
+  OptParser parser{
     "h|help \t show help message",
     "y| \t boolean flag",
     "n| \t another boolean flag",
@@ -23,28 +23,28 @@ int main(int argc, char** argv)
   };
 
   int nonopt;
-  if (cmd.parse(argc, argv, &nonopt) != 0)
+  if (parser.parse(argc, argv, &nonopt) != 0)
   {
     cout << "Syntax error. Valid options are:" << endl;
-    cout << cmd.synopsis() << endl;
+    cout << parser.synopsis() << endl;
   }
   if (argc == 1)
   {
     cout << "Usage:" << endl;
-    cout << cmd.synopsis() << endl;
+    cout << parser.synopsis() << endl;
     cout << "Where:" << endl
-      << cmd.description() << endl;
+      << parser.description() << endl;
     exit(0);
   }
   
   string optarg;
-  if (cmd.getopt('p', optarg, ','))
+  if (parser.getopt('p', optarg, ','))
     cout << "Parameters are: " << optarg << endl;
 
-  cout << "'y' flag is " << (cmd.hasopt('y') ? "set" : "reset") << endl;
-  cout << "'n' flag is " << (cmd.hasopt('n') ? "set" : "reset") << endl;
+  cout << "'y' flag is " << (parser.hasopt('y') ? "set" : "reset") << endl;
+  cout << "'n' flag is " << (parser.hasopt('n') ? "set" : "reset") << endl;
 
-  if (cmd.getopt("stuff", optarg, ','))
+  if (parser.getopt("stuff", optarg, ','))
     cout << "Stuff: " << optarg << endl;
 
   if (nonopt < argc)

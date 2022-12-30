@@ -27,16 +27,16 @@
 
 namespace mlib {
 
-class Options
+class OptParser
 {
 public:
-  Options ();
-  Options (std::vector<const char*>& list);
-  Options (std::initializer_list<const char*> list);
-  Options (const char** list);
+  OptParser ();
+  OptParser (std::vector<const char*>& list);
+  OptParser (std::initializer_list<const char*> list);
+  OptParser (const char** list);
 
   void set_options (std::vector<const char*>& list);
-  void add_option (const char* option);
+  void add_option (const char* descr);
 
   int parse (int argc, const char* const *argv, int *stop=0);
   bool next (std::string& opt, std::string& optarg, char sep='|');
@@ -76,7 +76,7 @@ private:
   This is the content of `argv[0]` without any path or extension.
 */
 inline
-const std::string& Options::appname () const
+const std::string& OptParser::appname () const
 {
   return app;
 }
@@ -87,7 +87,7 @@ const std::string& Options::appname () const
   \param  option  long or short form of the option
 */
 inline
-bool Options::hasopt (const std::string& option) const
+bool OptParser::hasopt (const std::string& option) const
 {
   return find_option (option) != cmd.end ();
 }
@@ -97,7 +97,7 @@ bool Options::hasopt (const std::string& option) const
   \param  option  short form of the option
 */
 inline
-bool Options::hasopt (char option) const
+bool OptParser::hasopt (char option) const
 {
   return find_option (option) != cmd.end ();
 }
@@ -114,7 +114,7 @@ bool Options::hasopt (char option) const
 */
 
 inline
-bool Options::getopt(const std::string& option, std::vector<std::string>& optarg) const
+bool OptParser::getopt(const std::string& option, std::vector<std::string>& optarg) const
 {
   optarg.clear();
   auto p = find_option(option);
@@ -126,7 +126,7 @@ bool Options::getopt(const std::string& option, std::vector<std::string>& optarg
 }
 
 inline
-bool Options::getopt(char option, std::vector<std::string>& optarg) const
+bool OptParser::getopt(char option, std::vector<std::string>& optarg) const
 {
   optarg.clear();
   auto p = find_option(option);

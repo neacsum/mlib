@@ -73,7 +73,7 @@ SOFTWARE.
 - \ref mlib::ipow() "ipow" - Integer powers through multiplication
 - \ref mlib::poly() "poly" - Polynomial evaluation using Horner's scheme
 - \ref NMEA-0183 parsing
-- \ref mlib::Options "Options" - Parsing command line options
+- \ref mlib::OptParser "OptParser" - Parsing command line options
 - \ref mlib::ring_buffer "ring_buffer" - FIFO Circular buffer
 - \ref serenum - Enumerators for serial ports
 - \ref mlib::statpars "statpars" - Statistical parameters
