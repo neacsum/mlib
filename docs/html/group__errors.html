@@ -59,7 +59,8 @@ Classes</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <p >Unified error handling. </p>
-<p >erc objects are a cross between exceptions and return values. A function can return an erc object and the caller can check it just like a regular return value as in this example: </p><div class="fragment"><div class="line">erc func ()</div>
+<p >erc objects are a cross between exceptions and return values. A function can return an erc object and the caller can check it just like a regular return value as in this example:</p>
+<div class="fragment"><div class="line">erc func ()</div>
 <div class="line">{</div>
 <div class="line">  <span class="keywordflow">return</span> erc(1);</div>
 <div class="line">}</div>
@@ -69,7 +70,8 @@ Classes</h2></td></tr>
 <div class="line">    ...</div>
 <div class="line">  }</div>
 <div class="line">}</div>
-</div><!-- fragment --><p >However with ercs, if the return result is not checked, it might be thrown as an exception as in the following example. </p><div class="fragment"><div class="line">erc func ()</div>
+</div><!-- fragment --><p >However with ercs, if the return result is not checked, it might be thrown as an exception as in the following example.</p>
+<div class="fragment"><div class="line">erc func ()</div>
 <div class="line">{</div>
 <div class="line">  <span class="keywordflow">return</span> erc(1);</div>
 <div class="line">}</div>

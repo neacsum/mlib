@@ -50,5 +50,7 @@ int main(int argc, char** argv)
   if (nonopt < argc)
     cout << "First non option argument is " << argv[nonopt] << endl;
 
+  cout << "Synopsis:" << endl << parser.synopsis () << endl;
+  cout << "Description:" << endl << parser.description () << endl;
   return 0;
 }

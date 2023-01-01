@@ -41,10 +41,10 @@ public:
   int parse (int argc, const char* const *argv, int *stop=0);
   bool next (std::string& opt, std::string& optarg, char sep='|');
   bool next (std::string& opt, std::vector<std::string>& optarg);
-  bool getopt (const std::string& option, std::string& optarg, char sep = '|') const;
-  bool getopt (const std::string& option, std::vector<std::string>& optarg) const;
-  bool getopt (char option, std::string& optarg, char sep = '|') const;
-  bool getopt (char option, std::vector<std::string>& optarg) const;
+  int getopt (const std::string& option, std::string& optarg, char sep = '|') const;
+  int getopt (const std::string& option, std::vector<std::string>& optarg) const;
+  int getopt (char option, std::string& optarg, char sep = '|') const;
+  int getopt (char option, std::vector<std::string>& optarg) const;
   bool hasopt (const std::string& option) const;
   bool hasopt (char option) const;
   const std::string synopsis () const;
@@ -58,6 +58,7 @@ private:
     char flag;                      //argument type
     std::string arg_descr;          //argument description
     std::vector<std::string> arg;   //actual argument(s)
+    int count;                      //number of occurrences
   };
 
   std::vector<opt>::const_iterator find_option(const std::string& opt) const;
@@ -110,31 +111,31 @@ bool OptParser::hasopt (char option) const
   \param  option  the requested option
   \param  optarg  option argument(s)
 
-  \return   `true` if successful, `false` otherwise
+  \return  number of occurrences on command line
 */
 
 inline
-bool OptParser::getopt(const std::string& option, std::vector<std::string>& optarg) const
+int OptParser::getopt(const std::string& option, std::vector<std::string>& optarg) const
 {
   optarg.clear();
   auto p = find_option(option);
   if (p == cmd.end())
-    return false;
+    return 0;
 
   optarg = p->arg;
-  return true;
+  return p->count;
 }
 
 inline
-bool OptParser::getopt(char option, std::vector<std::string>& optarg) const
+int OptParser::getopt(char option, std::vector<std::string>& optarg) const
 {
   optarg.clear();
   auto p = find_option(option);
   if (p == cmd.end())
-    return false;
+    return 0;
 
   optarg = p->arg;
-  return true;
+  return p->count;
 }
 ///@}
 

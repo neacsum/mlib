@@ -91,7 +91,7 @@ TEST (OptionalArg)
   OptParser o (optlist);
   CHECK_EQUAL (0, o.parse (_countof (cmd), cmd));
 
-  CHECK(o.getopt ('a', argval));
+  CHECK_EQUAL (1, o.getopt ('a', argval));
   CHECK_EQUAL ("abcd", argval);
 }
 
@@ -103,7 +103,7 @@ TEST (RequiredArgValue)
   OptParser o (optlist);
   CHECK_EQUAL (0, o.parse (_countof(cmd), cmd));
 
-  CHECK(o.getopt ('b', argval));
+  CHECK_EQUAL (1, o.getopt ('b', argval));
   CHECK_EQUAL ("abcd", argval);
 }
 
@@ -125,7 +125,7 @@ TEST (OneOrMoreWithOne)
   OptParser o (optlist);
   CHECK_EQUAL (0, o.parse (_countof (cmd), cmd));
 
-  CHECK(o.getopt ('c', argval));
+  CHECK_EQUAL (1, o.getopt ('c', argval));
   CHECK_EQUAL ("abcd", argval);
 }
 
@@ -137,7 +137,7 @@ TEST (OneOrMoreWithMore)
   OptParser o (optlist);
   CHECK_EQUAL (0, o.parse (_countof (cmd), cmd));
 
-  CHECK (o.getopt ('c', argval));
+  CHECK_EQUAL (1, o.getopt ('c', argval));
   CHECK_EQUAL ("abcd|efgh|ijkl", argval);
 }
 
@@ -158,7 +158,7 @@ TEST (ZeroOrMoreWithOne)
   OptParser o (optlist);
   CHECK_EQUAL (0, o.parse (_countof (cmd), cmd));
 
-  CHECK (o.getopt ('d', argval));
+  CHECK_EQUAL (1, o.getopt ('d', argval));
   CHECK_EQUAL ("abcd", argval);
 }
 
@@ -170,7 +170,7 @@ TEST (ZeroOrMoreWithMore)
   OptParser o (optlist);
   CHECK_EQUAL (0, o.parse (_countof (cmd), cmd));
 
-  CHECK (o.getopt ('d', argval));
+  CHECK_EQUAL (1, o.getopt ('d', argval));
   CHECK_EQUAL ("abcd|efgh|ijkl", argval);
 }
 
@@ -181,7 +181,7 @@ TEST (ZeroOrMoreWithNone)
 
   OptParser o (optlist);
   CHECK_EQUAL (0, o.parse (_countof (cmd), cmd));
-  CHECK (o.getopt ('d', argval));
+  CHECK_EQUAL (1, o.getopt ('d', argval));
   CHECK (argval.empty ());
 }
 
@@ -192,7 +192,7 @@ TEST (NoArg)
 
   OptParser o (optlist);
   CHECK_EQUAL (0, o.parse (_countof (cmd), cmd));
-  CHECK (o.getopt ('e', argval));
+  CHECK_EQUAL (1, o.getopt ('e', argval));
   CHECK (argval.empty ());
 }
 
@@ -204,7 +204,7 @@ TEST (LongOptShortForm)
   OptParser o (optlist);
   CHECK_EQUAL (0, o.parse (_countof (cmd), cmd));
 
-  CHECK (o.getopt ('f', argval));
+  CHECK_EQUAL (1, o.getopt ('f', argval));
   CHECK_EQUAL ("abcd", argval);
 }
 
@@ -216,7 +216,7 @@ TEST (LongOptShortFormAsString)
   OptParser o (optlist);
   CHECK_EQUAL (0, o.parse (_countof (cmd), cmd));
 
-  CHECK (o.getopt ("f", argval));
+  CHECK_EQUAL (1, o.getopt ("f", argval));
   CHECK_EQUAL ("abcd", argval);
 }
 
@@ -229,7 +229,7 @@ TEST (LongOptLongForm)
   OptParser o (optlist);
   CHECK_EQUAL (0, o.parse (_countof (cmd), cmd));
 
-  CHECK (o.getopt ('f', argval));
+  CHECK_EQUAL (1, o.getopt ('f', argval));
   CHECK_EQUAL ("abcd", argval);
 }
 
@@ -240,7 +240,7 @@ TEST (LongOptGetByLongName)
 
   OptParser o (optlist);
   CHECK_EQUAL (0, o.parse (_countof (cmd), cmd));
-  CHECK (o.getopt ("longorshort", argval));
+  CHECK_EQUAL (1, o.getopt ("longorshort", argval));
   CHECK_EQUAL ("abcd", argval);
 }
 
@@ -252,7 +252,7 @@ TEST (LongOptNoShortForm)
   OptParser o (optlist);
   CHECK_EQUAL (0, o.parse (_countof (cmd), cmd));
 
-  CHECK (o.getopt ("onlylong", argval));
+  CHECK_EQUAL (1, o.getopt ("onlylong", argval));
   CHECK_EQUAL ("abcd", argval);
 }
 
@@ -386,7 +386,7 @@ TEST (MultiOptionLastArg)
   CHECK (o.hasopt ('g'));
   CHECK (o.hasopt ('f'));
   string v;
-  CHECK (o.getopt ('f', v));
+  CHECK_EQUAL (1, o.getopt ('f', v));
   CHECK_EQUAL ("f_arg", v);
 }
 
@@ -405,21 +405,29 @@ TEST (AccumulatedArgs)
   const char *cmd[] = {"programname", "-a", "arg1", "-b", "arg_b", "-a", "arg2"};
   CHECK_EQUAL (0, o.parse (_countof (cmd), cmd));
   string str;
-  CHECK (o.getopt ('a', str));
+  CHECK_EQUAL (2, o.getopt ('a', str));
   CHECK_EQUAL ("arg1|arg2", str);
+}
+
+TEST (RepeatedOption)
+{
+  OptParser o (optlist);
+  string str;
+  const char *cmd[] = {"programname", "-e", "-e", "-e"};
+  CHECK_EQUAL (0, o.parse (_countof (cmd), cmd));
+  CHECK_EQUAL (3, o.getopt ('e', str));
 }
 
 TEST (SampleOptionsCode)
 {
-  OptParser optparser ( {
-      "a? optional_arg \t -a can have an argument example: -a 1 or -a xyz",
-      "b: required_arg \t -b must be followed by an argument example: -b mmm",
-      "c+ one_or_more_args \t -c can be followed by one or more arguments example: -c 12 ab cd",
-      "d* 0_or_more_args \t -d can have zero or more arguments",
-      "e| \t -e doesn't have any arguments",
-      "f?longorshort optional \t -f can be also written as --longorshort",
-      ":longopt required \t --longopt must have an argument"
-      });
+  OptParser optparser ({
+    "a? optional_arg \t -a can have an argument example: -a 1 or -a xyz",
+    "b: required_arg \t -b must be followed by an argument example: -b mmm",
+    "c+ one_or_more_args \t -c can be followed by one or more arguments example: -c 12 ab cd",
+    "d* 0_or_more_args \t -d can have zero or more arguments",
+    "e|\t-e doesn't have any arguments",
+    "f?longorshort optional \t -f can be also written as --longorshort",
+    ":longopt required \t --longopt must have an argument"});
 
   //sample command line
   const char *samp_argv[]{ "c:\\path\\to\\file\\program.exe", "-a", "1", "-e", "--longopt", "par" };

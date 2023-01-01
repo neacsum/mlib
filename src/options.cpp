@@ -79,6 +79,7 @@ and
 */
 #include <mlib/options.h>
 #include <ctype.h>
+#include <assert.h>
 #include <filesystem>
 
 using namespace std;
@@ -138,7 +139,7 @@ OptParser::OptParser (const char** list)
 */
 void OptParser::set_options (std::vector<const char*>& list)
 {
-  //remove previous optlist
+  //remove previous options
   optlist.clear ();
   for (auto& t : list)
     add_option (t);
@@ -197,23 +198,32 @@ void OptParser::set_options (std::vector<const char*>& list)
 */
 void OptParser::add_option (const char* descr)
 {
-  char *tmp = strdup (descr);
-  char* ptr = tmp;
   opt entry;
+  string tmp{descr};
+  auto ptr = tmp.begin ();
 
-  entry.oshort = (isalnum (*ptr)) ? *ptr++ : 0;
+  //short form
+  if (isalnum (*ptr))
+    entry.oshort = *ptr++;
+  else
+    entry.oshort = 0;
+  assert (ptr != tmp.end ());
+
+  //flag
+  assert (*ptr == '?' || *ptr == ':' || *ptr == '+' || *ptr == '*' || *ptr == '|');
   entry.flag = *ptr++;
-  char* p1 = strchr (ptr, ' ');
-  if (p1)
+
+  //long form
+  auto end_long = find_if (ptr, tmp.end (), [] (auto t) { return isspace (t); });
+  entry.olong = string (ptr, end_long);
+
+  //descriptor
+  if (end_long != tmp.end ())
   {
-    *p1++ = 0;
-    while (*p1 && *p1 == ' ')
-      p1++;
-    entry.arg_descr = p1;
+    ptr = find_if (end_long, tmp.end (), [] (auto t) { return t != ' '; });
+    entry.arg_descr = string (ptr, tmp.end ());  
   }
-  entry.olong = ptr;
   optlist.push_back (entry);
-  free (tmp);
 }
 
 /*!
@@ -229,7 +239,7 @@ void OptParser::add_option (const char* descr)
   \return   2   required argument is missing
   \return   3   invalid multiple options string
 */
-int OptParser::parse (int argc, const char* const* argv, int* stop)
+int OptParser::parse (int argc, const char *const *argv, int *stop)
 {
   int ret = 0;
   string d, p, e; //unused
@@ -248,6 +258,7 @@ int OptParser::parse (int argc, const char* const* argv, int* stop)
     auto op = optlist.begin ();
     opt option;
     option.oshort = 0;
+    option.count = 1;
     if (*ptr == '-')
     {
       //long option
@@ -347,7 +358,10 @@ int OptParser::parse (int argc, const char* const* argv, int* stop)
     if (prev == cmd.end())
       cmd.push_back(option);
     else
-      prev->arg.insert(prev->arg.end(), option.arg.begin(), option.arg.end());
+    {
+      prev->arg.insert (prev->arg.end (), option.arg.begin (), option.arg.end ());    
+      prev->count++;
+    }
   }
   nextop = cmd.begin (); //init options iterator
 
@@ -429,33 +443,33 @@ bool OptParser::next (std::string& opt, std::vector<std::string>& optarg)
   \param  optarg  option argument(s)
   \param  sep     separator character to insert between arguments if option has multiple arguments
 
-  \return   `true` if successful, `false` otherwise
+  \return number of occurrences on command line
 
   If the option has multiple arguments, `optarg` contains the arguments separated
   by separator character.
 */
-bool OptParser::getopt(const std::string &option, std::string& optarg, char sep) const
+int OptParser::getopt(const std::string &option, std::string& optarg, char sep) const
 {
   optarg.clear();
 
   auto op = find_option(option);
 
   if (op == cmd.end())
-    return false;
+    return 0;
   format_arg(optarg, *op, sep);
-  return true;
+  return op->count;
 }
 
-bool OptParser::getopt (char option, std::string& optarg, char sep) const
+int OptParser::getopt (char option, std::string& optarg, char sep) const
 {
   optarg.clear();
 
   auto op = find_option (option);
   if (op == cmd.end())
-    return false;
+    return 0;
 
   format_arg(optarg, *op, sep);
-  return true;
+  return op->count;
 }
 ///@}
 
