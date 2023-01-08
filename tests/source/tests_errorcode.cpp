@@ -152,4 +152,75 @@ SUITE (errorcode)
     erc rf1 (rf);
     CHECK (rf1 == rf);
   }
+
+  checked<string> cc (const string& s, int v)
+  {
+    return {s, v};
+  }
+
+  TEST (checked_basic)
+  {
+    checked<string> c1; //Default constructed
+    CHECK (c1->empty ()); //verify also that it's not throwing
+    CHECK_EQUAL (0, c1); // erc value is 0
+
+    const checked<string> c2{"stuff", 1, ERROR_PRI_INFO};
+    CHECK_EQUAL ("stuff", *c2); //also not throwing
+    CHECK_EQUAL (1, c2);
+
+    checked<string> c3{"stuff", 1}; //this will throw
+    bool thrown = false;
+    try {
+      string s = *c3;
+    }
+    catch (erc& x) {
+      CHECK_EQUAL (1, x);
+      thrown = true;
+    }
+    CHECK (thrown);
+
+    const checked<string> c4{"stuff"};
+    string s = *c4 + "abc";
+    CHECK_EQUAL ("stuffabc", s);
+  }
+
+  TEST (checked_copy)
+  {
+    auto c1 = cc ("stuff", 1);
+    checked<string> c2(c1);
+    CHECK_EQUAL (1, c2); //also reset the error code
+    CHECK_EQUAL ("stuff", c2->c_str ());
+  }
+
+  TEST (checked_assignment)
+  {
+    auto c1 = cc ("stuff", 1);
+    checked<string> c2;
+    c2 = c1;
+    CHECK_EQUAL (1, c2); // also reset the error code
+    CHECK_EQUAL ("stuff", c2->c_str ());
+    
+    checked<string> c3;
+    c3 = cc ("stuff", 1);
+    CHECK_EQUAL (1, c3);
+    CHECK_EQUAL ("stuff", c3->c_str ());
+  }
+
+  checked<string> seterr (const string &s, int v)
+  {
+    checked<string> r;
+    erc er{v};
+    *r = s;
+    r = er;
+    return r;
+  }
+
+  TEST (checked_set_error)
+  {
+    auto c = seterr ("stuff", 1);
+    checked<string> d;
+    d = c;
+    CHECK_EQUAL (1, d);
+    CHECK_EQUAL ("stuff", *d);
+  }
 }

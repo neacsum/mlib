@@ -79,12 +79,12 @@ public:
   erc exec (const std::string& sql);
 
   ///Return a Query object containing a prepared statement with the given SQL text
-  std::pair<Query, erc> make_query (const std::string& sql);
+  checked<Query> make_query (const std::string& sql);
 
-  ///Return a Query object containing a prepared statement with the given SQL text
-  std::pair<Query, erc> make_query (std::string& sql);
+  /// Return a Query object containing the first prepared statement of the given SQL text
+  checked<Query> make_query_multiple (std::string &sql);
 
-  ///Return filename of a database connection
+  /// Return filename of a database connection
   std::string filename (const std::string& schema = "main") const;
 
   ///Return schema name for a database connection

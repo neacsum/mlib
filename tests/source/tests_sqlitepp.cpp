@@ -54,11 +54,11 @@ TEST(Db_make_query_ok)
   Database db("");
   db.exec("CREATE TABLE tab (col);"
     "INSERT INTO tab VALUES (123)");
-  auto [q, ret] = db.make_query("SELECT * FROM tab");
-  CHECK_EQUAL(ERROR_SUCCESS, ret);
-  q.step();
-  CHECK_EQUAL(123, q.column_int(0));
-  q.finalize();
+  auto q = db.make_query("SELECT * FROM tab");
+  CHECK_EQUAL(ERROR_SUCCESS, q.code());
+  q->step();
+  CHECK_EQUAL(123, q->column_int(0));
+  q->finalize();
   db.close();
 }
 
@@ -67,8 +67,8 @@ TEST(Db_make_query_err)
   Database db("");
   db.exec("CREATE TABLE tab (col);"
     "INSERT INTO tab VALUES (123)");
-  auto [q, ret] = db.make_query("SELECT * MROM tab"); //syntax error
-  CHECK_EQUAL(SQLITE_ERROR, ret);
+  auto q = db.make_query("SELECT * MROM tab"); //syntax error
+  CHECK_EQUAL(SQLITE_ERROR, q);
   db.close();
 }
 
@@ -79,7 +79,7 @@ TEST(Db_make_query_throw)
   db.exec("CREATE TABLE tab (col);"
     "INSERT INTO tab VALUES (123)");
   try {
-    auto [q, ret] = db.make_query("SELECT * MROM tab"); //syntax error
+    auto q = db.make_query("SELECT * MROM tab"); //syntax error
   }
   catch (erc& x) {
     CHECK_EQUAL(SQLITE_ERROR, x);
@@ -95,18 +95,18 @@ TEST(db_make_query_multiple)
   std::string sql{ "CREATE TABLE tab (col);INSERT INTO tab VALUES (123)" };
   int count = 0;
   do {
-    auto [q, ret] = db.make_query(sql);
-    if (ret)
+    checked<Query> q = db.make_query_multiple(sql);
+    if (q.code())
       break;
-    q.step();
+    q->step();
     ++count;
   } while (!sql.empty());
   CHECK_EQUAL(2, count);
 
-  auto [q, ret] = db.make_query("SELECT * FROM tab");
-  CHECK_EQUAL(ERROR_SUCCESS, ret);
-  q.step();
-  CHECK_EQUAL(123, q.column_int(0));
+  checked<Query> q = db.make_query("SELECT * FROM tab");
+  CHECK_EQUAL(ERROR_SUCCESS, q.code());
+  q->step();
+  CHECK_EQUAL(123, q->column_int(0));
 }
 
 TEST (DbExecStatements)

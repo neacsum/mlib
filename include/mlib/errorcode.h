@@ -125,7 +125,7 @@ class erc
 {
 public:
   erc ();
-  erc (int value, short int priority=ERROR_PRI_ERROR, const errfac* f = 0);
+  erc (int value, short int priority=ERROR_PRI_ERROR, const errfac* f = nullptr);
   erc (const erc& other);
   erc (erc&& other);
 
@@ -148,7 +148,7 @@ public:
   ///Get logging message
   std::string  message () const;
 
-private:
+protected:
   //bit fields
   int             value : 24;
   unsigned int    priority_ : 4;
@@ -157,6 +157,103 @@ private:
   const errfac*   facility_;
 
 friend class errfac;
+};
+
+/*!
+  Provides a mechanism similar to [expected](https://en.cppreference.com/w/cpp/utility/expected)
+  for creating objects associated with error codes.
+
+  `checked<T>` objects are derived  from `mlib::erc`, so they can be treated as
+  regular `erc` objects, in particular compare with an integer to check if it
+  contains an error. To access the included `T` object, use the -> operator.
+*/
+template <typename T> class checked : public erc
+{
+public:
+  /// Default constructor invokes objects default constructor and sets the default
+  /// error code value (0).
+  checked () : erc (), obj () {}
+
+  checked (const T& obj_, const erc& err)
+    : erc (err), obj (obj_) {}
+  checked (const T& obj_, int value=0, short int pri_ = ERROR_PRI_ERROR, const errfac* fac_ = nullptr)
+    : erc (value, pri_, fac_), obj (obj_) {}
+
+  checked (T&& obj_, erc&& err)
+    : erc (std::move(err)), obj (std::move(obj_)) {}
+  checked (T&& obj_, const erc& err)
+    : erc (err), obj (std::move(obj_)) {}
+  checked (T&& obj_, int value=0, short int pri_ = ERROR_PRI_ERROR, const errfac* fac_ = nullptr)
+    : erc (value, pri_, fac_), obj (obj_) {}
+
+  /// Copy constructor
+  checked (const checked<T>& other)
+    : erc (other), obj (other.obj) {}
+
+  /// Move constructor
+  checked (checked<T>&& other)
+    : erc (other), obj (other.obj) {}
+
+  ~checked () noexcept (false) = default;
+
+  /// Assignment operator
+  checked<T>& operator= (const checked<T>& rhs)
+  {
+    if (&rhs != this)
+    {
+      erc::operator= (rhs);
+      obj = rhs.obj;    
+    }
+    return *this;
+  }
+
+  /// Move assignment operator
+  checked<T> &operator= (checked<T>&& rhs)
+  {
+    if (&rhs != this)
+    {
+      *(erc *)this = std::move (rhs);
+      obj = std::move (rhs.obj);
+    }
+    return *this;
+  }
+
+  /// Set error value
+  checked<T>& operator =(const erc& rhs)
+  {
+    erc::operator= (rhs);
+    return *this;
+  }
+
+  T& operator* ()
+  {
+    if (value && active && priority_)
+      facility_->raise (*this);
+    return obj;
+  }
+
+  const T& operator* () const
+  {
+    if (value && active && priority_)
+      facility_->raise (*this);
+    return obj;    
+  }
+
+  T* operator->()
+  {
+    if (value && active && priority_)
+      facility_->raise (*this);
+    return &obj;
+  }
+  const T* operator->() const
+  {
+    if (value && active && priority_)
+      facility_->raise (*this);
+    return &obj;
+  }
+
+protected:
+  T obj;
 };
 
 //-----------------------  errfac inlines -------------------------------------
@@ -363,7 +460,7 @@ erc::~erc () noexcept(false)
   Anyhow copy new values from the assigned object and take away it's active
   flag.
 
-  \note It is rather bad practice to assign to an active erc object. Here we
+  \note It is rather bad practice to assign to an active `erc` object. Here we
   take the view that, since the left side object was already active, we have
   to deal with it first.
 */

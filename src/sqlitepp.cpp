@@ -217,39 +217,33 @@ erc Database::exec (const string& sql)
 /*!
   This function compiles only the first statement in the \p sql string.
 
-  While the Query constructor throws an erc exception if query cannot be
-  prepared, this function returns an erc object that can be tested.
+  The function  returns a `checked<Query>` object that can be tested.
 */
-std::pair<Query, erc> Database::make_query (const std::string &sql)
+checked<Query> Database::make_query (const std::string &sql)
 {
-  pair<Query, erc> result{ *this, ERR_SUCCESS};
-  erc& ret = result.second;
-  Query& q = result.first;
+  Query q;
+  erc ret;
   int rc;
   if ((rc = sqlite3_prepare_v2 (db, sql.c_str(), -1, &q.stmt, 0)) != SQLITE_OK)
     ret = sqerc (rc, db);
-  return result;
+  return {std::move(q), ret};
 }
 
 /*!
   This function compiles only the first statement in the \p sql string.
-  It updates \p sql string with what's left after teh end of the query.
-
-  While the Query constructor throws an erc exception if query cannot be
-  prepared, this function returns an erc object that can be tested.
+  It updates \p sql string with what's left after the end of the query.
 */
-std::pair<Query, erc> Database::make_query (std::string& sql)
+checked<Query> Database::make_query_multiple (std::string& sql)
 {
-  pair<Query, erc> result{ *this, ERR_SUCCESS };
-  erc& ret = result.second;
-  Query& q = result.first;
+  erc ret;
+  Query q;
   int rc;
   const char* tail;
   if ((rc = sqlite3_prepare_v2 (db, sql.c_str(), -1, &q.stmt, &tail)) != SQLITE_OK)
     ret = sqerc (rc, db);
   else
     sql = tail;
-  return result;
+  return {std::move(q), ret};
 }
 
 int Database::extended_error ()
