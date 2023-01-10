@@ -81,7 +81,7 @@ erc JSONBridge::json_begin (json::node& root)
   if (!find (client ()->get_query (), pvar, &idx))
   {
     TRACE2 ("JSONBridge::json_begin - Cannot find %s", client ()->get_query ());
-    return erc (ERR_JSON_NOTFOUND, ERROR_PRI_ERROR);
+    return erc (ERR_JSON_NOTFOUND, erc::error);
   }
   return jsonify (root, pvar);
 }
@@ -109,7 +109,7 @@ erc JSONBridge::json_end (json::node& obj)
     x.reactivate ();
     return x;
   }
-  return ERR_SUCCESS;
+  return erc::success;
 }
 
 /// Serializes a variable to JSON format
@@ -120,7 +120,7 @@ erc JSONBridge::jsonify (json::node& n, dict_cptr v)
     {
       for (size_t i = 0; i < v->cnt; i++)
         serialize_node (n[i],v,i);
-      return ERR_SUCCESS;
+      return erc::success;
     }
     else
       return serialize_node (n, v);
@@ -183,9 +183,9 @@ erc JSONBridge::serialize_node (json::node& n, dict_cptr v, size_t index)
 
   default:
     TRACE ("Unexpected entry type %d", v->type);
-    return erc (ERR_JSON_DICSTRUC, ERROR_PRI_ERROR, json::errors);
+    return erc (ERR_JSON_DICSTRUC, erc::error, json::errors);
   }
-  return ERR_SUCCESS;
+  return erc::success;
 }
 
 erc JSONBridge::deserialize_node (const json::node& n, dict_cptr v, size_t index) const
@@ -244,7 +244,7 @@ erc JSONBridge::deserialize_node (const json::node& n, dict_cptr v, size_t index
     x.reactivate ();
     return x;
   }
-  return ERR_SUCCESS;
+  return erc::success;
 }
 
 void JSONBridge::not_found (const char *varname)
@@ -490,7 +490,7 @@ int JSONBridge::callback (const char *uri, http_connection& client, JSONBridge *
   {
     json::node root;
     erc ret;
-    if ((ret = ctx->json_begin (root)) == ERR_SUCCESS)
+    if ((ret = ctx->json_begin (root)) == erc::success)
       ctx->json_end (root);
     else if (ret == ERR_JSON_NOTFOUND)
       ctx->not_found (query);

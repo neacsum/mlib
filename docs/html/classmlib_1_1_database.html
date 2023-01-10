@@ -46,6 +46,7 @@ $(function() {
   <div class="summary">
 <a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#friends">Friends</a> &#124;
 <a href="classmlib_1_1_database-members.html">List of all members</a>  </div>
   <div class="headertitle"><div class="title">mlib::Database Class Reference<div class="ingroups"><a class="el" href="group__sqlite.html">SQLite C++ Wrappers</a></div></div></div>
 </div><!--header-->
@@ -124,12 +125,12 @@ __int64&#160;</td><td class="memItemRight" valign="bottom"><b>total_changes</b> 
 <a class="el" href="classmlib_1_1erc.html">erc</a>&#160;</td><td class="memItemRight" valign="bottom"><b>exec</b> (const std::string &amp;sql)</td></tr>
 <tr class="memdesc:a1fe538130bedc8efcc15c87434102f79"><td class="mdescLeft">&#160;</td><td class="mdescRight">Execute multiple SQL sentences. <br /></td></tr>
 <tr class="separator:a1fe538130bedc8efcc15c87434102f79"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9771fbcf98651e6309f9a43f013e3226"><td class="memItemLeft" align="right" valign="top">std::pair&lt; <a class="el" href="classmlib_1_1_query.html">Query</a>, <a class="el" href="classmlib_1_1erc.html">erc</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_database.html#a9771fbcf98651e6309f9a43f013e3226">make_query</a> (const std::string &amp;sql)</td></tr>
-<tr class="memdesc:a9771fbcf98651e6309f9a43f013e3226"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a <a class="el" href="classmlib_1_1_query.html" title="Wrapper for SQL prepared sentences.">Query</a> object containing a prepared statement with the given SQL text.  <a href="classmlib_1_1_database.html#a9771fbcf98651e6309f9a43f013e3226">More...</a><br /></td></tr>
-<tr class="separator:a9771fbcf98651e6309f9a43f013e3226"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abd351e1ebf795a53818043b4bf2af4ab"><td class="memItemLeft" align="right" valign="top">std::pair&lt; <a class="el" href="classmlib_1_1_query.html">Query</a>, <a class="el" href="classmlib_1_1erc.html">erc</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_database.html#abd351e1ebf795a53818043b4bf2af4ab">make_query</a> (std::string &amp;sql)</td></tr>
-<tr class="memdesc:abd351e1ebf795a53818043b4bf2af4ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a <a class="el" href="classmlib_1_1_query.html" title="Wrapper for SQL prepared sentences.">Query</a> object containing a prepared statement with the given SQL text.  <a href="classmlib_1_1_database.html#abd351e1ebf795a53818043b4bf2af4ab">More...</a><br /></td></tr>
-<tr class="separator:abd351e1ebf795a53818043b4bf2af4ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3bf10d72e71a6f392cbcb06854803b95"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classmlib_1_1checked.html">checked</a>&lt; <a class="el" href="classmlib_1_1_query.html">Query</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_database.html#a3bf10d72e71a6f392cbcb06854803b95">make_query</a> (const std::string &amp;sql)</td></tr>
+<tr class="memdesc:a3bf10d72e71a6f392cbcb06854803b95"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a <a class="el" href="classmlib_1_1_query.html" title="Wrapper for SQL prepared sentences.">Query</a> object containing a prepared statement with the given SQL text.  <a href="classmlib_1_1_database.html#a3bf10d72e71a6f392cbcb06854803b95">More...</a><br /></td></tr>
+<tr class="separator:a3bf10d72e71a6f392cbcb06854803b95"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4cd348eaa09bfb55efa98b83fb76db3d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classmlib_1_1checked.html">checked</a>&lt; <a class="el" href="classmlib_1_1_query.html">Query</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_database.html#a4cd348eaa09bfb55efa98b83fb76db3d">make_query_multiple</a> (std::string &amp;sql)</td></tr>
+<tr class="memdesc:a4cd348eaa09bfb55efa98b83fb76db3d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a <a class="el" href="classmlib_1_1_query.html" title="Wrapper for SQL prepared sentences.">Query</a> object containing the first prepared statement of the given SQL text.  <a href="classmlib_1_1_database.html#a4cd348eaa09bfb55efa98b83fb76db3d">More...</a><br /></td></tr>
+<tr class="separator:a4cd348eaa09bfb55efa98b83fb76db3d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac9df48cff2ff7e83e0b44edd6e3340ab"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1_database.html#ac9df48cff2ff7e83e0b44edd6e3340ab">filename</a> (const std::string &amp;<a class="el" href="classmlib_1_1_database.html#ae383111be8eac1b9a348ddff769b2469">schema</a>=&quot;main&quot;) const</td></tr>
 <tr class="memdesc:ac9df48cff2ff7e83e0b44edd6e3340ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return filename of a database connection.  <a href="classmlib_1_1_database.html#ac9df48cff2ff7e83e0b44edd6e3340ab">More...</a><br /></td></tr>
 <tr class="separator:ac9df48cff2ff7e83e0b44edd6e3340ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -144,6 +145,12 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>extended_error</b> ()<
 <a class="el" href="classmlib_1_1erc.html">erc</a>&#160;</td><td class="memItemRight" valign="bottom"><b>flush</b> ()</td></tr>
 <tr class="memdesc:af0e935235c99f25b7dd9f14f14a3dee0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Flush. <br /></td></tr>
 <tr class="separator:af0e935235c99f25b7dd9f14f14a3dee0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="friends" name="friends"></a>
+Friends</h2></td></tr>
+<tr class="memitem:a0de80064a367adf51ab09f7a9b6de05a"><td class="memItemLeft" align="right" valign="top"><a id="a0de80064a367adf51ab09f7a9b6de05a" name="a0de80064a367adf51ab09f7a9b6de05a"></a>
+class&#160;</td><td class="memItemRight" valign="bottom"><b>Query</b></td></tr>
+<tr class="separator:a0de80064a367adf51ab09f7a9b6de05a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p >Wrapper for database connection handle. </p>
@@ -318,14 +325,14 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>extended_error</b> ()<
 
 </div>
 </div>
-<a id="a9771fbcf98651e6309f9a43f013e3226" name="a9771fbcf98651e6309f9a43f013e3226"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9771fbcf98651e6309f9a43f013e3226">&#9670;&#160;</a></span>make_query() <span class="overload">[1/2]</span></h2>
+<a id="a3bf10d72e71a6f392cbcb06854803b95" name="a3bf10d72e71a6f392cbcb06854803b95"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3bf10d72e71a6f392cbcb06854803b95">&#9670;&#160;</a></span>make_query()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">std::pair&lt; <a class="el" href="classmlib_1_1_query.html">Query</a>, <a class="el" href="classmlib_1_1erc.html">erc</a> &gt; mlib::Database::make_query </td>
+          <td class="memname"><a class="el" href="classmlib_1_1checked.html">checked</a>&lt; <a class="el" href="classmlib_1_1_query.html">Query</a> &gt; mlib::Database::make_query </td>
           <td>(</td>
           <td class="paramtype">const std::string &amp;&#160;</td>
           <td class="paramname"><em>sql</em></td><td>)</td>
@@ -336,18 +343,18 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>extended_error</b> ()<
 
 <p>Return a <a class="el" href="classmlib_1_1_query.html" title="Wrapper for SQL prepared sentences.">Query</a> object containing a prepared statement with the given SQL text. </p>
 <p >This function compiles only the first statement in the <code>sql</code> string.</p>
-<p >While the <a class="el" href="classmlib_1_1_query.html" title="Wrapper for SQL prepared sentences.">Query</a> constructor throws an erc exception if query cannot be prepared, this function returns an erc object that can be tested. </p>
+<p >The function returns a <code>checked&lt;<a class="el" href="classmlib_1_1_query.html" title="Wrapper for SQL prepared sentences.">Query</a>&gt;</code> object that can be tested. </p>
 
 </div>
 </div>
-<a id="abd351e1ebf795a53818043b4bf2af4ab" name="abd351e1ebf795a53818043b4bf2af4ab"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abd351e1ebf795a53818043b4bf2af4ab">&#9670;&#160;</a></span>make_query() <span class="overload">[2/2]</span></h2>
+<a id="a4cd348eaa09bfb55efa98b83fb76db3d" name="a4cd348eaa09bfb55efa98b83fb76db3d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4cd348eaa09bfb55efa98b83fb76db3d">&#9670;&#160;</a></span>make_query_multiple()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">std::pair&lt; <a class="el" href="classmlib_1_1_query.html">Query</a>, <a class="el" href="classmlib_1_1erc.html">erc</a> &gt; mlib::Database::make_query </td>
+          <td class="memname"><a class="el" href="classmlib_1_1checked.html">checked</a>&lt; <a class="el" href="classmlib_1_1_query.html">Query</a> &gt; mlib::Database::make_query_multiple </td>
           <td>(</td>
           <td class="paramtype">std::string &amp;&#160;</td>
           <td class="paramname"><em>sql</em></td><td>)</td>
@@ -356,10 +363,9 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>extended_error</b> ()<
       </table>
 </div><div class="memdoc">
 
-<p>Return a <a class="el" href="classmlib_1_1_query.html" title="Wrapper for SQL prepared sentences.">Query</a> object containing a prepared statement with the given SQL text. </p>
+<p>Return a <a class="el" href="classmlib_1_1_query.html" title="Wrapper for SQL prepared sentences.">Query</a> object containing the first prepared statement of the given SQL text. </p>
 <p >This function compiles only the first statement in the <code>sql</code> string.</p>
-<p >It updates <code>sql</code> string with what's left after teh end of the query.</p>
-<p >While the <a class="el" href="classmlib_1_1_query.html" title="Wrapper for SQL prepared sentences.">Query</a> constructor throws an erc exception if query cannot be prepared, this function returns an erc object that can be tested. </p>
+<p >It updates <code>sql</code> string with what's left after the end of the query. </p>
 
 </div>
 </div>

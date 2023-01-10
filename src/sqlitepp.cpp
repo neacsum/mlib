@@ -27,7 +27,7 @@ using namespace std;
 namespace mlib {
 
 /*!
-  Error facility used by Database and Query objects. Keeps track of the last
+  Error facility used by Database and Query objects. Keeps track of associated
   database connection that has thrown the error and formats the error message
   using sqlite3_errmsg function.
   \ingroup sqlite
@@ -35,32 +35,13 @@ namespace mlib {
 class sqlitefac : public errfac
 {
 public:
-  sqlitefac () : errfac ("SQLite Error"), db(nullptr) {};
+  sqlitefac (sqlite3 *db_)
+    : errfac ("SQLite Error")
+    , db (db_){};
   sqlite3* db;                              ///<handle of db that generated last error
 protected:
   std::string message (const erc& e) const;
 };
-
-/*!
-  Error codes returned by Database and Query objects. The constructor takes the
-  additional database parameter needed by sqlitefac to format the error message
-  \ingroup sqlite
-*/
-class sqerc : public erc
-{
-public:
-  sqerc(int value, sqlite3* db, short int priority = ERROR_PRI_ERROR);
-};
-
-
-///Error facility used by Database and Query objects
-sqlitefac errors;
-
-/*!
-  Pointer to error facility. All errors are dispatched using this pointer so users
-  can redirect the errors by assigning another error facility to it. 
-*/
-errfac *sqlite_errors = &errors;
 
 /*!
   \class Database
@@ -87,9 +68,13 @@ Database::Database()
 Database::Database(const std::string& name, openflags flags)
   : db(0)
 {
-  int rc;
-  if ((rc=sqlite3_open_v2 (name.c_str(), &db, static_cast<int>(flags), 0)) != SQLITE_OK)
-    sqlite_errors->raise (sqerc (rc, db));
+  int rc = sqlite3_open_v2 (name.c_str (), &db, static_cast<int> (flags), 0);
+  errors.reset (new sqlitefac (db));
+  if ((rc) != SQLITE_OK)
+  {
+    erc (rc, erc::error, errors.get ()).raise ();
+    sqlite3_close (db); 
+  }
 }
 
 /*!
@@ -115,14 +100,14 @@ Database& Database::operator=(const Database& rhs)
   {
     auto bkp = sqlite3_backup_init (db, "main", rhs.db, "main");
     if (!bkp)
-      sqlite_errors->raise (sqerc (sqlite3_errcode(db), db));
+      erc (sqlite3_errcode (db), erc::error, errors.get ()).raise();
     int rc;
     if ((rc = sqlite3_backup_step (bkp, -1)) != SQLITE_DONE)
-      sqlite_errors->raise (sqerc (rc, db));
+      erc (rc, erc::error, errors.get ()).raise();
     sqlite3_backup_finish (bkp);
   }
   else
-    sqlite_errors->raise (sqerc (SQLITE_MISUSE, db)); //one db is not opened
+    erc (SQLITE_MISUSE, erc::error, errors.get ()).raise(); // one db is not opened
 
   return *this;
 }
@@ -184,13 +169,14 @@ erc Database::open (const string &name, openflags flags)
   {
     rc = sqlite3_close(db);
     if (rc != SQLITE_OK)
-      return sqerc(rc, db);
+      return erc (rc, erc::error, errors.get ());
   }
   rc = sqlite3_open_v2(name.c_str(), &db, static_cast<int>(flags), 0);
+  errors.reset (new sqlitefac (db));
   if (rc != SQLITE_OK)
-    return sqerc (rc, db);
+    return erc (rc, erc::error, errors.get ());
   else 
-    return ERR_SUCCESS;
+    return erc::success;
 }
 
 erc Database::close ()
@@ -199,19 +185,20 @@ erc Database::close ()
   {
     int rc = sqlite3_close(db);
     if (rc != SQLITE_OK)
-      return sqerc (rc, db);
+      return erc (rc, erc::error, errors.get ());
     db = 0;
+    errors.release ();
   }
-  return ERR_SUCCESS;
+  return erc::success;
 }
 
 erc Database::exec (const string& sql)
 {
   int rc;
   if ((rc=sqlite3_exec (db, sql.c_str(), 0, 0, 0)) != SQLITE_OK)
-    return sqerc (rc, db);
+    return erc (rc, erc::error, errors.get ());
   else
-    return ERR_SUCCESS;
+    return erc::success;
 }
 
 /*!
@@ -221,11 +208,11 @@ erc Database::exec (const string& sql)
 */
 checked<Query> Database::make_query (const std::string &sql)
 {
-  Query q;
+  Query q (*this);
   erc ret;
   int rc;
   if ((rc = sqlite3_prepare_v2 (db, sql.c_str(), -1, &q.stmt, 0)) != SQLITE_OK)
-    ret = sqerc (rc, db);
+    ret = erc (rc, erc::error, errors.get ());
   return {std::move(q), ret};
 }
 
@@ -236,11 +223,11 @@ checked<Query> Database::make_query (const std::string &sql)
 checked<Query> Database::make_query_multiple (std::string& sql)
 {
   erc ret;
-  Query q;
+  Query q (*this);
   int rc;
   const char* tail;
   if ((rc = sqlite3_prepare_v2 (db, sql.c_str(), -1, &q.stmt, &tail)) != SQLITE_OK)
-    ret = sqerc (rc, db);
+    ret = erc (rc, erc::error, errors.get ());
   else
     sql = tail;
   return {std::move(q), ret};
@@ -256,7 +243,7 @@ erc Database::flush()
 {
   assert(db);
   int rc = sqlite3_db_cacheflush(db);
-  return sqerc(rc, db);
+  return erc (rc, erc::error, errors.get ());
 }
 
 //-----------------------------------------------------------------------------
@@ -291,12 +278,12 @@ erc Database::flush()
 */
 Query::Query(Database &db, const std::string& sql) :
   stmt (0),
-  dbase(db),
+  dbase(&db),
   col_mapped (false)
 {
   int rc;
-  if ((rc = sqlite3_prepare_v2 (dbase, sql.c_str(), -1, &stmt, 0)) != SQLITE_OK)
-    sqlite_errors->raise (sqerc (rc, db));
+  if ((rc = sqlite3_prepare_v2 (dbase->db, sql.c_str(), -1, &stmt, 0)) != SQLITE_OK)
+    erc (rc, erc::error, dbase->errors.get ()).raise ();
 }
 
 /*!
@@ -306,7 +293,7 @@ Query::Query(Database &db, const std::string& sql) :
 */
 Query::Query(Database &db) :
   stmt (0),
-  dbase(db),
+  dbase(&db),
   col_mapped (false)
 {
 }
@@ -355,14 +342,11 @@ Query& Query::operator =(const std::string& sql)
 {
   int rc;
   if (!dbase)
-    sqlite_errors->raise (sqerc (SQLITE_MISUSE, 0));
+    erc (SQLITE_MISUSE, erc::error).raise ();
   if (stmt)
     sqlite3_finalize (stmt);
-  if ((rc = sqlite3_prepare_v2 (dbase, sql.c_str(), -1, &stmt, 0)) != SQLITE_OK)
-  {
-    TRACE ("error %d - %s", rc, sqlite3_errmsg (dbase));
-    sqlite_errors->raise (sqerc (rc, dbase));
-  }
+  if ((rc = sqlite3_prepare_v2 (dbase->db, sql.c_str(), -1, &stmt, 0)) != SQLITE_OK)
+    erc (rc, erc::error, dbase->errors.get()).raise ();
   col_mapped = false;
   return *this;
 }
@@ -383,16 +367,16 @@ std::string Query::sql () const
   When a new row of results is available the function returns SQLITE_ROW. When
   there are no more result the function returns SQLITE_DONE. Both codes are 
   wrapped in \ref erc objects with priority level `ERROR_PRI_INFO` that normally don't throw
-  an exception. Any other error is return at the normal priority level `ERROR_PRI_ERROR`.
+  an exception. Any other error is return at the normal priority level `erc::error`.
  */ 
 erc Query::step()
 {
   int rc = sqlite3_step (stmt);
 
   if (rc == SQLITE_ROW || rc == SQLITE_DONE)
-    return sqerc (rc, dbase, ERROR_PRI_INFO);
+    return erc (rc, erc::info, dbase->errors.get());
 
-  return sqerc(rc, dbase);
+  return erc(rc, erc::error, dbase->errors.get());
 }
 
 Query& Query::reset()
@@ -954,7 +938,7 @@ int Query::find_col (const std::string& colname) const
     map_columns ();
 
   if (index.find (colname) == index.end ())
-    sqlite_errors->raise (sqerc(SQLITE_RANGE, 0));
+    erc(SQLITE_RANGE, erc::error).raise ();
 
   return index[colname];
 }
@@ -962,8 +946,8 @@ int Query::find_col (const std::string& colname) const
 erc Query::check_errors (int rc)
 {
   if (rc != SQLITE_OK)
-    return sqerc (rc, sqlite3_db_handle (stmt));
-  return ERR_SUCCESS;
+    return erc (rc, erc::error, dbase?dbase->errors.get() : 0);
+  return erc::success;
 }
 
 //-----------------------------------------------------------------------------
@@ -990,27 +974,5 @@ std::string sqlitefac::message (const erc &e) const
     return name () + ' ' + to_string (e.code ()) + " (cannot find message)";
 }
 
-
-//-----------------------------------------------------------------------------
-/*!
-  \param value    error code
-  \param db       handle to database connection that triggered the error. Can be NULL.
-  \param pri      error severity
-*/
-sqerc::sqerc (int value, sqlite3* db, short int pri) : 
-  erc (value, pri, sqlite_errors)
-{
-  static bool sqerc_init_flag = false;
-  if (!sqerc_init_flag)
-  {
-    //first time around make sure error facility is initialized
-    new (&errors)sqlitefac;
-    sqlite_errors = &errors;
-    sqerc_init_flag = true;
-  }
-  sqlitefac *f = dynamic_cast<sqlitefac *>(sqlite_errors);
-  if (f)
-    f->db = db;
-}
 
 }

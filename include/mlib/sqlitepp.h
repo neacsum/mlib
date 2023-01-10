@@ -11,6 +11,7 @@
 
 #include <string>
 #include <map>
+#include <memory>
 
 #include <Winsock2.h>
 #include "sqlite3.h"
@@ -101,6 +102,8 @@ private:
   Database (const Database& t) = delete;
 
   sqlite3 *db;
+  std::unique_ptr<errfac> errors;
+  friend class Query;
 };
 
 ///Wrapper for SQL prepared sentences
@@ -218,7 +221,7 @@ private:
   erc           check_errors (int rc);
 
   sqlite3_stmt* stmt;
-  sqlite3*      dbase;
+  Database*     dbase;
 
   /*! SQLITE is case insensitive in column names. Make column_xxx functions also
   case insensitive */
@@ -229,8 +232,6 @@ private:
   std::map <std::string, int, Query::iless> mutable index;
   bool mutable col_mapped;
 };
-
-extern errfac *sqlite_errors;
 
 /*==================== INLINE FUNCTIONS ===========================*/
 inline

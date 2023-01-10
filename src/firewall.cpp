@@ -15,10 +15,9 @@ namespace mlib {
 BSTR ConvertStringToBSTR(const char* in);
 
 errfac fw_errors("Firewall error");
-errfac *fw_errptr = &fw_errors;
 
-#define FWERC(A) erc((A),ERROR_PRI_ERROR, fw_errptr)
-#define FWERROR(A) fw_errptr->raise (FWERC(A))
+#define FWERC(A) erc((A),erc::error, &fw_errors)
+#define FWERROR(A) FWERC(A).raise()
 
 
 firewall::firewall(void) :
@@ -232,7 +231,7 @@ erc firewall::add_port(int portnum, bool tcp, const char *name)
   INetFwOpenPorts* allports = NULL;
 
   if (!fwprofile)
-    return ERROR_SUCCESS;
+    return erc::success;
 
   // Retrieve the globally open ports collection.
   hr = fwprofile->get_GloballyOpenPorts(&allports);
@@ -268,7 +267,7 @@ erc firewall::add_port(int portnum, bool tcp, const char *name)
   if (FAILED(hr))
     return FWERC(hr);
 
-  return ERROR_SUCCESS;
+  return erc::success;
 }
 
 erc firewall::add_app(const char *appname, const char *filename)
@@ -278,7 +277,7 @@ erc firewall::add_app(const char *appname, const char *filename)
   INetFwAuthorizedApplications* allapps = NULL;
 
   if (!fwprofile)
-    return ERROR_SUCCESS;
+    return erc::success;
 
   // Retrieve the authorized applications collection.
   hr = fwprofile->get_AuthorizedApplications(&allapps);
@@ -317,7 +316,7 @@ erc firewall::add_app(const char *appname, const char *filename)
   if (FAILED(hr))
     return FWERC(hr);
 
-  return ERROR_SUCCESS;
+  return erc::success;
 }
 
 erc firewall::set_port (int portnum, bool tcp, bool enable)
@@ -329,7 +328,7 @@ erc firewall::set_port (int portnum, bool tcp, bool enable)
   INetFwOpenPorts* allports = NULL;
 
   if (!fwprofile)
-    return ERROR_SUCCESS;
+    return erc::success;
 
   // Retrieve the globally open ports collection.
   hr = fwprofile->get_GloballyOpenPorts(&allports);
@@ -362,7 +361,7 @@ erc firewall::set_port (int portnum, bool tcp, bool enable)
   port->Release();
   allports->Release();
 
-  return ERROR_SUCCESS;
+  return erc::success;
 }
 
 BSTR ConvertStringToBSTR(const char* in)

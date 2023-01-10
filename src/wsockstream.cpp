@@ -36,7 +36,7 @@ static sock_initializer init;
 errfac *sockerrors;
 
 /// Throws an error code with the value returned by WSAGetLastError
-#define WSALASTERROR (erc( WSAGetLastError(), ERROR_PRI_ERROR, sockerrors))
+#define WSALASTERROR (erc( WSAGetLastError(), erc::error, sockerrors))
 
 /*!
   \class sock
@@ -74,7 +74,7 @@ sock::sock (int type, int domain, int proto) :
   if ((sl->handle = ::socket (domain, type, proto)) == INVALID_SOCKET) 
   {
     delete sl;
-    sockerrors->raise (WSALASTERROR);
+    WSALASTERROR.raise ();
   }
   TRACE9 ("sock::sock (type %d domain %d proto %d)=%x", type, domain, proto, sl->handle);
 }
@@ -151,7 +151,7 @@ erc sock::open (int type, int domain, int proto)
   if ((sl->handle = ::socket (domain, type, proto)) == INVALID_SOCKET)
     return WSALASTERROR;
   TRACE8 ("sock::open handle=%x", sl->handle);
-  return ERR_SUCCESS;
+  return erc::success;
 }
 
 
@@ -181,7 +181,7 @@ inaddr sock::name () const
   sockaddr sa;
   int len = sizeof(sa);
   if (getsockname (sl->handle, &sa, &len) == SOCKET_ERROR)
-    sockerrors->raise WSALASTERROR;
+    WSALASTERROR.raise ();
   return sa;
 }
 
@@ -208,7 +208,7 @@ erc sock::bind (const sockaddr& sa)
     ntohs(((sockaddr_in&)sa).sin_port));
   if (::bind (sl->handle, &sa, sizeof(sa)) == SOCKET_ERROR)
     return WSALASTERROR;
-  return ERR_SUCCESS;
+  return erc::success;
 }
 
 /*!
@@ -226,7 +226,7 @@ erc sock::bind()
 
   if (::bind (sl->handle, &sa, sizeof(sa)) == SOCKET_ERROR)
     return WSALASTERROR;
-  return ERR_SUCCESS;
+  return erc::success;
 }
 
 /*!
@@ -242,17 +242,17 @@ erc sock::connect (const sockaddr& sa, int wp_sec)
   {
     blocking (false);
     if (!::connect (sl->handle, &sa, sizeof (sa)))
-      return ERR_SUCCESS;
+      return erc::success;
     DWORD ret = WSAGetLastError ();
     if (WSAGetLastError () != WSAEWOULDBLOCK)
       return WSALASTERROR;
     if (is_writeready (wp_sec))
-      return ERR_SUCCESS;
-    return erc (WSAETIMEDOUT, ERROR_PRI_INFO);
+      return erc::success;
+    return erc (WSAETIMEDOUT, erc::info);
   }
   if (::connect(sl->handle, &sa, sizeof(sa)) == SOCKET_ERROR)
     return WSALASTERROR;
-  return ERR_SUCCESS;
+  return erc::success;
 }
 
 /*!
@@ -263,7 +263,7 @@ erc sock::listen (int num)
 {
   if (::listen (sl->handle, num) == SOCKET_ERROR)
     return WSALASTERROR;
-  return ERR_SUCCESS;
+  return erc::success;
 }
 
 /*!
@@ -277,7 +277,7 @@ sock sock::accept (sockaddr& sa)
   SOCKET soc;
   int len = sizeof(sa);
   if ((soc = ::accept (sl->handle, &sa, &len)) == INVALID_SOCKET)
-    sockerrors->raise (WSALASTERROR);
+    WSALASTERROR.raise ();
   return soc;
 }
 
@@ -289,7 +289,7 @@ sock sock::accept ()
 {
   SOCKET soc;
   if ((soc = ::accept (sl->handle, 0, 0)) == INVALID_SOCKET)
-    sockerrors->raise (WSALASTERROR);
+    WSALASTERROR.raise ();
   return soc;
 }
 
@@ -315,7 +315,7 @@ size_t sock::recv (void* buf, size_t len, int msgf)
     }
     else if (what == WSAECONNABORTED || what == WSAECONNRESET || what == WSAETIMEDOUT)
       return EOF;
-    sockerrors->raise (WSALASTERROR);
+    WSALASTERROR.raise ();
   }
   return (rval==0) ? EOF: rval;
 }
@@ -373,7 +373,7 @@ size_t sock::send (const void* buf, size_t len, int msgf)
         return 0;
       else if (what == WSAECONNABORTED || what == WSAECONNRESET)
         return EOF;
-      sockerrors->raise (WSALASTERROR);
+      WSALASTERROR.raise ();
     }
     len -= wval;
     wlen += wval;
@@ -406,7 +406,7 @@ size_t sock::sendto (const sockaddr& sa, const void* buf, size_t len, int msgf)
         return 0;
       else if (what == WSAECONNABORTED || what == WSAECONNRESET)
         return EOF;
-      sockerrors->raise (WSALASTERROR);
+      WSALASTERROR.raise ();
     }
     len -= wval;
     wlen += wval;
@@ -490,7 +490,7 @@ bool sock::is_readready (int wp_sec, int wp_usec) const
   int ret = select (FD_SETSIZE, &fds, 0, 0, (wp_sec < 0) ? 0: &tv);
   if (ret == SOCKET_ERROR) 
   {
-    sockerrors->raise (WSALASTERROR);
+    WSALASTERROR.raise ();
     return false;
   }
   return (ret != 0);
@@ -517,7 +517,7 @@ bool sock::is_writeready (int wp_sec, int wp_usec) const
   int ret = select (FD_SETSIZE, 0, &fds, 0, (wp_sec < 0) ? 0: &tv);
   if (ret == SOCKET_ERROR) 
   {
-    sockerrors->raise (WSALASTERROR);
+    WSALASTERROR.raise ();
     return false;
   }
   return (ret != 0);
@@ -538,7 +538,7 @@ bool sock::is_exceptionpending (int wp_sec, int wp_usec) const
   int ret = select (FD_SETSIZE, 0, 0, &fds, (wp_sec < 0) ? 0: &tv);
   if (ret == SOCKET_ERROR) 
   {
-    sockerrors->raise (WSALASTERROR);
+    WSALASTERROR.raise ();
     return false;
   }
   return (ret != 0);
@@ -565,7 +565,7 @@ erc sock::shutdown (shuthow sh)
   if (::shutdown(sl->handle, sh) == SOCKET_ERROR)
     return WSALASTERROR;
 	
-  return ERR_SUCCESS;		
+  return erc::success;		
 }
 
 /*!
@@ -581,7 +581,7 @@ int sock::getopt (int op, void* buf, int len, int level) const
 {
   int	rlen = len;
   if (::getsockopt (sl->handle, level, op, (char*) buf, &rlen) == SOCKET_ERROR)
-    sockerrors->raise (WSALASTERROR);
+    WSALASTERROR.raise ();
   return rlen;
 }
 
@@ -595,7 +595,7 @@ int sock::getopt (int op, void* buf, int len, int level) const
 void sock::setopt (int op, void* buf, int len, int level) const
 {
   if (::setsockopt (sl->handle, level, op, (char*) buf, len) == SOCKET_ERROR)
-    sockerrors->raise (WSALASTERROR);
+    WSALASTERROR.raise ();
 }
 
 /*!
@@ -762,7 +762,7 @@ void sock::blocking (bool on_off)
 {
   unsigned long mode = on_off?0:1;
   if (ioctlsocket (sl->handle, FIONBIO, &mode) == SOCKET_ERROR)
-    sockerrors->raise (WSALASTERROR);
+    WSALASTERROR.raise ();
 }
 
 /*!
@@ -782,7 +782,7 @@ erc sock::setevent (HANDLE evt, long mask)
 {
   if (WSAEventSelect (sl->handle, (WSAEVENT)evt, mask) == SOCKET_ERROR)
     return WSALASTERROR;
-  return ERR_SUCCESS;
+  return erc::success;
 }
 
 /*!
@@ -794,7 +794,7 @@ long sock::enumevents ()
 {
   WSANETWORKEVENTS netev;
   if (WSAEnumNetworkEvents (sl->handle, NULL, &netev) == SOCKET_ERROR)
-    sockerrors->raise (WSALASTERROR);
+    WSALASTERROR.raise ();
   return netev.lNetworkEvents;
 }
 

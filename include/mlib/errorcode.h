@@ -5,7 +5,7 @@
   Copyright (c) Mircea Neacsu 2000
   Based on an idea from Marc Guillermont (CUJ 05/2000)
 
-  \defgroup errors Error Error Handling
+  \defgroup errors Error Handling
   \brief Unified error handling.
 
   erc objects are a cross between exceptions and return values. A function
@@ -15,7 +15,7 @@
 ```CPP
   erc func ()
   {
-    return erc(1);
+    return erc(1, erc::error);
   }
 
   main () {
@@ -31,7 +31,7 @@
 ```CPP
   erc func ()
   {
-    return erc(1);
+    return erc(1, erc::error);
   }
   main () {
     try {
@@ -57,75 +57,25 @@
 
 namespace mlib {
 
-class erc;
-
-/*! 
-  \anchor ERROR_PRI
-  \name Error priorities (borrowed from BSD Unix)
- \{
-*/
-#define ERROR_PRI_SUCCESS     0  //!< always    not logged,   not thrown
-#define ERROR_PRI_INFO        1  //!< default   not logged,   not thrown
-#define ERROR_PRI_NOTICE      2  //!< default   not logged,   not thrown
-#define ERROR_PRI_WARNING     3  //!< default   logged,       not thrown
-#define ERROR_PRI_ERROR       4  //!< default   logged,       thrown
-#define ERROR_PRI_CRITICAL    5  //!< default   logged,       thrown
-#define ERROR_PRI_ALERT       6  //!< default   logged,       thrown
-#define ERROR_PRI_EMERG       7  //!< always    logged,       thrown
-/// \}
-
-/*! 
-  An error facility routes a group of errors handled in a
-  similar manner.
-*/
-
-class errfac
-{
-  friend class erc;
-
-public:
-  // constructors/destructor
-  errfac (const std::string& name = "Error");
-  
-  /// set throw priority
-  void throw_priority (unsigned int pri);
-
-  /// get throw priority
-  unsigned int throw_priority () const;
-
-  /// set log priority
-  void log_priority (unsigned int pri);
-
-  /// get log priority
-  unsigned int log_priority () const;
-
-  /// return message to be logged
-  virtual std::string message (const erc& e) const;
-
-  /// get name
-  const std::string& name () const;
-
-  /// set default facility
-  static void Default (errfac *f);
-
-  /// get default facility
-  static errfac& Default ();
-
-  virtual void raise (const erc& e) const;
-  virtual void log (const erc& e) const;
-
-private:
-  unsigned int    log_level;
-  unsigned int    throw_level;
-  std::string     name_;
-  static errfac*  default_facility;
-};
-
 class erc
 {
+  friend class errfac;
+
 public:
+
+  /// Error levels (borrowed from BSD Unix)
+  enum level {
+    none = 0,     //!< always    not logged,   not thrown
+    info,         //!< default   not logged,   not thrown
+    notice,       //!< default   not logged,   not thrown
+    warning,      //!< default   logged,       not thrown
+    error,        //!< default   logged,       thrown
+    critical,     //!< default   logged,       thrown
+    alert,        //!< default   logged,       thrown
+    emerg         //!< always    logged,       thrown
+  };
   erc ();
-  erc (int value, short int priority=ERROR_PRI_ERROR, const errfac* f = nullptr);
+  erc (int value, level priority, const errfac* f = nullptr);
   erc (const erc& other);
   erc (erc&& other);
 
@@ -135,10 +85,18 @@ public:
   operator int () const;
   
   ///Return priority value
-  unsigned int priority () const;
+  level priority () const;
+
+  /// Return activity flag
+  bool is_active () const;
 
   ///Return reference to facility
   const errfac& facility () const;
+
+  bool operator== (const erc& other) const;
+  bool operator!= (const erc& other) const;
+
+  void raise () const;
 
   erc& reactivate ();
   erc& deactivate ();
@@ -148,16 +106,66 @@ public:
   ///Get logging message
   std::string  message () const;
 
-protected:
+  static erc success;
+
+private:
   //bit fields
-  int             value : 24;
-  unsigned int    priority_ : 4;
-  mutable unsigned int active : 1;
+  int               value : 24;
+  unsigned short    priority_ : 3;
+  mutable bool      active : 1;
 
   const errfac*   facility_;
 
-friend class errfac;
+  friend class errfac;
 };
+
+/*!
+  An error facility routes a group of errors handled in a
+  similar manner.
+*/
+
+class errfac
+{
+public:
+  // constructors/destructor
+  errfac (const std::string &name = "Error");
+
+  /// set throw priority
+  void throw_priority (erc::level pri);
+
+  /// get throw priority
+  erc::level throw_priority () const;
+
+  /// set log priority
+  void log_priority (erc::level pri);
+
+  /// get log priority
+  erc::level log_priority () const;
+
+  /// return message to be logged
+  virtual std::string message (const erc &e) const;
+
+  /// get name
+  const std::string &name () const;
+
+  /// set default facility
+  static void Default (errfac *f);
+
+  /// get default facility
+  static errfac &Default ();
+
+  virtual void raise (const erc &e) const;
+  virtual void log (const erc &e) const;
+
+private:
+  erc::level log_level;
+  erc::level throw_level;
+  std::string name_;
+  static errfac *default_facility;
+};
+
+template <class T>
+concept checkable = !std::is_convertible_v<T, int>;
 
 /*!
   Provides a mechanism similar to [expected](https://en.cppreference.com/w/cpp/utility/expected)
@@ -165,25 +173,36 @@ friend class errfac;
 
   `checked<T>` objects are derived  from `mlib::erc`, so they can be treated as
   regular `erc` objects, in particular compare with an integer to check if it
-  contains an error. To access the included `T` object, use the -> operator.
+  contains an error. To access the included `T` object, use the '->' or '*' operators.
+
+  \note To avoid conflicts with the erc integer conversion operator, the template
+  argument T should not be convertible to `int`.
+
+  \tparam T - the type of the included object
+
+  \ingroup errors
 */
-template <typename T> class checked : public erc
+template <checkable T> 
+class checked : public erc
 {
 public:
-  /// Default constructor invokes objects default constructor and sets the default
+  /// Default constructor. Invoke T's default constructor and set the default
   /// error code value (0).
   checked () : erc (), obj () {}
 
+  /// Constructor using a T and an error code. Both are copy-constructed
   checked (const T& obj_, const erc& err)
     : erc (err), obj (obj_) {}
-  checked (const T& obj_, int value=0, short int pri_ = ERROR_PRI_ERROR, const errfac* fac_ = nullptr)
+
+  /// 
+  checked (const T& obj_, int value=0, erc::level pri_ = erc::level::error, const errfac* fac_ = nullptr)
     : erc (value, pri_, fac_), obj (obj_) {}
 
   checked (T&& obj_, erc&& err)
     : erc (std::move(err)), obj (std::move(obj_)) {}
   checked (T&& obj_, const erc& err)
     : erc (err), obj (std::move(obj_)) {}
-  checked (T&& obj_, int value=0, short int pri_ = ERROR_PRI_ERROR, const errfac* fac_ = nullptr)
+  checked (T&& obj_, int value=0, erc::level pri_ = erc::level::error, const errfac* fac_ = nullptr)
     : erc (value, pri_, fac_), obj (obj_) {}
 
   /// Copy constructor
@@ -225,32 +244,35 @@ public:
     return *this;
   }
 
+  ///@{
+  /// Access the included T object
   T& operator* ()
   {
-    if (value && active && priority_)
-      facility_->raise (*this);
+    if (code () && is_active () && priority ())
+      raise ();
     return obj;
   }
 
   const T& operator* () const
   {
-    if (value && active && priority_)
-      facility_->raise (*this);
+    if (code () && is_active () && priority ())
+      raise ();
     return obj;    
   }
 
   T* operator->()
   {
-    if (value && active && priority_)
-      facility_->raise (*this);
+    if (code () && is_active () && priority ())
+      raise ();
     return &obj;
   }
   const T* operator->() const
   {
-    if (value && active && priority_)
-      facility_->raise (*this);
+    if (value && active && priority())
+      raise ();
     return &obj;
   }
+  ///@}
 
 protected:
   T obj;
@@ -280,44 +302,36 @@ inline errfac *errfac::default_facility = &deffac;
 ///  Set defaults for log and throw levels.
 inline
 errfac::errfac (const std::string& name)
-  : throw_level (ERROR_PRI_ERROR)
-  , log_level (ERROR_PRI_WARNING)
+  : throw_level (erc::level::error)
+  , log_level (erc::level::warning)
   , name_ (name)
 {
 }
 
-/*!
-  Throw priority must be between ERROR_PRI_SUCCESS and ERROR_PRI_EMERG
-  \ref ERROR_PRI "see Error Priorities"
-*/
 inline
-void errfac::throw_priority (unsigned int level)
+void errfac::throw_priority (erc::level pri)
 {
-  throw_level = (level < ERROR_PRI_INFO) ? ERROR_PRI_INFO :
-    (level > ERROR_PRI_EMERG) ? ERROR_PRI_EMERG :
-    level;
+  throw_level = (pri < erc::info) ? erc::info :
+    (pri > erc::emerg) ? erc::emerg :
+    pri;
 }
 
 inline
-unsigned int  errfac::throw_priority () const
+erc::level  errfac::throw_priority () const
 {
   return throw_level;
 }
 
-/*!
-  Logging priority must be between ERROR_PRI_SUCCESS and ERROR_PRI_EMERG
-  \ref ERROR_PRI "see Error Priorities"
-*/
 inline
-void errfac::log_priority (unsigned int level)
+void errfac::log_priority (erc::level pri)
 {
-  log_level = (level < ERROR_PRI_INFO) ? ERROR_PRI_INFO :
-    (level > ERROR_PRI_EMERG) ? ERROR_PRI_EMERG :
-    level;
+  log_level = (pri < erc::info) ? erc::info :
+    (pri > erc::emerg) ? erc::emerg :
+    pri;
 }
 
 inline
-unsigned int errfac::log_priority () const
+erc::level errfac::log_priority () const
 {
   return log_level;
 }
@@ -395,7 +409,7 @@ void errfac::log (const erc& e) const
 inline
 erc::erc () :
   value (0),
-  priority_ (ERROR_PRI_SUCCESS),
+  priority_ (none),
   active (0),
   facility_ (&errfac::Default ())
 {
@@ -403,7 +417,7 @@ erc::erc () :
 
 ///  Ctor for a real erc
 inline
-erc::erc (int v, short int l, const errfac* f) :
+erc::erc (int v, level l, const errfac* f) :
   value (v),
   priority_ (l),
   facility_ (f ? f : &errfac::Default ()),
@@ -506,15 +520,59 @@ erc& erc::operator= (erc&& rhs)
 }
 
 inline
-unsigned int erc::priority () const
+erc::level erc::priority () const
 {
-  return priority_;
+  return (erc::level)priority_;
+}
+
+inline
+bool erc::is_active () const
+{
+  return active;
 }
 
 inline
 const errfac& erc::facility () const 
 {
   return *facility_;
+}
+
+/*!
+  Equality comparison operator
+
+  Doesn't change status of activity flag.
+  All success codes are equal. Other codes are equal only if their value, level
+  and facility are equal.
+*/
+inline
+bool erc::operator == (const erc &other) const
+{
+  if ((!priority_ || !value) && (!other.priority_ || !other.value))
+    return true; //success values are the same
+  if (facility_ == other.facility_ && priority_ == other.priority_ && value == other.value)
+    return true;
+
+  return false;
+}
+
+/*!
+  Inequality comparison operator
+
+  Doesn't change status of activity flag.
+  All success codes are equal. Other codes are equal only if their value, level
+  and facility are equal. 
+*/
+inline bool erc::operator != (const erc &other) const
+{
+  return !operator== (other);
+}
+
+/// Invoke facility's raise function (errfac::raise) to determine if error code
+/// should be logged or thrown
+inline 
+void erc::raise () const
+{
+  facility_->raise (*this);
 }
 
 /*!
@@ -567,10 +625,11 @@ erc& erc::deactivate ()
   return *this;
 }
 
-
-}
 /// The SUCCESS indicator
-#define ERR_SUCCESS (mlib::erc (0, ERROR_PRI_SUCCESS))
+inline erc erc::success{0, erc::none};
+
+} //end namespace
+
 
 
 

@@ -44,10 +44,12 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="summary">
+<a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-static-attribs">Static Public Attributes</a> &#124;
 <a href="#friends">Friends</a> &#124;
 <a href="classmlib_1_1erc-members.html">List of all members</a>  </div>
-  <div class="headertitle"><div class="title">mlib::erc Class Reference<div class="ingroups"><a class="el" href="group__errors.html">Error Error Handling</a></div></div></div>
+  <div class="headertitle"><div class="title">mlib::erc Class Reference<div class="ingroups"><a class="el" href="group__errors.html">Error Handling</a></div></div></div>
 </div><!--header-->
 <div class="contents">
 
@@ -61,20 +63,37 @@ Inheritance diagram for mlib::erc:</div>
  <div class="center">
   <img src="classmlib_1_1erc.png" usemap="#mlib::erc_map" alt=""/>
   <map id="mlib::erc_map" name="mlib::erc_map">
-<area href="classmlib_1_1sqerc.html" title="Error codes returned by Database and Query objects." alt="mlib::sqerc" shape="rect" coords="0,56,71,80"/>
+<area href="classmlib_1_1checked.html" title="Provides a mechanism similar to expected for creating objects associated with error codes." alt="mlib::checked&lt; T &gt;" shape="rect" coords="0,56,119,80"/>
   </map>
 </div></div>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-types" name="pub-types"></a>
+Public Types</h2></td></tr>
+<tr class="memitem:af6014fc6af332518e0572dfab3bf5643"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1erc.html#af6014fc6af332518e0572dfab3bf5643">level</a> { <br />
+&#160;&#160;<a class="el" href="classmlib_1_1erc.html#af6014fc6af332518e0572dfab3bf5643a0dbc5070eba84734037938067d045d7f">none</a> = 0
+, <a class="el" href="classmlib_1_1erc.html#af6014fc6af332518e0572dfab3bf5643a645b27b94b7184a98c54ca4ae698694c">info</a>
+, <a class="el" href="classmlib_1_1erc.html#af6014fc6af332518e0572dfab3bf5643a0df059aa54db69e062434cad36412203">notice</a>
+, <a class="el" href="classmlib_1_1erc.html#af6014fc6af332518e0572dfab3bf5643ad7990f7e14907a53366027a3e10c4f8f">warning</a>
+, <br />
+&#160;&#160;<a class="el" href="classmlib_1_1erc.html#af6014fc6af332518e0572dfab3bf5643aa29ce38d1fbd35279156343d97fe131f">error</a>
+, <a class="el" href="classmlib_1_1erc.html#af6014fc6af332518e0572dfab3bf5643aad6bbcdee6f28a1f1cbb25cabd4074fc">critical</a>
+, <a class="el" href="classmlib_1_1erc.html#af6014fc6af332518e0572dfab3bf5643aa83be8ff520dc02af12055c0acb7bcf8">alert</a>
+, <a class="el" href="classmlib_1_1erc.html#af6014fc6af332518e0572dfab3bf5643a03728b66074dda41ffd86294ecc73e09">emerg</a>
+<br />
+ }</td></tr>
+<tr class="memdesc:af6014fc6af332518e0572dfab3bf5643"><td class="mdescLeft">&#160;</td><td class="mdescRight">Error levels (borrowed from BSD Unix)  <a href="classmlib_1_1erc.html#af6014fc6af332518e0572dfab3bf5643">More...</a><br /></td></tr>
+<tr class="separator:af6014fc6af332518e0572dfab3bf5643"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a8c85c4021ed47fef5231c03c84cb3c63"><td class="memItemLeft" align="right" valign="top"><a id="a8c85c4021ed47fef5231c03c84cb3c63" name="a8c85c4021ed47fef5231c03c84cb3c63"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>erc</b> ()</td></tr>
 <tr class="memdesc:a8c85c4021ed47fef5231c03c84cb3c63"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default ctor for erc objects creates an inactive error. <br /></td></tr>
 <tr class="separator:a8c85c4021ed47fef5231c03c84cb3c63"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af9a320f96450e4cd33f60de567acbef8"><td class="memItemLeft" align="right" valign="top"><a id="af9a320f96450e4cd33f60de567acbef8" name="af9a320f96450e4cd33f60de567acbef8"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>erc</b> (int value, short int <a class="el" href="classmlib_1_1erc.html#aacd8e492c5358a5de2116aee526372a7">priority</a>=<a class="el" href="errorcode_8h.html#a045f609c6f81928ed19bec8fa95ce978">ERROR_PRI_ERROR</a>, const <a class="el" href="classmlib_1_1errfac.html">errfac</a> *f=0)</td></tr>
-<tr class="memdesc:af9a320f96450e4cd33f60de567acbef8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Ctor for a real erc. <br /></td></tr>
-<tr class="separator:af9a320f96450e4cd33f60de567acbef8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad5799a1a43454b77f04008232ba82ca0"><td class="memItemLeft" align="right" valign="top"><a id="ad5799a1a43454b77f04008232ba82ca0" name="ad5799a1a43454b77f04008232ba82ca0"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>erc</b> (int value, <a class="el" href="classmlib_1_1erc.html#af6014fc6af332518e0572dfab3bf5643">level</a> <a class="el" href="classmlib_1_1erc.html#a4c96cdee3e7e1d37e7079d1f702bec66">priority</a>, const <a class="el" href="classmlib_1_1errfac.html">errfac</a> *f=nullptr)</td></tr>
+<tr class="memdesc:ad5799a1a43454b77f04008232ba82ca0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Ctor for a real erc. <br /></td></tr>
+<tr class="separator:ad5799a1a43454b77f04008232ba82ca0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad53189ed92df58baecf1b58124312d6e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1erc.html#ad53189ed92df58baecf1b58124312d6e">erc</a> (const <a class="el" href="classmlib_1_1erc.html">erc</a> &amp;other)</td></tr>
 <tr class="memdesc:ad53189ed92df58baecf1b58124312d6e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy constructor removes the activity flag of the original object.  <a href="classmlib_1_1erc.html#ad53189ed92df58baecf1b58124312d6e">More...</a><br /></td></tr>
 <tr class="separator:ad53189ed92df58baecf1b58124312d6e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -95,14 +114,26 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a8c708b44a5e0d670e68ca6152941dfcc"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1erc.html#a8c708b44a5e0d670e68ca6152941dfcc">operator int</a> () const</td></tr>
 <tr class="memdesc:a8c708b44a5e0d670e68ca6152941dfcc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Integer conversion operator.  <a href="classmlib_1_1erc.html#a8c708b44a5e0d670e68ca6152941dfcc">More...</a><br /></td></tr>
 <tr class="separator:a8c708b44a5e0d670e68ca6152941dfcc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aacd8e492c5358a5de2116aee526372a7"><td class="memItemLeft" align="right" valign="top"><a id="aacd8e492c5358a5de2116aee526372a7" name="aacd8e492c5358a5de2116aee526372a7"></a>
-unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>priority</b> () const</td></tr>
-<tr class="memdesc:aacd8e492c5358a5de2116aee526372a7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return priority value. <br /></td></tr>
-<tr class="separator:aacd8e492c5358a5de2116aee526372a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4c96cdee3e7e1d37e7079d1f702bec66"><td class="memItemLeft" align="right" valign="top"><a id="a4c96cdee3e7e1d37e7079d1f702bec66" name="a4c96cdee3e7e1d37e7079d1f702bec66"></a>
+<a class="el" href="classmlib_1_1erc.html#af6014fc6af332518e0572dfab3bf5643">level</a>&#160;</td><td class="memItemRight" valign="bottom"><b>priority</b> () const</td></tr>
+<tr class="memdesc:a4c96cdee3e7e1d37e7079d1f702bec66"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return priority value. <br /></td></tr>
+<tr class="separator:a4c96cdee3e7e1d37e7079d1f702bec66"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a944d26e7ed2f8687f81f1505821a9d87"><td class="memItemLeft" align="right" valign="top"><a id="a944d26e7ed2f8687f81f1505821a9d87" name="a944d26e7ed2f8687f81f1505821a9d87"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>is_active</b> () const</td></tr>
+<tr class="memdesc:a944d26e7ed2f8687f81f1505821a9d87"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return activity flag. <br /></td></tr>
+<tr class="separator:a944d26e7ed2f8687f81f1505821a9d87"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab7cd4b82f8b71b3ce84292dbac333575"><td class="memItemLeft" align="right" valign="top"><a id="ab7cd4b82f8b71b3ce84292dbac333575" name="ab7cd4b82f8b71b3ce84292dbac333575"></a>
 const <a class="el" href="classmlib_1_1errfac.html">errfac</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>facility</b> () const</td></tr>
 <tr class="memdesc:ab7cd4b82f8b71b3ce84292dbac333575"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return reference to facility. <br /></td></tr>
 <tr class="separator:ab7cd4b82f8b71b3ce84292dbac333575"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3041ac59951e19ba4f2b62e6cc43fbbb"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1erc.html#a3041ac59951e19ba4f2b62e6cc43fbbb">operator==</a> (const <a class="el" href="classmlib_1_1erc.html">erc</a> &amp;other) const</td></tr>
+<tr class="memdesc:a3041ac59951e19ba4f2b62e6cc43fbbb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Equality comparison operator.  <a href="classmlib_1_1erc.html#a3041ac59951e19ba4f2b62e6cc43fbbb">More...</a><br /></td></tr>
+<tr class="separator:a3041ac59951e19ba4f2b62e6cc43fbbb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a10122c373b8b3b99c94e2440d8df9eda"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1erc.html#a10122c373b8b3b99c94e2440d8df9eda">operator!=</a> (const <a class="el" href="classmlib_1_1erc.html">erc</a> &amp;other) const</td></tr>
+<tr class="memdesc:a10122c373b8b3b99c94e2440d8df9eda"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inequality comparison operator.  <a href="classmlib_1_1erc.html#a10122c373b8b3b99c94e2440d8df9eda">More...</a><br /></td></tr>
+<tr class="separator:a10122c373b8b3b99c94e2440d8df9eda"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7867449917e6f71b3d2621dd645811fc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1erc.html#a7867449917e6f71b3d2621dd645811fc">raise</a> () const</td></tr>
+<tr class="separator:a7867449917e6f71b3d2621dd645811fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:add2e7365d38fa52c3744671f83cdef01"><td class="memItemLeft" align="right" valign="top"><a id="add2e7365d38fa52c3744671f83cdef01" name="add2e7365d38fa52c3744671f83cdef01"></a>
 <a class="el" href="classmlib_1_1erc.html">erc</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>reactivate</b> ()</td></tr>
 <tr class="memdesc:add2e7365d38fa52c3744671f83cdef01"><td class="mdescLeft">&#160;</td><td class="mdescRight">Similar to re-throwing an exception. <br /></td></tr>
@@ -118,16 +149,58 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><b>message</b> ()
 <tr class="memdesc:a230befc71d557d39d4dd18f7ad6269b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get logging message. <br /></td></tr>
 <tr class="separator:a230befc71d557d39d4dd18f7ad6269b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-attribs" name="pub-static-attribs"></a>
+Static Public Attributes</h2></td></tr>
+<tr class="memitem:a75b67fe145d8ad3f4c5a962647a26ff8"><td class="memItemLeft" align="right" valign="top"><a id="a75b67fe145d8ad3f4c5a962647a26ff8" name="a75b67fe145d8ad3f4c5a962647a26ff8"></a>
+static <a class="el" href="classmlib_1_1erc.html">erc</a>&#160;</td><td class="memItemRight" valign="bottom"><b>success</b> {0, <a class="el" href="classmlib_1_1erc.html#af6014fc6af332518e0572dfab3bf5643a0dbc5070eba84734037938067d045d7f">erc::none</a>}</td></tr>
+<tr class="memdesc:a75b67fe145d8ad3f4c5a962647a26ff8"><td class="mdescLeft">&#160;</td><td class="mdescRight">The SUCCESS indicator. <br /></td></tr>
+<tr class="separator:a75b67fe145d8ad3f4c5a962647a26ff8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="friends" name="friends"></a>
 Friends</h2></td></tr>
-<tr class="memitem:a72979edc13b0732722ea1793a4708995"><td class="memItemLeft" align="right" valign="top"><a id="a72979edc13b0732722ea1793a4708995" name="a72979edc13b0732722ea1793a4708995"></a>
+<tr class="memitem:a28d5d7b1cb71f5fcfcc214a8b5ae2c2e"><td class="memItemLeft" align="right" valign="top"><a id="a28d5d7b1cb71f5fcfcc214a8b5ae2c2e" name="a28d5d7b1cb71f5fcfcc214a8b5ae2c2e"></a>
 class&#160;</td><td class="memItemRight" valign="bottom"><b>errfac</b></td></tr>
-<tr class="separator:a72979edc13b0732722ea1793a4708995"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="separator:a28d5d7b1cb71f5fcfcc214a8b5ae2c2e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p >objects returned as a function result or thrown directly. </p>
 <p >If not tested and their level is above facility's logging level they will be logged (by calling <a class="el" href="classmlib_1_1errfac.html#a43fe5ce46412ba0a196443f62eb90d98" title="Logging action. Default is to use stderr.">errfac::log()</a> ). If the level is above facility's throwing level they will be thrown as exceptions. </p>
-</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+</div><h2 class="groupheader">Member Enumeration Documentation</h2>
+<a id="af6014fc6af332518e0572dfab3bf5643" name="af6014fc6af332518e0572dfab3bf5643"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af6014fc6af332518e0572dfab3bf5643">&#9670;&#160;</a></span>level</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="classmlib_1_1erc.html#af6014fc6af332518e0572dfab3bf5643">mlib::erc::level</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Error levels (borrowed from BSD Unix) </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="af6014fc6af332518e0572dfab3bf5643a0dbc5070eba84734037938067d045d7f" name="af6014fc6af332518e0572dfab3bf5643a0dbc5070eba84734037938067d045d7f"></a>none&#160;</td><td class="fielddoc"><p >always not logged, not thrown </p>
+</td></tr>
+<tr><td class="fieldname"><a id="af6014fc6af332518e0572dfab3bf5643a645b27b94b7184a98c54ca4ae698694c" name="af6014fc6af332518e0572dfab3bf5643a645b27b94b7184a98c54ca4ae698694c"></a>info&#160;</td><td class="fielddoc"><p >default not logged, not thrown </p>
+</td></tr>
+<tr><td class="fieldname"><a id="af6014fc6af332518e0572dfab3bf5643a0df059aa54db69e062434cad36412203" name="af6014fc6af332518e0572dfab3bf5643a0df059aa54db69e062434cad36412203"></a>notice&#160;</td><td class="fielddoc"><p >default not logged, not thrown </p>
+</td></tr>
+<tr><td class="fieldname"><a id="af6014fc6af332518e0572dfab3bf5643ad7990f7e14907a53366027a3e10c4f8f" name="af6014fc6af332518e0572dfab3bf5643ad7990f7e14907a53366027a3e10c4f8f"></a>warning&#160;</td><td class="fielddoc"><p >default logged, not thrown </p>
+</td></tr>
+<tr><td class="fieldname"><a id="af6014fc6af332518e0572dfab3bf5643aa29ce38d1fbd35279156343d97fe131f" name="af6014fc6af332518e0572dfab3bf5643aa29ce38d1fbd35279156343d97fe131f"></a>error&#160;</td><td class="fielddoc"><p >default logged, thrown </p>
+</td></tr>
+<tr><td class="fieldname"><a id="af6014fc6af332518e0572dfab3bf5643aad6bbcdee6f28a1f1cbb25cabd4074fc" name="af6014fc6af332518e0572dfab3bf5643aad6bbcdee6f28a1f1cbb25cabd4074fc"></a>critical&#160;</td><td class="fielddoc"><p >default logged, thrown </p>
+</td></tr>
+<tr><td class="fieldname"><a id="af6014fc6af332518e0572dfab3bf5643aa83be8ff520dc02af12055c0acb7bcf8" name="af6014fc6af332518e0572dfab3bf5643aa83be8ff520dc02af12055c0acb7bcf8"></a>alert&#160;</td><td class="fielddoc"><p >default logged, thrown </p>
+</td></tr>
+<tr><td class="fieldname"><a id="af6014fc6af332518e0572dfab3bf5643a03728b66074dda41ffd86294ecc73e09" name="af6014fc6af332518e0572dfab3bf5643a03728b66074dda41ffd86294ecc73e09"></a>emerg&#160;</td><td class="fielddoc"><p >always logged, thrown </p>
+</td></tr>
+</table>
+
+</div>
+</div>
+<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="ad53189ed92df58baecf1b58124312d6e" name="ad53189ed92df58baecf1b58124312d6e"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ad53189ed92df58baecf1b58124312d6e">&#9670;&#160;</a></span>erc()</h2>
 
@@ -243,6 +316,35 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>errfac</b></td></tr>
 
 </div>
 </div>
+<a id="a10122c373b8b3b99c94e2440d8df9eda" name="a10122c373b8b3b99c94e2440d8df9eda"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a10122c373b8b3b99c94e2440d8df9eda">&#9670;&#160;</a></span>operator!=()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool mlib::erc::operator!= </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classmlib_1_1erc.html">erc</a> &amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Inequality comparison operator. </p>
+<p >Doesn't change status of activity flag. All success codes are equal. Other codes are equal only if their value, level and facility are equal. </p>
+
+</div>
+</div>
 <a id="ad7f22b152ab3aaa2a5077893aa4d9f09" name="ad7f22b152ab3aaa2a5077893aa4d9f09"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ad7f22b152ab3aaa2a5077893aa4d9f09">&#9670;&#160;</a></span>operator=() <span class="overload">[1/2]</span></h2>
 
@@ -269,7 +371,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>errfac</b></td></tr>
 
 <p>Principal assignment operator. </p>
 <p >If we were active before, call the facility to log or throw. Anyhow copy new values from the assigned object and take away it's active flag.</p>
-<dl class="section note"><dt>Note</dt><dd>It is rather bad practice to assign to an active erc object. Here we take the view that, since the left side object was already active, we have to deal with it first. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>It is rather bad practice to assign to an active <code>erc</code> object. Here we take the view that, since the left side object was already active, we have to deal with it first. </dd></dl>
 
 </div>
 </div>
@@ -299,6 +401,61 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>errfac</b></td></tr>
 
 <p>Move assignment operator. </p>
 <p >If we were active before, call the facility to log or throw. Anyhow copy new values from the assigned object and take away it's active flag. </p>
+
+</div>
+</div>
+<a id="a3041ac59951e19ba4f2b62e6cc43fbbb" name="a3041ac59951e19ba4f2b62e6cc43fbbb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3041ac59951e19ba4f2b62e6cc43fbbb">&#9670;&#160;</a></span>operator==()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool mlib::erc::operator== </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classmlib_1_1erc.html">erc</a> &amp;&#160;</td>
+          <td class="paramname"><em>other</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Equality comparison operator. </p>
+<p >Doesn't change status of activity flag. All success codes are equal. Other codes are equal only if their value, level and facility are equal. </p>
+
+</div>
+</div>
+<a id="a7867449917e6f71b3d2621dd645811fc" name="a7867449917e6f71b3d2621dd645811fc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7867449917e6f71b3d2621dd645811fc">&#9670;&#160;</a></span>raise()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void mlib::erc::raise </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >Invoke facility's raise function (<a class="el" href="classmlib_1_1errfac.html#a092d672fd00b86c30304aad2c8071eeb" title="Check if error must be logged or thrown.">errfac::raise</a>) to determine if error code should be logged or thrown </p>
 
 </div>
 </div>

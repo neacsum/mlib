@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.5"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>MLIB: Error Error Handling</title>
+<title>MLIB: Error Handling</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -41,7 +41,7 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Classes</a>  </div>
-  <div class="headertitle"><div class="title">Error Error Handling</div></div>
+  <div class="headertitle"><div class="title">Error Handling</div></div>
 </div><!--header-->
 <div class="contents">
 
@@ -50,6 +50,9 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
 Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1checked.html">mlib::checked&lt; T &gt;</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Provides a mechanism similar to <a href="https://en.cppreference.com/w/cpp/utility/expected">expected</a> for creating objects associated with error codes.  <a href="classmlib_1_1checked.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmlib_1_1errfac.html">mlib::errfac</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">An error facility routes a group of errors handled in a similar manner.  <a href="classmlib_1_1errfac.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -62,7 +65,7 @@ Classes</h2></td></tr>
 <p >erc objects are a cross between exceptions and return values. A function can return an erc object and the caller can check it just like a regular return value as in this example:</p>
 <div class="fragment"><div class="line">erc func ()</div>
 <div class="line">{</div>
-<div class="line">  <span class="keywordflow">return</span> erc(1);</div>
+<div class="line">  <span class="keywordflow">return</span> erc(1, erc::error);</div>
 <div class="line">}</div>
 <div class="line"> </div>
 <div class="line">main () {</div>
@@ -73,7 +76,7 @@ Classes</h2></td></tr>
 </div><!-- fragment --><p >However with ercs, if the return result is not checked, it might be thrown as an exception as in the following example.</p>
 <div class="fragment"><div class="line">erc func ()</div>
 <div class="line">{</div>
-<div class="line">  <span class="keywordflow">return</span> erc(1);</div>
+<div class="line">  <span class="keywordflow">return</span> erc(1, erc::error);</div>
 <div class="line">}</div>
 <div class="line">main () {</div>
 <div class="line">  <span class="keywordflow">try</span> {</div>

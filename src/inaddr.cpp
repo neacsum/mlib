@@ -16,7 +16,7 @@
 namespace mlib {
 
 
-#define WSALASTERROR (erc( WSAGetLastError(), ERROR_PRI_ERROR, sockerrors))
+#define WSALASTERROR (erc( WSAGetLastError(), erc::error, sockerrors))
 
 sock_initializer init;
 
@@ -76,7 +76,7 @@ erc inaddr::host (const char *hostname)
     else
       memcpy (&sa.sin_addr, he->h_addr_list[0], he->h_length);
   }
-  return ERR_SUCCESS;
+  return erc::success;
 }
 
 /*!

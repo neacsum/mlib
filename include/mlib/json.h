@@ -109,19 +109,19 @@ public:
       if (target.t == type::object)
       {
         if (objit == target.obj.end ())
-          throw mlib::erc (ERR_JSON_ITERPOS, ERROR_PRI_ERROR, errors);
+          mlib::erc (ERR_JSON_ITERPOS, mlib::erc::error, errors).raise ();
         return *objit->second;
       }
       else if (target.t == type::array)
       {
         if (arrit == target.arr.end ())
-          throw mlib::erc (ERR_JSON_ITERPOS, ERROR_PRI_ERROR, errors);
+          mlib::erc (ERR_JSON_ITERPOS, mlib::erc::error, errors).raise ();
         return **arrit;
       }
-      else if (!at_end)
-        return const_cast<json::node&>(target);
-      else
-        throw mlib::erc (ERR_JSON_ITERPOS, ERROR_PRI_ERROR, errors);
+      else if (at_end)
+        mlib::erc (ERR_JSON_ITERPOS, mlib::erc::error, errors).raise ();
+
+      return const_cast<json::node&>(target);
     }
 
     /// Value pointer
@@ -130,32 +130,28 @@ public:
       if (target.t == type::object)
       {
         if (objit == target.obj.end ())
-          throw mlib::erc (ERR_JSON_ITERPOS, ERROR_PRI_ERROR, errors);
+          mlib::erc (ERR_JSON_ITERPOS, mlib::erc::error, errors).raise ();
         return objit->second.get ();
       }
       else if (target.t == type::array)
       {
         if (arrit == target.arr.end ())
-          throw mlib::erc (ERR_JSON_ITERPOS, ERROR_PRI_ERROR, errors);
+          mlib::erc (ERR_JSON_ITERPOS, mlib::erc::error, errors).raise ();
         return arrit->get ();
       }
-      else if (!at_end)
-        return const_cast<json::node *>(&target);
-      else
-        throw mlib::erc (ERR_JSON_ITERPOS, ERROR_PRI_ERROR, errors);
+      else if (at_end)
+        mlib::erc (ERR_JSON_ITERPOS, mlib::erc::error, errors).raise ();
+      return const_cast<json::node *> (&target);
     }
 
     /// Object name
     const std::string& name () const
     {
-      if (target.t == type::object)
-      {
-        if (objit == target.obj.end ())
-          throw mlib::erc (ERR_JSON_ITERPOS, ERROR_PRI_ERROR, errors);
-        return objit->first;
-      }
-      else
-        throw mlib::erc (ERR_JSON_ITERTYPE, ERROR_PRI_ERROR, errors);
+      if (target.t != type::object)
+        mlib::erc (ERR_JSON_ITERTYPE, mlib::erc::error, errors).raise ();
+      if (objit == target.obj.end ())
+        mlib::erc (ERR_JSON_ITERPOS, mlib::erc::error, errors).raise ();
+      return objit->first;
     }
 
     ///Increment operator (postfix)
@@ -169,7 +165,7 @@ public:
       else if (!at_end)
         at_end = true;
       else
-        throw mlib::erc (ERR_JSON_ITERPOS, ERROR_PRI_ERROR, errors);
+        mlib::erc (ERR_JSON_ITERPOS, mlib::erc::error, errors).raise ();
       return tmp;
     }
 
@@ -183,7 +179,7 @@ public:
       else if (!at_end)
         at_end = true;
       else
-        throw mlib::erc (ERR_JSON_ITERPOS, ERROR_PRI_ERROR, errors);
+        mlib::erc (ERR_JSON_ITERPOS, mlib::erc::error, errors).raise ();
 
       return *this;
     }
@@ -195,11 +191,11 @@ public:
       if (target.t == type::object)
         objit.operator-- ();
       else if (target.t == type::array)
-        arrit.operator --();
+        arrit.operator-- ();
       else if (at_end)
         at_end = false;
       else
-        throw mlib::erc (ERR_JSON_ITERPOS, ERROR_PRI_ERROR, errors);
+        mlib::erc (ERR_JSON_ITERPOS, mlib::erc::error, errors).raise ();
       return tmp;
     }
 
@@ -213,7 +209,7 @@ public:
       else if (at_end)
         at_end = false;
       else
-        throw mlib::erc (ERR_JSON_ITERPOS, ERROR_PRI_ERROR, errors);
+        mlib::erc (ERR_JSON_ITERPOS, mlib::erc::error, errors).raise ();
       return *this;
     }
 
@@ -482,14 +478,13 @@ inline node::operator std::string () const
 
 /*
   Return a pointer to node's string value.
-  Any assignment to node will invalidate the pointer
+  Any assignment to node invalidates the pointer
 */
 inline node::operator const char* () const
 {
-  if (t == type::string)
-    return str.c_str ();
-
-  throw mlib::erc (ERR_JSON_INVTYPE, ERROR_PRI_ERROR, errors);
+  if (t != type::string)
+    mlib::erc (ERR_JSON_INVTYPE, mlib::erc::error, errors).raise ();
+  return str.c_str ();
 }
 
 /// Return numeric value of a node

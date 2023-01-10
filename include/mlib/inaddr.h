@@ -50,7 +50,7 @@ public:
   unsigned host () const                  { return ntohl(sa.sin_addr.s_addr); };
 
   /// set host address
-  erc host (unsigned int h)           { sa.sin_addr.s_addr = htonl(h); return ERR_SUCCESS;};
+  erc host (unsigned int h)           { sa.sin_addr.s_addr = htonl(h); return erc::success;};
 
   erc host (const char *hostname);
   void hostname (char *name, size_t sz);

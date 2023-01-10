@@ -258,7 +258,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>Database</b></td></t
 <div class="line">  .bind (<span class="stringliteral">&quot;:param1&quot;</span>, value1)</div>
 <div class="line">  .bind (<span class="stringliteral">&quot;:param2&quot;</span>, value2)</div>
 <div class="line">  .step ();</div>
-<div class="ttc" id="aclassmlib_1_1_query_html_a7ee97cc5ed429ef7a420c4549e9fd6f0"><div class="ttname"><a href="classmlib_1_1_query.html#a7ee97cc5ed429ef7a420c4549e9fd6f0">mlib::Query::Query</a></div><div class="ttdeci">Query()</div><div class="ttdoc">Default constructor.</div><div class="ttdef"><b>Definition:</b> sqlitepp.h:254</div></div>
+<div class="ttc" id="aclassmlib_1_1_query_html_a7ee97cc5ed429ef7a420c4549e9fd6f0"><div class="ttname"><a href="classmlib_1_1_query.html#a7ee97cc5ed429ef7a420c4549e9fd6f0">mlib::Query::Query</a></div><div class="ttdeci">Query()</div><div class="ttdoc">Default constructor.</div><div class="ttdef"><b>Definition:</b> sqlitepp.h:255</div></div>
 </div><!-- fragment --><p >For data extraction, the class provides <code>column_xxx</code> functions that return the value of a column specified either by name or by index (first column index is 0). </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="abbf4ddcb778885223d11bc35030e5b1c" name="abbf4ddcb778885223d11bc35030e5b1c"></a>
@@ -933,8 +933,8 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>Database</b></td></t
 <div class="line"><a class="code hl_class" href="classmlib_1_1_query.html">Query</a> q (db, <span class="stringliteral">&quot;SELECT c1, c2 FROM tbl JOIN tbl2&quot;</span>);  <span class="comment">// SELECT query</span></div>
 <div class="line"><span class="keyword">auto</span> s = q.database_name (<span class="stringliteral">&quot;c1&quot;</span>);          <span class="comment">// s == &quot;main&quot;</span></div>
 <div class="line">s = q.database_name (<span class="stringliteral">&quot;c2&quot;</span>);               <span class="comment">// s == &quot;db2&quot;</span></div>
-<div class="ttc" id="aclassmlib_1_1_database_html"><div class="ttname"><a href="classmlib_1_1_database.html">mlib::Database</a></div><div class="ttdoc">Wrapper for database connection handle.</div><div class="ttdef"><b>Definition:</b> sqlitepp.h:25</div></div>
-<div class="ttc" id="aclassmlib_1_1_query_html"><div class="ttname"><a href="classmlib_1_1_query.html">mlib::Query</a></div><div class="ttdoc">Wrapper for SQL prepared sentences.</div><div class="ttdef"><b>Definition:</b> sqlitepp.h:108</div></div>
+<div class="ttc" id="aclassmlib_1_1_database_html"><div class="ttname"><a href="classmlib_1_1_database.html">mlib::Database</a></div><div class="ttdoc">Wrapper for database connection handle.</div><div class="ttdef"><b>Definition:</b> sqlitepp.h:26</div></div>
+<div class="ttc" id="aclassmlib_1_1_query_html"><div class="ttname"><a href="classmlib_1_1_query.html">mlib::Query</a></div><div class="ttdoc">Wrapper for SQL prepared sentences.</div><div class="ttdef"><b>Definition:</b> sqlitepp.h:111</div></div>
 </div><!-- fragment --><p >SQLITE must be compiled with the SQLITE_ENABLE_COLUMN_METADATA for this function to be available. </p>
 
 </div>
@@ -1140,7 +1140,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>Database</b></td></t
 
 <p>Evaluate the statement. </p>
 <p >When a new row of results is available the function returns SQLITE_ROW.</p>
-<p >When there are no more result the function returns SQLITE_DONE. Both codes are wrapped in <a class="el" href="classmlib_1_1erc.html">erc</a> objects with priority level <code>ERROR_PRI_INFO</code> that normally don't throw an exception. Any other error is return at the normal priority level <code>ERROR_PRI_ERROR</code>. </p>
+<p >When there are no more result the function returns SQLITE_DONE. Both codes are wrapped in <a class="el" href="classmlib_1_1erc.html">erc</a> objects with priority level <code>ERROR_PRI_INFO</code> that normally don't throw an exception. Any other error is return at the normal priority level <code><a class="el" href="classmlib_1_1erc.html#af6014fc6af332518e0572dfab3bf5643aa29ce38d1fbd35279156343d97fe131f" title="default logged, thrown">erc::error</a></code>. </p>
 
 </div>
 </div>

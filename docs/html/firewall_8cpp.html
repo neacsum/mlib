@@ -59,10 +59,10 @@ $(function() {
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="define-members" name="define-members"></a>
 Macros</h2></td></tr>
 <tr class="memitem:aa8496b3491d9a04faca6f43ec50cab75"><td class="memItemLeft" align="right" valign="top"><a id="aa8496b3491d9a04faca6f43ec50cab75" name="aa8496b3491d9a04faca6f43ec50cab75"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>FWERC</b>(A)&#160;&#160;&#160;erc((A),<a class="el" href="errorcode_8h.html#a045f609c6f81928ed19bec8fa95ce978">ERROR_PRI_ERROR</a>, fw_errptr)</td></tr>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>FWERC</b>(A)&#160;&#160;&#160;erc((A),erc::error, &amp;fw_errors)</td></tr>
 <tr class="separator:aa8496b3491d9a04faca6f43ec50cab75"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1ef7dd18e5cc37e5816500e750baacd3"><td class="memItemLeft" align="right" valign="top"><a id="a1ef7dd18e5cc37e5816500e750baacd3" name="a1ef7dd18e5cc37e5816500e750baacd3"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>FWERROR</b>(A)&#160;&#160;&#160;fw_errptr-&gt;raise (FWERC(A))</td></tr>
+#define&#160;</td><td class="memItemRight" valign="bottom"><b>FWERROR</b>(A)&#160;&#160;&#160;FWERC(A).raise()</td></tr>
 <tr class="separator:a1ef7dd18e5cc37e5816500e750baacd3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
