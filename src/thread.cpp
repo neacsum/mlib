@@ -106,7 +106,7 @@ void thread::initialize (PSECURITY_DESCRIPTOR sd, BOOL inherit)
 thread::~thread()
 {
   TRACE2 ("Thread %s[0x%x] in destructor", name().c_str(), id_);
-  if (stat == state::running)
+  if (stat == state::running || stat == state::starting)
   {
     TRACE ("WARNING! thread was still running");
     TerminateThread (handle (), 0);
@@ -136,7 +136,6 @@ UINT _stdcall thread::entryProc (thread *th)
     }
     th->stat = state::ending;
     th->term ();
-    th->stat = state::finished;
   }
   catch (...)
   {
@@ -145,6 +144,7 @@ UINT _stdcall thread::entryProc (thread *th)
   }
 
   TRACE2 ("Thread %s[0x%x] is ending", th->name().c_str(), th->id_);
+  th->stat = state::finished;
   _endthreadex (th->exitcode);
   return th->exitcode;
 }

@@ -8,6 +8,9 @@ using namespace mlib;
 
 using namespace std;
 
+SUITE (HttpServer)
+{
+
 TEST (Auth)
 {
   httpd srv (8080);
@@ -32,7 +35,7 @@ TEST (AuthMatch)
   srv.add_realm ("Control", "/ctl");
   srv.add_realm ("Control1", "/ctl/inner");
   bool ok = srv.is_protected ("/status/map.html", realm);
-  CHECK(!ok);
+  CHECK (!ok);
   ok = srv.is_protected ("/ctl/change.cgi", realm);
   CHECK (ok);
   CHECK_EQUAL ("Control", realm);
@@ -44,7 +47,8 @@ TEST (AuthMatch)
   CHECK_EQUAL ("Control1", realm);
 }
 
-class HttpServerFixture {
+class HttpServerFixture
+{
 public:
   HttpServerFixture ();
   ~HttpServerFixture ();
@@ -53,20 +57,20 @@ public:
   string request;
   string uri;
   string answer;
-  std::function<int()> cfunc;
+  std::function<int ()> cfunc;
   int status_code;
 };
 
-HttpServerFixture::HttpServerFixture () :
-  uri ("/")
+HttpServerFixture::HttpServerFixture ()
+  : uri ("/")
 {
-  idx.open("index.html");
+  idx.open ("index.html");
   idx << "<html><head><title>TEST Page</title></head><body>Some stuff</body></html>\r\n";
   idx.close ();
   srv.docroot (".");
   srv.start ();
   cfunc = [&] () -> int {
-    sockstream ws(inaddr ("127.0.0.1", srv.port()));
+    sockstream ws (inaddr ("127.0.0.1", srv.port ()));
     ws << "GET " << uri << " HTTP/1.1" << endl;
     cout << "GET " << uri.c_str () << endl;
     ws << request.c_str () << endl << flush;
@@ -76,7 +80,7 @@ HttpServerFixture::HttpServerFixture () :
     ws.getline (text, sizeof (text));
     cout << "Status line " << text << endl;
     strtok (text, " ");
-    status_code = atoi (strtok(NULL, " "));
+    status_code = atoi (strtok (NULL, " "));
     while (!ws.eof ())
     {
       ws.getline (text, sizeof (text));
@@ -94,7 +98,6 @@ HttpServerFixture::~HttpServerFixture ()
   srv.terminate ();
   remove ("index.html");
 }
-
 
 TEST_FIXTURE (HttpServerFixture, OkAnswer)
 {
@@ -140,10 +143,12 @@ TEST_FIXTURE (HttpServerFixture, HttpBadPassword)
 {
   srv.add_realm ("Control", "/");
   srv.add_user ("Control", "Alice", "password");
-  request = "Authorization: Basic QWxpY2U6d3Jvbmc=\r\n"; //wrong password
+  request = "Authorization: Basic QWxpY2U6d3Jvbmc=\r\n"; // wrong password
 
   mlib::thread client (cfunc);
   client.start ();
   client.wait ();
   CHECK_EQUAL (401, status_code);
 }
+
+} //end suite
