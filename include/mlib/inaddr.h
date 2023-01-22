@@ -50,11 +50,10 @@ public:
   unsigned host () const                  { return ntohl(sa.sin_addr.s_addr); };
 
   /// set host address
-  erc host (unsigned int h)           { sa.sin_addr.s_addr = htonl(h); return erc::success;};
+  void host (unsigned int h)           { sa.sin_addr.s_addr = htonl(h);};
 
-  erc host (const char *hostname);
-  void hostname (char *name, size_t sz);
-  const char* hostname ();
+  erc host (const std::string& hostname);
+  std::string hostname ();
 
   /// return host address in dotted format
   const char *ntoa ();

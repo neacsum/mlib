@@ -18,9 +18,6 @@
 namespace mlib {
 
 
-///Error facility used by all sock derived classes.
-extern errfac *sockerrors;
-
 //sockbuf flags
 #define _S_ALLOCBUF   0x0002    ///< locally allocated buffer
 #define _S_NO_READS   0x0004    ///< write only flag
@@ -53,7 +50,7 @@ public:
   SOCKET            handle () const {return sl->handle;};
   
   virtual erc       open (int type, int domain=AF_INET, int proto=0);
-  void              close ();
+  virtual erc       close ();
   virtual erc       shutdown (shuthow sh);
 
   ///Check if socket is opened
@@ -107,6 +104,10 @@ public:
   long              enumevents ();
   void              linger (bool on_off, unsigned short seconds);
   bool              linger (unsigned short *seconds = 0);
+
+  /// Error facility used by all sock derived classes.
+  static errfac *errors;
+  static erc last_error ();
 
 protected:
 
@@ -218,14 +219,348 @@ static struct sock_initializer
   ~sock_initializer ();
 } sock_nifty_counter;
 
-///Router for socket errors
-class sock_facility : public errfac
+inline errfac *sock::errors;
+
+/*==================== INLINE FUNCTIONS ===========================*/
+
+/*!
+  Set send timeout value
+  \param  wp_sec    timeout value in seconds
+  \retval Previous timeout value in seconds
+*/
+inline
+int sock::sendtimeout (int wp_sec)
 {
-public:
-  sock_facility ();
-  void log (const erc& e);
-  const char *msg (const erc& e);
-};
+  int oldwtmo;
+  int optlen = sizeof (int);
+  getsockopt (sl->handle, SOL_SOCKET, SO_SNDTIMEO, (char *)&oldwtmo, &optlen);
+  wp_sec *= 1000;
+  setsockopt (sl->handle, SOL_SOCKET, SO_SNDTIMEO, (char *)&wp_sec, optlen);
+  return oldwtmo / 1000;
+}
+
+///  Returns the send timeout value
+inline
+int sock::sendtimeout () const
+{
+  int oldwtmo;
+  int optlen = sizeof (int);
+  getsockopt (sl->handle, SOL_SOCKET, SO_SNDTIMEO, (char *)&oldwtmo, &optlen);
+  return oldwtmo / 1000;
+}
+
+/*!
+  Set receive timeout value
+  \param  wp_sec    timeout value in seconds
+  \retval Previous timeout value in seconds
+*/
+inline
+int sock::recvtimeout (int wp_sec)
+{
+  int oldrtmo;
+  int optlen = sizeof (int);
+  getsockopt (sl->handle, SOL_SOCKET, SO_RCVTIMEO, (char *)&oldrtmo, &optlen);
+  wp_sec *= 1000;
+  setsockopt (sl->handle, SOL_SOCKET, SO_RCVTIMEO, (char *)&wp_sec, optlen);
+  return oldrtmo / 1000;
+}
+
+///  Returns the send timeout value
+inline
+int sock::recvtimeout () const
+{
+  int oldrtmo;
+  int optlen = sizeof (int);
+  getsockopt (sl->handle, SOL_SOCKET, SO_RCVTIMEO, (char *)&oldrtmo, &optlen);
+  return oldrtmo / 1000;
+}
+
+/*!
+  Returns a socket option.
+  \param  op    option to return
+  \param  buf   buffer for option value
+  \param  len   size of buffer
+  \param  level level at which the option is defined
+
+  \return Size of returned option
+*/
+inline
+int sock::getopt (int op, void *buf, int len, int level) const
+{
+  int rlen = len;
+  if (::getsockopt (sl->handle, level, op, (char *)buf, &rlen) == SOCKET_ERROR)
+    last_error ().raise ();
+  return rlen;
+}
+
+/*!
+  Set a socket option.
+  \param  op    option to return
+  \param  buf   buffer for option value
+  \param  len   size of buffer
+  \param  level level at which the option is defined
+*/
+inline
+void sock::setopt (int op, void *buf, int len, int level) const
+{
+  if (::setsockopt (sl->handle, level, op, (char *)buf, len) == SOCKET_ERROR)
+    last_error ().raise ();
+}
+
+/*!
+  Return socket type (SOCK_DGRAM or SOCK_STREAM)
+*/
+inline
+int sock::gettype () const
+{
+  int ty = 0;
+  getopt (SO_TYPE, &ty, sizeof (ty));
+  return ty;
+}
+
+/*!
+  Return and clear the socket error flag.
+  \return Error flag status
+
+  The per socket-based error code is different from the per thread error
+  code that is handled using the WSAGetLastError function call.
+  A successful call using the socket does not reset the socket based error code
+  returned by this function.
+*/
+inline
+int sock::clearerror () const
+{
+  int err = 0;
+  getopt (SO_ERROR, &err, sizeof (err));
+  return err;
+}
+
+/// Return the debug flag.
+inline
+bool sock::debug () const
+{
+  BOOL old;
+  getopt (SO_DEBUG, &old, sizeof (old));
+  return (old != FALSE);
+}
+
+/// Set the debug flag
+inline
+void sock::debug (bool b)
+{
+  BOOL opt = b;
+  setopt (SO_DEBUG, &opt, sizeof (opt));
+}
+
+/// Return the "reuse address" flag
+inline
+bool sock::reuseaddr () const
+{
+  BOOL old;
+  getopt (SO_REUSEADDR, &old, sizeof (old));
+  return (old != FALSE);
+}
+
+/// Set the "reuse address" flag
+inline
+void sock::reuseaddr (bool b)
+{
+  BOOL opt = b;
+  setopt (SO_REUSEADDR, &opt, sizeof (opt));
+}
+
+/// Return "keep alive" flag
+inline
+bool sock::keepalive () const
+{
+  BOOL old;
+  getopt (SO_KEEPALIVE, &old, sizeof (old));
+  return (old != FALSE);
+}
+
+/// Set "keep alive" flag
+inline
+void sock::keepalive (bool b)
+{
+  BOOL opt = b;
+  setopt (SO_KEEPALIVE, &opt, sizeof (opt));
+}
+
+/// Return status of "don't route" flag
+inline
+bool sock::dontroute () const
+{
+  BOOL old;
+  getopt (SO_DONTROUTE, &old, sizeof (old));
+  return (old != FALSE);
+}
+
+/// Turn on or off the "don't route" flag
+inline
+void sock::dontroute (bool b)
+{
+  BOOL opt = b;
+  setopt (SO_DONTROUTE, &opt, sizeof (opt));
+}
+
+/// Return "broadcast" option
+inline
+bool sock::broadcast () const
+{
+  BOOL old;
+  getopt (SO_BROADCAST, &old, sizeof (old));
+  return (old != FALSE);
+}
+
+/*!
+  Turn on or off the "broadcast" option
+
+  \note Socket semantics require that an application set this option
+  before attempting to send a datagram to broadcast address.
+*/
+inline
+void sock::broadcast (bool b)
+{
+  BOOL opt = b;
+  setopt (SO_BROADCAST, &opt, sizeof (opt));
+}
+
+/*!
+  Return the status of the OOB_INLINE flag.
+  If set, OOB data is being received in the normal data stream.
+*/
+inline
+bool sock::oobinline () const
+{
+  BOOL old;
+  getopt (SO_OOBINLINE, &old, sizeof (old));
+  return (old != FALSE);
+}
+
+/*!
+  Set the status of the OOB_INLINE flag.
+  If set, OOB data is being received in the normal data stream.
+*/
+inline
+void sock::oobinline (bool b)
+{
+  BOOL opt = b;
+  setopt (SO_OOBINLINE, &opt, sizeof (opt));
+}
+
+/// Return buffer size for send operations.
+inline
+int sock::sendbufsz () const
+{
+  int old = 0;
+  getopt (SO_SNDBUF, &old, sizeof (old));
+  return old;
+}
+
+/// Set buffer size for send operations.
+inline
+void sock::sendbufsz (size_t sz)
+{
+  setopt (SO_SNDBUF, &sz, sizeof (sz));
+}
+
+/// Return buffer size for receive operations
+inline
+int sock::recvbufsz () const
+{
+  int old = 0;
+  getopt (SO_RCVBUF, &old, sizeof (old));
+  return old;
+}
+
+/// Set buffer size for receive operations
+inline
+void sock::recvbufsz (size_t sz)
+{
+  setopt (SO_RCVBUF, &sz, sizeof (sz));
+}
+
+/*!
+  Change blocking mode.
+  sock objects are created by default as blocking sockets. They can be turned
+  into non-blocking sockets using this function.
+*/
+inline
+void sock::blocking (bool on_off)
+{
+  unsigned long mode = on_off ? 0 : 1;
+  if (ioctlsocket (sl->handle, FIONBIO, &mode) == SOCKET_ERROR)
+    last_error ().raise ();
+}
+
+/*!
+  Associate an event object with this socket.
+
+  \param  evt   handle to event object
+  \param  mask  conditions that trigger the event Can be a combination of:
+                  FD_READ, FD_WRITE, FD_OOB, FD_ACCEPT, FD_CONNECT, FD_CLOSE
+
+  The event object must be a manual event. It will be set to signaled state if
+  the corresponding socket status change.
+
+  It is not possible to specify different event objects for different
+  network events.
+
+  The function automatically sets socket to nonblocking mode.
+*/
+inline
+erc sock::setevent (HANDLE evt, long mask)
+{
+  if (WSAEventSelect (sl->handle, (WSAEVENT)evt, mask) == SOCKET_ERROR)
+    return last_error ();
+  return erc::success;
+}
+
+/*!
+  Indicates which of the FD_XXX network events have occurred.
+
+  The function reports only network activity and errors for which setevent()
+  has been called.
+*/
+inline
+long sock::enumevents ()
+{
+  WSANETWORKEVENTS netev;
+  if (WSAEnumNetworkEvents (sl->handle, NULL, &netev) == SOCKET_ERROR)
+    last_error ().raise ();
+  return netev.lNetworkEvents;
+}
+
+/*!
+  Turn on or off linger mode and lingering timeout.
+*/
+inline
+void sock::linger (bool on_off, unsigned short seconds)
+{
+  struct linger opt;
+  opt.l_onoff = on_off;
+  opt.l_linger = seconds;
+  setopt (SO_LINGER, &opt, sizeof (opt));
+}
+
+/*!
+  Return linger mode and lingering timeout.
+*/
+inline
+bool sock::linger (unsigned short *seconds)
+{
+  struct linger opt;
+  getopt (SO_LINGER, &opt, sizeof (opt));
+  if (seconds)
+    *seconds = opt.l_linger;
+  return (opt.l_onoff == 0);
+}
+
+/// Return an error code with the value returned by WSAGetLastError
+inline erc sock::last_error ()
+{
+  return {WSAGetLastError (), erc::error, sock::errors};
+}
 
 }
 

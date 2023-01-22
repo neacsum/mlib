@@ -110,5 +110,34 @@ TEST (wait_duration)
   CHECK_EQUAL (WAIT_TIMEOUT, ret);
 }
 
+TEST (event_is_signaled)
+{
+  event evt_auto;
+
+  evt_auto.signal ();
+
+  CHECK (evt_auto.is_signaled ());
+
+  //calling is_signaled doesn't change state
+  CHECK (evt_auto.is_signaled ());
+
+  //a "real" wait resets the event
+  evt_auto.wait (1ms);
+  CHECK (!evt_auto.is_signaled ());
+
+  event evt_manual{event::manual};
+  evt_manual.signal ();
+  CHECK (evt_manual.is_signaled ());
+  
+  // calling is_signaled doesn't change state
+  CHECK (evt_manual.is_signaled ());
+
+  // a "real" wait does not reset the event
+  evt_manual.wait (1ms);
+  CHECK (evt_manual.is_signaled ());
+
+  evt_manual.reset ();
+  CHECK (!evt_manual.is_signaled ());
+}
 
 }

@@ -16,8 +16,6 @@
 namespace mlib {
 
 
-#define WSALASTERROR (erc( WSAGetLastError(), erc::error, sockerrors))
-
 sock_initializer init;
 
 /*!
@@ -56,7 +54,7 @@ inaddr::inaddr (const char *hostname, unsigned short port)
   {
     HOSTENT *he;
     if (NULL == (he = gethostbyname (hostname)))
-      sockerrors->raise (WSALASTERROR);
+      sock::last_error().raise ();
     else
       memcpy (&sa.sin_addr, he->h_addr_list[0], he->h_length);
   }
@@ -65,14 +63,14 @@ inaddr::inaddr (const char *hostname, unsigned short port)
 /*!
   Set host address after resolving name
 */
-erc inaddr::host (const char *hostname)
+erc inaddr::host (const std::string& hostname)
 {
-  if ((sa.sin_addr.s_addr=inet_addr (hostname)) == INADDR_NONE &&
-       strcmp(hostname, "255.255.255.255"))
+  if ((sa.sin_addr.s_addr=inet_addr (hostname.c_str())) == INADDR_NONE &&
+       hostname != "255.255.255.255")
   {
-    HOSTENT *he = gethostbyname (hostname);
+    HOSTENT *he = gethostbyname (hostname.c_str());
     if (he == NULL)
-      return WSALASTERROR;
+      return sock::last_error();
     else
       memcpy (&sa.sin_addr, he->h_addr_list[0], he->h_length);
   }
@@ -82,7 +80,7 @@ erc inaddr::host (const char *hostname)
 /*!
   Find hostname from the host address in sockaddr
 */
-const char* inaddr::hostname ()
+std::string inaddr::hostname ()
 {
   HOSTENT *he = gethostbyaddr ((char*)&sa.sin_addr, sizeof(sa.sin_addr), AF_INET);
   if (he == NULL)
@@ -96,20 +94,12 @@ const char* inaddr::hostname ()
                                                 //Make a char string from dotted address
     else
     {
-      sockerrors->raise (WSALASTERROR);
+      sock::last_error().raise ();
       return "0.0.0.0";
     }
   }
   else
     return he->h_name;
-}
-
-/*!
-  Alternate form copies host name in user supplied buffer
-*/
-void inaddr::hostname (char *name, size_t sz)
-{
-  strncpy_s (name, sz, hostname(), _TRUNCATE);
 }
 
 /*!

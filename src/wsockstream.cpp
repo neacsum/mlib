@@ -22,6 +22,23 @@
 
 namespace mlib {
 
+/// Router for socket errors
+/*!
+  \class sock_facility
+  \ingroup sockets
+
+  Converts from error number to error name.
+*/
+class sock_facility : public errfac
+{
+public:
+  sock_facility () : errfac ("SOCKSTREAM ERROR") {};
+  void log (const erc& e) const override;
+  const char *msg (const erc& e) const;
+};
+
+sock_facility the_errors;
+
 int sock_initializer_counter=0;
 
 /*!
@@ -32,11 +49,6 @@ int sock_initializer_counter=0;
 ///The initialization object
 static sock_initializer init;
 
-/// Pointer to error handler
-errfac *sockerrors;
-
-/// Throws an error code with the value returned by WSAGetLastError
-#define WSALASTERROR (erc( WSAGetLastError(), erc::error, sockerrors))
 
 /*!
   \class sock
@@ -74,7 +86,7 @@ sock::sock (int type, int domain, int proto) :
   if ((sl->handle = ::socket (domain, type, proto)) == INVALID_SOCKET) 
   {
     delete sl;
-    WSALASTERROR.raise ();
+    last_error().raise ();
   }
   TRACE9 ("sock::sock (type %d domain %d proto %d)=%x", type, domain, proto, sl->handle);
 }
@@ -119,7 +131,7 @@ sock& sock::operator = (const sock& rhs)
 /*!
   Destructor.
 
-  If the 'lives' counter is 0, calls closesocket to free the Winsock handle.
+  If the 'lives' counter is 0, calls closesocket() to free the Winsock handle.
 */
 sock::~sock ()
 {
@@ -140,7 +152,7 @@ sock::~sock ()
 /*!
   Open the socket.
   
-  If the socket was previously opened it calls first closesocket.
+  If the socket was previously opened it calls first closesocket().
 */
 erc sock::open (int type, int domain, int proto)
 {
@@ -149,7 +161,7 @@ erc sock::open (int type, int domain, int proto)
     closesocket (sl->handle);
 
   if ((sl->handle = ::socket (domain, type, proto)) == INVALID_SOCKET)
-    return WSALASTERROR;
+    return last_error ();
   TRACE8 ("sock::open handle=%x", sl->handle);
   return erc::success;
 }
@@ -158,14 +170,17 @@ erc sock::open (int type, int domain, int proto)
 /*!
   Close socket.
 */
-void sock::close()
+erc sock::close()
 {
   if (sl->handle != INVALID_SOCKET)
   {
     TRACE8 ("sock::close (%x)", sl->handle);
-    closesocket (sl->handle);
+    if (closesocket (sl->handle) == SOCKET_ERROR)
+      return last_error ();
+
     sl->handle = INVALID_SOCKET;
   }
+  return erc::success;
 }
 
 /*!
@@ -181,7 +196,7 @@ inaddr sock::name () const
   sockaddr sa;
   int len = sizeof(sa);
   if (getsockname (sl->handle, &sa, &len) == SOCKET_ERROR)
-    WSALASTERROR.raise ();
+    last_error ().raise ();
   return sa;
 }
 
@@ -194,7 +209,7 @@ inaddr sock::peer () const
   sockaddr sa;
   int len = sizeof(sa);
   if (getpeername (sl->handle, &sa, &len) == SOCKET_ERROR)
-    sockerrors->raise (WSALASTERROR);
+    last_error ().raise ();
   return sa;
 }
 
@@ -207,7 +222,7 @@ erc sock::bind (const sockaddr& sa)
     sl->handle, ntohl(((sockaddr_in&)sa).sin_addr.S_un.S_addr), 
     ntohs(((sockaddr_in&)sa).sin_port));
   if (::bind (sl->handle, &sa, sizeof(sa)) == SOCKET_ERROR)
-    return WSALASTERROR;
+    return last_error ();
   return erc::success;
 }
 
@@ -225,7 +240,7 @@ erc sock::bind()
   sa.sa_family = AF_INET;
 
   if (::bind (sl->handle, &sa, sizeof(sa)) == SOCKET_ERROR)
-    return WSALASTERROR;
+    return last_error ();
   return erc::success;
 }
 
@@ -243,15 +258,15 @@ erc sock::connect (const sockaddr& sa, int wp_sec)
     blocking (false);
     if (!::connect (sl->handle, &sa, sizeof (sa)))
       return erc::success;
-    DWORD ret = WSAGetLastError ();
-    if (WSAGetLastError () != WSAEWOULDBLOCK)
-      return WSALASTERROR;
+    int ret = WSAGetLastError ();
+    if (ret != WSAEWOULDBLOCK)
+      return {ret, erc::error, sock::errors};
     if (is_writeready (wp_sec))
       return erc::success;
-    return erc (WSAETIMEDOUT, erc::info);
+    return {WSAETIMEDOUT, erc::info, sock::errors};
   }
   if (::connect(sl->handle, &sa, sizeof(sa)) == SOCKET_ERROR)
-    return WSALASTERROR;
+    return last_error ();
   return erc::success;
 }
 
@@ -262,7 +277,7 @@ erc sock::connect (const sockaddr& sa, int wp_sec)
 erc sock::listen (int num)
 {
   if (::listen (sl->handle, num) == SOCKET_ERROR)
-    return WSALASTERROR;
+    return last_error ();
   return erc::success;
 }
 
@@ -277,7 +292,7 @@ sock sock::accept (sockaddr& sa)
   SOCKET soc;
   int len = sizeof(sa);
   if ((soc = ::accept (sl->handle, &sa, &len)) == INVALID_SOCKET)
-    WSALASTERROR.raise ();
+    last_error ().raise ();
   return soc;
 }
 
@@ -289,7 +304,7 @@ sock sock::accept ()
 {
   SOCKET soc;
   if ((soc = ::accept (sl->handle, 0, 0)) == INVALID_SOCKET)
-    WSALASTERROR.raise ();
+    last_error ().raise ();
   return soc;
 }
 
@@ -315,7 +330,7 @@ size_t sock::recv (void* buf, size_t len, int msgf)
     }
     else if (what == WSAECONNABORTED || what == WSAECONNRESET || what == WSAETIMEDOUT)
       return EOF;
-    WSALASTERROR.raise ();
+    last_error ().raise ();
   }
   return (rval==0) ? EOF: rval;
 }
@@ -345,7 +360,7 @@ size_t sock::recvfrom (sockaddr& sa, void* buf, size_t len, int msgf)
     }
     else if (what == WSAECONNABORTED || what == WSAECONNRESET || what == WSAETIMEDOUT)
       return EOF;
-    sockerrors->raise (WSALASTERROR);
+    last_error ().raise ();
   }
   return (rval==0) ? (size_t)EOF: rval;
 }
@@ -373,7 +388,7 @@ size_t sock::send (const void* buf, size_t len, int msgf)
         return 0;
       else if (what == WSAECONNABORTED || what == WSAECONNRESET)
         return EOF;
-      WSALASTERROR.raise ();
+      last_error ().raise ();
     }
     len -= wval;
     wlen += wval;
@@ -406,65 +421,13 @@ size_t sock::sendto (const sockaddr& sa, const void* buf, size_t len, int msgf)
         return 0;
       else if (what == WSAECONNABORTED || what == WSAECONNRESET)
         return EOF;
-      WSALASTERROR.raise ();
+      last_error ().raise ();
     }
     len -= wval;
     wlen += wval;
     cp += wval;
   }
   return wlen;
-}
-
-/*!
-  Set send timeout value
-  \param  wp_sec    timeout value in seconds
-  \retval Previous timeout value in seconds
-*/
-int sock::sendtimeout (int wp_sec)
-{
-  int oldwtmo;
-  int optlen = sizeof(int);
-  getsockopt (sl->handle, SOL_SOCKET, SO_SNDTIMEO, (char*)&oldwtmo, &optlen);
-  wp_sec *= 1000;
-  setsockopt (sl->handle, SOL_SOCKET, SO_SNDTIMEO, (char*)&wp_sec, optlen);
-  return oldwtmo/1000;
-}
-
-/*!
-  Returns the send timeout value
-*/
-int sock::sendtimeout () const
-{
-  int oldwtmo;
-  int optlen = sizeof(int);
-  getsockopt (sl->handle, SOL_SOCKET, SO_SNDTIMEO, (char*)&oldwtmo, &optlen);
-  return oldwtmo/1000;
-}
-
-/*!
-  Set receive timeout value
-  \param  wp_sec    timeout value in seconds
-  \retval Previous timeout value in seconds
-*/
-int sock::recvtimeout (int wp_sec)
-{
-  int oldrtmo;
-  int optlen = sizeof(int);
-  getsockopt (sl->handle, SOL_SOCKET, SO_RCVTIMEO, (char*)&oldrtmo, &optlen);
-  wp_sec *= 1000;
-  setsockopt (sl->handle, SOL_SOCKET, SO_RCVTIMEO, (char*)&wp_sec, optlen);
-  return oldrtmo/1000;
-}
-
-/*!
-  Returns the send timeout value
-*/
-int sock::recvtimeout () const
-{
-  int oldrtmo;
-  int optlen = sizeof(int);
-  getsockopt (sl->handle, SOL_SOCKET, SO_RCVTIMEO, (char*)&oldrtmo, &optlen);
-  return oldrtmo/1000;
 }
 
 /*!
@@ -490,7 +453,7 @@ bool sock::is_readready (int wp_sec, int wp_usec) const
   int ret = select (FD_SETSIZE, &fds, 0, 0, (wp_sec < 0) ? 0: &tv);
   if (ret == SOCKET_ERROR) 
   {
-    WSALASTERROR.raise ();
+    last_error ().raise ();
     return false;
   }
   return (ret != 0);
@@ -500,11 +463,11 @@ bool sock::is_readready (int wp_sec, int wp_usec) const
   Check if socket is "writable".
 
   If wp_sec or wp_usec are not 0, the function waits the specified time for the
-  socket to become "writeable".
+  socket to become "writable".
   
-  If the socket is processing a connect call, the socket is writeable if the 
+  If the socket is processing a connect call, the socket is writable if the 
   connection establishment successfully completes. If the socket is not 
-  processing a connect call, writability means a send or sendto 
+  processing a connect call, being writable means a send() or sendto() 
   are guaranteed to succeed.
 */
 bool sock::is_writeready (int wp_sec, int wp_usec) const
@@ -517,7 +480,7 @@ bool sock::is_writeready (int wp_sec, int wp_usec) const
   int ret = select (FD_SETSIZE, 0, &fds, 0, (wp_sec < 0) ? 0: &tv);
   if (ret == SOCKET_ERROR) 
   {
-    WSALASTERROR.raise ();
+    last_error ().raise ();
     return false;
   }
   return (ret != 0);
@@ -538,7 +501,7 @@ bool sock::is_exceptionpending (int wp_sec, int wp_usec) const
   int ret = select (FD_SETSIZE, 0, 0, &fds, (wp_sec < 0) ? 0: &tv);
   if (ret == SOCKET_ERROR) 
   {
-    WSALASTERROR.raise ();
+    last_error ().raise ();
     return false;
   }
   return (ret != 0);
@@ -551,7 +514,7 @@ unsigned int sock::nread ()
 {
   unsigned long sz;
   if (ioctlsocket (sl->handle, FIONREAD, &sz) == SOCKET_ERROR)
-    sockerrors->raise (WSALASTERROR);
+    last_error ().raise ();
   return sz;
 }
 
@@ -563,263 +526,13 @@ unsigned int sock::nread ()
 erc sock::shutdown (shuthow sh)
 {
   if (::shutdown(sl->handle, sh) == SOCKET_ERROR)
-    return WSALASTERROR;
+    return last_error ();
 	
   return erc::success;		
 }
 
-/*!
-  Returns a socket option.
-  \param  op    option to return
-  \param  buf   buffer for option value
-  \param  len   size of buffer
-  \param  level level at which the option is defined
 
-  \return Size of returned option
-*/
-int sock::getopt (int op, void* buf, int len, int level) const
-{
-  int	rlen = len;
-  if (::getsockopt (sl->handle, level, op, (char*) buf, &rlen) == SOCKET_ERROR)
-    WSALASTERROR.raise ();
-  return rlen;
-}
 
-/*!
-  Set a socket option.
-  \param  op    option to return
-  \param  buf   buffer for option value
-  \param  len   size of buffer
-  \param  level level at which the option is defined
-*/
-void sock::setopt (int op, void* buf, int len, int level) const
-{
-  if (::setsockopt (sl->handle, level, op, (char*) buf, len) == SOCKET_ERROR)
-    WSALASTERROR.raise ();
-}
-
-/*!
-  Return socket type (SOCK_DGRAM or SOCK_STREAM)
-*/
-int sock::gettype () const
-{
-  int ty=0;
-  getopt (SO_TYPE, &ty, sizeof (ty));
-  return ty;
-}
-
-/*!
-  Clear the socket error flag.
-  \return Error flag status
-
-  The per socket-based error code is different from the per thread error
-  code that is handled using the WSAGetLastError function call. 
-  A successful call using the socket does not reset the socket based error code
-  returned by this function.
-*/
-int sock::clearerror () const
-{
-  int err=0;
-  getopt (SO_ERROR, &err, sizeof (err));
-  return err;
-}
-
-/// Return the debug flag.
-bool sock::debug () const
-{
-  BOOL old;
-  getopt (SO_DEBUG, &old, sizeof (old));
-  return (old != FALSE);
-}
-
-/// Set the debug flag
-void sock::debug (bool b)
-{
-  BOOL opt = b;
-  setopt (SO_DEBUG, &opt, sizeof (opt));
-}
-
-/// Return the "reuse address" flag
-bool sock::reuseaddr () const
-{
-  BOOL old;
-  getopt (SO_REUSEADDR, &old, sizeof (old));
-  return (old != FALSE);
-}
-
-/// Set the "reuse address" flag
-void sock::reuseaddr (bool b)
-{
-  BOOL opt = b;
-  setopt (SO_REUSEADDR, &opt, sizeof (opt));
-}
-
-/// Return "keep alive" flag
-bool sock::keepalive () const
-{
-  BOOL old;
-  getopt (SO_KEEPALIVE, &old, sizeof (old));
-  return (old != FALSE);
-}
-
-/// Set "keep alive" flag
-void sock::keepalive (bool b)
-{
-  BOOL opt = b;
-  setopt (SO_KEEPALIVE, &opt, sizeof (opt));
-}
-
-/// Return "don't route" flag
-bool sock::dontroute () const
-{
-  BOOL old;
-  getopt (SO_DONTROUTE, &old, sizeof (old));
-  return (old != FALSE);
-}
-
-/// Set "don't route" flag
-void sock::dontroute (bool b)
-{
-  BOOL opt = b;
-  setopt (SO_DONTROUTE, &opt, sizeof (opt));
-}
-
-/// Return "broadcast" option
-bool sock::broadcast () const
-{
-  BOOL old;
-  getopt (SO_BROADCAST, &old, sizeof (old));
-  return (old != FALSE);
-}
-
-/*! 
-  Set the "broadcast" option
-  
-  \note Socket semantics require that an application set this option 
-  before attempting to send a datagram to broadcast address.
-*/
-void sock::broadcast (bool b)
-{
-  BOOL opt = b;
-  setopt (SO_BROADCAST, &opt, sizeof (opt));
-}
-
-/*!
-  Return the status of the OOB_INLINE flag.
-  If set, OOB data is being received in the normal data stream.
-*/
-bool sock::oobinline () const
-{
-  BOOL old;
-  getopt (SO_OOBINLINE, &old, sizeof (old));
-  return (old != FALSE);
-}
-
-/*!
-  Set the status of the OOB_INLINE flag.
-  If set, OOB data is being received in the normal data stream.
-*/
-void sock::oobinline (bool b)
-{
-  BOOL opt = b;
-  setopt (SO_OOBINLINE, &opt, sizeof (opt));
-}
-
-/// Return buffer size for send operations.
-int sock::sendbufsz () const
-{
-  int old=0;
-  getopt (SO_SNDBUF, &old, sizeof (old));
-  return old;
-}
-
-/// Set buffer size for send operations.
-void sock::sendbufsz (size_t sz)
-{
-  setopt (SO_SNDBUF, &sz, sizeof (sz));
-}
-
-/// Return buffer size for receive operations
-int sock::recvbufsz () const
-{
-  int old=0;
-  getopt (SO_RCVBUF, &old, sizeof (old));
-  return old;
-}
-
-/// Set buffer size for receive operations
-void sock::recvbufsz (size_t sz)
-{
-  setopt (SO_RCVBUF, &sz, sizeof (sz));
-}
-
-/*!
-  Change blocking mode.
-  sock objects are created by default as blocking sockets. They can be turned
-  into non-blocking sockets using this function.
-*/
-void sock::blocking (bool on_off)
-{
-  unsigned long mode = on_off?0:1;
-  if (ioctlsocket (sl->handle, FIONBIO, &mode) == SOCKET_ERROR)
-    WSALASTERROR.raise ();
-}
-
-/*!
-  Associate an event object with this socket.
-
-  \param  evt   handle to event object
-  \param  mask  conditions that trigger the event Can be a combination of:
-                  FD_READ, FD_WRITE, FD_OOB, FD_ACCEPT, FD_CONNECT, FD_CLOSE 
-
-  The event object must be a manual event. It will be set to signaled state if
-  the corresponding socket status change.
-
-  It is not possible to specify different event objects for different
-  network events. 
-*/
-erc sock::setevent (HANDLE evt, long mask)
-{
-  if (WSAEventSelect (sl->handle, (WSAEVENT)evt, mask) == SOCKET_ERROR)
-    return WSALASTERROR;
-  return erc::success;
-}
-
-/*!
-  Indicates which of the FD_XXX network events have occurred.
-  enumevents reports only network activity and errors for which setevent has 
-  been called.
-*/
-long sock::enumevents ()
-{
-  WSANETWORKEVENTS netev;
-  if (WSAEnumNetworkEvents (sl->handle, NULL, &netev) == SOCKET_ERROR)
-    WSALASTERROR.raise ();
-  return netev.lNetworkEvents;
-}
-
-/*!
-  Set turn on or off linger mode and lingering timeout.
-*/
-void sock::linger (bool on_off, unsigned short seconds)
-{
-  struct linger opt;
-  opt.l_onoff = on_off;
-  opt.l_linger = seconds;
-  setopt (SO_LINGER, &opt, sizeof (opt));
-}
-  
-/*!
-  Return linger mode and lingering timeout.
-*/
-bool sock::linger (unsigned short* seconds)
-{
-  struct linger opt;
-  getopt (SO_LINGER, &opt, sizeof (opt));
-  if (seconds)
-    *seconds = opt.l_linger;
-  return (opt.l_onoff == 0);
-}
 
 
 //---------------------------- sockbuf class --------------------------------//
@@ -1063,7 +776,7 @@ std::streamsize sockbuf::showmanyc ()
   It uses the "Nifty Counter" (https://en.wikibooks.org/wiki/More_C%2B%2B_Idioms/Nifty_Counter)
   idiom to ensure Winsock library is properly
   initialized before usage. The header file wsockstream.h contains a declaration
-  of the static object sock_nifty_counter. Because it is a static object there
+  of the static object `sock_nifty_counter`. Because it is a static object there
   will be one such object in each translation unit that includes the header file.
   Moreover, because it is declared before any other global object in that translation
   unit, sock_nifty_counter constructor will be called first. 
@@ -1079,7 +792,9 @@ sock_initializer::sock_initializer ()
     WSADATA wsadata; 
     int err = WSAStartup (MAKEWORD(2,0), &wsadata);
     TRACE8 ("sock_initializer - WSAStartup result = %d", err);
-    sockerrors = new sock_facility ();
+
+    //Set default error handling facility
+    sock::errors = &the_errors;
   }
 }
 
@@ -1090,22 +805,10 @@ sock_initializer::~sock_initializer()
   {
     int err = WSACleanup ();
     TRACE8 ("sock_initializer - WSACleanup result=%d", err);
-    delete sockerrors;
   }
   TRACE9 ("sock_initializer::~sock_initializer cnt=%d", sock_initializer_counter);
 }
 
-/*!
-  \class sock_facility
-  \ingroup sockets
-
-  Converts from error number to error name. 
-*/
-/// Constructor
-sock_facility::sock_facility () : errfac ("SOCKSTREAM ERROR") 
-{
-  TRACE9 ("sock_facility::sock_facility");
-}
 
 //Create an entry in the error table
 #define ENTRY(A) {A, #A}
@@ -1113,7 +816,7 @@ sock_facility::sock_facility () : errfac ("SOCKSTREAM ERROR")
 /*!
   Return the error message text.
 */
-const char* sock_facility::msg (const erc& e)
+const char* sock_facility::msg (const erc& e) const
 {
   static struct errtab {
     int code;
@@ -1206,7 +909,7 @@ const char* sock_facility::msg (const erc& e)
 /*!
   Output either the message text or message number if no text.
 */
-void sock_facility::log (const erc& e)
+void sock_facility::log (const erc& e) const
 {
   const char *str = msg (e);
   if (str)

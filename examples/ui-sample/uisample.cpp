@@ -32,6 +32,7 @@
 #include <utf8/winutf8.h>
 #include <assert.h>
 #include <mlib/asset.h>
+#include <mlib/trace.h>
 
 #include "resource.h"
 
