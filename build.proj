@@ -1,8 +1,8 @@
 <Project DefaultTargets="all">
     <PropertyGroup>
-      <SQLiteVersion>3390100</SQLiteVersion>
-      <SQLiteName>sqlite-amalgamation-3390100</SQLiteName>
-      <SQLiteUrl>https://www.sqlite.org/2022/$(SQLiteName).zip</SQLiteUrl>
+      <SQLiteVersion>3410100</SQLiteVersion>
+      <SQLiteName>sqlite-amalgamation-3410100</SQLiteName>
+      <SQLiteUrl>https://www.sqlite.org/2023/$(SQLiteName).zip</SQLiteUrl>
     </PropertyGroup>
     <Target Name="all" DependsOnTargets="DownloadSQLite">
         <MSBuild Projects="mlib.sln" Properties="Configuration=Debug;Platform=x64"/>      
