@@ -30,12 +30,6 @@
     <ClInclude Include="..\include\mlib\trace.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\mlib\sqlite3.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\mlib\sqlite3ext.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\mlib\sqlitepp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -213,9 +207,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="shmem.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="sqlite3.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="sqlitepp.cpp">

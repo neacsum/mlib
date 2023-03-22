@@ -10,9 +10,3 @@
 *.ipch
 .vs/
 /lib
-
-#SQLite stuff
-
-src/sqlite3.c
-include/mlib/sqlite3.h
-include/mlib/sqlite3ext.h

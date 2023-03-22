@@ -23,7 +23,4 @@ echo Visual studio installation folder is: %VSInstallDir%
 rem "%VSInstallDir%\common7\tools\vsdevcmd.bat"
 call "%VSInstallDir%\common7\tools\vsmsbuildcmd.bat"
 
-rem Download SQLITE files
-msbuild -target:DownloadSQLite %~dp0\build.proj
-
 if "%~1"=="" (msbuild %~dp0\build.proj) else (msbuild -target:%1 %~dp0\build.proj)

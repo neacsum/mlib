@@ -198,8 +198,6 @@
     <ClInclude Include="..\include\mlib\semaphore.h" />
     <ClInclude Include="..\include\mlib\serenum.h" />
     <ClInclude Include="..\include\mlib\shmem.h" />
-    <ClInclude Include="..\include\mlib\sqlite3.h" />
-    <ClInclude Include="..\include\mlib\sqlite3ext.h" />
     <ClInclude Include="..\include\mlib\sqlitepp.h" />
     <ClInclude Include="..\include\mlib\statpars.h" />
     <ClInclude Include="..\include\mlib\stopwatch.h" />
@@ -241,12 +239,6 @@
     <ClCompile Include="serenum2.cpp" />
     <ClCompile Include="serenum3.cpp" />
     <ClCompile Include="shmem.cpp" />
-    <ClCompile Include="sqlite3.c">
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">SQLITE_CUSTOM_INCLUDE=mlib/defs.h;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">SQLITE_CUSTOM_INCLUDE=mlib/defs.h;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">SQLITE_CUSTOM_INCLUDE=mlib/defs.h;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">SQLITE_CUSTOM_INCLUDE=mlib/defs.h;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ClCompile>
     <ClCompile Include="sqlitepp.cpp" />
     <ClCompile Include="statpars.cpp" />
     <ClCompile Include="stopwatch.cpp" />

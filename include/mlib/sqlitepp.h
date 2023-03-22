@@ -14,8 +14,10 @@
 #include <memory>
 
 #include <Winsock2.h>
-#include "sqlite3.h"
+#include <sqlite3/sqlite3.h>
 #include "errorcode.h"
+
+#pragma comment (lib, "sqlite3.lib")
 
 namespace mlib {
 
