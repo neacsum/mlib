@@ -164,6 +164,7 @@ private:
   static errfac *default_facility;
 };
 
+#if __cplusplus >= 202002L
 template <class T>
 concept checkable = !std::is_convertible_v<T, int>;
 
@@ -172,11 +173,12 @@ concept checkable = !std::is_convertible_v<T, int>;
   for creating objects associated with error codes.
 
   `checked<T>` objects are derived  from `mlib::erc`, so they can be treated as
-  regular `erc` objects, in particular compare with an integer to check if it
-  contains an error. To access the included `T` object, use the '->' or '*' operators.
+  regular `erc` objects, in particular they can be compared with an integer to
+  check if they contain an error. To access the included `T` object, use the 
+  '->' or '*' operators.
 
   \note To avoid conflicts with the erc integer conversion operator, the template
-  argument T should not be convertible to `int`.
+  argument T should **NOT** be convertible to `int`.
 
   \tparam T - the type of the included object
 
@@ -277,6 +279,7 @@ public:
 protected:
   T obj;
 };
+#endif
 
 //-----------------------  errfac inlines -------------------------------------
 
