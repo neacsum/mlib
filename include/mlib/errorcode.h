@@ -55,6 +55,11 @@
 
 #include <string>
 
+#if (defined(_MSVC_LANG) && _MSVC_LANG < 201703L)                                                  \
+  || (!defined(_MSVC_LANG) && (__cplusplus < 201703L))
+#error "errorcode requires c++17"
+#endif
+
 namespace mlib {
 
 class erc
@@ -164,7 +169,8 @@ private:
   static errfac *default_facility;
 };
 
-#if __cplusplus >= 202002L
+#if (defined(_MSVC_LANG) && _MSVC_LANG >= 202002L)                            \
+ || (!defined(_MSVC_LANG) && (__cplusplus >= 202002L))
 template <class T>
 concept checkable = !std::is_convertible_v<T, int>;
 
