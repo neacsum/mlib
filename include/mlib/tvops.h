@@ -93,11 +93,6 @@ auto operator <=> (const timeval & t1, const timeval & t2)
 
 #endif
 
-#if 0
-//conversion to/from milliseconds since midnight
-void tolocal (const timeval& tv, DWORD *msSinceMidnight, WORD *usec=NULL);
-void fromlocal (DWORD ms, WORD usec, timeval& tv);
-#endif
 
 //conversion to/from microseconds
 LONGLONG usec64 (const timeval& tv);
@@ -109,7 +104,7 @@ double secd (const timeval& tv);
 timeval fromsystime (const SYSTEMTIME& st);
 void tosystime (const timeval& tv, SYSTEMTIME* st);
 void tolocaltime (const timeval& tv, SYSTEMTIME* st);
-int zone_bias();
+timeval zone_bias();
 
 void normalize (timeval& tv);
 
