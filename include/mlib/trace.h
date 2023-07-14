@@ -34,11 +34,12 @@
 # undef TRACE8
 # undef TRACE9
 
-//SYSLOG_TRACE forces TRACE
+// MLIB_SYSLOG_TRACE forces MLIB_TRACE
 #if MLIB_SYSLOG_TRACE && !defined (MLIB_TRACE)
 #define MLIB_TRACE MLIB_SYSLOG_TRACE
 #endif
 
+// _TRACE forces MLIB_TRACE
 #if defined(_TRACE) && !defined (MLIB_TRACE)
 #define MLIB_TRACE _TRACE
 #endif

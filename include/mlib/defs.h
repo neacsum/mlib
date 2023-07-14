@@ -34,6 +34,12 @@
 
   Intermediate levels are left available for user programs
 */
+
+// If _TRACE has a numeric value, that becomes the trace level
+#if !defined(MLIB_TRACE_LEVEL) && defined(_TRACE) && ((_TRACE)+0 > 0)
+#define MLIB_TRACE_LEVEL _TRACE
+#endif
+
 #ifndef MLIB_TRACE_LEVEL
 #define MLIB_TRACE_LEVEL 7
 #endif
