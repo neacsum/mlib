@@ -171,7 +171,8 @@ void thread::start ()
   TRACE2 ("Thread %s[0x%x] is starting", name ().c_str (), id_);
   stat = state::starting;
   started.signal ();
-  Sleep (0);
+  while (stat < state::running)
+    Sleep (0);
 }
 
 /*!
