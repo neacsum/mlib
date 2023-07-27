@@ -81,7 +81,7 @@ erc JSONBridge::json_begin (json::node& root)
   if (!find (client ()->get_query (), pvar, &idx))
   {
     TRACE2 ("JSONBridge::json_begin - Cannot find %s", client ()->get_query ());
-    return erc (ERR_JSON_NOTFOUND, erc::error);
+    return erc (ERR_JSON_NOTFOUND);
   }
   return jsonify (root, pvar);
 }

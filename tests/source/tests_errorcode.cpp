@@ -9,7 +9,7 @@ using namespace std;
 SUITE (errorcode)
 {
 
-erc f (int i) {return erc(i, erc::error);}
+erc f (int i) {return erc(i);}
 erc g (int i) {return erc (i, erc::warning);}
 erc ff () 
 {

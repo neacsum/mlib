@@ -80,7 +80,7 @@ public:
     emerg         //!< always    logged,       thrown
   };
   erc ();
-  erc (int value, level priority, const errfac* f = nullptr);
+  explicit erc (int value, level priority = level::error, const errfac* f = nullptr);
   erc (const erc& other);
   erc (erc&& other);
 
