@@ -549,13 +549,15 @@ const errfac& erc::facility () const
 /*!
   Equality comparison operator
 
-  Doesn't change status of activity flag.
   All success codes are equal. Other codes are equal only if their value, level
   and facility are equal.
+
+  Resets the activity flag.
 */
 inline
 bool erc::operator == (const erc &other) const
 {
+  active = false;
   if ((!priority_ || !value) && (!other.priority_ || !other.value))
     return true; //success values are the same
   if (facility_ == other.facility_ && priority_ == other.priority_ && value == other.value)
@@ -567,9 +569,10 @@ bool erc::operator == (const erc &other) const
 /*!
   Inequality comparison operator
 
-  Doesn't change status of activity flag.
   All success codes are equal. Other codes are equal only if their value, level
   and facility are equal. 
+
+  Resets the activity flag.
 */
 inline bool erc::operator != (const erc &other) const
 {
