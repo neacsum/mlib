@@ -1,5 +1,6 @@
 #include <utpp/utpp.h>
-#include <mlib/point.h>
+#include <mlib/mlib.h>
+#pragma hdrstop
 
 using namespace mlib;
 

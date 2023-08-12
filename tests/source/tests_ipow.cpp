@@ -1,6 +1,7 @@
+#include <mlib/mlib.h>
 #include <utpp/utpp.h>
-#include <mlib/ipow.h>
-#include <mlib/poly.h>
+#pragma hdrstop
+
 
 #define _USE_MATH_DEFINES
 #include <math.h>

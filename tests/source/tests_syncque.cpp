@@ -1,7 +1,6 @@
 #include <utpp/utpp.h>
-#include <mlib/syncque.h>
-#include <mlib/thread.h>
-#include <mlib/stopwatch.h>
+#include <mlib/mlib.h>
+#pragma hdrstop
 
 #include <iostream>
 #include <iomanip>

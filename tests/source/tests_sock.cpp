@@ -1,6 +1,6 @@
 #include <utpp/utpp.h>
-#include <mlib/wsockstream.h>
-#include <mlib/thread.h>
+#include <mlib/mlib.h>
+#pragma hdrstop
 
 using namespace mlib;
 

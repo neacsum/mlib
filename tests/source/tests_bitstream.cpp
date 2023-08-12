@@ -1,5 +1,6 @@
 #include <utpp/utpp.h>
-#include <mlib/bitstream.h>
+#include <mlib/mlib.h>
+#pragma hdrstop
 #include <sstream>
 
 using namespace mlib;

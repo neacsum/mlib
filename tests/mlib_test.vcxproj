@@ -19,7 +19,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="source\tests_base64.cpp" />
+    <ClCompile Include="source\tests_base64.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">mlib/mlib.h</PrecompiledHeaderFile>
+    </ClCompile>
     <ClCompile Include="source\tests_basename.cpp" />
     <ClCompile Include="source\tests_convert.cpp" />
     <ClCompile Include="source\tests_crc32.cpp" />
@@ -39,7 +42,7 @@
     <ClCompile Include="source\tests_syncque.cpp" />
     <ClCompile Include="source\tests_thread.cpp" />
     <ClCompile Include="source\tests_tvops.cpp" />
-    <ClCompile Include="source\test_point.cpp" />
+    <ClCompile Include="source\tests_point.cpp" />
     <ClCompile Include="source\tests_bitstream.cpp" />
     <ClCompile Include="source\tests_syncro.cpp" />
   </ItemGroup>
@@ -143,14 +146,14 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_TRACE;_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalOptions>/Zc:char8_t- /Zc:__cplusplus /utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <PrecompiledHeaderFile>mlib/mlib.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

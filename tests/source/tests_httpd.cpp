@@ -1,8 +1,7 @@
 #include <utpp/utpp.h>
-#include <mlib/httpd.h>
-#include <mlib/wsockstream.h>
+#include <mlib/mlib.h>
+#pragma hdrstop
 #include <fstream>
-#include <mlib/trace.h>
 
 using namespace mlib;
 
