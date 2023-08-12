@@ -25,6 +25,7 @@
 #include "mutex.h"
 #include "nmea.h"
 #include "options.h"
+#include "rotmat.h"
 #include "rdir.h"
 #include "ringbuf.h"
 #include "semaphore.h"
