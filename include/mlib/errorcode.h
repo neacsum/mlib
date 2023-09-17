@@ -55,6 +55,11 @@
 
 #include <string>
 
+#if (defined(_MSVC_LANG) && _MSVC_LANG < 201703L)                                                  \
+  || (!defined(_MSVC_LANG) && (__cplusplus < 201703L))
+#error "errorcode requires c++17"
+#endif
+
 namespace mlib {
 
 class erc
@@ -75,7 +80,7 @@ public:
     emerg         //!< always    logged,       thrown
   };
   erc ();
-  erc (int value, level priority, const errfac* f = nullptr);
+  explicit erc (int value, level priority = level::error, const errfac* f = nullptr);
   erc (const erc& other);
   erc (erc&& other);
 
@@ -164,6 +169,8 @@ private:
   static errfac *default_facility;
 };
 
+#if (defined(_MSVC_LANG) && _MSVC_LANG >= 202002L)                            \
+ || (!defined(_MSVC_LANG) && (__cplusplus >= 202002L))
 template <class T>
 concept checkable = !std::is_convertible_v<T, int>;
 
@@ -172,11 +179,12 @@ concept checkable = !std::is_convertible_v<T, int>;
   for creating objects associated with error codes.
 
   `checked<T>` objects are derived  from `mlib::erc`, so they can be treated as
-  regular `erc` objects, in particular compare with an integer to check if it
-  contains an error. To access the included `T` object, use the '->' or '*' operators.
+  regular `erc` objects, in particular they can be compared with an integer to
+  check if they contain an error. To access the included `T` object, use the 
+  '->' or '*' operators.
 
   \note To avoid conflicts with the erc integer conversion operator, the template
-  argument T should not be convertible to `int`.
+  argument T should **NOT** be convertible to `int`.
 
   \tparam T - the type of the included object
 
@@ -277,6 +285,7 @@ public:
 protected:
   T obj;
 };
+#endif
 
 //-----------------------  errfac inlines -------------------------------------
 
@@ -540,13 +549,15 @@ const errfac& erc::facility () const
 /*!
   Equality comparison operator
 
-  Doesn't change status of activity flag.
   All success codes are equal. Other codes are equal only if their value, level
   and facility are equal.
+
+  Resets the activity flag.
 */
 inline
 bool erc::operator == (const erc &other) const
 {
+  active = false;
   if ((!priority_ || !value) && (!other.priority_ || !other.value))
     return true; //success values are the same
   if (facility_ == other.facility_ && priority_ == other.priority_ && value == other.value)
@@ -558,9 +569,10 @@ bool erc::operator == (const erc &other) const
 /*!
   Inequality comparison operator
 
-  Doesn't change status of activity flag.
   All success codes are equal. Other codes are equal only if their value, level
   and facility are equal. 
+
+  Resets the activity flag.
 */
 inline bool erc::operator != (const erc &other) const
 {

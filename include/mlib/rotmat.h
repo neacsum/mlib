@@ -36,9 +36,18 @@ public:
   /// Rotate a vector containing the x, y, z coordinates
   void rotate (double *vec) const;
 
+  /// Return reference to rotation matrix (3x3)
+  double (&matrix ())[3][3];
+
 private:
   double r[3][3];
   void multiply (double m[3][3]);
 };
+
+inline double (&RotMat::matrix ())[3][3]
+{
+  return r;
+}
+
 
 }

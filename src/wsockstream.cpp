@@ -260,10 +260,10 @@ erc sock::connect (const sockaddr& sa, int wp_sec)
       return erc::success;
     int ret = WSAGetLastError ();
     if (ret != WSAEWOULDBLOCK)
-      return {ret, erc::error, sock::errors};
+      return erc(ret, erc::error, sock::errors);
     if (is_writeready (wp_sec))
       return erc::success;
-    return {WSAETIMEDOUT, erc::info, sock::errors};
+    return erc(WSAETIMEDOUT, erc::info, sock::errors);
   }
   if (::connect(sl->handle, &sa, sizeof(sa)) == SOCKET_ERROR)
     return last_error ();

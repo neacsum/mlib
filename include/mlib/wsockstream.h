@@ -559,7 +559,7 @@ bool sock::linger (unsigned short *seconds)
 /// Return an error code with the value returned by WSAGetLastError
 inline erc sock::last_error ()
 {
-  return {WSAGetLastError (), erc::error, sock::errors};
+  return erc(WSAGetLastError (), erc::error, sock::errors);
 }
 
 }

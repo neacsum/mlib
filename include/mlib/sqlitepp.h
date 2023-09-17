@@ -17,6 +17,11 @@
 #include <sqlite3/sqlite3.h>
 #include "errorcode.h"
 
+#if (defined(_MSVC_LANG) && _MSVC_LANG < 202002L)                             \
+ || (!defined(_MSVC_LANG) && (__cplusplus < 202002L))
+#error "sqlitepp requires c++20"
+#endif
+
 #pragma comment (lib, "sqlite3.lib")
 
 namespace mlib {

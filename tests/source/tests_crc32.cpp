@@ -1,5 +1,6 @@
-#include <mlib/crc32.h>
+#include <mlib/mlib.h>
 #include <utpp/utpp.h>
+#pragma hdrstop
 
 
 TEST (CRC32_QuickBrownFox)

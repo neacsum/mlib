@@ -8,13 +8,19 @@
 
 namespace mlib {
 
-RotMat::RotMat ()
+RotMat::RotMat () 
+  : r{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}
 {
-  for (int i = 0; i < 3; i++)
-    for (int j = 0; j < 3; j++)
-      r[i][j] = (i == j) ? 1. : 0.;
 }
 
+/*!
+  Create a rotation matrix with specified rotation angles.
+  \param rx rotation around X-axis (radians)
+  \param ry rotation around Y-axis (radians)
+  \param rz rotation around Z-axis (radians)
+
+  Rotations are applied in the order z, y, x (Tait-Bryant convention).
+*/
 RotMat::RotMat (double rx, double ry, double rz)
   : RotMat ()
 {
@@ -25,10 +31,7 @@ RotMat::RotMat (double rx, double ry, double rz)
 
 void RotMat::x_rotation (double angle)
 {
-  double rx[3][3];
-  for (int i = 0; i < 3; i++)
-    for (int j = 0; j < 3; j++)
-      rx[i][j] = (i == j) ? 1. : 0.;
+  double rx[3][3] = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
   rx[1][1] = rx[2][2] = cos (angle);
   rx[1][2] = -(rx[2][1] = sin (angle));
   multiply (rx);
@@ -36,10 +39,7 @@ void RotMat::x_rotation (double angle)
 
 void RotMat::y_rotation (double angle)
 {
-  double ry[3][3];
-  for (int i = 0; i < 3; i++)
-    for (int j = 0; j < 3; j++)
-      ry[i][j] = (i == j) ? 1. : 0.;
+  double ry[3][3] = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
   ry[0][0] = ry[2][2] = cos (angle);
   ry[2][0] = -(ry[0][2] = sin (angle));
   multiply (ry);
@@ -47,12 +47,9 @@ void RotMat::y_rotation (double angle)
 
 void RotMat::z_rotation (double angle)
 {
-  double rz[3][3];
-  for (int i = 0; i < 3; i++)
-    for (int j = 0; j < 3; j++)
-      rz[i][j] = (i == j) ? 1. : 0.;
+  double rz[3][3] = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
   rz[0][0] = rz[1][1] = cos (angle);
-  rz[1][0] = -(rz[0][1] = sin (angle));
+  rz[0][1] = -(rz[1][0] = sin (angle));
   multiply (rz);
 }
 
@@ -63,7 +60,7 @@ void RotMat::rotate (double *vec) const
   {
     t[i] = 0;
     for (int j = 0; j < 3; j++)
-      t[i] += vec[j] * r[j][i];
+      t[i] += vec[j] * r[i][j];
   }
   for (int i = 0; i < 3; i++)
     vec[i] = t[i];

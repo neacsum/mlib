@@ -48,7 +48,7 @@
     <ClCompile Include="source\tests_sqlitepp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\test_point.cpp">
+    <ClCompile Include="source\tests_point.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\tests_errorcode.cpp">

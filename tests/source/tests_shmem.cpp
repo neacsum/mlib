@@ -1,8 +1,7 @@
-#include <mlib/shmem.h>
 #include <utpp/utpp.h>
+#include <mlib/mlib.h>
+#pragma hdrstop
 #include <string>
-#include <mlib/thread.h>
-#include <mlib/trace.h>
 
 using namespace mlib;
 using namespace std;
