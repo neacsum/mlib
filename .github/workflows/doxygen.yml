@@ -1,0 +1,36 @@
+name: Generate Doxygen Pages
+
+on:
+  push:
+    branches: [ "master" ]
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  make_docs:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download Doxygen
+        uses: engineerd/configurator@v0.0.10
+        with:
+          name: doxygen.exe
+          url: https://github.com/doxygen/doxygen/releases/download/Release_1_9_8/doxygen-1.9.8.windows.x64.bin.zip
+          pathInArchive: doxygen.exe
+
+      - name: Generate Doxygen documentation
+        run: doxygen tools/doxygen/Doxyfile
+      
+      - name: Upload pages
+        uses: actions/upload-pages-artifact@v2
+        with:
+          path: docs
+      
+      - name: Deploy pages
+        uses: actions/deploy-pages@v2
