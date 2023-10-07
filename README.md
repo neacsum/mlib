@@ -26,9 +26,9 @@ Example programs:
 ## Building ##
 mlib requires the [UTF-8 Library](https://github.com/neacsum/utf8). in addition The test program requires the [UTPP Library](https://github.com/neacsum/utpp).
 
-The preferred method is to use the [CPM - C/C++ Package Manager](https://github.com/neacsum/cpm/releases/latest/download/cpm.exe) to fetch all dependent packages and build them. Just issue the `CPM` command:
+The preferred method is to use the [CPM - C/C++ Package Manager](https://github.com/neacsum/cpm/). Download the [CPM executable](https://github.com/neacsum/cpm/releases/latest/download/cpm.exe) and, from the root of the development tree, issue the `cpm` command:
 ```
-c:\mlib>cpm
+  cpm -u https://github.com/neacsum/mlib.git mlib
 ```
 
 You can also use the `BUILD.bat` script will create all libraries and test programs:
@@ -36,17 +36,17 @@ You can also use the `BUILD.bat` script will create all libraries and test progr
 c:\mlib>build all
 ```
 
-
 ## Documentation ##
-You can find Doxygen generated documentation [here](https://neacsum.github.io/mlib/html/index.html).
+You can find Doxygen generated documentation [here](https://neacsum.github.io/mlib/index.html).
 
-Also there are some articles on CodeProject detailing some of the features:
- - [Error code objects](https://www.codeproject.com/Articles/5251693/Cplusplus-Error-Handling-with-Error-Code-Objects)
- - [Windows Sockets Streams](https://www.codeproject.com/Articles/5252621/Windows-Sockets-Streams)
- - [Windows Sockets Streams Part II - Multi-Threaded TCP Servers](https://www.codeproject.com/Articles/5270886/Windows-Sockets-Streams-Part-II-Multi-Threaded-TCP)
- - [Windows Sockets Streams Part III - HTTP Server](https://www.codeproject.com/Articles/5272994/Windows-Sockets-Streams-Part-III-HTTP-Server)
- - [YACB - Yet Another Circular Buffer](https://www.codeproject.com/Articles/5292326/YACB-Yet-Another-Circular-Buffer)
- - [Producer/Consumer Queues in C++](https://www.codeproject.com/Articles/5281878/Producer-Consumer-Queues-in-Cplusplus)
+There are also some articles about some of the features:
+ - [Error code objects](https://neacsu.net/docs/programming/error_codes/cp_article/)
+ - [Windows Sockets Streams](https://neacsu.net/docs/programming/sockstreams/windows-socket-streams/)
+ - [Windows Sockets Streams Part II - Multi-Threaded TCP Servers](https://neacsu.net/docs/programming/sockstreams/multi-threaded-servers/)
+ - [Windows Sockets Streams Part III - HTTP Server](https://neacsu.net/docs/programming/sockstreams/httpserver/)
+ - [YACB - Yet Another Circular Buffer](https://neacsu.net/docs/programming/circular_buffer/)
+ - [Producer/Consumer Queues in C++](https://neacsu.net/docs/programming/producer-consumer-queues/)
+ - [C++ Replacement for `getopt`](https://neacsu.net/docs/programming/getopt/)
 
 ## License ##
 [MIT License](https://github.com/neacsum/mlib/blob/master/LICENSE)
