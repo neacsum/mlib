@@ -18,7 +18,8 @@
     },
     {
       "name": "sqlite3",
-      "git": "git@github.com:neacsum/sqlite3.git"
+      "git": "git@github.com:neacsum/sqlite3.git",
+      "https": "https://github.com/neacsum/sqlite3.git"
     }
   ]
 }

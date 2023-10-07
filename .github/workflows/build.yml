@@ -18,16 +18,13 @@ jobs:
     
     steps:      
       - name: Get CPM
-        uses: engineerd/configurator@v0.0.8
+        uses: engineerd/configurator@v0.0.10
         with:
           name: cpm.exe
           url: https://github.com/neacsum/cpm/releases/latest/download/cpm.exe
       
-      - name: Clone
-        run: git clone https://github.com/neacsum/mlib.git .\mlib
-
       - name: Build libraries
-        run: cpm -v --proto https -r . mlib
+        run: cpm -v --proto https https://github.com/neacsum/mlib.git -r $HOME mlib
         
       - name: Build and run tests
         run: mlib/build.bat tests
