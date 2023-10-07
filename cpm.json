@@ -1,20 +1,24 @@
 {
-    "name": "mlib",
-    "git": "git@github.com:neacsum/mlib.git",
-    "https": "https://github.com/neacsum/mlib.git",
-    "build": [
-        {"cmd": "build.bat", "args": ["lib"]}
-    ], 
-    "depends": [
-        {
-            "name": "utf8",
-            "git": "git@github.com:neacsum/utf8.git",
-            "https": "https://github.com/neacsum/utf8.git"
-        },
-        {
-            "name": "utpp",
-            "git": "git@github.com:neacsum/utpp.git",
-            "https": "https://github.com/neacsum/utpp.git"
-        }
-    ]
+  "name": "mlib",
+  "git": "git@github.com:neacsum/mlib.git",
+  "https": "https://github.com/neacsum/mlib.git",
+  "build": [
+    {"cmd": "build.bat", "args": ["lib"]}
+  ], 
+  "depends": [
+    {
+      "name": "utf8",
+      "git": "git@github.com:neacsum/utf8.git",
+      "https": "https://github.com/neacsum/utf8.git"
+    },
+    {
+      "name": "utpp",
+      "git": "git@github.com:neacsum/utpp.git",
+      "https": "https://github.com/neacsum/utpp.git"
+    },
+    {
+      "name": "sqlite3",
+      "git": "git@github.com:neacsum/sqlite3.git"
+    }
+  ]
 }

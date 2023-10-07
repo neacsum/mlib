@@ -44,15 +44,3 @@
 #define MLIB_TRACE_LEVEL 7
 #endif
 
-/*
-  SQLITE compile time options.
-  See https://www.sqlite.org/compile.html for the full list
-
-  This header file must be included when compiling sqlite.c amalgamation.
-  To do that, add /D "SQLITE_CUSTOM_INCLUDE=mlib/defs.h" on the command line
-  while compiling sqlite.c
-*/
-
-#define SQLITE_OMIT_UTF16
-#define SQLITE_ENABLE_COLUMN_METADATA
-//#define SQLITE_ENABLE_RTREE

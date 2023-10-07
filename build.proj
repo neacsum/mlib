@@ -1,16 +1,11 @@
 <Project DefaultTargets="all">
-    <PropertyGroup>
-      <SQLiteVersion>3410100</SQLiteVersion>
-      <SQLiteName>sqlite-amalgamation-3410100</SQLiteName>
-      <SQLiteUrl>https://www.sqlite.org/2023/$(SQLiteName).zip</SQLiteUrl>
-    </PropertyGroup>
-    <Target Name="all" DependsOnTargets="DownloadSQLite">
+    <Target Name="all">
         <MSBuild Projects="mlib.sln" Properties="Configuration=Debug;Platform=x64"/>      
         <MSBuild Projects="mlib.sln" Properties="Configuration=Release;Platform=x64"/>      
         <MSBuild Projects="mlib.sln" Properties="Configuration=Debug;Platform=x86"/>      
         <MSBuild Projects="mlib.sln" Properties="Configuration=Release;Platform=x86"/>      
     </Target>
-    <Target Name="lib" DependsOnTargets="DownloadSQLite">
+    <Target Name="lib">
         <MSBuild Projects="src\mlib.vcxproj" Properties="SolutionDir=..\;Configuration=Debug;Platform=x64"/>  
         <MSBuild Projects="src\mlib.vcxproj" Properties="SolutionDir=..\;Configuration=Release;Platform=x64"/> 
         <MSBuild Projects="src\mlib.vcxproj" Properties="SolutionDir=..\;Configuration=Debug;Platform=x86"/>  
@@ -22,11 +17,4 @@
         <MSBuild Projects="tests\mlib_test.vcxproj" Properties="SolutionDir=..\;Configuration=Debug;Platform=x86"/>  
         <MSBuild Projects="tests\mlib_test.vcxproj" Properties="SolutionDir=..\;Configuration=Release;Platform=x86"/>
     </Target>
-    <Target Name="DownloadSQLite">
-        <DownloadFile SourceUrl="$(SQLiteUrl)" DestinationFolder="$(MSBuildProjectDirectory)\build\sqlite" />
-        <Unzip SourceFiles="build\sqlite\$(SQLiteName).zip" DestinationFolder="build\sqlite" />
-        <Copy SourceFiles="build\sqlite\$(SQLiteName)\sqlite3.c" DestinationFolder="src" SkipUnchangedFiles="true" />
-        <Copy SourceFiles="build\sqlite\$(SQLiteName)\sqlite3.h" DestinationFolder="include\mlib" SkipUnchangedFiles="true" />
-        <Copy SourceFiles="build\sqlite\$(SQLiteName)\sqlite3ext.h" DestinationFolder="include\mlib" SkipUnchangedFiles="true" />
-    </Target>  
 </Project>
