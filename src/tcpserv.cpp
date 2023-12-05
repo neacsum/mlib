@@ -128,7 +128,7 @@ void tcpserver::run ()
 
       inaddr peer;
       contab[i] = new conndata;
-      contab[i]->socket = accept (peer);
+      contab[i]->socket = accept (&peer);
 
       /* clear inherited attributes (nonblocking mode and event mask)*/
       contab[i]->socket.setevent (0, 0);
@@ -271,7 +271,7 @@ void tcpserver::termconn (sock& socket, thread *th)
     th->wait (10);
     delete th;
   }
-  if (socket.handle () != INVALID_SOCKET)
+  if (socket.is_open())
   {
     try {
       /* Throughout this sequence we might get slapped with a WSAECONNRESET error

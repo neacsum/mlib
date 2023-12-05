@@ -1,8 +1,10 @@
-/*!
-  \file inaddr.cpp Implementation of inaddr class.
-
-  (c) Mircea Neacsu 2002. All rights reserved.
+/*
+  MLIB Library
+  (c) Mircea Neacsu 2002-2023. Licensed under MIT License.
+  See README file for full license terms.
 */
+
+/// \file inaddr.cpp Implementation of inaddr class.
 
 //get rid of a deprecation warning related to inet_ntoa (MN 22-Jan-17) 
 #ifndef _WINSOCK_DEPRECATED_NO_WARNINGS
@@ -19,7 +21,7 @@ namespace mlib {
 sock_initializer init;
 
 /*!
-  \class inaddr
+  \class inaddr wrapper class for sockaddr structure.
   \ingroup sockets
 */
 
@@ -44,16 +46,18 @@ inaddr::inaddr (const sockaddr& s)
 /*!
   Fill sockaddr structure after resolving hostname
 */
-inaddr::inaddr (const char *hostname, unsigned short port)
+inaddr::inaddr (const std::string& hostname, unsigned short port)
 {
   memset (&sa, 0, sizeof(sa));
   sa.sin_family = AF_INET;
   sa.sin_port = htons (port);
-  if ((sa.sin_addr.s_addr=inet_addr (hostname)) == INADDR_NONE &&
-      strcmp(hostname, "255.255.255.255"))
+  if (hostname == "255.255.255.255")
+    sa.sin_addr.s_addr = INADDR_BROADCAST;
+  else if (!hostname.empty ()
+        && (sa.sin_addr.s_addr = inet_addr (hostname.c_str ())) == INADDR_NONE)
   {
     HOSTENT *he;
-    if (NULL == (he = gethostbyname (hostname)))
+    if (NULL == (he = gethostbyname (hostname.c_str())))
       sock::last_error().raise ();
     else
       memcpy (&sa.sin_addr, he->h_addr_list[0], he->h_length);
@@ -61,12 +65,68 @@ inaddr::inaddr (const char *hostname, unsigned short port)
 }
 
 /*!
+  Fill sockaddr structure after resolving host and service names
+
+  \param hostname host name or IP address
+  \param service  well-known service or port number
+  \param proto    service protocol
+*/
+inaddr::inaddr (const std::string &hostname, const std::string &service, 
+                const std::string &proto)
+{
+  memset (&sa, 0, sizeof (sa));
+  sa.sin_family = AF_INET;
+  if (hostname == "255.255.255.255")
+    sa.sin_addr.s_addr = INADDR_BROADCAST;
+  else if (!hostname.empty ()
+        && (sa.sin_addr.s_addr = inet_addr (hostname.c_str ())) == INADDR_NONE)
+  {
+    HOSTENT *he;
+    if (NULL == (he = gethostbyname (hostname.c_str ())))
+      sock::last_error ().raise ();
+    else
+      memcpy (&sa.sin_addr, he->h_addr_list[0], he->h_length);
+  }
+  port (service, proto);
+}
+
+
+/*!
+  \param service service name
+  \param proto protocol name
+
+  The \p name parameter can be either one of the well-known service names or a
+  numeric port value. If it is a numeric value, the function converts it to a
+  port number using the `strtoul` function.
+*/
+erc inaddr::port (const std::string& service, const std::string& proto)
+{
+  char *eptr;
+  unsigned long p = strtoul (service.c_str (), &eptr, 0);
+  if (!*eptr)
+  {
+    port ((unsigned short)p);
+    return erc::success;
+  }
+
+  const char *pproto = proto.empty () ? nullptr : proto.c_str ();
+  struct servent *serv = getservbyname (service.c_str (), pproto);
+  if (!serv)
+    return sock::last_error ();
+  
+  sa.sin_port = serv->s_port;
+  return erc::success;
+}
+
+/*!
   Set host address after resolving name
 */
 erc inaddr::host (const std::string& hostname)
 {
-  if ((sa.sin_addr.s_addr=inet_addr (hostname.c_str())) == INADDR_NONE &&
-       hostname != "255.255.255.255")
+  if (hostname == "255.255.255.255")
+    sa.sin_addr.s_addr = INADDR_BROADCAST;
+  else if (!hostname.empty ()
+        && (sa.sin_addr.s_addr = inet_addr (hostname.c_str ())) == INADDR_NONE)
   {
     HOSTENT *he = gethostbyname (hostname.c_str());
     if (he == NULL)
@@ -80,18 +140,18 @@ erc inaddr::host (const std::string& hostname)
 /*!
   Find hostname from the host address in sockaddr
 */
-std::string inaddr::hostname ()
+std::string inaddr::hostname () const
 {
   HOSTENT *he = gethostbyaddr ((char*)&sa.sin_addr, sizeof(sa.sin_addr), AF_INET);
   if (he == NULL)
   {
     DWORD err = WSAGetLastError();
-    if ( err == WSAHOST_NOT_FOUND ||
-         err == WSANO_DATA ||
-         err == WSANO_RECOVERY ||
-         err == WSATRY_AGAIN)
-      return inet_ntoa( sa.sin_addr );          //Seems like a DNS problem.
-                                                //Make a char string from dotted address
+    if (err == WSAHOST_NOT_FOUND ||
+        err == WSANO_DATA ||
+        err == WSANO_RECOVERY ||
+        err == WSATRY_AGAIN)
+      // Seems like a DNS problem; make a char string from dotted address.
+      return inet_ntoa (sa.sin_addr);
     else
     {
       sock::last_error().raise ();
@@ -141,7 +201,7 @@ unsigned inaddr::localhost ()
   return ntohl ((lcl_addr.sin_addr.s_addr));
 }
 
-const char *inaddr::ntoa ()
+const char *inaddr::ntoa () const
 {
   return inet_ntoa (sa.sin_addr);
 }

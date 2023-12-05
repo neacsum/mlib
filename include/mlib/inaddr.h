@@ -1,19 +1,19 @@
 #pragma once
-/*!
-  \file inaddr.h Definition of inaddr class.
-
-  (c) Mircea Neacsu 2002. All rights reserved.
-
-  inaddr is a wrapper class for sockaddr structure.
+/*
+  MLIB Library
+  (c) Mircea Neacsu 2002-2023. Licensed under MIT License.
+  See README file for full license terms.
 */
 
-//#include <winsock2.h>   //MS
+/// \file inaddr.h Definition of inaddr class.
 
 #if __has_include ("defs.h")
 #include "defs.h"
 #endif
 
-#include <WinSock2.h>
+#include <winsock2.h>
+#include <ostream>
+
 #include "errorcode.h"
 
 
@@ -25,14 +25,17 @@ class inaddr
 {
 public:
   inaddr (unsigned long host=INADDR_ANY, unsigned short port=0);
-  inaddr (const char *hostname, unsigned short port);
+  inaddr (const std::string& hostname, unsigned short port);
+  inaddr (const std::string &hostname, const std::string &service,
+          const std::string &proto = std::string ());
+
   inaddr (const sockaddr& adr);
   inaddr& operator =(const inaddr& rhs);
 
   /// convert to a pointer to sockaddr
   operator sockaddr* () const             { return (sockaddr*)&sa; };
-  int operator ==(const inaddr& other) const;
-  int operator != (const inaddr& other) const;
+  bool operator ==(const inaddr& other) const;
+  bool operator != (const inaddr& other) const;
 
   /// convert to a reference to sockaddr (const variant)
   operator const sockaddr& () const       { return *(sockaddr*)&sa; };
@@ -46,17 +49,21 @@ public:
   /// set port number
   void port (unsigned short p)            { sa.sin_port = htons(p); };
 
+  /// set port number based on well-known service ports
+  erc port (const std::string& service, const std::string& proto = std::string());
+
   /// return host address in host order
   unsigned host () const                  { return ntohl(sa.sin_addr.s_addr); };
 
   /// set host address
-  void host (unsigned int h)           { sa.sin_addr.s_addr = htonl(h);};
+  void host (unsigned int h)              { sa.sin_addr.s_addr = htonl(h);};
 
   erc host (const std::string& hostname);
-  std::string hostname ();
+
+  std::string hostname () const;
 
   /// return host address in dotted format
-  const char *ntoa ();
+  const char *ntoa () const;
 
   /// check if it's multicast host
   bool is_multicast () const             {return ((host() & 0xf0000000) ==  0xe0000000);};
@@ -77,7 +84,7 @@ inaddr& inaddr::operator =(const inaddr &rhs)
 
 /// Equality operator
 inline
-int inaddr::operator == (const inaddr& other) const
+bool inaddr::operator == (const inaddr& other) const
 {
   return (sa.sin_addr.S_un.S_addr == other.sa.sin_addr.S_un.S_addr) &&
          (sa.sin_port == other.sa.sin_port);
@@ -85,10 +92,17 @@ int inaddr::operator == (const inaddr& other) const
 
 /// Inequality operator
 inline
-int inaddr::operator != (const inaddr& other) const
+bool inaddr::operator != (const inaddr& other) const
 {
   return (! operator ==(other));
 }
 
+} //namespace mlib
 
+/// Serialize an address as '<hostname>:<port>'
+inline
+std::ostream &operator<< (std::ostream &strm, mlib::inaddr& addr)
+{
+  strm << addr.hostname () << ':' << addr.port ();
+  return strm;
 }

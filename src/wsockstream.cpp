@@ -1,10 +1,10 @@
-/*!
-  \file wsockstream.cpp Implementation of sock and sock-derived classes
-
- Copyright (c) 2001 Mircea Neacsu
-
-
+/*
+  MLIB Library
+  (c) Mircea Neacsu 2002-2023. Licensed under MIT License.
+  See README file for full license terms.
 */
+
+/// \file wsockstream.cpp Implementation of sock and sock-derived classes
 
 //comment this line if you want debug messages from this module
 #undef _TRACE
@@ -54,7 +54,7 @@ static sock_initializer init;
   \class sock
   \ingroup sockets
 
-  We keep a 'lives' counter associated with each sock object because sockets
+  We keep a 'use_count' counter associated with each sock object because sockets
   cannot be safely duplicated (it seems) and anyway would be more expensive 
   to call DuplicateHandle.
 */
@@ -65,7 +65,7 @@ static sock_initializer init;
 sock::sock (SOCKET soc) :
   sl (new sock_life)
 {
-  sl->lives = 1;
+  sl->use_count = 1;
   sl->handle = soc;
   TRACE9 ("sock::sock (SOCKET %x)", sl->handle);
 }
@@ -82,7 +82,7 @@ sock::sock (SOCKET soc) :
 sock::sock (int type, int domain, int proto) : 
   sl (new sock_life)
 {
-  sl->lives = 1;
+  sl->use_count = 1;
   if ((sl->handle = ::socket (domain, type, proto)) == INVALID_SOCKET) 
   {
     delete sl;
@@ -99,8 +99,15 @@ sock::sock (int type, int domain, int proto) :
 sock::sock (const sock& sb)
 {
   sl = sb.sl;
-  sl->lives++;
-  TRACE9 ("sock::sock (sock %x) has %d lives", sl->handle,sl->lives);
+  sl->use_count++;
+  TRACE9 ("sock::sock (sock %x) has %d lives", sl->handle,sl->use_count);
+}
+
+/// Move constructor
+sock::sock (sock&& sb)
+{
+  sl = sb.sl;
+  sb.sl = new sock_life;
 }
 
 /*!
@@ -111,7 +118,7 @@ sock& sock::operator = (const sock& rhs)
   if (this == &rhs)
     return *this;       //trivial assignment
   
-  if (--sl->lives == 0)
+  if (--sl->use_count == 0)
   {
     //close our previous socket if we had one
     if (sl->handle != INVALID_SOCKET)
@@ -123,19 +130,41 @@ sock& sock::operator = (const sock& rhs)
     TRACE9 ("sock::operator= deleting old sl");
   }
   sl = rhs.sl;
-  sl->lives++;
-  TRACE9 ("sock::operator= -- handle=%x has %d lives", sl->handle, sl->lives);
+  sl->use_count++;
+  TRACE9 ("sock::operator= -- handle=%x has %d lives", sl->handle, sl->use_count);
+  return *this;
+}
+
+/// Move assignment
+sock &sock::operator= (sock &&rhs)
+{
+  if (this == &rhs)
+    return *this; // trivial assignment
+
+  if (--sl->use_count == 0)
+  {
+    // close our previous socket if we had one
+    if (sl->handle != INVALID_SOCKET)
+    {
+      TRACE8 ("sock::operator=&& -- closesocket(%x)", sl->handle);
+      closesocket (sl->handle);
+    }
+    delete sl;
+    TRACE9 ("sock::operator=&& deleting old sl");
+  }
+  sl = rhs.sl;
+  rhs.sl = new sock_life;
   return *this;
 }
 
 /*!
   Destructor.
 
-  If the 'lives' counter is 0, calls closesocket() to free the Winsock handle.
+  If the 'use_count' counter is 0, calls closesocket() to free the Winsock handle.
 */
 sock::~sock ()
 {
-  if (--sl->lives == 0)
+  if (--sl->use_count == 0)
   {
     if (sl->handle != INVALID_SOCKET)
     {
@@ -146,7 +175,7 @@ sock::~sock ()
     TRACE9 ("sock::~sock deleting sl");
   }
   else
-    TRACE9 ("sock::~sock -- handle=%x has %d lives)", sl->handle, sl->lives);
+    TRACE9 ("sock::~sock -- handle=%x has %d lives)", sl->handle, sl->use_count);
 }
 
 /*!
@@ -216,12 +245,10 @@ inaddr sock::peer () const
 /*!
   Associates a local address with the socket.
 */
-erc sock::bind (const sockaddr& sa)
+erc sock::bind (const inaddr& sa) const
 {
-  TRACE8 ("sock::bind (%x) to %x:%d", 
-    sl->handle, ntohl(((sockaddr_in&)sa).sin_addr.S_un.S_addr), 
-    ntohs(((sockaddr_in&)sa).sin_port));
-  if (::bind (sl->handle, &sa, sizeof(sa)) == SOCKET_ERROR)
+  TRACE8 ("sock::bind (%x) to %s:%d", sl->handle, sa.ntoa (), sa.port ());
+  if (::bind (sl->handle, sa, sizeof(sa)) == SOCKET_ERROR)
     return last_error ();
   return erc::success;
 }
@@ -233,7 +260,7 @@ erc sock::bind (const sockaddr& sa)
   name() after calling bind to learn the address and the port that has been
   assigned to it.
 */
-erc sock::bind()
+erc sock::bind() const
 {
   sockaddr sa;
   memset (&sa, 0, sizeof(sa));
@@ -251,12 +278,12 @@ erc sock::bind()
   the function waits the specified interval for the connection to be established.
   If it is not established the function returns WSAETIMEDOUT.
 */
-erc sock::connect (const sockaddr& sa, int wp_sec)
+erc sock::connect (const inaddr& sa, int wp_sec) const
 {
   if (wp_sec != INFINITE)
   {
     blocking (false);
-    if (!::connect (sl->handle, &sa, sizeof (sa)))
+    if (!::connect (sl->handle, sa, sizeof (sa)))
       return erc::success;
     int ret = WSAGetLastError ();
     if (ret != WSAEWOULDBLOCK)
@@ -265,7 +292,7 @@ erc sock::connect (const sockaddr& sa, int wp_sec)
       return erc::success;
     return erc(WSAETIMEDOUT, erc::info, sock::errors);
   }
-  if (::connect(sl->handle, &sa, sizeof(sa)) == SOCKET_ERROR)
+  if (::connect(sl->handle, sa, sizeof(sa)) == SOCKET_ERROR)
     return last_error ();
   return erc::success;
 }
@@ -274,7 +301,7 @@ erc sock::connect (const sockaddr& sa, int wp_sec)
   Places the socket in a state in which it is listening for
   incoming connections.
 */
-erc sock::listen (int num)
+erc sock::listen (int num) const
 {
   if (::listen (sl->handle, num) == SOCKET_ERROR)
     return last_error ();
@@ -283,28 +310,19 @@ erc sock::listen (int num)
 
 /*!
   Permits an incoming connection attempt on the socket.
-  \param  sa  address of the connecting peer.
+  \param  addr  optional pointer to address of the connecting peer.
 
   The connection is actually made with the socket that is returned by accept.
 */
-sock sock::accept (sockaddr& sa)
+sock sock::accept (inaddr* addr) const
 {
   SOCKET soc;
+  sockaddr sa;
   int len = sizeof(sa);
   if ((soc = ::accept (sl->handle, &sa, &len)) == INVALID_SOCKET)
     last_error ().raise ();
-  return soc;
-}
-
-/*!
-  Permits an incoming connection attempt on the socket.
-  The connection is actually made with the socket that is returned by accept.
-*/
-sock sock::accept ()
-{
-  SOCKET soc;
-  if ((soc = ::accept (sl->handle, 0, 0)) == INVALID_SOCKET)
-    last_error ().raise ();
+  if (addr)
+    *addr = sa;
   return soc;
 }
 
@@ -317,7 +335,7 @@ sock sock::accept ()
   \return Number of characters received or EOF if connection closed by peer.
 
 */
-size_t sock::recv (void* buf, size_t len, int msgf)
+size_t sock::recv (void* buf, size_t len, int msgf) const
 {
   int rval = ::recv (sl->handle, (char*) buf, (int)len, msgf);
   if (rval == SOCKET_ERROR)
@@ -345,7 +363,7 @@ size_t sock::recv (void* buf, size_t len, int msgf)
   \return Number of characters received or EOF if connection closed by peer.
 
 */
-size_t sock::recvfrom (sockaddr& sa, void* buf, size_t len, int msgf)
+size_t sock::recvfrom (sockaddr& sa, void* buf, size_t len, int msgf) const
 {
   int rval;
   int sa_len = sizeof(sa);
@@ -374,7 +392,7 @@ size_t sock::recvfrom (sockaddr& sa, void* buf, size_t len, int msgf)
   The function returns the number of characters actually sent or EOF if 
   connection was closed by peer.
 */
-size_t sock::send (const void* buf, size_t len, int msgf)
+size_t sock::send (const void* buf, size_t len, int msgf) const
 {
   size_t wlen=0;
   const char *cp = (const char *)buf;
@@ -510,7 +528,7 @@ bool sock::is_exceptionpending (int wp_sec, int wp_usec) const
 /*!
   Return number of characters waiting in socket's buffer.
 */
-unsigned int sock::nread ()
+unsigned int sock::nread () const
 {
   unsigned long sz;
   if (ioctlsocket (sl->handle, FIONREAD, &sz) == SOCKET_ERROR)
@@ -523,7 +541,7 @@ unsigned int sock::nread ()
 
   \param  sh   describes what types of operation will no longer be allowed
 */
-erc sock::shutdown (shuthow sh)
+erc sock::shutdown (shuthow sh) const
 {
   if (::shutdown(sl->handle, sh) == SOCKET_ERROR)
     return last_error ();
@@ -627,8 +645,12 @@ sockbuf& sockbuf::operator = (const sockbuf& rhs)
 */
 sockbuf::~sockbuf ()
 {
-  if (handle() != INVALID_SOCKET)
+  if (is_open ())
+  {
     overflow ();
+    shutdown (shut_readwrite);
+    close ();
+  }
 
   if (x_flags & _S_ALLOCBUF)
   {

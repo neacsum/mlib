@@ -25,6 +25,19 @@ TEST (inaddr_basic1)
   CHECK_EQUAL (INADDR_LOOPBACK, lh.host ());
 }
 
+TEST (inadder_port_string)
+{
+  inaddr lh ("localhost", "1234");
+  CHECK_EQUAL (1234, lh.port ());
+
+  auto err = lh.port ("http");
+  CHECK_EQUAL (erc::success, err);
+  CHECK_EQUAL (80, lh.port ());
+  
+  err = lh.port ("blah");
+  CHECK_EQUAL (WSANO_DATA, err);
+}
+
 TEST (inaddr_assignment)
 {
   inaddr lh ("localhost", 1234);
@@ -128,7 +141,9 @@ TEST (stream_send_receive)
     port = s.name ().port ();
     s.listen ();
     th2_go.signal ();
-    sockstream ss (s.accept ());
+    inaddr who;
+    sockstream ss (s.accept (&who));
+    std::cout << "Incomming connection from " << who << std::endl;
     ss << "TEST STREAM" << std::endl;
     th2_done.wait ();
     return 0;

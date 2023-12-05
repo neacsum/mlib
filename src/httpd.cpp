@@ -129,7 +129,7 @@ http_connection::http_connection (sock& socket, httpd& server)
 void http_connection::run ()
 {
   ws->recvtimeout (HTTPD_TIMEOUT);
-  TRACE8 ("http_connection::run - Connection from %s", ws->peer ().hostname ());
+  TRACE8 ("http_connection::run - Connection from %s", ws->peer ().hostname ().c_str());
   try {
     while (1)
     {
@@ -158,7 +158,7 @@ void http_connection::run ()
         if (!ws.good ())
         {
           TRACE2 ("http_connection::run - timeout peer %s",
-            ws->peer ().hostname ());
+            ws->peer ().hostname ().c_str());
           respond (408);
           return;
         }
@@ -184,7 +184,7 @@ void http_connection::run ()
       if (req_len == HTTPD_MAX_HEADER)
       {
         TRACE2 ("http_connection::run - Request too long (%d) peer %s",
-          req_len, ws->peer ().hostname ());
+          req_len, ws->peer ().hostname ().c_str());
         respond (413);
         return;
       }
@@ -241,7 +241,7 @@ void http_connection::run ()
 
 void http_connection::term ()
 {
-  TRACE8 ("http_connection::term - Closed connection to %s", ws->peer ().hostname ());
+  TRACE8 ("http_connection::term - Closed connection to %s", ws->peer ().hostname ().c_str());
   parent.close_connection (*ws.rdbuf ());
   thread::term ();
 }

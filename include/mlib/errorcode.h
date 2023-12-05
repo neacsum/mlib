@@ -417,20 +417,20 @@ void errfac::log (const erc& e) const
 ///  Default ctor for erc objects creates an inactive error
 inline
 erc::erc () :
-  value (0),
-  priority_ (none),
-  active (0),
-  facility_ (&errfac::Default ())
+  value{ 0 },
+  priority_{ none },
+  active{ false },
+  facility_{ &errfac::Default () }
 {
 }
 
 ///  Ctor for a real erc
 inline
 erc::erc (int v, level l, const errfac* f) :
-  value (v),
-  priority_ (l),
-  facility_ (f ? f : &errfac::Default ()),
-  active (1)
+  value{ v },
+  priority_{ (unsigned short)l },
+  facility_{ f ? f : &errfac::Default () },
+  active{ true }
 {
 }
 /*!
@@ -447,10 +447,10 @@ erc::erc (int v, level l, const errfac* f) :
 */
 inline
 erc::erc (const erc& other) :
-  value (other.value),
-  priority_ (other.priority_),
-  active (other.active),
-  facility_ (other.facility_)
+  value{ other.value },
+  priority_{ other.priority_ },
+  active{ other.active },
+  facility_{ other.facility_ }
 {
   //we are the active error now, the other is deactivated
   other.active = 0;
@@ -459,10 +459,10 @@ erc::erc (const erc& other) :
 ///  Move constructor removes the activity flag of the original object
 inline
 erc::erc (erc&& other) :
-  value (other.value),
-  priority_ (other.priority_),
-  active (other.active),
-  facility_ (other.facility_)
+  value{ other.value },
+  priority_{ other.priority_ },
+  active{ other.active },
+  facility_{ other.facility_ }
 {
   //we are the active error now, the other is deactivated
   other.active = 0;

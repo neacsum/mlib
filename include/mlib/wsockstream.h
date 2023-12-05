@@ -1,8 +1,10 @@
-/*! 
-  \file wsockstream.h sock and sockstream classes
-
- Copyright (c) 2001-2019 Mircea Neacsu
+/*
+  MLIB Library
+  (c) Mircea Neacsu 2001-2023. Licensed under MIT License.
+  See README file for full license terms.
 */
+
+/// \file wsockstream.h Definition of sock and sockstream classes
 #pragma once
 
 #if __has_include ("defs.h")
@@ -37,46 +39,46 @@ public:
   };
 
   sock (SOCKET soc = INVALID_SOCKET);
-  sock (int type, int domain=AF_INET, int proto=0);
+  explicit sock (int type, int domain=AF_INET, int proto=0);
   sock (const sock&);
+  sock (sock &&);
 
   virtual           ~sock ();
-  sock&             operator = (const sock&);
+  sock&             operator= (const sock&);
+  sock&             operator= (sock &&);
 
-  ///Convert into a Windows socket 
-  operator          SOCKET() const { return sl->handle; }
-  
   ///Retrieve Windows socket handle
-  SOCKET            handle () const {return sl->handle;};
-  
+  HANDLE            handle () const {return (HANDLE)sl->handle;};
+  bool              operator== (const sock &other) const;
+  bool              operator!= (const sock &other) const;
+
   virtual erc       open (int type, int domain=AF_INET, int proto=0);
   virtual erc       close ();
-  virtual erc       shutdown (shuthow sh);
+  virtual erc       shutdown (shuthow sh) const;
 
   ///Check if socket is opened
   virtual bool      is_open () const  { return sl->handle != INVALID_SOCKET; }
-  size_t            recv (void* buf, size_t maxlen, int msgf=0);
-  size_t            recvfrom (sockaddr& sa,void* buf, size_t maxlen, int msgf=0);
-  size_t            send (const void* buf, size_t len, int msgf=0);
+  size_t            recv (void* buf, size_t maxlen, int msgf=0) const;
+  size_t            recvfrom (sockaddr& sa,void* buf, size_t maxlen, int msgf=0) const;
+  size_t            send (const void* buf, size_t len, int msgf=0) const;
   size_t            sendto (const sockaddr& sa,const void* buf, size_t len, int msgf=0);
-  int               sendtimeout (int wp_sec);
+  int               sendtimeout (int wp_sec) const;
   int               sendtimeout () const;
-  int               recvtimeout (int wp_sec);
+  int               recvtimeout (int wp_sec) const;
   int               recvtimeout () const;
   bool              is_readready (int wp_sec, int wp_usec=0) const;
   bool              is_writeready (int wp_sec, int wp_usec=0) const;
   bool              is_exceptionpending (int wp_sec, int wp_usec=0) const;
-  unsigned int      nread ();
+  unsigned int      nread () const;
 
-  erc               bind (const sockaddr&);
-  erc               bind ();
-  erc               connect (const sockaddr& peer, int wp_sec = INFINITE);
-  erc               listen (int num=SOMAXCONN);
+  erc               bind (const inaddr&) const;
+  erc               bind () const;
+  erc               connect (const inaddr& peer, int wp_sec = INFINITE) const;
+  erc               listen (int num=SOMAXCONN) const;
   inaddr            name () const;
   inaddr            peer () const;
 
-  virtual sock      accept ();
-  virtual sock      accept (sockaddr& sa);
+  virtual sock      accept (inaddr* sa = nullptr) const;
 
   int               getopt (int op, void* buf,int len, int level=SOL_SOCKET) const;
   void              setopt (int op, void* buf,int len, int level=SOL_SOCKET) const;
@@ -84,26 +86,26 @@ public:
   int               gettype () const;
   int               clearerror () const;
   bool              debug () const;
-  void              debug (bool opt);
+  void              debug (bool opt) const;
   bool              reuseaddr () const;
-  void              reuseaddr (bool opt);
+  void              reuseaddr (bool opt) const;
   bool              keepalive () const;
-  void              keepalive (bool opt);
+  void              keepalive (bool opt) const;
   bool              dontroute () const;
-  void              dontroute (bool opt);
+  void              dontroute (bool opt) const;
   bool              broadcast () const;
-  void              broadcast (bool opt);
+  void              broadcast (bool opt) const;
   bool              oobinline () const;
-  void              oobinline (bool opt);
+  void              oobinline (bool opt) const;
   int               sendbufsz () const;
-  void              sendbufsz (size_t sz);
+  void              sendbufsz (size_t sz) const;
   int               recvbufsz () const;
-  void              recvbufsz (size_t sz);
-  void              blocking (bool on_off);
-  erc               setevent (HANDLE evt, long mask);
-  long              enumevents ();
-  void              linger (bool on_off, unsigned short seconds);
-  bool              linger (unsigned short *seconds = 0);
+  void              recvbufsz (size_t sz) const;
+  void              blocking (bool on_off) const;
+  erc               setevent (HANDLE evt, long mask) const;
+  long              enumevents () const;
+  void              linger (bool on_off, unsigned short seconds) const;
+  bool              linger (unsigned short *seconds = 0) const;
 
   /// Error facility used by all sock derived classes.
   static errfac *errors;
@@ -112,9 +114,12 @@ public:
 protected:
 
 private:
-    struct sock_life {
+  struct sock_life {
+    sock_life ()
+      : handle{INVALID_SOCKET}
+      , use_count{1} {};
     SOCKET  handle;
-    int     lives;
+    int     use_count;
   } *sl;
 };
 
@@ -229,7 +234,7 @@ inline errfac *sock::errors;
   \retval Previous timeout value in seconds
 */
 inline
-int sock::sendtimeout (int wp_sec)
+int sock::sendtimeout (int wp_sec) const
 {
   int oldwtmo;
   int optlen = sizeof (int);
@@ -255,7 +260,7 @@ int sock::sendtimeout () const
   \retval Previous timeout value in seconds
 */
 inline
-int sock::recvtimeout (int wp_sec)
+int sock::recvtimeout (int wp_sec) const
 {
   int oldrtmo;
   int optlen = sizeof (int);
@@ -346,7 +351,7 @@ bool sock::debug () const
 
 /// Set the debug flag
 inline
-void sock::debug (bool b)
+void sock::debug (bool b) const
 {
   BOOL opt = b;
   setopt (SO_DEBUG, &opt, sizeof (opt));
@@ -363,7 +368,7 @@ bool sock::reuseaddr () const
 
 /// Set the "reuse address" flag
 inline
-void sock::reuseaddr (bool b)
+void sock::reuseaddr (bool b) const
 {
   BOOL opt = b;
   setopt (SO_REUSEADDR, &opt, sizeof (opt));
@@ -380,7 +385,7 @@ bool sock::keepalive () const
 
 /// Set "keep alive" flag
 inline
-void sock::keepalive (bool b)
+void sock::keepalive (bool b) const
 {
   BOOL opt = b;
   setopt (SO_KEEPALIVE, &opt, sizeof (opt));
@@ -397,7 +402,7 @@ bool sock::dontroute () const
 
 /// Turn on or off the "don't route" flag
 inline
-void sock::dontroute (bool b)
+void sock::dontroute (bool b) const
 {
   BOOL opt = b;
   setopt (SO_DONTROUTE, &opt, sizeof (opt));
@@ -419,7 +424,7 @@ bool sock::broadcast () const
   before attempting to send a datagram to broadcast address.
 */
 inline
-void sock::broadcast (bool b)
+void sock::broadcast (bool b) const
 {
   BOOL opt = b;
   setopt (SO_BROADCAST, &opt, sizeof (opt));
@@ -442,7 +447,7 @@ bool sock::oobinline () const
   If set, OOB data is being received in the normal data stream.
 */
 inline
-void sock::oobinline (bool b)
+void sock::oobinline (bool b) const
 {
   BOOL opt = b;
   setopt (SO_OOBINLINE, &opt, sizeof (opt));
@@ -459,7 +464,7 @@ int sock::sendbufsz () const
 
 /// Set buffer size for send operations.
 inline
-void sock::sendbufsz (size_t sz)
+void sock::sendbufsz (size_t sz) const
 {
   setopt (SO_SNDBUF, &sz, sizeof (sz));
 }
@@ -475,7 +480,7 @@ int sock::recvbufsz () const
 
 /// Set buffer size for receive operations
 inline
-void sock::recvbufsz (size_t sz)
+void sock::recvbufsz (size_t sz) const
 {
   setopt (SO_RCVBUF, &sz, sizeof (sz));
 }
@@ -486,7 +491,7 @@ void sock::recvbufsz (size_t sz)
   into non-blocking sockets using this function.
 */
 inline
-void sock::blocking (bool on_off)
+void sock::blocking (bool on_off) const
 {
   unsigned long mode = on_off ? 0 : 1;
   if (ioctlsocket (sl->handle, FIONBIO, &mode) == SOCKET_ERROR)
@@ -509,7 +514,7 @@ void sock::blocking (bool on_off)
   The function automatically sets socket to nonblocking mode.
 */
 inline
-erc sock::setevent (HANDLE evt, long mask)
+erc sock::setevent (HANDLE evt, long mask) const
 {
   if (WSAEventSelect (sl->handle, (WSAEVENT)evt, mask) == SOCKET_ERROR)
     return last_error ();
@@ -523,7 +528,7 @@ erc sock::setevent (HANDLE evt, long mask)
   has been called.
 */
 inline
-long sock::enumevents ()
+long sock::enumevents () const
 {
   WSANETWORKEVENTS netev;
   if (WSAEnumNetworkEvents (sl->handle, NULL, &netev) == SOCKET_ERROR)
@@ -531,11 +536,9 @@ long sock::enumevents ()
   return netev.lNetworkEvents;
 }
 
-/*!
-  Turn on or off linger mode and lingering timeout.
-*/
+/// Turn on or off linger mode and lingering timeout.
 inline
-void sock::linger (bool on_off, unsigned short seconds)
+void sock::linger (bool on_off, unsigned short seconds) const
 {
   struct linger opt;
   opt.l_onoff = on_off;
@@ -543,11 +546,9 @@ void sock::linger (bool on_off, unsigned short seconds)
   setopt (SO_LINGER, &opt, sizeof (opt));
 }
 
-/*!
-  Return linger mode and lingering timeout.
-*/
+/// Return linger mode and lingering timeout.
 inline
-bool sock::linger (unsigned short *seconds)
+bool sock::linger (unsigned short *seconds) const
 {
   struct linger opt;
   getopt (SO_LINGER, &opt, sizeof (opt));
@@ -557,10 +558,34 @@ bool sock::linger (unsigned short *seconds)
 }
 
 /// Return an error code with the value returned by WSAGetLastError
-inline erc sock::last_error ()
+inline
+erc sock::last_error ()
 {
   return erc(WSAGetLastError (), erc::error, sock::errors);
 }
+
+/*!
+   Equality comparison operator
+
+   Returns `true` if both objects have the same handle
+*/
+inline
+bool sock::operator== (const sock &other) const
+{
+  return (sl->handle == other.sl->handle);
+}
+
+/*!
+   Inequality comparison operator
+
+   Returns `false` if both objects have the same handle
+*/
+inline
+bool sock::operator!= (const sock &other) const
+{
+  return !operator ==(other);
+}
+
 
 }
 
