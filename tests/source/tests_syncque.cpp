@@ -13,7 +13,7 @@ SUITE (sync_queue) {
 TEST (ballroom)
 {
   const int pairs = 10;
-  event ball_start (event::manual);
+  manual_event ball_start;
   LONG finished = 0;
 
   sync_queue<int> pairing;

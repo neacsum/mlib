@@ -8,7 +8,7 @@ using namespace std;
 
 SUITE (threads)
 {
-  event f_run;
+  auto_event f_run;
   int f (int i)
   {
     f_run.signal ();

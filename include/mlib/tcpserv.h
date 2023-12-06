@@ -59,7 +59,7 @@ private:
   unsigned int count;     //number of active connections
   unsigned int limit;     //max number of active connections
   size_t alloc;           //number of allocated entries in conntab
-  event evt;              //main event
+  auto_event evt;         // main event
   bool end_req;           //true when server must exit
   DWORD idle;
   std::function<int (sock& s)> connfunc;

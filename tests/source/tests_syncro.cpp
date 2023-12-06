@@ -12,7 +12,7 @@ SUITE (syncro)
 
 TEST (wait_any_infinite)
 {
-  event e1, e2;
+  auto_event e1, e2;
   thread th ([&]()-> unsigned int {
     Sleep (50); e1.signal (); return 0; });
 
@@ -24,7 +24,7 @@ TEST (wait_any_infinite)
 
 TEST (wait_any_timeout)
 {
-  event e1, e2;
+  auto_event e1, e2;
   thread th ([&]()-> unsigned int {
     Sleep (100); e1.signal (); return 0; });
 
@@ -104,14 +104,14 @@ TEST (move_assignment)
 
 TEST (wait_duration)
 {
-  event evt;
+  auto_event evt;
   auto ret = evt.wait (50ms);
   CHECK_EQUAL (WAIT_TIMEOUT, ret);
 }
 
 TEST (event_is_signaled)
 {
-  event evt_auto;
+  auto_event evt_auto;
 
   evt_auto.signal ();
 
@@ -124,7 +124,7 @@ TEST (event_is_signaled)
   evt_auto.wait (1ms);
   CHECK (!evt_auto.is_signaled ());
 
-  event evt_manual{event::manual};
+  manual_event evt_manual;
   evt_manual.signal ();
   CHECK (evt_manual.is_signaled ());
   

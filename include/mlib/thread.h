@@ -53,7 +53,7 @@ private:
 
   DWORD id_;
   state volatile stat;
-  event created, started;
+  auto_event created, started;
   static unsigned int _stdcall entryProc (thread *ts);
   DWORD stack;
   std::function<unsigned int ()> thfunc;

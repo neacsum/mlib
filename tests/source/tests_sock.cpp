@@ -82,7 +82,7 @@ TEST (inaddr_dns_fail_3)
 
 TEST (dgram_send_receive)
 {
-  event go;
+  auto_event go;
   char buf[80];
   auto f = [&]() -> int {
     sock s (SOCK_DGRAM);
@@ -111,7 +111,7 @@ TEST (dgram_send_receive)
 
 TEST (sock_readready)
 {
-  event sent;
+  auto_event sent;
   auto f = [&] () -> int {
     sock s (SOCK_DGRAM);
     s.connect (inaddr ("127.0.0.1", 1234));
@@ -132,7 +132,7 @@ TEST (sock_readready)
 
 TEST (stream_send_receive)
 {
-  event th2_go, th2_done;
+  manual_event th2_go, th2_done;
   unsigned short port;
   char buf[80];
   auto f = [&] () -> int {

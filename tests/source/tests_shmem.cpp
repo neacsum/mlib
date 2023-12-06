@@ -12,7 +12,7 @@ struct S{
   int ival;
 };
 
-event shrd, shwr;
+auto_event shrd, shwr;
 
 struct shmem_fixture {
   shmem_fixture () 

@@ -29,7 +29,7 @@
 */
 
 #include <mlib/jbridge.h>
-#include <utf8/winutf8.h>
+#include <utf8/utf8.h>
 #include <assert.h>
 #include <mlib/asset.h>
 #include <mlib/trace.h>
@@ -136,7 +136,6 @@ LRESULT WINAPI WndProc (HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case ID_SAMPLE_ABOUT:
       utf8::ShellExecute ("http://localhost:" + to_string (ui_server.port ()) + "/about.html");
       break;
-
     case ID_SAMPLE_EXIT:
       DestroyWindow (hWnd);
       break;

@@ -33,7 +33,7 @@
 #include <fstream>
 
 #include <mlib/jbridge.h>
-#include <utf8/winutf8.h>
+#include <utf8/utf8.h>
 
 using namespace mlib;
 using namespace std;

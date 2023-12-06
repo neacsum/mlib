@@ -1,8 +1,10 @@
-/*!
-  \file event.cpp event class implementation.
-  (c) Mircea Neacsu 1999
-
+/*
+  MLIB Library
+  (c) Mircea Neacsu 2001-2023. Licensed under MIT License.
+  See README file for full license terms.
 */
+
+///  \file event.cpp event class implementation.
 
 #ifndef UNICODE
 #define UNICODE
@@ -30,36 +32,16 @@ namespace mlib {
 */
 
 ///Constructor for event objects
-event::event (mode md, bool signaled, const std::string& name) :
-  syncbase (name),
-  m (md)
+event::event (bool manual, bool signaled, const std::string& name) :
+  syncbase (name)
 {
 #ifdef HAS_UTF8
-  HANDLE h = CreateEventW (NULL, m == manual, signaled, !name.empty () ? utf8::widen (name).c_str () : NULL);
+  HANDLE h = CreateEventW (NULL, manual, signaled, !name.empty () ? utf8::widen (name).c_str () : NULL);
 #else
-  HANDLE h = CreateEventA (NULL, m == manual, signaled, !name.empty () ? name.c_str () : NULL);
+  HANDLE h = CreateEventA (NULL, manual, signaled, !name.empty () ? name.c_str () : NULL);
 #endif
   assert (h);
   set_handle (h);
-}
-
-/// Assignment operator
-event& event::operator =(const event& rhs)
-{
-  syncbase::operator = (rhs);
-  m = rhs.m;
-  return *this;
-}
-
-
-/*!
-  Automatic events are set back to signaled state because testing resets them.
-*/
-bool event::is_signaled ()
-{
-  bool result = syncbase::is_signaled();
-  if (result && m==automatic ) signal();
-  return result;
 }
 
 }
