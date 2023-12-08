@@ -146,19 +146,19 @@ bool syncbase::is_signaled ()
   Windows API function.
   \param  objs    array of objects to wait for
   \param  count   number of objects in \p array
-  \param  time_limit  time limit in milliseconds
+  \param  msec    time limit (in milliseconds)
 
   \ingroup syncro
 */
 template <typename T>
-DWORD wait_all (const T* objs, int count, DWORD time_limit = INFINITE)
+DWORD wait_all (const T* objs, int count, DWORD msec = INFINITE)
 {
   assert (count < MAXIMUM_WAIT_OBJECTS);
   HANDLE harr[MAXIMUM_WAIT_OBJECTS];
   for (int i = 0; i < count; i++)
     harr[i] = objs[i].handle ();
 
-  DWORD result = WaitForMultipleObjects (count, harr, true, time_limit);
+  DWORD result = WaitForMultipleObjects (count, harr, true, msec);
   return result;
 }
 
@@ -167,12 +167,13 @@ DWORD wait_all (const T* objs, int count, DWORD time_limit = INFINITE)
 
   Wrapper for [WaitForMultipleObjects](https://docs.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-waitformultipleobjects)
   Windows API function.
-  \param  objs   objects to wait for
+  \param  objs    objects to wait for
+  \param  msec    time limit (in milliseconds)
 
   \ingroup syncro
 */
 template <typename T>
-DWORD wait_all (std::initializer_list<const T*> objs)
+DWORD wait_all (std::initializer_list<const T*> objs, DWORD msec = INFINITE)
 {
   assert (objs.size() < MAXIMUM_WAIT_OBJECTS);
   HANDLE harr[MAXIMUM_WAIT_OBJECTS];
@@ -180,7 +181,7 @@ DWORD wait_all (std::initializer_list<const T*> objs)
   for (auto p = objs.begin (); p != objs.end (); ++p)
     harr[i++] = (*p)->handle ();
 
-  DWORD result = WaitForMultipleObjects ((DWORD)objs.size(), harr, true, INFINITE);
+  DWORD result = WaitForMultipleObjects ((DWORD)objs.size(), harr, true, msec);
   return result;
 }
 
@@ -189,8 +190,8 @@ DWORD wait_all (std::initializer_list<const T*> objs)
 
   Wrapper for [WaitForMultipleObjects](https://docs.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-waitformultipleobjects)
   Windows API function.
-  \param  objs   objects to wait for
-  \param  limit  time limit in milliseconds
+  \param  objs    objects to wait for
+  \param  limit   time limit in milliseconds
 
   \ingroup syncro
 */
@@ -203,7 +204,8 @@ DWORD wait_all (std::initializer_list<const T*> objs, std::chrono::milliseconds 
   for (auto p = objs.begin(); p != objs.end(); ++p)
     harr[i++] = (*p)->handle ();
 
-  DWORD result = WaitForMultipleObjects ((DWORD)objs.size (), harr, true, limit);
+  DWORD msec = (DWORD)limit.count ();
+  DWORD result = WaitForMultipleObjects ((DWORD)objs.size (), harr, true, msec);
   return result;
 }
 
@@ -214,18 +216,19 @@ DWORD wait_all (std::initializer_list<const T*> objs, std::chrono::milliseconds 
   Windows API function.
   \param  objs    array of objects to wait for
   \param  count   number of objects in \p array
+  \param  msec    timeout interval (in milliseconds)
 
   \ingroup syncro
 */
 template <typename T>
-DWORD wait_any (const T* objs, int count, DWORD time_limit = INFINITE)
+DWORD wait_any (const T* objs, int count, DWORD msec = INFINITE)
 {
   assert (count < MAXIMUM_WAIT_OBJECTS);
   HANDLE harr[MAXIMUM_WAIT_OBJECTS];
   for (int i = 0; i < count; i++)
     harr[i] = objs[i].handle ();
 
-  DWORD result = WaitForMultipleObjects (count, harr, false, time_limit);
+  DWORD result = WaitForMultipleObjects (count, harr, false, msec);
   return result;
 }
 
@@ -234,12 +237,13 @@ DWORD wait_any (const T* objs, int count, DWORD time_limit = INFINITE)
 
   Wrapper for [WaitForMultipleObjects](https://docs.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-waitformultipleobjects)
   Windows API function.
-  \param  objs   objects to wait for
+  \param  objs    objects to wait for
+  \param  msec    timeout interval (in milliseconds)
 
   \ingroup syncro
 */
 template <typename T>
-DWORD wait_any (std::initializer_list<const T*> objs)
+DWORD wait_any (std::initializer_list<const T*> objs, DWORD msec=INFINITE)
 {
   assert (objs.size () < MAXIMUM_WAIT_OBJECTS);
   HANDLE harr[MAXIMUM_WAIT_OBJECTS];
@@ -247,7 +251,7 @@ DWORD wait_any (std::initializer_list<const T*> objs)
   for (auto p = objs.begin (); p != objs.end (); ++p)
     harr[i++] = (*p)->handle ();
 
-  DWORD result = WaitForMultipleObjects ((DWORD)objs.size (), harr, false, INFINITE);
+  DWORD result = WaitForMultipleObjects ((DWORD)objs.size (), harr, false, msec);
   return result;
 }
 
@@ -256,21 +260,21 @@ DWORD wait_any (std::initializer_list<const T*> objs)
 
   Wrapper for [WaitForMultipleObjects](https://docs.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-waitformultipleobjects)
   Windows API function.
-  \param  objs   objects to wait for
-  \param  limit  time limit
+  \param  objs    objects to wait for
+  \param  timeout timeout interval
 
   \ingroup syncro
 */
 template <typename T>
-DWORD wait_any (std::initializer_list<const T*> objs, std::chrono::milliseconds limit)
+DWORD wait_any (std::initializer_list<const T*> objs, std::chrono::milliseconds timeout)
 {
   assert (objs.size () < MAXIMUM_WAIT_OBJECTS);
   HANDLE harr[MAXIMUM_WAIT_OBJECTS];
   int i = 0;
   for (auto p = objs.begin (); p != objs.end (); ++p)
     harr[i++] = (*p)->handle ();
-  DWORD timeout = (DWORD)limit.count ();
-  DWORD result = WaitForMultipleObjects ((DWORD)objs.size (), harr, false, timeout);
+  DWORD msec = (DWORD)timeout.count ();
+  DWORD result = WaitForMultipleObjects ((DWORD)objs.size (), harr, false, msec);
   return result;
 }
 
@@ -282,20 +286,20 @@ DWORD wait_any (std::initializer_list<const T*> objs, std::chrono::milliseconds 
   \param  objs    array of objects to wait for
   \param  count   number of objects in \p array
   \param  all     if `true`, wait for all objects to become signaled
-  \param  time_limit  time limit in milliseconds
+  \param  msec    timeout interval (in milliseconds)
   \param  mask    message mask (combination of QS_... constants)
 
   \ingroup syncro
 */
 template <typename T>
-DWORD wait_msg (const T* objs, int count, bool all=true, DWORD time_limit = INFINITE, DWORD mask = QS_ALLINPUT)
+DWORD wait_msg (const T* objs, int count, bool all=true, DWORD msec = INFINITE, DWORD mask = QS_ALLINPUT)
 {
   assert (count < MAXIMUM_WAIT_OBJECTS);
   HANDLE harr[MAXIMUM_WAIT_OBJECTS];
   for (int i = 0; i < count; i++)
     harr[i] = objs[i]->handle ();
 
-  DWORD result = MsgWaitForMultipleObjects (count, harr, all, time_limit, mask);
+  DWORD result = MsgWaitForMultipleObjects (count, harr, all, msec, mask);
   return result;
 }
 
@@ -306,13 +310,13 @@ DWORD wait_msg (const T* objs, int count, bool all=true, DWORD time_limit = INFI
   Windows API function.
   \param  objs    objects to wait for
   \param  all     if `true`, wait for all objects to become signaled
-  \param  time_limit  time limit in milliseconds
+  \param  msec    timeout interval (in milliseconds)
   \param  mask    message mask (combination of QS_... constants)
 
   \ingroup syncro
 */
 template <typename T>
-DWORD wait_msg (std::initializer_list<const T*> objs, bool all = true, DWORD time_limit = INFINITE, DWORD mask = QS_ALLINPUT)
+DWORD wait_msg (std::initializer_list<const T*> objs, bool all = true, DWORD msec = INFINITE, DWORD mask = QS_ALLINPUT)
 {
   assert (objs.size() < MAXIMUM_WAIT_OBJECTS);
   HANDLE harr[MAXIMUM_WAIT_OBJECTS];
@@ -320,7 +324,7 @@ DWORD wait_msg (std::initializer_list<const T*> objs, bool all = true, DWORD tim
   for (auto p = objs.begin (); p != objs.end (); ++p)
     harr[i++] = (*p)->handle ();
 
-  DWORD result = MsgWaitForMultipleObjects ((DWORD)objs.size(), harr, all, time_limit, mask);
+  DWORD result = MsgWaitForMultipleObjects ((DWORD)objs.size(), harr, all, msec, mask);
   return result;
 }
 
