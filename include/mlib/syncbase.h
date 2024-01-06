@@ -178,12 +178,13 @@ DWORD wait_all (std::initializer_list<const T*> objs, DWORD msec = INFINITE)
   assert (objs.size() < MAXIMUM_WAIT_OBJECTS);
   HANDLE harr[MAXIMUM_WAIT_OBJECTS];
   int i = 0;
-  for (auto p = objs.begin (); p != objs.end (); ++p)
-    harr[i++] = (*p)->handle ();
+  for (auto& p : objs)
+    harr[i++] = p->handle ();
 
   DWORD result = WaitForMultipleObjects ((DWORD)objs.size(), harr, true, msec);
   return result;
 }
+
 
 /*!
   Wait for multiple objects until <u>all</u> become signaled.
@@ -201,8 +202,8 @@ DWORD wait_all (std::initializer_list<const T*> objs, std::chrono::milliseconds 
   assert (objs.size () < MAXIMUM_WAIT_OBJECTS);
   HANDLE harr[MAXIMUM_WAIT_OBJECTS];
   int i = 0;
-  for (auto p = objs.begin(); p != objs.end(); ++p)
-    harr[i++] = (*p)->handle ();
+  for (auto& p : objs)
+    harr[i++] = p->handle ();
 
   DWORD msec = (DWORD)limit.count ();
   DWORD result = WaitForMultipleObjects ((DWORD)objs.size (), harr, true, msec);
@@ -248,8 +249,8 @@ DWORD wait_any (std::initializer_list<const T*> objs, DWORD msec=INFINITE)
   assert (objs.size () < MAXIMUM_WAIT_OBJECTS);
   HANDLE harr[MAXIMUM_WAIT_OBJECTS];
   int i = 0;
-  for (auto p = objs.begin (); p != objs.end (); ++p)
-    harr[i++] = (*p)->handle ();
+  for (auto& p : objs)
+    harr[i++] = p->handle ();
 
   DWORD result = WaitForMultipleObjects ((DWORD)objs.size (), harr, false, msec);
   return result;
@@ -271,8 +272,8 @@ DWORD wait_any (std::initializer_list<const T*> objs, std::chrono::milliseconds 
   assert (objs.size () < MAXIMUM_WAIT_OBJECTS);
   HANDLE harr[MAXIMUM_WAIT_OBJECTS];
   int i = 0;
-  for (auto p = objs.begin (); p != objs.end (); ++p)
-    harr[i++] = (*p)->handle ();
+  for (auto& p : objs)
+    harr[i++] = p->handle ();
   DWORD msec = (DWORD)timeout.count ();
   DWORD result = WaitForMultipleObjects ((DWORD)objs.size (), harr, false, msec);
   return result;
@@ -297,7 +298,7 @@ DWORD wait_msg (const T* objs, int count, bool all=true, DWORD msec = INFINITE, 
   assert (count < MAXIMUM_WAIT_OBJECTS);
   HANDLE harr[MAXIMUM_WAIT_OBJECTS];
   for (int i = 0; i < count; i++)
-    harr[i] = objs[i]->handle ();
+    harr[i] = objs[i].handle ();
 
   DWORD result = MsgWaitForMultipleObjects (count, harr, all, msec, mask);
   return result;
@@ -321,11 +322,11 @@ DWORD wait_msg (std::initializer_list<const T*> objs, bool all = true, DWORD mse
   assert (objs.size() < MAXIMUM_WAIT_OBJECTS);
   HANDLE harr[MAXIMUM_WAIT_OBJECTS];
   int i = 0;
-  for (auto p = objs.begin (); p != objs.end (); ++p)
-    harr[i++] = (*p)->handle ();
+  for (auto& p : objs)
+    harr[i++] = p->handle ();
 
   DWORD result = MsgWaitForMultipleObjects ((DWORD)objs.size(), harr, all, msec, mask);
   return result;
 }
 
-}
+} //mlib namespace

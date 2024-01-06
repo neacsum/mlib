@@ -25,7 +25,7 @@ public:
   DWORD wait (DWORD time_limit = INFINITE);
   DWORD wait_alertable (DWORD time_limit = INFINITE);
   DWORD wait_msg (DWORD time_limit = INFINITE, DWORD mask = QS_ALLINPUT);
-
+  void rethrow_exception () const;
 
   DWORD id () const;
   UINT result () const;
@@ -147,6 +147,14 @@ void  thread::term ()
 {
 }
 
+inline
+void thread::rethrow_exception () const
+{
+  if (pex)
+    std::rethrow_exception (pex);
+}
+
+
 // ----------- current_thread inline functions ------------------------------
 
 /// Return ID of current thread
@@ -176,4 +184,161 @@ void current_thread::priority (int pri)
   SetThreadPriority (GetCurrentThread (), pri);
 }
 
+/*!
+  Specialization of wait functions for threads, re-throw any exceptions that
+  might have occurred during thread execution. Only the first exception is
+  re-thrown.
+
+@{
+*/
+
+inline
+DWORD wait_all (const thread* objs, int count, DWORD msec = INFINITE)
+{
+  assert (count < MAXIMUM_WAIT_OBJECTS);
+  HANDLE harr[MAXIMUM_WAIT_OBJECTS];
+  for (int i = 0; i < count; i++)
+    harr[i] = objs[i].handle ();
+
+  DWORD result = WaitForMultipleObjects (count, harr, true, msec);
+  if (result < WAIT_OBJECT_0 + count)
+  {
+    for (int i = 0; i < count; i++)
+      objs[i].rethrow_exception ();
+  }
+
+  return result;
 }
+
+inline
+DWORD wait_all (std::initializer_list<const thread*> objs, std::chrono::milliseconds limit)
+{
+  assert (objs.size () < MAXIMUM_WAIT_OBJECTS);
+  HANDLE harr[MAXIMUM_WAIT_OBJECTS];
+  int i = 0;
+  for (auto p = objs.begin (); p != objs.end (); ++p)
+    harr[i++] = (*p)->handle ();
+
+  DWORD msec = (DWORD)limit.count ();
+  DWORD result = WaitForMultipleObjects ((DWORD)objs.size (), harr, true, msec);
+  if (result < WAIT_OBJECT_0 + objs.size ())
+  {
+    for (auto &p : objs)
+      p->rethrow_exception ();
+  }
+
+  return result;
+}
+
+inline
+DWORD wait_all (std::initializer_list<const mlib::thread*> objs, DWORD msec = INFINITE)
+{
+  assert (objs.size () < MAXIMUM_WAIT_OBJECTS);
+  HANDLE harr[MAXIMUM_WAIT_OBJECTS];
+  int i = 0;
+  for (auto p = objs.begin (); p != objs.end (); ++p)
+    harr[i++] = (*p)->handle ();
+
+  DWORD result = WaitForMultipleObjects ((DWORD)objs.size (), harr, true, msec);
+  if (result < WAIT_OBJECT_0 + objs.size ())
+  {
+    for (auto &p : objs)
+      p->rethrow_exception ();
+  }
+
+  return result;
+}
+
+inline
+DWORD wait_any (const thread* objs, int count, DWORD msec = INFINITE)
+{
+  assert (count < MAXIMUM_WAIT_OBJECTS);
+  HANDLE harr[MAXIMUM_WAIT_OBJECTS];
+  for (int i = 0; i < count; i++)
+    harr[i] = objs[i].handle ();
+
+  DWORD result = WaitForMultipleObjects (count, harr, false, msec);
+  if (result < WAIT_OBJECT_0 + count)
+  {
+    for (int i = 0; i < count; i++)
+      objs[i].rethrow_exception ();
+  }
+  return result;
+}
+
+inline
+DWORD wait_any (std::initializer_list<const thread*> objs, DWORD msec = INFINITE)
+{
+  assert (objs.size () < MAXIMUM_WAIT_OBJECTS);
+  HANDLE harr[MAXIMUM_WAIT_OBJECTS];
+  int i = 0;
+  for (auto p = objs.begin (); p != objs.end (); ++p)
+    harr[i++] = (*p)->handle ();
+
+  DWORD result = WaitForMultipleObjects ((DWORD)objs.size (), harr, false, msec);
+  if (result < WAIT_OBJECT_0 + objs.size ())
+  {
+    for (auto &p : objs)
+      p->rethrow_exception ();
+  }
+  return result;
+}
+
+inline 
+DWORD wait_any (std::initializer_list<const thread*> objs, std::chrono::milliseconds timeout)
+{
+  assert (objs.size () < MAXIMUM_WAIT_OBJECTS);
+  HANDLE harr[MAXIMUM_WAIT_OBJECTS];
+  int i = 0;
+  for (auto p = objs.begin (); p != objs.end (); ++p)
+    harr[i++] = (*p)->handle ();
+  DWORD msec = (DWORD)timeout.count ();
+  DWORD result = WaitForMultipleObjects ((DWORD)objs.size (), harr, false, msec);
+  if (result < WAIT_OBJECT_0 + objs.size ())
+  {
+    for (auto &p : objs)
+      p->rethrow_exception ();
+  }
+  return result;
+}
+
+inline
+DWORD wait_msg (const thread* objs, int count, bool all = true, DWORD msec = INFINITE,
+                       DWORD mask = QS_ALLINPUT)
+{
+  assert (count < MAXIMUM_WAIT_OBJECTS);
+  HANDLE harr[MAXIMUM_WAIT_OBJECTS];
+  for (int i = 0; i < count; i++)
+    harr[i] = objs[i].handle ();
+
+  DWORD result = MsgWaitForMultipleObjects (count, harr, all, msec, mask);
+  if (result < WAIT_OBJECT_0 + count)
+  {
+    for (int i = 0; i < count; i++)
+      objs[i].rethrow_exception ();
+  }
+  return result;
+}
+
+inline
+DWORD wait_msg (std::initializer_list<const thread*> objs, bool all = true, DWORD msec = INFINITE,
+                DWORD mask = QS_ALLINPUT)
+{
+  assert (objs.size () < MAXIMUM_WAIT_OBJECTS);
+  HANDLE harr[MAXIMUM_WAIT_OBJECTS];
+  int i = 0;
+  for (auto p = objs.begin (); p != objs.end (); ++p)
+    harr[i++] = (*p)->handle ();
+
+  DWORD result = MsgWaitForMultipleObjects ((DWORD)objs.size (), harr, all, msec, mask);
+  if (result < WAIT_OBJECT_0 + objs.size ())
+  {
+    for (auto &p : objs)
+      p->rethrow_exception ();
+  }
+  return result;
+}
+
+///@}
+
+} //mlib namespace

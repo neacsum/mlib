@@ -188,10 +188,7 @@ DWORD thread::wait (DWORD time_limit)
 {
   DWORD ret = syncbase::wait (time_limit);
   if (ret == WAIT_OBJECT_0)
-  {
-    if (pex)
-      std::rethrow_exception (pex);
-  }
+    rethrow_exception ();
   return ret;
 }
 
@@ -209,10 +206,7 @@ DWORD thread::wait_alertable (DWORD time_limit)
 {
   DWORD ret = syncbase::wait_alertable (time_limit);
   if (ret == WAIT_OBJECT_0)
-  {
-    if (pex)
-      std::rethrow_exception (pex);
-  }
+    rethrow_exception ();
   return ret;
 }
 
@@ -230,10 +224,7 @@ DWORD thread::wait_msg (DWORD time_limit, DWORD mask)
 {
   DWORD ret = syncbase::wait_msg (time_limit, mask);
   if (ret == WAIT_OBJECT_0)
-  {
-    if (pex)
-      std::rethrow_exception (pex);
-  }
+    rethrow_exception ();
   return ret;
 }
 
