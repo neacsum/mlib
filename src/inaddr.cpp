@@ -51,9 +51,7 @@ inaddr::inaddr (const std::string& hostname, unsigned short port)
   memset (&sa, 0, sizeof(sa));
   sa.sin_family = AF_INET;
   sa.sin_port = htons (port);
-  if (hostname == "255.255.255.255")
-    sa.sin_addr.s_addr = INADDR_BROADCAST;
-  else if (!hostname.empty ()
+  if (!hostname.empty ()
         && (sa.sin_addr.s_addr = inet_addr (hostname.c_str ())) == INADDR_NONE)
   {
     HOSTENT *he;
