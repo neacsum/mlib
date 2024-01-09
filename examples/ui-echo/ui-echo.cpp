@@ -92,11 +92,17 @@ int main()
 
   // Start HTTP server
   ui_server.start ();
-  while (!ui_server.is_running ())
-    Sleep (0);
+  Sleep (10);
+  if (!ui_server.is_running ())
+  {
+    std::cout << "Failed to start HTTP server!!\n";
+    return 1;
+  }
 
   // Direct a browser to HTML page
-  utf8::ShellExecute ("http://localhost:" + to_string(ui_server.port()));
+  inaddr addr;
+  ui_server.socket ().name (addr);
+  utf8::ShellExecute ("http://localhost:" + to_string(addr.port()));
 
   // wait until user types "QUIT"
   while (_stricmp (field.c_str(), "quit"))
@@ -105,4 +111,6 @@ int main()
   // stop server and clean up
   ui_server.terminate ();
   remove ("index.html");
+
+  return 0;
 }

@@ -35,34 +35,46 @@ using namespace mlib;
 
 #pragma comment (lib, "mlib")
 
+tcpserver srv (0, "Echo server", 2);
+
 int main (int argc, char** argv)
 {
-  tcpserver srv;
 
-  // This is a demo server,  bind listening socket only on the loopback interface.
+  // This is a demo server,  bind listening socket only on the loop-back interface.
   // A real world server would probably use INADDR_ANY
-  srv.bind (inaddr (INADDR_LOOPBACK, 12321));
+  srv.socket ().bind (inaddr (INADDR_LOOPBACK, 12321));
 
 
   srv.set_connfunc (
-    [](sock& conn)->int {
+    [](sock conn)->int {
       sockstream strm (conn);
       std::string line;
-
-      cout << "Connection from " << conn.peer ().ntoa () << ':' << conn.peer ().port () << endl;
+      inaddr other;
+      conn.peer (other);
+      cout << "Connection from " << other << " socket " << conn.handle() << endl;
 
       //echo each line
       while (getline (strm, line))
         strm << line << endl;
 
-      cout << "Terminated connection to " << conn.peer ().ntoa () << ':' << conn.peer ().port () << endl;
+      cout << "Terminated connection to " << other << " socket " << conn.handle () << endl;
       return 0;
     }
   );
 
   srv.start ();
-  cout << "Echo server waiting for connections on "
-    << srv.sock::name ().ntoa () << ":" << srv.sock::name ().port () << endl;
+  Sleep (10);
+
+  if (srv.get_state() != thread::state::running)
+  {
+    cout << "Could not start echo server. Error was " << srv.socket ().clearerror () << endl;
+    srv.terminate ();
+    return 1;
+  }
+  inaddr me;
+  srv.socket ().name (me);
+  cout << "Echo server waiting for connections on " << me << endl;
+  cout << "Timeout is " << srv.timeout () << " seconds." << endl;
   cout << "Press any key to exit..." << endl;
 
   while (_kbhit ())

@@ -69,7 +69,9 @@ HttpServerFixture::HttpServerFixture ()
   srv.docroot (".");
   srv.start ();
   cfunc = [&] () -> int {
-    sockstream ws (inaddr ("127.0.0.1", srv.port ()));
+    inaddr srv_addr;
+    srv.socket ().name (srv_addr);
+    sockstream ws (inaddr ("127.0.0.1", srv_addr.port ()));
     ws << "GET " << uri << " HTTP/1.1" << endl;
     cout << "GET " << uri.c_str () << endl;
     ws << request.c_str () << endl << flush;

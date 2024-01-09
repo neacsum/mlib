@@ -77,6 +77,7 @@ const char *psarr[]
 double pi = atan(1)*4.;
 
 httpd       ui_server;      //HTTP server for user interface
+unsigned short server_port;
 
 int submit_sarr (const std::string& uri, JSONBridge& ui);
 int exit_server (const std::string& uri, JSONBridge& ui);
@@ -101,7 +102,6 @@ std::vector<asset> assets {
   {IDR_MAIN_CSS     ,"css/main.css" },
 };
 
-
 /*
   Main window procedure.
 
@@ -123,6 +123,7 @@ LRESULT WINAPI WndProc (HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
   {
   case WM_CREATE:
     menu = LoadMenu (hInst, MAKEINTRESOURCE (IDM_UISAMPLE));
+    break;
 
   case WM_COMMAND:
     wmId = LOWORD (wParam);
@@ -131,10 +132,10 @@ LRESULT WINAPI WndProc (HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     switch (wmId)
     {
     case ID_OPENINTERFACE:
-      utf8::ShellExecute ("http://localhost:" + to_string(ui_server.port()));
+      utf8::ShellExecute ("http://localhost:" + to_string(server_port));
       break;
     case ID_SAMPLE_ABOUT:
-      utf8::ShellExecute ("http://localhost:" + to_string (ui_server.port ()) + "/about.html");
+      utf8::ShellExecute ("http://localhost:" + to_string (server_port) + "/about.html");
       break;
     case ID_SAMPLE_EXIT:
       DestroyWindow (hWnd);
@@ -241,9 +242,16 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE, LPSTR /*lpCmdLine*/, int /*n
   user_interface.attach_to (ui_server);
 
   //Set action after receiving user data
-  user_interface.set_action ([](JSONBridge& ui) {ui.client ()->redirect ("/"); });
+  user_interface.set_action ([](JSONBridge& ui) {
+    ui.client ()->redirect ("/");
+    });
   //Start the server
   ui_server.start ();
+
+  inaddr server_addr;
+  ui_server.socket ().name (server_addr);
+  server_port = server_addr.port ();
+
 
   //Register main window class
   WNDCLASSEX wcex;
@@ -360,19 +368,27 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE, LPSTR /*lpCmdLine*/, int /*n
 int submit_sarr (const std::string& uri, JSONBridge& ui)
 {
   bool ok = ui.parse_urlencoded ();
-  string msg{
+  string mbox_msg = 
     "sarr[0] " + string (sarr[0]) + "\n"
     "sarr[1] " + string (sarr[1]) + "\n"
     "sarr[2] " + string (sarr[2]) + "\n"
-    "sarr[3] " + string (sarr[3]) + "\n"
-  };
-  utf8::MessageBox (mainWnd, msg, "UI Sample App", MB_OK);
+    "sarr[3] " + string (sarr[3]) + "\n";
+
+  /* The function is executed in the context of connection specific thread,
+  not the main UI thread. If function needs to do more UI stuff, a nicer
+  approach would be to post a message to main UI thread and let it do the work.
+  
+  This is just a quick and dirty handler.*/
+  utf8::MessageBox (mainWnd, mbox_msg, "UI Sample App", MB_OK | MB_SYSTEMMODAL);
+
+  ui.client ()->add_ohdr ("Connection", "Close");
   return 0;
 }
 
 int exit_server (const std::string& uri, JSONBridge& ui)
 {
   PostMessage (mainWnd, WM_COMMAND, ID_SAMPLE_EXIT, 0);
+  ui.client ()->add_ohdr ("Connection", "Close");
   return 0;
 }
 

@@ -73,8 +73,8 @@ public:
 
 protected:
               http_connection (sock& socket, httpd& server);
-  void        run ();
-  void        term ();
+  void        run () override;
+  void        term () override;
 
   httpd&      parent;
   sockstream  ws;
@@ -140,9 +140,6 @@ public:
   void        default_uri (const char *name) {defuri = name;};
   const char* default_uri () {return defuri.c_str();};
 
-  unsigned short port ();
-  void        port (unsigned short portnum);
-
   void        add_mime_type (const char *ext, const char *type, bool shtml=false);
   void        delete_mime_type (const char *ext);
 
@@ -157,10 +154,8 @@ protected:
   const char* guess_mimetype (const char *file, bool& shtml);
   http_connection* make_thread(sock& connection);
 
-  bool        init ();
 
 private:
-  unsigned short  port_num;       //!< port number
   str_pairs       out_headers;    //!< response headers
   mlib::criticalsection hdr_lock; ///<! headers access lock
   str_pairs       realms;         //!< access control realms
@@ -237,11 +232,6 @@ const char* httpd::docroot () const
 {
   return root.c_str ();
 }
-
-/// Return port number where server is listening
-inline
-unsigned short httpd::port () { return port_num; }
-
 
 /// Acquire lock on server's variables
 inline

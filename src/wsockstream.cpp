@@ -13,11 +13,6 @@
 #include <mlib/inaddr.h>
 #include <mlib/trace.h>
 
-//default buffer size
-#if !defined(BUFSIZ)
-# define BUFSIZ 1024
-#endif
-
 #pragma comment (lib, "ws2_32.lib")
 
 namespace mlib {
@@ -34,7 +29,7 @@ class sock_facility : public errfac
 public:
   sock_facility () : errfac ("SOCKSTREAM ERROR") {};
   void log (const erc& e) const override;
-  const char *msg (const erc& e) const;
+  std::string message (const erc& e) const override;
 };
 
 sock_facility the_errors;
@@ -54,19 +49,21 @@ static sock_initializer init;
   \class sock
   \ingroup sockets
 
-  We keep a 'use_count' counter associated with each sock object because sockets
-  cannot be safely duplicated (it seems) and anyway would be more expensive 
-  to call DuplicateHandle.
+  We keep a reference counter associated with each sock object because it is
+  more expensive to duplicate a socket handle using WSADuplicateHandle
 */
 
 /*!
   Create a sock object from a socket handle.
 */
 sock::sock (SOCKET soc) :
-  sl (new sock_life)
+  sl (nullptr)
 {
-  sl->use_count = 1;
-  sl->handle = soc;
+  if (soc != INVALID_SOCKET)
+  {
+    sl = new sock_ref;
+    sl->handle = soc;
+  }
   TRACE9 ("sock::sock (SOCKET %x)", sl->handle);
 }
 
@@ -80,58 +77,61 @@ sock::sock (SOCKET soc) :
   Throws an exception if the socket cannot be created.
 */
 sock::sock (int type, int domain, int proto) : 
-  sl (new sock_life)
+  sl (nullptr)
 {
-  sl->use_count = 1;
-  if ((sl->handle = ::socket (domain, type, proto)) == INVALID_SOCKET) 
-  {
-    delete sl;
+  SOCKET h;
+  if ((h = ::socket (domain, type, proto)) == INVALID_SOCKET) 
     last_error().raise ();
-  }
+
+  sl = new sock_ref;
+  sl->handle = h;
   TRACE9 ("sock::sock (type %d domain %d proto %d)=%x", type, domain, proto, sl->handle);
 }
 
 /*!
-  Copy constructor.
+  Copy constructor
 
-  Increments the 'lives' counter associated with this socket
+  The new object shares the handle with the original. This constructor only
+  increments the reference counter associated with the socket handle.
 */
 sock::sock (const sock& sb)
 {
   sl = sb.sl;
-  sl->use_count++;
-  TRACE9 ("sock::sock (sock %x) has %d lives", sl->handle,sl->use_count);
+  if (sl)
+  {
+    sl->ref_count++;
+    TRACE9 ("sock::sock (sock %x) has %d lives", sl->handle, sl->ref_count);
+  }
 }
 
-/// Move constructor
+/*!
+    Move constructor
+
+    The new object takes over the handle of the original.
+*/
 sock::sock (sock&& sb)
 {
   sl = sb.sl;
-  sb.sl = new sock_life;
+  sb.sl = nullptr;
 }
 
 /*!
   Assignment operator
+
+  The left hand object shares the handle of the right hand object.
 */
 sock& sock::operator = (const sock& rhs)
 {
   if (this == &rhs)
     return *this;       //trivial assignment
   
-  if (--sl->use_count == 0)
+  close (); //close previous handle
+
+  if ((sl = rhs.sl) != nullptr)
   {
-    //close our previous socket if we had one
-    if (sl->handle != INVALID_SOCKET)
-    {
-      TRACE8 ("sock::operator= -- closesocket(%x)", sl->handle);
-      closesocket (sl->handle);
-    }
-    delete sl;
-    TRACE9 ("sock::operator= deleting old sl");
+    sl->ref_count++;
+    TRACE9 ("sock::operator= -- handle=%x has %d lives", sl->handle, sl->ref_count);
   }
-  sl = rhs.sl;
-  sl->use_count++;
-  TRACE9 ("sock::operator= -- handle=%x has %d lives", sl->handle, sl->use_count);
   return *this;
 }
 
@@ -141,30 +141,21 @@ sock &sock::operator= (sock &&rhs)
   if (this == &rhs)
     return *this; // trivial assignment
 
-  if (--sl->use_count == 0)
-  {
-    // close our previous socket if we had one
-    if (sl->handle != INVALID_SOCKET)
-    {
-      TRACE8 ("sock::operator=&& -- closesocket(%x)", sl->handle);
-      closesocket (sl->handle);
-    }
-    delete sl;
-    TRACE9 ("sock::operator=&& deleting old sl");
-  }
+  close (); //close previous handle
+
   sl = rhs.sl;
-  rhs.sl = new sock_life;
+  rhs.sl = nullptr;
   return *this;
 }
 
 /*!
   Destructor.
 
-  If the 'use_count' counter is 0, calls closesocket() to free the Winsock handle.
+  If the 'ref_count' counter is 0, calls closesocket() to free the Winsock handle.
 */
 sock::~sock ()
 {
-  if (--sl->use_count == 0)
+  if (sl && --sl->ref_count == 0)
   {
     if (sl->handle != INVALID_SOCKET)
     {
@@ -174,21 +165,25 @@ sock::~sock ()
     delete sl;
     TRACE9 ("sock::~sock deleting sl");
   }
-  else
-    TRACE9 ("sock::~sock -- handle=%x has %d lives)", sl->handle, sl->use_count);
 }
 
 /*!
   Open the socket.
   
-  If the socket was previously opened it calls first closesocket().
+  If the socket was previously opened it calls first close().
 */
 erc sock::open (int type, int domain, int proto)
 {
   TRACE8 ("sock::open (type=%d, domain=%d, proto=%d)", type, domain, proto);
-  if (sl->handle != INVALID_SOCKET)
-    closesocket (sl->handle);
-
+  if (sl && sl->handle != INVALID_SOCKET)
+  {
+    if (--sl->ref_count == 0)
+      closesocket (sl->handle); //no other references to this handle
+    else
+      sl = nullptr; 
+  }
+  if (!sl)
+    sl = new sock_ref;
   if ((sl->handle = ::socket (domain, type, proto)) == INVALID_SOCKET)
     return last_error ();
   TRACE8 ("sock::open handle=%x", sl->handle);
@@ -201,13 +196,20 @@ erc sock::open (int type, int domain, int proto)
 */
 erc sock::close()
 {
-  if (sl->handle != INVALID_SOCKET)
+  if (sl && sl->handle != INVALID_SOCKET)
   {
     TRACE8 ("sock::close (%x)", sl->handle);
-    if (closesocket (sl->handle) == SOCKET_ERROR)
-      return last_error ();
+    if (sl->ref_count == 1)
+    {
+      // no other references to this handle
+      if (closesocket (sl->handle) == SOCKET_ERROR)
+        return last_error ();
 
-    sl->handle = INVALID_SOCKET;
+      delete sl;
+    }
+    else
+      --sl->ref_count;
+    sl = nullptr;
   }
   return erc::success;
 }
@@ -220,26 +222,34 @@ erc sock::close()
   name function provides the only way to determine the local association 
   that has been set by the system.
 */
-inaddr sock::name () const
+erc sock::name (inaddr& addr) const
 {
+  if (!sl || sl->handle == INVALID_SOCKET)
+    return erc (WSAENOTSOCK, erc::error, sock::errors);
+
   sockaddr sa;
   int len = sizeof(sa);
   if (getsockname (sl->handle, &sa, &len) == SOCKET_ERROR)
-    last_error ().raise ();
-  return sa;
+    return last_error ();
+  addr = sa;
+  return erc::success;
 }
 
 /*!
   Retrieves the name of the peer to which the socket is connected. 
   The socket must be connected.
 */
-inaddr sock::peer () const
+erc sock::peer (inaddr& addr) const
 {
+  if (!sl || sl->handle == INVALID_SOCKET)
+    return erc (WSAENOTSOCK, erc::error, sock::errors);
+
   sockaddr sa;
   int len = sizeof(sa);
   if (getpeername (sl->handle, &sa, &len) == SOCKET_ERROR)
-    last_error ().raise ();
-  return sa;
+    return last_error ();
+  addr = sa;
+  return erc::success;
 }
 
 /*!
@@ -247,6 +257,8 @@ inaddr sock::peer () const
 */
 erc sock::bind (const inaddr& sa) const
 {
+  assert (sl && sl->handle != INVALID_SOCKET);
+
   TRACE8 ("sock::bind (%x) to %s:%d", sl->handle, sa.ntoa (), sa.port ());
   if (::bind (sl->handle, sa, sizeof(sa)) == SOCKET_ERROR)
     return last_error ();
@@ -262,6 +274,9 @@ erc sock::bind (const inaddr& sa) const
 */
 erc sock::bind() const
 {
+  if (!sl || sl->handle == INVALID_SOCKET)
+    return erc (WSAENOTSOCK, erc::error, sock::errors);
+
   sockaddr sa;
   memset (&sa, 0, sizeof(sa));
   sa.sa_family = AF_INET;
@@ -273,57 +288,52 @@ erc sock::bind() const
 
 /*!
   Establishes a connection to a specified address
+  \param  peer   address of peer
+  \param  wp_sec  timeout interval (in seconds)
 
-  If a timeout is specified, the socket switches to non-blocking mode and the 
-  the function waits the specified interval for the connection to be established.
+  Waits the specified interval for a connection to be established.
   If it is not established the function returns WSAETIMEDOUT.
 */
-erc sock::connect (const inaddr& sa, int wp_sec) const
+erc sock::connect (const inaddr& peer, int wp_sec) const
 {
-  if (wp_sec != INFINITE)
-  {
-    blocking (false);
-    if (!::connect (sl->handle, sa, sizeof (sa)))
-      return erc::success;
-    int ret = WSAGetLastError ();
-    if (ret != WSAEWOULDBLOCK)
-      return erc(ret, erc::error, sock::errors);
-    if (is_writeready (wp_sec))
-      return erc::success;
-    return erc(WSAETIMEDOUT, erc::info, sock::errors);
-  }
-  if (::connect(sl->handle, sa, sizeof(sa)) == SOCKET_ERROR)
-    return last_error ();
-  return erc::success;
-}
+  if (!sl || sl->handle == INVALID_SOCKET)
+    return erc (WSAENOTSOCK, erc::error, sock::errors);
 
-/*!
-  Places the socket in a state in which it is listening for
-  incoming connections.
-*/
-erc sock::listen (int num) const
-{
-  if (::listen (sl->handle, num) == SOCKET_ERROR)
+  if (is_writeready (wp_sec))
+  {
+    ::connect (sl->handle, peer, sizeof (peer));
     return last_error ();
-  return erc::success;
+  }
+  return erc (WSAETIMEDOUT, erc::info, sock::errors);
 }
 
 /*!
   Permits an incoming connection attempt on the socket.
-  \param  addr  optional pointer to address of the connecting peer.
 
-  The connection is actually made with the socket that is returned by accept.
+  \param  client  socket for communication with connected peer.
+  \param  addr    optional pointer to address of the connecting peer.
+  \param  wp_sec  timeout interval (in seconds)
+
+  The function waits the specified interval for a connecting peer.
+  If no connection request is made the function returns WSAETIMEDOUT.
 */
-sock sock::accept (inaddr* addr) const
+erc sock::accept (sock &client, int wp_sec, inaddr *addr) const
 {
-  SOCKET soc;
+  if (!sl || sl->handle == INVALID_SOCKET)
+    return erc (WSAENOTSOCK, erc::error, sock::errors);
+
   sockaddr sa;
   int len = sizeof(sa);
-  if ((soc = ::accept (sl->handle, &sa, &len)) == INVALID_SOCKET)
-    last_error ().raise ();
+  if (is_readready (wp_sec))
+    client = sock (::accept (sl->handle, &sa, &len));
+  else
+  {
+    client = sock ();
+    return erc (WSAETIMEDOUT, erc::info, sock::errors);
+  }
   if (addr)
     *addr = sa;
-  return soc;
+  return last_error();
 }
 
 /*!
@@ -335,9 +345,12 @@ sock sock::accept (inaddr* addr) const
   \return Number of characters received or EOF if connection closed by peer.
 
 */
-size_t sock::recv (void* buf, size_t len, int msgf) const
+size_t sock::recv (void *buf, size_t len, mflags msgf) const
 {
-  int rval = ::recv (sl->handle, (char*) buf, (int)len, msgf);
+  if (!sl || sl->handle == INVALID_SOCKET)
+    throw erc (WSAENOTSOCK, erc::error, sock::errors);
+
+  int rval = ::recv (sl->handle, (char *)buf, (int)len, msgf);
   if (rval == SOCKET_ERROR)
   {
     int what =  WSAGetLastError();
@@ -346,7 +359,10 @@ size_t sock::recv (void* buf, size_t len, int msgf) const
       TRACE8 ("sock::recv - EWOULDBLOCK");
       return 0;
     }
-    else if (what == WSAECONNABORTED || what == WSAECONNRESET || what == WSAETIMEDOUT)
+    else if (what == WSAECONNABORTED 
+          || what == WSAECONNRESET 
+          || what == WSAETIMEDOUT
+          || what == WSAESHUTDOWN)
       return EOF;
     last_error ().raise ();
   }
@@ -363,8 +379,11 @@ size_t sock::recv (void* buf, size_t len, int msgf) const
   \return Number of characters received or EOF if connection closed by peer.
 
 */
-size_t sock::recvfrom (sockaddr& sa, void* buf, size_t len, int msgf) const
+size_t sock::recvfrom (sockaddr &sa, void *buf, size_t len, mflags msgf) const
 {
+  if (!sl || sl->handle == INVALID_SOCKET)
+    throw erc (WSAENOTSOCK, erc::error, sock::errors);
+
   int rval;
   int sa_len = sizeof(sa);
   
@@ -386,15 +405,18 @@ size_t sock::recvfrom (sockaddr& sa, void* buf, size_t len, int msgf) const
 /*!
   Send data to the connected peer.
   \param  buf     data to send
-  \param  len     length of buffer
+  \param  len     length of buffer.
   \param  msgf    flags (MSG_OOB or MSG_DONTROUTE)
 
   The function returns the number of characters actually sent or EOF if 
   connection was closed by peer.
 */
-size_t sock::send (const void* buf, size_t len, int msgf) const
+size_t sock::send (const void *buf, size_t len, mflags msgf) const
 {
-  size_t wlen=0;
+  if (!sl || sl->handle == INVALID_SOCKET)
+    throw erc (WSAENOTSOCK, erc::error, sock::errors);
+
+  size_t wlen = 0;
   const char *cp = (const char *)buf;
   while (len>0) 
   {
@@ -425,9 +447,12 @@ size_t sock::send (const void* buf, size_t len, int msgf) const
   The function returns the number of characters actually sent or EOF if 
   connection was closed by peer.
 */
-size_t sock::sendto (const sockaddr& sa, const void* buf, size_t len, int msgf)
+size_t sock::sendto (const sockaddr &sa, const void *buf, size_t len, mflags msgf) const
 {
-  int wlen=0;
+  if (!sl || sl->handle == INVALID_SOCKET)
+    throw erc (WSAENOTSOCK, erc::error, sock::errors);
+
+  int wlen = 0;
   const char *cp = (const char *)buf;
   while (len>0) 
   {
@@ -462,13 +487,16 @@ size_t sock::sendto (const sockaddr& sa, const void* buf, size_t len, int msgf)
 */
 bool sock::is_readready (int wp_sec, int wp_usec) const
 {
+  if (!sl || sl->handle == INVALID_SOCKET)
+    return false;
+
   fd_set fds;
   FD_ZERO (&fds);
   FD_SET (sl->handle, &fds);
   
   timeval tv = { wp_sec, wp_usec };
   
-  int ret = select (FD_SETSIZE, &fds, 0, 0, (wp_sec < 0) ? 0: &tv);
+  int ret = ::select (FD_SETSIZE, &fds, 0, 0, (wp_sec < 0) ? 0: &tv);
   if (ret == SOCKET_ERROR) 
   {
     last_error ().raise ();
@@ -490,12 +518,15 @@ bool sock::is_readready (int wp_sec, int wp_usec) const
 */
 bool sock::is_writeready (int wp_sec, int wp_usec) const
 {
+  if (!sl || sl->handle == INVALID_SOCKET)
+    return false;
+
   fd_set fds;
   FD_ZERO (&fds);
   FD_SET (sl->handle, &fds);
   timeval tv = { wp_sec, wp_usec };
   
-  int ret = select (FD_SETSIZE, 0, &fds, 0, (wp_sec < 0) ? 0: &tv);
+  int ret = ::select (FD_SETSIZE, 0, &fds, 0, (wp_sec < 0) ? 0: &tv);
   if (ret == SOCKET_ERROR) 
   {
     last_error ().raise ();
@@ -511,12 +542,15 @@ bool sock::is_writeready (int wp_sec, int wp_usec) const
 */
 bool sock::is_exceptionpending (int wp_sec, int wp_usec) const
 {
+  if (!sl || sl->handle == INVALID_SOCKET)
+    return false;
+
   fd_set fds;
   FD_ZERO (&fds);
   FD_SET  (sl->handle, &fds);
   timeval tv = { wp_sec, wp_usec};
   
-  int ret = select (FD_SETSIZE, 0, 0, &fds, (wp_sec < 0) ? 0: &tv);
+  int ret = ::select (FD_SETSIZE, 0, 0, &fds, (wp_sec < 0) ? 0: &tv);
   if (ret == SOCKET_ERROR) 
   {
     last_error ().raise ();
@@ -530,6 +564,9 @@ bool sock::is_exceptionpending (int wp_sec, int wp_usec) const
 */
 unsigned int sock::nread () const
 {
+  if (!sl || sl->handle == INVALID_SOCKET)
+    return 0;
+
   unsigned long sz;
   if (ioctlsocket (sl->handle, FIONREAD, &sz) == SOCKET_ERROR)
     last_error ().raise ();
@@ -543,7 +580,10 @@ unsigned int sock::nread () const
 */
 erc sock::shutdown (shuthow sh) const
 {
-  if (::shutdown(sl->handle, sh) == SOCKET_ERROR)
+  if (!sl || sl->handle == INVALID_SOCKET)
+    return erc (WSAENOTSOCK, erc::error, sock::errors);
+
+  if (::shutdown (sl->handle, sh) == SOCKET_ERROR)
     return last_error ();
 	
   return erc::success;		
@@ -572,60 +612,51 @@ erc sock::shutdown (shuthow sh) const
   
   Write:
   pbase() points to the start of the put area
-  The unflushed chars are pbase() - pptr()
+  The unflushed chars are `pbase() - pptr()`
   epptr() points to the end of the write buffer.
   
   Output is flushed whenever one of the following conditions
   holds:
-  (1) pptr() == epptr()
+  (1) `pptr() == epptr()`
   (2) EOF is written
  
  Unbuffered:
-  Input buffer size is assumed to be of size 1 and output
-  buffer is of size 0. That is, egptr() <= base()+1 and
-  epptr() == pbase().
- */
-
-
-/*!
-  Build a sockbuf object from an existing socket
+  Input buffer size is assumed to be of size 1 and output buffer is of size 0.
+  That is, `egptr() <= base()+1` and `epptr() == pbase()`.
 */
-sockbuf::sockbuf (SOCKET s) :
-  sock (s),
-  x_flags (0)
+
+
+///  Build a sockbuf object from an existing socket
+sockbuf::sockbuf (SOCKET s) 
+  : sock (s)
+  , x_flags (0)
 {
-  setbuf (0, BUFSIZ);
+  setbuf (0, SOCKBUF_BUFSIZ);
 }
 
-/*!
-  Build a sockbuf object and the attached socket with the given parameters
-*/
-sockbuf::sockbuf (int type, int domain, int proto) : 
-  sock (type, domain, proto),
-  x_flags (0)
+///  Build a sockbuf object and the attached socket with the given parameters
+sockbuf::sockbuf (int type, int domain, int proto)
+  : sock (type, domain, proto)
+  , x_flags (0)
 {
-  setbuf (0, BUFSIZ);
+  setbuf (0, SOCKBUF_BUFSIZ);
 }
 
-/*!
-  Build a sockbuf object from a sock base
-*/
-sockbuf::sockbuf (const sock& s) :
-  sock (s),
-  x_flags (0)
+///  Build a sockbuf object from a sock base
+sockbuf::sockbuf (const sock& s)
+  : sock (s)
+  , x_flags (0)
 {
-  setbuf (0, BUFSIZ);
+  setbuf (0, SOCKBUF_BUFSIZ);
 }
 
-/*!
-  Copy ctor
-*/
-sockbuf::sockbuf (const sockbuf& sb) : 
-  sock (sb),
-  x_flags (sb.x_flags)
+///  Copy constructor
+sockbuf::sockbuf (const sockbuf& sb)
+  : sock (sb)
+  , x_flags (sb.x_flags)
 {
-  if (x_flags & _S_ALLOCBUF)
-    setbuf (0, (int)(const_cast<sockbuf&>(sb).epptr()-const_cast<sockbuf&>(sb).pbase()));
+  if (x_flags & flags::allocbuf)
+    setbuf (0, (int)(const_cast<sockbuf &> (sb).epptr () - const_cast<sockbuf &> (sb).pbase ()));
 }
 
 /*!
@@ -636,23 +667,22 @@ sockbuf::sockbuf (const sockbuf& sb) :
 sockbuf& sockbuf::operator = (const sockbuf& rhs)
 {
   sock::operator =(rhs);
-  x_flags = (x_flags & _S_ALLOCBUF) | (rhs.x_flags & ~_S_ALLOCBUF);
+  std::streambuf::operator= (rhs);
+  x_flags = (x_flags & flags::allocbuf) | (rhs.x_flags & ~flags::allocbuf);
   return *this;
 }
 
-/*!
-  Destructor
-*/
+///  Destructor
 sockbuf::~sockbuf ()
 {
   if (is_open ())
   {
     overflow ();
-    shutdown (shut_readwrite);
-    close ();
+    shutdown (shut_readwrite).deactivate (); //ignore any errors
+    close ().deactivate (); //ignore errors
   }
 
-  if (x_flags & _S_ALLOCBUF)
+  if (x_flags & flags::allocbuf)
   {
     delete [] pbase();
     delete [] eback();
@@ -667,7 +697,7 @@ int sockbuf::sync ()
 {
   if (pptr () <= pbase ()) 
     return 0;                                     //unbuffered or empty buffer
-  if (!(x_flags & _S_NO_WRITES)) 
+  if (!(x_flags & flags::no_writes)) 
   {
     size_t wlen   = pptr () - pbase ();
     size_t wval   = send (pbase (), wlen);
@@ -685,32 +715,32 @@ int sockbuf::sync ()
   If \p buf is NULL, switches to automatic buffering mode with separate buffers
   for input and output.
 */
-std::streambuf* sockbuf::setbuf (char* buf, int sz)
+std::streambuf* sockbuf::setbuf (char* buf, std::streamsize sz)
 {
   overflow(EOF);                                  //flush current output buffer
   
   //switch to unbuffered mode
-  if (x_flags & _S_ALLOCBUF)
+  if (x_flags & flags::allocbuf)
   {
     delete []eback();
     delete []pbase();
   }
   setp (NULL, NULL);
   setg (NULL, NULL, NULL);
-  x_flags &= ~_S_ALLOCBUF;
+  x_flags &= ~flags::allocbuf;
   ibsize = 0;
   if (!buf)
   {
     //automatic buffer - allocate separate input and output buffers
-    x_flags |= _S_ALLOCBUF;
+    x_flags |= flags::allocbuf;
     char *ptr = new char[sz+1];
     setp (ptr, ptr+sz);
     ptr = new char[sz];
-    setg( ptr, ptr+sz, ptr+sz );
-    ibsize = sz;
+    setg (ptr, ptr + sz, ptr + sz);
+    ibsize = (int)sz;
   }
   else
-    setp( buf, buf+sz-1 );                        //user specified buffer used only for output
+    setp (buf, buf + sz - 1);   // user specified buffer used only for output
   return this;
 }
 
@@ -719,7 +749,7 @@ std::streambuf* sockbuf::setbuf (char* buf, int sz)
 */
 int sockbuf::underflow ()
 {
-  if (x_flags & _S_NO_READS) 
+  if (x_flags & flags::no_reads) 
     return EOF;                                   //reads blocked for this socket
   
   if (gptr () < egptr ()) 
@@ -748,13 +778,13 @@ int sockbuf::underflow ()
 }
 
 /*!
-  If c == EOF or buffer full , return sync();
+  If c == EOF or buffer full, return sync();
   otherwise insert c into the buffer and return c
 */
 int sockbuf::overflow (int c)
 {
-  if (x_flags & _S_NO_WRITES) 
-    return EOF;                                   //socket blocked for writing, can't do anything
+  if (x_flags & flags::no_writes) 
+    return EOF;           //socket blocked for writing, can't do anything
 
   if (sync () == EOF)     //flush output
     return EOF;
@@ -837,14 +867,21 @@ sock_initializer::~sock_initializer()
 
 /*!
   Return the error message text.
+
+  Values from: https://learn.microsoft.com/en-us/windows/win32/winsock/windows-sockets-error-codes-2
 */
-const char* sock_facility::msg (const erc& e) const
+std::string sock_facility::message (const erc& e) const
 {
   static struct errtab {
     int code;
     const char *str;
   } errors[] = {
-
+    ENTRY (WSA_INVALID_HANDLE),
+    ENTRY (WSA_NOT_ENOUGH_MEMORY),
+    ENTRY (WSA_INVALID_PARAMETER),
+    ENTRY (WSA_OPERATION_ABORTED),
+    ENTRY (WSA_IO_INCOMPLETE),
+    ENTRY (WSA_IO_PENDING),
     ENTRY (WSAEINTR),
     ENTRY (WSAEBADF),
     ENTRY (WSAEACCES),
@@ -933,9 +970,9 @@ const char* sock_facility::msg (const erc& e) const
 */
 void sock_facility::log (const erc& e) const
 {
-  const char *str = msg (e);
-  if (str)
-    dprintf ("%s  - %s(%d)", name().c_str(), str, e.code());
+  auto str = message (e);
+  if (!str.empty())
+    dprintf ("%s  - %s(%d)", name ().c_str (), str.c_str (), e.code ());
   else
     dprintf ("%s - %d", name().c_str(), e.code());
 }

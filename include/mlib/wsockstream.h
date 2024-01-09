@@ -14,17 +14,13 @@
 #include <WinSock2.h>
 #include <iostream>
 
-#include "errorcode.h"
-#include "inaddr.h"
+#include <mlib/errorcode.h>
+#include <mlib/inaddr.h>
+
+#include <assert.h>
 
 namespace mlib {
 
-
-//sockbuf flags
-#define _S_ALLOCBUF   0x0002    ///< locally allocated buffer
-#define _S_NO_READS   0x0004    ///< write only flag
-#define _S_NO_WRITES  0x0008    ///< read only flag
-#define _S_EOF_SEEN   0x0010    ///< read eof condition
 
 /// Encapsulation of a Windows socket
 class sock
@@ -33,12 +29,22 @@ public:
 
   ///operation blocked by shutdown function
   enum shuthow {
-    shut_read=SD_RECEIVE,   ///< blocked for reading
-    shut_write=SD_SEND,     ///< blocked for writing
-    shut_readwrite=SD_BOTH  ///< blocked for both
+    shut_read=0,      ///< blocked for reading
+    shut_write=1,     ///< blocked for writing
+    shut_readwrite=2  ///< blocked for both
   };
 
-  sock (SOCKET soc = INVALID_SOCKET);
+  /// Flags for send/receive operations
+  enum mflags {
+    none = 0,                   ///< no flags
+    out_of_band=MSG_OOB,        ///< send out of band data
+    peek = MSG_PEEK,            ///< don't remove data from the input queue
+    dont_route = MSG_DONTROUTE, ///< data should not be routed
+    wait_all = MSG_WAITALL      ///< wait until buffer full or connection closed
+  };
+
+  sock ();
+  explicit sock (SOCKET soc);
   explicit sock (int type, int domain=AF_INET, int proto=0);
   sock (const sock&);
   sock (sock &&);
@@ -47,8 +53,7 @@ public:
   sock&             operator= (const sock&);
   sock&             operator= (sock &&);
 
-  ///Retrieve Windows socket handle
-  HANDLE            handle () const {return (HANDLE)sl->handle;};
+  HANDLE            handle () const;
   bool              operator== (const sock &other) const;
   bool              operator!= (const sock &other) const;
 
@@ -56,12 +61,16 @@ public:
   virtual erc       close ();
   virtual erc       shutdown (shuthow sh) const;
 
-  ///Check if socket is opened
-  virtual bool      is_open () const  { return sl->handle != INVALID_SOCKET; }
-  size_t            recv (void* buf, size_t maxlen, int msgf=0) const;
-  size_t            recvfrom (sockaddr& sa,void* buf, size_t maxlen, int msgf=0) const;
-  size_t            send (const void* buf, size_t len, int msgf=0) const;
-  size_t            sendto (const sockaddr& sa,const void* buf, size_t len, int msgf=0);
+  virtual bool      is_open () const;
+  size_t            recv (void *buf, size_t maxlen, mflags msgf = mflags::none) const;
+  size_t            recvfrom (sockaddr &sa, void *buf, size_t maxlen, mflags msgf = mflags::none) const;
+  size_t            send (const void *buf, size_t len, mflags msgf = mflags::none) const;
+  template <typename T> 
+  size_t            send (std::basic_string<T> buf, mflags msgf = mflags::none) const;
+  size_t            sendto (const sockaddr &sa, const void *buf, size_t len, mflags msgf = mflags::none) const;
+  template <typename T> 
+  size_t            sendto (const sockaddr &sa, std::basic_string<T> buf, mflags msgf = mflags::none) const;
+  
   int               sendtimeout (int wp_sec) const;
   int               sendtimeout () const;
   int               recvtimeout (int wp_sec) const;
@@ -71,17 +80,18 @@ public:
   bool              is_exceptionpending (int wp_sec, int wp_usec=0) const;
   unsigned int      nread () const;
 
-  erc               bind (const inaddr&) const;
+  erc               bind (const inaddr& ) const;
   erc               bind () const;
-  erc               connect (const inaddr& peer, int wp_sec = INFINITE) const;
+  erc               connect (const inaddr& peer) const;
+  erc               connect (const inaddr &peer, int wp_sec) const;
   erc               listen (int num=SOMAXCONN) const;
-  inaddr            name () const;
-  inaddr            peer () const;
-
-  virtual sock      accept (inaddr* sa = nullptr) const;
+  erc               accept (sock &client, inaddr *sa = nullptr) const;
+  erc               accept (sock &client, int wp_sec, inaddr *sa = nullptr) const;
+  erc               name (inaddr& addr) const;
+  erc               peer (inaddr& addr) const;
 
   int               getopt (int op, void* buf,int len, int level=SOL_SOCKET) const;
-  void              setopt (int op, void* buf,int len, int level=SOL_SOCKET) const;
+  erc               setopt (int op, void* buf,int len, int level=SOL_SOCKET) const;
 
   int               gettype () const;
   int               clearerror () const;
@@ -101,30 +111,46 @@ public:
   void              sendbufsz (size_t sz) const;
   int               recvbufsz () const;
   void              recvbufsz (size_t sz) const;
-  void              blocking (bool on_off) const;
+  void              blocking (bool on_off);
   erc               setevent (HANDLE evt, long mask) const;
   long              enumevents () const;
   void              linger (bool on_off, unsigned short seconds) const;
   bool              linger (unsigned short *seconds = 0) const;
 
+protected:
   /// Error facility used by all sock derived classes.
   static errfac *errors;
   static erc last_error ();
 
-protected:
-
 private:
-  struct sock_life {
-    sock_life ()
+  struct sock_ref
+  {
+    sock_ref ()
       : handle{INVALID_SOCKET}
-      , use_count{1} {};
+      , ref_count{1} {};
     SOCKET  handle;
-    int     use_count;
+    int     ref_count;
   } *sl;
+
+  friend class inaddr;
+  friend struct sock_initializer;
 };
 
+/// Extraction operator shows socket handle
+inline
+std::ostream& operator<< (std::ostream& strm, const sock& s)
+{
+  strm << s.handle ();
+  return strm;
+}
 
-///Provide functions required by streambuf interface using an underlying socket
+
+// default buffer size
+#if !defined(SOCKBUF_BUFSIZ)
+#define SOCKBUF_BUFSIZ 1024
+#endif
+
+///Provide functions required by `streambuf` interface using an underlying socket
 class sockbuf: public sock, public std::streambuf {
 public:
 
@@ -138,18 +164,26 @@ public:
   sockbuf&          operator = (const sockbuf&);
   
 protected:
-  /// \name Redefined virtuals from parent streambuf
+  /// \name Redefined virtuals from parent `streambuf`
   ///\{
-  virtual int       underflow ();
-  virtual int       overflow (int c = EOF);
-  virtual int       sync ();
-  virtual std::streambuf* setbuf (char *buf, int sz);
-  virtual std::streamsize showmanyc ();
+  virtual int       underflow () override;
+  virtual int       overflow (int c = EOF) override;
+  virtual int       sync () override;
+  virtual std::streambuf *setbuf (char *buf, std::streamsize sz) override;
+  virtual std::streamsize showmanyc () override;
   ///\}
 
 
 private:
-  int     x_flags;
+  enum flags
+  {
+    allocbuf = 0x0002, ///< locally allocated buffer
+    no_reads = 0x0004, ///< write only flag
+    no_writes = 0x0008,   ///< read only flag
+    eof_seen  = 0x0010    ///< read EOF condition
+  };
+
+  int   x_flags;
   int     ibsize;   //input buffer size
 };
 
@@ -228,6 +262,97 @@ inline errfac *sock::errors;
 
 /*==================== INLINE FUNCTIONS ===========================*/
 
+/// Default constructor creates a closed socket
+inline
+sock::sock ()
+  : sl{nullptr}
+{
+}
+
+/// Retrieve Windows socket handle
+inline
+HANDLE sock::handle () const
+{
+  return sl ? (HANDLE)sl->handle : INVALID_HANDLE_VALUE;
+}
+
+/// Check if socket is opened
+inline
+bool sock::is_open () const
+{
+  return sl && sl->handle != INVALID_SOCKET;
+}
+
+/// Establishes a connection to specified peer
+inline
+erc sock::connect (const inaddr &peer) const
+{
+  if (!sl || sl->handle == INVALID_SOCKET)
+    return erc (WSAENOTSOCK, erc::error, sock::errors);
+
+  int ret = ::connect (sl->handle, peer, sizeof (peer));
+  if (ret == SOCKET_ERROR)
+    return last_error ();
+
+  return erc::success;
+}
+
+
+/// Permits an incoming connection attempt on the socket.
+inline 
+erc sock::accept (sock &client, inaddr *addr) const
+{
+  if (!sl || sl->handle == INVALID_SOCKET)
+    return erc (WSAENOTSOCK, erc::error, sock::errors);
+
+  sockaddr sa;
+  int len = sizeof (sa);
+  client = sock (::accept (sl->handle, &sa, &len));
+  if (addr)
+    *addr = sa;
+  return erc ();
+}
+
+/// Places the socket in a state in which it is listening for incoming connections.
+inline
+erc sock::listen (int num) const
+{
+  if (!sl || sl->handle == INVALID_SOCKET)
+    return erc (WSAENOTSOCK, erc::error, sock::errors);
+
+  ::listen (sl->handle, num);
+  return last_error ();
+}
+
+/*!
+  Send data to connected peer.
+  \param  buf     data to send
+  \param  msgf    flags (MSG_OOB or MSG_DONTROUTE)
+
+  The function returns the number of characters actually sent or EOF if
+  connection was closed by peer.
+*/
+template <typename T> 
+size_t sock::send (std::basic_string<T> buf, mflags msgf) const
+{
+  return send (buf.c_str (), buf.size () * sizeof (T), msgf);
+}
+
+/*!
+  Send data to a peer.
+  \param  sa      peer address
+  \param  buf     data to send
+  \param  msgf    flags (MSG_OOB or MSG_DONTROUTE)
+
+  The function returns the number of characters actually sent or EOF if
+  connection was closed by peer.
+*/
+template <typename T>
+size_t sock::sendto (const sockaddr& sa, std::basic_string<T> buf, mflags msgf) const
+{
+  return sendto (sa, buf.c_str (), buf.size () * sizeof (T), msgf);
+}
+
 /*!
   Set send timeout value
   \param  wp_sec    timeout value in seconds
@@ -236,6 +361,9 @@ inline errfac *sock::errors;
 inline
 int sock::sendtimeout (int wp_sec) const
 {
+  if (!sl || sl->handle == INVALID_SOCKET)
+    return erc (WSAENOTSOCK, erc::error, sock::errors);
+
   int oldwtmo;
   int optlen = sizeof (int);
   getsockopt (sl->handle, SOL_SOCKET, SO_SNDTIMEO, (char *)&oldwtmo, &optlen);
@@ -248,6 +376,9 @@ int sock::sendtimeout (int wp_sec) const
 inline
 int sock::sendtimeout () const
 {
+  if (!sl || sl->handle == INVALID_SOCKET)
+    return erc (WSAENOTSOCK, erc::error, sock::errors);
+
   int oldwtmo;
   int optlen = sizeof (int);
   getsockopt (sl->handle, SOL_SOCKET, SO_SNDTIMEO, (char *)&oldwtmo, &optlen);
@@ -262,6 +393,9 @@ int sock::sendtimeout () const
 inline
 int sock::recvtimeout (int wp_sec) const
 {
+  if (!sl || sl->handle == INVALID_SOCKET)
+    return erc (WSAENOTSOCK, erc::error, sock::errors);
+
   int oldrtmo;
   int optlen = sizeof (int);
   getsockopt (sl->handle, SOL_SOCKET, SO_RCVTIMEO, (char *)&oldrtmo, &optlen);
@@ -274,6 +408,9 @@ int sock::recvtimeout (int wp_sec) const
 inline
 int sock::recvtimeout () const
 {
+  if (!sl || sl->handle == INVALID_SOCKET)
+    return erc (WSAENOTSOCK, erc::error, sock::errors);
+
   int oldrtmo;
   int optlen = sizeof (int);
   getsockopt (sl->handle, SOL_SOCKET, SO_RCVTIMEO, (char *)&oldrtmo, &optlen);
@@ -292,6 +429,9 @@ int sock::recvtimeout () const
 inline
 int sock::getopt (int op, void *buf, int len, int level) const
 {
+  if (!sl || sl->handle == INVALID_SOCKET)
+    return erc (WSAENOTSOCK, erc::error, sock::errors);
+
   int rlen = len;
   if (::getsockopt (sl->handle, level, op, (char *)buf, &rlen) == SOCKET_ERROR)
     last_error ().raise ();
@@ -306,10 +446,15 @@ int sock::getopt (int op, void *buf, int len, int level) const
   \param  level level at which the option is defined
 */
 inline
-void sock::setopt (int op, void *buf, int len, int level) const
+erc sock::setopt (int op, void *buf, int len, int level) const
 {
+  if (!sl || sl->handle == INVALID_SOCKET)
+    return erc (WSAENOTSOCK, erc::error, sock::errors);
+
   if (::setsockopt (sl->handle, level, op, (char *)buf, len) == SOCKET_ERROR)
-    last_error ().raise ();
+    return last_error ();
+
+  return erc::success;
 }
 
 /*!
@@ -491,8 +636,11 @@ void sock::recvbufsz (size_t sz) const
   into non-blocking sockets using this function.
 */
 inline
-void sock::blocking (bool on_off) const
+void sock::blocking (bool on_off)
 {
+  if (!sl || sl->handle == INVALID_SOCKET)
+    throw erc (WSAENOTSOCK, erc::error, sock::errors);
+
   unsigned long mode = on_off ? 0 : 1;
   if (ioctlsocket (sl->handle, FIONBIO, &mode) == SOCKET_ERROR)
     last_error ().raise ();
@@ -516,6 +664,9 @@ void sock::blocking (bool on_off) const
 inline
 erc sock::setevent (HANDLE evt, long mask) const
 {
+  if (!sl || sl->handle == INVALID_SOCKET)
+    return erc (WSAENOTSOCK, erc::error, sock::errors);
+
   if (WSAEventSelect (sl->handle, (WSAEVENT)evt, mask) == SOCKET_ERROR)
     return last_error ();
   return erc::success;
@@ -530,6 +681,9 @@ erc sock::setevent (HANDLE evt, long mask) const
 inline
 long sock::enumevents () const
 {
+  if (!sl || sl->handle == INVALID_SOCKET)
+    throw erc (WSAENOTSOCK, erc::error, sock::errors);
+
   WSANETWORKEVENTS netev;
   if (WSAEnumNetworkEvents (sl->handle, NULL, &netev) == SOCKET_ERROR)
     last_error ().raise ();
@@ -561,18 +715,23 @@ bool sock::linger (unsigned short *seconds) const
 inline
 erc sock::last_error ()
 {
-  return erc(WSAGetLastError (), erc::error, sock::errors);
+  int code = WSAGetLastError ();
+  if (!code)
+    return erc::success;
+  else
+    return erc(code, erc::error, sock::errors);
 }
 
 /*!
    Equality comparison operator
 
-   Returns `true` if both objects have the same handle
+   Returns `true` if both objects point to the same underlining socket control
+   structure
 */
 inline
 bool sock::operator== (const sock &other) const
 {
-  return (sl->handle == other.sl->handle);
+  return (sl == other.sl);
 }
 
 /*!
@@ -586,6 +745,12 @@ bool sock::operator!= (const sock &other) const
   return !operator ==(other);
 }
 
+/// Bitwise OR operator for send message flags
+inline
+sock::mflags operator | (sock::mflags f1, sock::mflags f2)
+{
+  return (sock::mflags) ((int)f1 | (int)f2);
+}
 
 }
 

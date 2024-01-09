@@ -129,7 +129,11 @@ http_connection::http_connection (sock& socket, httpd& server)
 void http_connection::run ()
 {
   ws->recvtimeout (HTTPD_TIMEOUT);
-  TRACE8 ("http_connection::run - Connection from %s", ws->peer ().hostname ().c_str());
+#if defined(MLIB_TRACE)
+  inaddr addr;
+  ws->peer (addr);
+  TRACE8 ("http_connection::run - Connection from %s", addr.hostname ().c_str());
+#endif
   try {
     while (1)
     {
@@ -157,8 +161,12 @@ void http_connection::run ()
 
         if (!ws.good ())
         {
+#if defined(MLIB_TRACE)
+          inaddr addr;
+          ws->peer (addr);
           TRACE2 ("http_connection::run - timeout peer %s",
-            ws->peer ().hostname ().c_str());
+            addr.hostname ().c_str());
+#endif
           respond (408);
           return;
         }
@@ -183,8 +191,12 @@ void http_connection::run ()
 
       if (req_len == HTTPD_MAX_HEADER)
       {
+#if defined(MLIB_TRACE)
+        inaddr addr;
+        ws->peer (addr);
         TRACE2 ("http_connection::run - Request too long (%d) peer %s",
-          req_len, ws->peer ().hostname ().c_str());
+          req_len, addr.hostname ().c_str());
+#endif
         respond (413);
         return;
       }
@@ -241,7 +253,11 @@ void http_connection::run ()
 
 void http_connection::term ()
 {
-  TRACE8 ("http_connection::term - Closed connection to %s", ws->peer ().hostname ().c_str());
+#if defined(MLIB_TRACE)
+  inaddr addr;
+  ws->peer (addr);
+  TRACE8 ("http_connection::term - Closed connection to %s", addr.hostname ().c_str());
+#endif
   parent.close_connection (*ws.rdbuf ());
   thread::term ();
 }
@@ -1056,12 +1072,10 @@ void http_connection::respond_next (bool last)
   - server name is HTTPD_SERVER_NAME  
 */
 httpd::httpd (unsigned short port, unsigned int maxconn)
-  : tcpserver (maxconn)
-  , port_num (port)
+  : tcpserver (port, HTTPD_SERVER_NAME, maxconn)
   , root ("./")
   , defuri (HTTPD_DEFAULT_URI)
 {
-  name (HTTPD_SERVER_NAME);
   smime* ptr = knowntypes;
   while (ptr->suffix)
   {
@@ -1075,40 +1089,6 @@ httpd::httpd (unsigned short port, unsigned int maxconn)
 */
 httpd::~httpd()
 {
-}
-
-/*!
-  This function is called automatically as part of the server startup process.
-  It binds the listening socket on all interfaces.
-*/
-bool httpd::init ()
-{
-  try {
-    if (!is_open ())
-      open (SOCK_STREAM);
-    inaddr me (port_num?INADDR_ANY : INADDR_LOOPBACK, port_num);
-    bind (me);
-    port_num = sock::name ().port ();
-  }
-  catch (erc& x)
-  {
-    x.deactivate ();
-    TRACE ("httpd::init Error %x", (int)x);
-    return false;
-  }
-  return tcpserver::init ();
-}
-
-/*!
-  Change port number where server will be listening.
-  \param  portnum new port number
-
-  This function is effective only until the server is started.
-*/
-void httpd::port (unsigned short portnum)
-{
-  if (!is_running ())
-    port_num = portnum;
 }
 
 /*!
