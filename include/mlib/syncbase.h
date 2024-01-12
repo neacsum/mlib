@@ -298,7 +298,7 @@ DWORD wait_msg (const T* objs, int count, bool all=true, DWORD msec = INFINITE, 
   assert (count < MAXIMUM_WAIT_OBJECTS);
   HANDLE harr[MAXIMUM_WAIT_OBJECTS];
   for (int i = 0; i < count; i++)
-    harr[i] = objs[i].handle ();
+    harr[i] = objs[i]->handle ();
 
   DWORD result = MsgWaitForMultipleObjects (count, harr, all, msec, mask);
   return result;
