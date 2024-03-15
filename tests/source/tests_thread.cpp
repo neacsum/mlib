@@ -43,7 +43,7 @@ SUITE (threads)
 
     mlib::thread th (bad_func);
     th.start ();
-    CHECK_THROW (std::out_of_range, th.wait ());
+    CHECK_THROW (th.wait (), std::out_of_range);
   }
 
   TEST (thread_states)

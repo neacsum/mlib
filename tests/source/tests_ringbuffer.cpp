@@ -268,7 +268,7 @@ SUITE (RingBuffer)
     CHECK (++last == testbuf.end ());
 
     // VERIFY: dereferencing end pointer throws exception
-    CHECK_THROW (std::range_error, *last == 0);
+    CHECK_THROW (*last == 0, std::range_error);
 
 
     last--;

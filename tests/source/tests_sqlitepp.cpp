@@ -161,7 +161,7 @@ TEST (DbAssign_Fail)
 {
   Database db_to (""), db_from;
 
-  CHECK_THROW (erc, db_to = db_from );
+  CHECK_THROW (db_to = db_from, erc );
 }
 
 //cannot copy database if a query is active
@@ -177,7 +177,7 @@ TEST (DbAssign_Busy)
   Query q (db_to, "SELECT * FROM tab");
   q.step ();
 
-  CHECK_THROW (erc, db_to = db_from);
+  CHECK_THROW (db_to = db_from, erc);
 
   q.finalize (); // now db is free, we can copy
   db_to = db_from;
@@ -271,13 +271,13 @@ TEST_FIXTURE (TestDatabase, NonExisitngColumnName)
 {
   q = "SELECT * FROM tab";
   q.step ();
-  CHECK_THROW_EQUAL (erc, SQLITE_RANGE, q.column_int ("no_such_column"));
+  CHECK_THROW_EQUAL (q.column_int ("no_such_column"), SQLITE_RANGE, erc);
 }
 
 TEST_FIXTURE (TestDatabase, NonExistingParameter)
 {
   q = "SELECT (:par)";
-  CHECK_THROW_EQUAL (erc, SQLITE_RANGE, q.bind (":no_such_par", 123));
+  CHECK_THROW_EQUAL (q.bind (":no_such_par", 123), SQLITE_RANGE, erc);
 }
 
 // test for Query::sql function and string conversion operator

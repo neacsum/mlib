@@ -27,13 +27,13 @@ erc gg (int i)
 // Default erc objects are thrown
 TEST (erc_trhow)
 {
-  CHECK_THROW (erc, f (2));
+  CHECK_THROW (f(2), erc);
 }
 
 // Assigned erc object is thrown
 TEST (erc_assign)
 {
-  CHECK_THROW (erc, ff ());
+  CHECK_THROW (ff(), erc);
 }
 
 // Integer conversion operator deactivates the erc
@@ -99,7 +99,7 @@ TEST (facility_pri)
 {
   auto p = errfac::Default ().throw_priority ();
   errfac::Default ().throw_priority (erc::warning);
-  CHECK_THROW (erc, g (1));
+  CHECK_THROW (g (1), erc);
   errfac::Default ().throw_priority (p); //restore previous throw priority
   g (1);
 }
@@ -147,7 +147,7 @@ TEST (erc_assignment)
   rg = gg (2);
 
   // assigning to an active erc throws
-  CHECK_THROW (erc, (rf = rg));
+  CHECK_THROW ((rf = rg), erc);
 }
 
 TEST (erc_copy)

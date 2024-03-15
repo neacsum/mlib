@@ -13,7 +13,7 @@ SUITE (Point)
 TEST (distance) {
   dpoint O, A (3, 0), B (0, 4);
   double d = A.distance (B);
-  CHECK_CLOSE (5, d, dpoint::traits::tolerance());
+  CHECK_CLOSE (d, 5., dpoint::traits::tolerance());
 }
 
 TEST (angle) {
