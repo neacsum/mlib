@@ -8,7 +8,7 @@
 #include <mlib/base64.h>
 
 #if __has_include(<utf8/utf8.h>)
-#define HAS_UTF8
+#define MLIB_HAS_UTF8_LIB
 #include <utf8/utf8.h>
 #else
 #include <io.h> //for _access
@@ -535,7 +535,7 @@ bool http_connection::has_bparam (const char* key)
 */
 int http_connection::serve_shtml (const std::string& full_path)
 {
-#ifdef HAS_UTF8
+#ifdef MLIB_HAS_UTF8_LIB
   FILE *fn = utf8::fopen (full_path, "rS");
 #else
   FILE* fn = fopen (full_path.c_str(), "rS");
@@ -740,7 +740,7 @@ int http_connection::serve_buffer (const std::string& str)
 int http_connection::serve_file (const std::string& full_path)
 {
   int ret = HTTPD_OK;
-#ifdef HAS_UTF8
+#ifdef MLIB_HAS_UTF8_LIB
   FILE *fin = utf8::fopen (full_path, "rbS");
 #else
   FILE* fin = fopen (full_path.c_str(), "rbS");
@@ -1484,7 +1484,7 @@ bool file_exists (char *path)
       *p = '\\';
     ++p;
   }
-#ifdef HAS_UTF8
+#ifdef MLIB_HAS_UTF8_LIB
   return utf8::access (path, 4);
 #else
   return (_access (path, 4) != 0);

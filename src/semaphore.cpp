@@ -8,7 +8,7 @@
 #include <assert.h>
 
 #if __has_include(<utf8/utf8.h>)
-#define HAS_UTF8
+#define MLIB_HAS_UTF8_LIB
 #include <utf8/utf8.h>
 #endif
 
@@ -30,7 +30,7 @@ namespace mlib {
 semaphore::semaphore (int limit, const std::string& name)
   : syncbase (name)
 {
-#ifdef HAS_UTF8
+#ifdef MLIB_HAS_UTF8_LIB
   HANDLE h = CreateSemaphoreW (NULL, 0, limit, !name.empty () ? utf8::widen (name).c_str () : NULL);
 #else
   HANDLE h = CreateSemaphoreA (NULL, 0, limit, !name.empty () ? name.c_str () : NULL);

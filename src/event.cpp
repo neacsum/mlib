@@ -14,7 +14,7 @@
 #include <assert.h>
 
 #if __has_include(<utf8/utf8.h>)
-#define HAS_UTF8
+#define MLIB_HAS_UTF8_LIB
 #include <utf8/utf8.h>
 #endif
 
@@ -35,7 +35,7 @@ namespace mlib {
 event::event (bool manual, bool signaled, const std::string& name) :
   syncbase (name)
 {
-#ifdef HAS_UTF8
+#ifdef MLIB_HAS_UTF8_LIB
   HANDLE h = CreateEventW (NULL, manual, signaled, !name.empty () ? utf8::widen (name).c_str () : NULL);
 #else
   HANDLE h = CreateEventA (NULL, manual, signaled, !name.empty () ? name.c_str () : NULL);

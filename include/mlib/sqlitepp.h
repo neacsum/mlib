@@ -12,6 +12,7 @@
 #include <string>
 #include <map>
 #include <memory>
+#include <cassert>
 
 #include <Winsock2.h>
 #include <sqlite3/sqlite3.h>
@@ -27,6 +28,7 @@
 namespace mlib {
 
 class Query;
+extern errfac* sqlite_errors;
 
 ///Wrapper for database connection handle
 class Database
@@ -47,26 +49,26 @@ public:
     nofollow      = SQLITE_OPEN_NOFOLLOW      ///<filename cannot be a symlink
   };
 
-  ///Default constructor
+  /// Default constructor
   Database ();
 
   ///Open a database specified by name
   Database (const std::string& name, openflags flags=openflags::create);
 
-  ///Destructor
-  ~Database ();
-
-  /// Assignment operator 
-  Database& operator =(const Database& rhs);
+  /// Copy database content 
+  Database& copy (Database& src);
 
   ///Check if database is opened or not
-  bool connected () {return (db != 0);};
+  bool connected () {return (bool)db;};
 
   /// Return true if database connection is read-only
   bool is_readonly ();
 
   ///Return handle of database connection
-  operator sqlite3* () {return db;};
+  operator sqlite3 * () {return handle ();}
+
+  ///Return handle of database connection
+  sqlite3 *handle ()const {return db?db.get():nullptr;}
 
   ///Return rowid of last successful insert
   __int64 last_rowid ();
@@ -105,11 +107,7 @@ public:
   erc flush();
 
 private:
-  /// prohibit default function 
-  Database (const Database& t) = delete;
-
-  sqlite3 *db;
-  std::unique_ptr<errfac> errors;
+  std::shared_ptr<sqlite3> db;
   friend class Query;
 };
 
@@ -122,17 +120,20 @@ public:
   ///Default constructor
   Query ();
 
-  ///Statement attached to a database but without any SQL
-  Query (Database& db);
+  ///Build a prepared statement
+  Query (Database& db, const std::string& sql= std::string());
 
-  ///Build a prepared statement from SQL text
-  Query (Database& db, const std::string& sql);
+  ///Copy constructor
+  Query (const Query &other);
 
   /// Move constructor
   Query(Query&& other);
 
   /// Move assignment operator
   Query& operator =(Query&& rhs);
+
+  /// Principal assignment operator
+  Query &operator= (const Query &rhs);
 
   ~Query ();
 
@@ -212,23 +213,17 @@ public:
   int           columns ();
 
   ///Reset statement to initial state
-  Query&        reset ();
+  erc           reset ();
 
-  void          finalize ();
+  void          clear ();
 
 private:
-  /// prohibit default function 
-  Query(const Query& t) = delete;
-
-  /// prohibit default function 
-  Query& operator= (const Query& rhs) = delete;
-
   void          map_columns () const;
   int           find_col (const std::string& colname) const;
   erc           check_errors (int rc);
 
-  sqlite3_stmt* stmt;
-  Database*     dbase;
+  sqlite3_stmt*   stmt;
+  Database        dbase;
 
   /*! SQLITE is case insensitive in column names. Make column_xxx functions also
   case insensitive */
@@ -244,22 +239,25 @@ private:
 inline
 __int64 Database::last_rowid () 
 {
-  return sqlite3_last_insert_rowid (db);
+  assert (db);
+  return sqlite3_last_insert_rowid (db.get());
 }
 
 inline
 __int64 Database::changes () 
 {
-  return sqlite3_changes64 (db);
+  assert (db);
+  return sqlite3_changes64 (db.get ());
 }
 
 inline __int64 mlib::Database::total_changes ()
 {
-  return sqlite3_total_changes64 (db);
+  assert (db);
+  return sqlite3_total_changes64 (db.get ());
 }
 
 inline
-Query::Query() : stmt (0), dbase(0), col_mapped (false) 
+Query::Query() : stmt (0), col_mapped (false) 
 {
 }
 

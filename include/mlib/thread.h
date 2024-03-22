@@ -192,8 +192,12 @@ void current_thread::priority (int pri)
 @{
 */
 
+template <typename T>
+concept ThreadDerived = std::derived_from<T, mlib::thread>;
+
+template <ThreadDerived T>
 inline
-DWORD wait_all (const thread* objs, int count, DWORD msec = INFINITE)
+DWORD wait_all (const T* objs, int count, DWORD msec = INFINITE)
 {
   assert (count < MAXIMUM_WAIT_OBJECTS);
   HANDLE harr[MAXIMUM_WAIT_OBJECTS];
@@ -210,47 +214,50 @@ DWORD wait_all (const thread* objs, int count, DWORD msec = INFINITE)
   return result;
 }
 
+template <ThreadDerived T>
 inline
-DWORD wait_all (std::initializer_list<const thread*> objs, std::chrono::milliseconds limit)
+DWORD wait_all (std::initializer_list<const T*> objs, std::chrono::milliseconds limit)
 {
   assert (objs.size () < MAXIMUM_WAIT_OBJECTS);
   HANDLE harr[MAXIMUM_WAIT_OBJECTS];
   int i = 0;
-  for (auto p = objs.begin (); p != objs.end (); ++p)
-    harr[i++] = (*p)->handle ();
+  for (auto& th : objs)
+    harr[i++] = th->handle ();
 
   DWORD msec = (DWORD)limit.count ();
   DWORD result = WaitForMultipleObjects ((DWORD)objs.size (), harr, true, msec);
   if (result < WAIT_OBJECT_0 + objs.size ())
   {
-    for (auto &p : objs)
-      p->rethrow_exception ();
+    for (auto &th : objs)
+      th->rethrow_exception ();
   }
 
   return result;
 }
 
+template <ThreadDerived T>
 inline
-DWORD wait_all (std::initializer_list<const mlib::thread*> objs, DWORD msec = INFINITE)
+DWORD wait_all (std::initializer_list<const T*> objs, DWORD msec = INFINITE)
 {
   assert (objs.size () < MAXIMUM_WAIT_OBJECTS);
   HANDLE harr[MAXIMUM_WAIT_OBJECTS];
   int i = 0;
-  for (auto p = objs.begin (); p != objs.end (); ++p)
-    harr[i++] = (*p)->handle ();
+  for (auto& th :objs)
+    harr[i++] = th->handle ();
 
   DWORD result = WaitForMultipleObjects ((DWORD)objs.size (), harr, true, msec);
   if (result < WAIT_OBJECT_0 + objs.size ())
   {
-    for (auto &p : objs)
-      p->rethrow_exception ();
+    for (auto &th : objs)
+      th->rethrow_exception ();
   }
 
   return result;
 }
 
+template <ThreadDerived T>
 inline
-DWORD wait_any (const thread* objs, int count, DWORD msec = INFINITE)
+DWORD wait_any (const T* objs, int count, DWORD msec = INFINITE)
 {
   assert (count < MAXIMUM_WAIT_OBJECTS);
   HANDLE harr[MAXIMUM_WAIT_OBJECTS];
@@ -266,44 +273,47 @@ DWORD wait_any (const thread* objs, int count, DWORD msec = INFINITE)
   return result;
 }
 
+template <ThreadDerived T>
 inline
-DWORD wait_any (std::initializer_list<const thread*> objs, DWORD msec = INFINITE)
+DWORD wait_any (std::initializer_list<const T*> objs, DWORD msec = INFINITE)
 {
   assert (objs.size () < MAXIMUM_WAIT_OBJECTS);
   HANDLE harr[MAXIMUM_WAIT_OBJECTS];
   int i = 0;
-  for (auto p = objs.begin (); p != objs.end (); ++p)
-    harr[i++] = (*p)->handle ();
+  for (auto& th : objs)
+    harr[i++] = th->handle ();
 
   DWORD result = WaitForMultipleObjects ((DWORD)objs.size (), harr, false, msec);
   if (result < WAIT_OBJECT_0 + objs.size ())
   {
-    for (auto &p : objs)
-      p->rethrow_exception ();
+    for (auto &th : objs)
+      th->rethrow_exception ();
   }
   return result;
 }
 
+template <ThreadDerived T>
 inline 
-DWORD wait_any (std::initializer_list<const thread*> objs, std::chrono::milliseconds timeout)
+DWORD wait_any (std::initializer_list<const T*> objs, std::chrono::milliseconds timeout)
 {
   assert (objs.size () < MAXIMUM_WAIT_OBJECTS);
   HANDLE harr[MAXIMUM_WAIT_OBJECTS];
   int i = 0;
-  for (auto p = objs.begin (); p != objs.end (); ++p)
-    harr[i++] = (*p)->handle ();
+  for (auto& th : objs)
+    harr[i++] = th->handle ();
   DWORD msec = (DWORD)timeout.count ();
   DWORD result = WaitForMultipleObjects ((DWORD)objs.size (), harr, false, msec);
   if (result < WAIT_OBJECT_0 + objs.size ())
   {
-    for (auto &p : objs)
-      p->rethrow_exception ();
+    for (auto &th : objs)
+      th->rethrow_exception ();
   }
   return result;
 }
 
+template <ThreadDerived T>
 inline
-DWORD wait_msg (const thread* objs, int count, bool all = true, DWORD msec = INFINITE,
+DWORD wait_msg (const T* objs, int count, bool all = true, DWORD msec = INFINITE,
                        DWORD mask = QS_ALLINPUT)
 {
   assert (count < MAXIMUM_WAIT_OBJECTS);
@@ -320,21 +330,22 @@ DWORD wait_msg (const thread* objs, int count, bool all = true, DWORD msec = INF
   return result;
 }
 
+template <ThreadDerived T>
 inline
-DWORD wait_msg (std::initializer_list<const thread*> objs, bool all = true, DWORD msec = INFINITE,
+DWORD wait_msg (std::initializer_list<const T*> objs, bool all = true, DWORD msec = INFINITE,
                 DWORD mask = QS_ALLINPUT)
 {
   assert (objs.size () < MAXIMUM_WAIT_OBJECTS);
   HANDLE harr[MAXIMUM_WAIT_OBJECTS];
   int i = 0;
-  for (auto p = objs.begin (); p != objs.end (); ++p)
-    harr[i++] = (*p)->handle ();
+  for (auto& th : objs)
+    harr[i++] = th->handle ();
 
   DWORD result = MsgWaitForMultipleObjects ((DWORD)objs.size (), harr, all, msec, mask);
   if (result < WAIT_OBJECT_0 + objs.size ())
   {
-    for (auto &p : objs)
-      p->rethrow_exception ();
+    for (auto &th : objs)
+      th->rethrow_exception ();
   }
   return result;
 }

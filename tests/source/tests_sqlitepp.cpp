@@ -59,7 +59,7 @@ TEST(Db_make_query_ok)
   CHECK_EQUAL(ERROR_SUCCESS, q.code());
   q->step();
   CHECK_EQUAL(123, q->column_int(0));
-  q->finalize();
+  q->clear();
   db.close();
 }
 
@@ -120,13 +120,13 @@ TEST (DbExecStatements)
   Query q(db, "SELECT * FROM tab");
   q.step();
   CHECK_EQUAL(123, q.column_int(0));
-  q.finalize();
+  q.clear();
   db.close();
   utf8::remove ("testdb.sqlite");
 }
 
-//Assign an existing database
-TEST (DbAssign_Existing)
+//Copy an existing database
+TEST (DbCopy_Existing)
 {
   remove ("disk.db");
   Database db_from ("disk.db");
@@ -137,7 +137,7 @@ TEST (DbAssign_Existing)
   )");
 
   Database db_to ("memory.db", Database::openflags::memory);
-  db_to = db_from;
+  db_to.copy(db_from);
   db_from.close ();
   remove ("disk.db");
 
@@ -148,24 +148,16 @@ TEST (DbAssign_Existing)
   CHECK_EQUAL (2, q.column_int (0));
 }
 
-TEST (DbAssign_Empty)
-{
-  Database db_to, db_from;
-  db_to = db_from;
-
-  CHECK (!db_to.connected ());
-}
-
-//cannot assign database if one is opened and the other is not
-TEST (DbAssign_Fail)
+//cannot copy database if one is opened and the other is not
+TEST (DbCopy_Fail)
 {
   Database db_to (""), db_from;
 
-  CHECK_THROW (db_to = db_from, erc );
+  CHECK_THROW (db_to.copy(db_from), erc );
 }
 
 //cannot copy database if a query is active
-TEST (DbAssign_Busy)
+TEST (DbCopy_Busy)
 {
   Database db_to ("to.db", Database::openflags::memory);
   db_to.exec (R"(
@@ -177,10 +169,10 @@ TEST (DbAssign_Busy)
   Query q (db_to, "SELECT * FROM tab");
   q.step ();
 
-  CHECK_THROW (db_to = db_from, erc);
+  CHECK_THROW (db_to.copy(db_from), erc);
 
-  q.finalize (); // now db is free, we can copy
-  db_to = db_from;
+  q.clear (); // now db is free, we can copy
+  db_to.copy(db_from);
 
 }
 
@@ -188,7 +180,7 @@ struct TestDatabase {
   TestDatabase () : db(""), q(db) {
     db.exec ("CREATE TABLE tab (col);CREATE TABLE tab2 (a PRIMARY KEY, b UNIQUE);");
   };
-  ~TestDatabase () {q.finalize (); db.close ();};
+  ~TestDatabase () {q.clear (); db.close ();};
 
   Database db;
   Query q;
@@ -202,8 +194,6 @@ TEST_FIXTURE (TestDatabase, SqlSyntaxError)
   }
   catch (erc & x)
   {
-    std::string s ("Message " + x.message ());
-    std::cout << s << std::endl;
     caught = true;
   }
   CHECK (caught);
@@ -216,6 +206,20 @@ TEST_FIXTURE (TestDatabase, QueryHasGoodDbHandle)
   sqlite3 *hdb = db;
   CHECK_EQUAL (hdb, h);
 }
+
+TEST_FIXTURE (TestDatabase, db_assignment_op)
+{
+  Database db1 = db;
+  Query q1 (db1, "SELECT(1)");
+  sqlite3 *hdb = db;
+  sqlite3 *h1 = sqlite3_db_handle (q1);
+  CHECK_EQUAL (hdb, h1);
+
+  auto rc = q1.step ();
+  CHECK_EQUAL (SQLITE_ROW, rc);
+  CHECK_EQUAL (1, q1.column_int (0));
+}
+
 
 TEST_FIXTURE (TestDatabase, QueryStep)
 {

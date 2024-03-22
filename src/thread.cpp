@@ -9,7 +9,10 @@
 #include <assert.h>
 #include <mlib/trace.h>
 #include <mlib/thread.h>
+#if __has_include(<utf8/utf8.h>)
 #include <utf8/utf8.h>
+#define MLIB_HAS_UTF8_LIB
+#endif
 
 namespace mlib {
 
@@ -54,8 +57,10 @@ thread::thread (const std::string& name, DWORD stack_size, PSECURITY_DESCRIPTOR 
   , stack (stack_size)
 {
   initialize (sd, inherit);
+#ifdef MLIB_HAS_UTF8_LIB
   if (!name.empty ())
     SetThreadDescription (handle (), utf8::widen (name).c_str ());
+#endif
   TRACE2 ("Created thread %s[0x%x]", name.c_str(), id ());
 }
 
@@ -158,7 +163,9 @@ void thread::run()
 
 void thread::name (const std::string& nam)
 {
+#ifdef MLIB_HAS_UTF8_LIB
   SetThreadDescription (handle(), utf8::widen (nam).c_str ());
+#endif
   syncbase::name (nam);
 }
 

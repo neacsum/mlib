@@ -44,3 +44,5 @@
 #define MLIB_TRACE_LEVEL 7
 #endif
 
+#define SQLITE_ENABLE_COLUMN_METADATA
+

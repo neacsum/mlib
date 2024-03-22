@@ -110,16 +110,18 @@ public:
 
   ///Get logging message
   std::string  message () const;
+  void message (const std::string &m);
 
   static erc success;
 
 private:
   //bit fields
   int               value : 24;
-  unsigned short    priority_ : 3;
-  mutable bool      active : 1;
+  int               priority_ : 4;
+  mutable int       active : 1;
 
-  const errfac*   facility_;
+  const errfac*     facility_;
+  std::string       msg;
 
   friend class errfac;
 };
@@ -299,8 +301,8 @@ inline errfac *errfac::default_facility = &deffac;
   \class errfac
   \ingroup errors
 
-  To centralize and facilitate handling of erc objects, each erc has associated
-  a _facility_. Instead of throwing an exception directly, the erc calls the
+  To group handling of erc objects, each erc has associated a _facility_.
+  Instead of throwing an exception directly, the erc calls the
   facility's #raise function. In turn, it is this function that decides what
   should happen erc based on facility's log level and throw level.
 
@@ -351,11 +353,11 @@ const std::string& errfac::name () const
   return name_;
 }
 
-/// Default message is facility name followed by the error code value
+/// Default message is "error <code>"
 inline
 std::string errfac::message (const erc& e) const
 {
-  return name_ + ' ' + std::to_string (e.value);
+  return std::string("error ") + std::to_string (e.value);
 }
 
 inline
@@ -396,10 +398,11 @@ void errfac::raise (const erc& e) const
 }
 
 /// Logging action. Default is to use stderr
+/// Message is "<facility name> - <erc message>\n"
 inline
 void errfac::log (const erc& e) const
 {
-  fprintf (stderr, "%s\n", message (e).c_str ());
+  fprintf (stderr, "%s - %s\n", name ().c_str (), e.message ().c_str ());
 }
 
 //--------------------------- erc inlines -------------------------------------
@@ -416,21 +419,21 @@ void errfac::log (const erc& e) const
 
 ///  Default ctor for erc objects creates an inactive error
 inline
-erc::erc () :
-  value{ 0 },
-  priority_{ none },
-  active{ false },
-  facility_{ &errfac::Default () }
+erc::erc ()
+  : value{ 0 }
+  , priority_{ none }
+  , active{ false }
+  , facility_{ &errfac::Default () }
 {
 }
 
 ///  Ctor for a real erc
 inline
-erc::erc (int v, level l, const errfac* f) :
-  value{ v },
-  priority_{ (unsigned short)l },
-  facility_{ f ? f : &errfac::Default () },
-  active{ true }
+erc::erc (int v, level l, const errfac* f)
+  : value{ v }
+  , priority_{ (unsigned short)l }
+  , facility_{ f ? f : &errfac::Default () }
+  , active{ true }
 {
 }
 /*!
@@ -450,7 +453,8 @@ erc::erc (const erc& other) :
   value{ other.value },
   priority_{ other.priority_ },
   active{ other.active },
-  facility_{ other.facility_ }
+  facility_{ other.facility_ }, 
+  msg{other.msg}
 {
   //we are the active error now, the other is deactivated
   other.active = 0;
@@ -462,18 +466,18 @@ erc::erc (erc&& other) :
   value{ other.value },
   priority_{ other.priority_ },
   active{ other.active },
-  facility_{ other.facility_ }
+  facility_{ other.facility_ },
+  msg{other.msg}
 {
   //we are the active error now, the other is deactivated
   other.active = 0;
 }
 
-///  Destructor. If we are active, call our facility to see if we get logged or thrown.
+///  Destructor. Call raise() function to see if the error should get logged or thrown.
 inline
 erc::~erc () noexcept(false)
 {
-  if (value && active && priority_)
-    facility_->raise (*this);
+  raise ();
 }
 
 /*!
@@ -499,6 +503,7 @@ erc& erc::operator= (const erc& rhs)
     value = rhs.value;
     priority_ = rhs.priority_;
     facility_ = rhs.facility_;
+    msg = rhs.msg;
     active = rhs_active;
   }
   return *this;
@@ -523,6 +528,7 @@ erc& erc::operator= (erc&& rhs)
     value = rhs.value;
     priority_ = rhs.priority_;
     facility_ = rhs.facility_;
+    msg = rhs.msg;
     active = rhs_active;
   }
   return *this;
@@ -584,7 +590,8 @@ inline bool erc::operator != (const erc &other) const
 inline 
 void erc::raise () const
 {
-  facility_->raise (*this);
+  if (value && active && priority_)
+    facility_->raise (*this);
 }
 
 /*!
@@ -599,10 +606,22 @@ int erc::code () const
   return value;
 }
 
-inline
-std::string erc::message () const
+/*!
+  Return message string associated this error.
+
+  If no message string has been attached to this object, it calls
+  errfac::message() function to generate the message string. 
+*/
+inline std::string erc::message () const
 {
-  return facility_->message (*this);
+  return msg.empty()? facility_->message (*this) : msg;
+}
+
+/// Set the message for this error.
+inline
+void erc::message (const std::string &m)
+{
+  msg = m;
 }
 
 /*!

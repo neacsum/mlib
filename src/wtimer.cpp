@@ -12,7 +12,7 @@
 #include <assert.h>
 
 #if __has_include(<utf8/utf8.h>)
-#define HAS_UTF8
+#define MLIB_HAS_UTF8_LIB
 #include <utf8/utf8.h>
 #endif
 
@@ -48,7 +48,7 @@ wtimer::wtimer (mode m, const std::string& name, bool use_apc) :
   syncbase (name),
   apc_ (use_apc)
 {
-#ifdef HAS_UTF8
+#ifdef MLIB_HAS_UTF8_LIB
   HANDLE h = CreateWaitableTimerW (NULL, (m == manual), !name.empty () ? utf8::widen (name).c_str () : NULL);
 #else
   HANDLE h = CreateWaitableTimerA (NULL, (m == manual), !name.empty () ? name.c_str () : NULL);

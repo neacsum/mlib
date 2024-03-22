@@ -24,26 +24,17 @@
 
 using namespace std;
 
+#define STR(X) #X
+#define STRINGERIZE(X) STR (X)
+
 namespace mlib {
 
-/*!
-  Error facility used by Database and Query objects. Keeps track of associated
-  database connection that has thrown the error and formats the error message
-  using sqlite3_errmsg function.
-  \ingroup sqlite
-*/
-class sqlitefac : public errfac
-{
-public:
-  sqlitefac (sqlite3 *db_)
-    : errfac ("SQLite Error")
-    , db (db_){};
-  sqlite3* db;                              ///<handle of db that generated last error
-protected:
-  std::string message (const erc& e) const;
-};
+void set_erc_message (erc &err, sqlite3 *db);
 
-/*!
+errfac the_errors ("SQLITEPP");
+errfac *sqlite_errors = &the_errors;
+
+  /*!
   \class Database
 
   The Database class is a wrapper around the <a href="http://sqlite.org/c3ref/sqlite3.html">sqlite3</a>
@@ -57,7 +48,6 @@ protected:
   to a database. It has to be connected using the open() function.
 */
 Database::Database()
-  : db(0)
 {
 }
 
@@ -66,24 +56,17 @@ Database::Database()
   \param  flags     open flags
 */
 Database::Database(const std::string& name, openflags flags)
-  : db(0)
 {
-  int rc = sqlite3_open_v2 (name.c_str (), &db, static_cast<int> (flags), 0);
-  errors.reset (new sqlitefac (db));
+  sqlite3 *pdb;
+  int rc = sqlite3_open_v2 (name.c_str (), &pdb, static_cast<int> (flags), 0);
+  db.reset (pdb, sqlite3_close);
   if ((rc) != SQLITE_OK)
   {
-    erc (rc, erc::error, errors.get ()).raise ();
-    sqlite3_close (db); 
+    erc err (rc, erc::error, sqlite_errors);
+    set_erc_message (err, handle());
+    db.reset ();
+    err.raise ();
   }
-}
-
-/*!
-  Closes database connection
-*/
-Database::~Database ()
-{
-  if (db)
-    sqlite3_close (db);
 }
 
 /*!
@@ -91,24 +74,36 @@ Database::~Database ()
   
   Both databases should be opened.
 */
-Database& Database::operator=(const Database& rhs)
+Database& Database::copy(Database& src)
 {
-  if (db == rhs.db)
-    return *this;
-
-  if (db && rhs.db)
+  int rc;
+  if (db && src.db)
   {
-    auto bkp = sqlite3_backup_init (db, "main", rhs.db, "main");
+    auto bkp = sqlite3_backup_init (handle(), "main", src, "main");
     if (!bkp)
-      erc (sqlite3_errcode (db), erc::error, errors.get ()).raise();
-    int rc;
-    if ((rc = sqlite3_backup_step (bkp, -1)) != SQLITE_DONE)
-      erc (rc, erc::error, errors.get ()).raise();
-    sqlite3_backup_finish (bkp);
+    {
+      rc = sqlite3_errcode (handle());
+      erc err (rc, erc::error, sqlite_errors);
+      set_erc_message (err, handle());
+      err.raise ();
+    }
+    else
+    {
+      if ((rc = sqlite3_backup_step (bkp, -1)) != SQLITE_DONE)
+      {
+        erc err (rc, erc::error, sqlite_errors);
+        set_erc_message (err, handle ());
+        err.raise ();
+      }
+      sqlite3_backup_finish (bkp);
+    }
   }
   else
-    erc (SQLITE_MISUSE, erc::error, errors.get ()).raise(); // one db is not opened
-
+  {
+    erc err (SQLITE_MISUSE, erc::error, sqlite_errors);
+    err.message ("Error " STRINGERIZE(SQLITE_MISUSE) " database is not opened");
+    err.raise (); // one db is not opened
+  }
   return *this;
 }
 
@@ -122,7 +117,7 @@ string Database::filename (const string& schema) const
 {
   const char *pfn = 0;
   if (db)
-    pfn = sqlite3_db_filename (db, schema.c_str());
+    pfn = sqlite3_db_filename (handle (), schema.c_str ());
   return pfn ? pfn : string ();
 }
 
@@ -138,7 +133,7 @@ std::string Database::schema (int n) const
 {
   const char* psch = 0;
   if (db)
-    psch = sqlite3_db_name (db, n);
+    psch = sqlite3_db_name (handle (), n);
   return psch? psch : string ();
 }
 
@@ -150,7 +145,7 @@ bool
 Database::is_readonly ()
 {
   if (db)
-    return (sqlite3_db_readonly (db, "main") == 1);
+    return (sqlite3_db_readonly (handle (), "main") == 1);
   else
     return true;
 }
@@ -164,17 +159,15 @@ Database::is_readonly ()
 */
 erc Database::open (const string &name, openflags flags)
 {
-  int rc;
-  if (db)
-  {
-    rc = sqlite3_close(db);
-    if (rc != SQLITE_OK)
-      return erc (rc, erc::error, errors.get ());
-  }
-  rc = sqlite3_open_v2(name.c_str(), &db, static_cast<int>(flags), 0);
-  errors.reset (new sqlitefac (db));
+  sqlite3 *pdb;
+  auto rc = sqlite3_open_v2(name.c_str(), &pdb, static_cast<int>(flags), 0);
+  db.reset (pdb, sqlite3_close);
   if (rc != SQLITE_OK)
-    return erc (rc, erc::error, errors.get ());
+  {
+    erc err (rc, erc::error, sqlite_errors);
+    set_erc_message (err, handle());
+    return err;
+  }
   else 
     return erc::success;
 }
@@ -182,21 +175,19 @@ erc Database::open (const string &name, openflags flags)
 erc Database::close ()
 {
   if (db)
-  {
-    int rc = sqlite3_close(db);
-    if (rc != SQLITE_OK)
-      return erc (rc, erc::error, errors.get ());
-    db = 0;
-    errors.release ();
-  }
+    db.reset();
   return erc::success;
 }
 
 erc Database::exec (const string& sql)
 {
   int rc;
-  if ((rc=sqlite3_exec (db, sql.c_str(), 0, 0, 0)) != SQLITE_OK)
-    return erc (rc, erc::error, errors.get ());
+  if ((rc = sqlite3_exec (handle (), sql.c_str (), 0, 0, 0)) != SQLITE_OK)
+  {
+    auto ret = erc (rc, erc::error, sqlite_errors);
+    set_erc_message (ret, handle());
+    return ret;
+  }
   else
     return erc::success;
 }
@@ -211,8 +202,12 @@ checked<Query> Database::make_query (const std::string &sql)
   Query q (*this);
   erc ret;
   int rc;
-  if ((rc = sqlite3_prepare_v2 (db, sql.c_str(), -1, &q.stmt, 0)) != SQLITE_OK)
-    ret = erc (rc, erc::error, errors.get ());
+  if ((rc = sqlite3_prepare_v2 (handle (), sql.c_str (), -1, &q.stmt, 0)) != SQLITE_OK)
+  {
+    erc err (rc, erc::error, sqlite_errors);
+    set_erc_message (err, handle());
+    ret = err;
+  }
   return {std::move(q), ret};
 }
 
@@ -226,8 +221,12 @@ checked<Query> Database::make_query_multiple (std::string& sql)
   Query q (*this);
   int rc;
   const char* tail;
-  if ((rc = sqlite3_prepare_v2 (db, sql.c_str(), -1, &q.stmt, &tail)) != SQLITE_OK)
-    ret = erc (rc, erc::error, errors.get ());
+  if ((rc = sqlite3_prepare_v2 (handle (), sql.c_str (), -1, &q.stmt, &tail)) != SQLITE_OK)
+  {
+    erc err (rc, erc::error, sqlite_errors);
+    set_erc_message (err, handle());
+    ret = err;
+  }
   else
     sql = tail;
   return {std::move(q), ret};
@@ -236,22 +235,27 @@ checked<Query> Database::make_query_multiple (std::string& sql)
 int Database::extended_error ()
 {
   assert (db);
-  return sqlite3_extended_errcode (db);
+  return sqlite3_extended_errcode (handle());
 }
 
 erc Database::flush()
 {
   assert(db);
-  int rc = sqlite3_db_cacheflush(db);
-  return erc (rc, erc::error, errors.get ());
+  int rc = sqlite3_db_cacheflush(handle());
+  if (rc != SQLITE_OK)
+  {
+    erc err (rc, erc::error, sqlite_errors);
+    set_erc_message (err, handle());
+    return err;
+  }
+  return erc::success;
 }
 
 //-----------------------------------------------------------------------------
 /*!
   \class Query
   The Query class is a wrapper around a prepared <a href="http://sqlite.org/c3ref/stmt.html">sqlite3</a>
-  statement. There are no copy constructors as the status of a prepared statement
-  cannot be fully reproduced.
+  statement.
 
   The class provides a number of overloaded \c bind functions that can be used to
   bind parameters specified either by name or by number  (first parameter is 1)
@@ -274,38 +278,42 @@ erc Database::flush()
 
 /*!
   \param  db      database connection
-  \param  sql     SQL statement
+  \param  sql     SQL statement. It can be empty, in which case the query is
+                  attached to a database but the SQL has to be set later using
+                  the string assignment operator. 
 */
 Query::Query(Database &db, const std::string& sql) :
   stmt (0),
-  dbase(&db),
+  dbase(db),
   col_mapped (false)
 {
-  int rc;
-  if ((rc = sqlite3_prepare_v2 (dbase->db, sql.c_str(), -1, &stmt, 0)) != SQLITE_OK)
-    erc (rc, erc::error, dbase->errors.get ()).raise ();
+  if (!sql.empty ())
+  {
+    int rc;
+    if ((rc = sqlite3_prepare_v2 (dbase, sql.c_str (), -1, &stmt, 0)) != SQLITE_OK)
+    {
+      erc err (rc, erc::error, sqlite_errors);
+      set_erc_message (err, dbase);
+      err.raise ();
+    }
+  }
 }
 
-/*!
-  The object is linked to a database but doesn't have yet a prepared statement
-  associated with it. This is convenient for statements that will latter receive
-  their SQL through the assignment operator.
-*/
-Query::Query(Database &db) :
-  stmt (0),
-  dbase(&db),
-  col_mapped (false)
+Query::Query (const Query &other)
+  : stmt (other.stmt)
+  , dbase (other.dbase) 
+  , col_mapped (other.col_mapped)
+  , index (other.index)
 {
 }
 
 Query::Query(Query&& other)
   : stmt (other.stmt)
-  , dbase (other.dbase)
   , col_mapped (other.col_mapped)
   , index (other.index)
+  , dbase (other.dbase)
 {
   other.stmt = 0;
-  other.dbase = 0;
   other.col_mapped = false;
   other.index.clear();
 }
@@ -318,12 +326,29 @@ Query& Query::operator=(Query&& rhs)
   stmt = rhs.stmt;
   rhs.stmt = nullptr;
 
-  dbase = rhs.dbase;
+  dbase= rhs.dbase;
   
   col_mapped = rhs.col_mapped;
   index = rhs.index;
   rhs.index.clear();
+  rhs.dbase = Database ();
 
+  return *this;
+}
+
+Query &Query::operator= (const Query &rhs)
+{
+  if (&rhs != this)
+  {
+    if (stmt)
+      sqlite3_finalize (stmt);
+
+    stmt = rhs.stmt;
+    dbase = rhs.dbase;
+
+    col_mapped = rhs.col_mapped;
+    index = rhs.index;
+  }
   return *this;
 }
 
@@ -345,8 +370,12 @@ Query& Query::operator =(const std::string& sql)
     erc (SQLITE_MISUSE, erc::error).raise ();
   if (stmt)
     sqlite3_finalize (stmt);
-  if ((rc = sqlite3_prepare_v2 (dbase->db, sql.c_str(), -1, &stmt, 0)) != SQLITE_OK)
-    erc (rc, erc::error, dbase->errors.get()).raise ();
+  if ((rc = sqlite3_prepare_v2 (dbase, sql.c_str (), -1, &stmt, 0)) != SQLITE_OK)
+  {
+    erc err (rc, erc::error, sqlite_errors);
+    set_erc_message (err, dbase);
+    err.raise ();
+  }
   col_mapped = false;
   return *this;
 }
@@ -374,25 +403,29 @@ erc Query::step()
   int rc = sqlite3_step (stmt);
 
   if (rc == SQLITE_ROW || rc == SQLITE_DONE)
-    return erc (rc, erc::info, dbase->errors.get());
+    return erc (rc, erc::info, sqlite_errors);
 
-  return erc(rc, erc::error, dbase->errors.get());
+  erc err (rc, erc::error, sqlite_errors);
+  set_erc_message (err, dbase);
+  return err;
 }
 
-Query& Query::reset()
+erc Query::reset()
 {
-  check_errors (sqlite3_reset (stmt));
-  return *this;
+  return check_errors (sqlite3_reset (stmt));
 }
 
 /*!
+  Finalizes the statement and removes the database connection.
+
   Statements are automatically finalized when Query objects are destructed or
-  assigned a new SQL text. Occasionally user might need to manually finalize a
+  assigned a new SQL text. Occasionally user might need to manually clear a
   query (for instance if he needs to close a database connection).
 */
-void Query::finalize ()
+void Query::clear ()
 {
   sqlite3_finalize (stmt);
+  dbase = Database ();
   stmt = 0;
 }
 
@@ -938,7 +971,13 @@ int Query::find_col (const std::string& colname) const
     map_columns ();
 
   if (index.find (colname) == index.end ())
-    erc(SQLITE_RANGE, erc::error).raise ();
+  {
+    erc err(SQLITE_RANGE, erc::error, sqlite_errors);
+    string s = "Error " STRINGERIZE(SQLITE_RANGE)
+               " column '" + colname + "' not found ";
+    err.message (s);
+    err.raise ();
+  }
 
   return index[colname];
 }
@@ -946,7 +985,11 @@ int Query::find_col (const std::string& colname) const
 erc Query::check_errors (int rc)
 {
   if (rc != SQLITE_OK)
-    return erc (rc, erc::error, dbase?dbase->errors.get() : 0);
+  {
+    erc err (rc, erc::error, sqlite_errors);
+    set_erc_message (err, dbase);
+    return err;
+  }
   return erc::success;
 }
 
@@ -958,21 +1001,19 @@ erc Query::check_errors (int rc)
   to obtain the error message. Otherwise generates a bland message with the error
   code numerical value.
 
-  \param  e       error code
+  \param  err       Error code
+  \param  db        Database connection handle
 */
-std::string sqlitefac::message (const erc &e) const
+static void set_erc_message (erc &err, sqlite3 *db)
 {
   if (db)
   {
     const char *file = sqlite3_db_filename (db, "main");
-    string s = name () + ' ' + to_string (e.code ()) + ' ' + sqlite3_errmsg (db);
-    if (file && strlen(file))
-      s += " Database: " + string(file);
-    return s;
+    string s = "Error " + to_string (err.code ()) + ' ' + sqlite3_errmsg (db);
+    if (file && strlen (file))
+      s += " Database: " + string (file);
+    err.message (s);
   }
-  else
-    return name () + ' ' + to_string (e.code ()) + " (cannot find message)";
 }
 
-
-}
+} // namespace mlib
