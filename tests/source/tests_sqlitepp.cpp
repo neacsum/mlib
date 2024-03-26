@@ -192,7 +192,7 @@ TEST_FIXTURE (TestDatabase, SqlSyntaxError)
   try {
     db.exec ("SELECT ;");
   }
-  catch (erc & x)
+  catch (erc &)
   {
     caught = true;
   }

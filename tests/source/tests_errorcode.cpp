@@ -109,7 +109,7 @@ TEST (erc_message)
 {
   erc r = f (1);
   string s = r.message ();
-  CHECK_EQUAL ("Error 1", s);
+  CHECK_EQUAL ("error 1", s);
   r.deactivate ();
 }
 
@@ -124,7 +124,8 @@ TEST (other_facility)
 {
   erc r = ff (3);
   string s = r.message ();
-  CHECK_EQUAL ("Bad Stuff 3", s);
+  CHECK_EQUAL ("error 3", s);
+  CHECK_EQUAL ("Bad Stuff", r.facility ().name ());
   CHECK_EQUAL (3, r); // comparison invokes integer conversion and deactivates
                       // the error code
 }
