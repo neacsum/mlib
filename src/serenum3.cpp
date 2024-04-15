@@ -19,8 +19,7 @@ namespace mlib {
 bool SerEnum_UsingRegistry (vector<int>& ports)
 {
   HKEY comm_key;
-  if (utf8::RegOpenKey (HKEY_LOCAL_MACHINE, "HARDWARE\\DEVICEMAP\\SERIALCOMM", comm_key,
-                        KEY_READ)
+  if (utf8::RegOpenKey (HKEY_LOCAL_MACHINE, "HARDWARE\\DEVICEMAP\\SERIALCOMM", comm_key, KEY_READ)
       != ERROR_SUCCESS)
     return false;
 
