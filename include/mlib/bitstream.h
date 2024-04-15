@@ -6,7 +6,7 @@
 #pragma once
 #include <iostream>
 
-#if __has_include ("defs.h")
+#if __has_include("defs.h")
 #include "defs.h"
 #endif
 
@@ -18,24 +18,24 @@ class bitstream
 public:
   bitstream (std::iostream& str, unsigned int pack);
 
-  bool read ();                     ///< Read the next bit
-  void write (int val);             ///< Write a bit to stream
+  bool read ();         ///< Read the next bit
+  void write (int val); ///< Write a bit to stream
   void flush ();
 
-  ///Read a variable number of bits
+  /// Read a variable number of bits
   int mread (unsigned int sz, bool is_signed = false);
 
-  ///Write a variable number of bits.
+  /// Write a variable number of bits.
   void mwrite (int val, unsigned int sz);
 
 protected:
   const unsigned int packing;
   std::iostream& s;
 
-  ///Encode bit field in a byte
-  virtual void encode (unsigned char bits, char &chr);
+  /// Encode bit field in a byte
+  virtual void encode (unsigned char bits, char& chr);
 
-  ///Decode bit field from a byte
+  /// Decode bit field from a byte
   virtual void decode (unsigned char& bits, char chr);
 
 private:
@@ -48,8 +48,7 @@ private:
   \param bits     bit field to encode
   \param chr      encoded byte
 */
-inline void
-bitstream::encode (unsigned char bits, char &chr)
+inline void bitstream::encode (unsigned char bits, char& chr)
 {
   chr = (bits & (1 << packing) - 1);
 }
@@ -59,10 +58,9 @@ bitstream::encode (unsigned char bits, char &chr)
   \param bits     resulting bit field
   \param chr      encoded byte
 */
-inline void
-bitstream::decode (unsigned char& bits, char chr)
+inline void bitstream::decode (unsigned char& bits, char chr)
 {
   bits = (chr & (1 << packing) - 1);
 }
 
-};
+}; // namespace mlib

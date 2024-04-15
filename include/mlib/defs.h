@@ -13,17 +13,15 @@
 #endif
 #endif
 
-
-
 #ifndef NODEFAULTLIB
-#pragma comment (lib, "mlib.lib")
+#pragma comment(lib, "mlib.lib")
 #endif
 
 /// log facility claimed by MLIB
-#define MLIB_LOGFAC (25<<3)
+#define MLIB_LOGFAC (25 << 3)
 
 /// set to 1 to send trace output to syslog
-//#define MLIB_SYSLOG_TRACE 1
+// #define MLIB_SYSLOG_TRACE 1
 
 /*!
   Active trace level. A rough description would be:
@@ -36,7 +34,7 @@
 */
 
 // If _TRACE has a numeric value, that becomes the trace level
-#if !defined(MLIB_TRACE_LEVEL) && defined(_TRACE) && ((_TRACE)+0 > 0)
+#if !defined(MLIB_TRACE_LEVEL) && defined(_TRACE) && ((_TRACE) + 0 > 0)
 #define MLIB_TRACE_LEVEL _TRACE
 #endif
 
@@ -45,4 +43,3 @@
 #endif
 
 #define SQLITE_ENABLE_COLUMN_METADATA
-

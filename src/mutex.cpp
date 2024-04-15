@@ -4,7 +4,8 @@
   (c) Mircea Neacsu 1999
 
 */
-#include <mlib/mutex.h>
+#include <mlib/mlib.h>
+#pragma hdrstop
 #include <assert.h>
 
 #if __has_include(<utf8/utf8.h>)
@@ -23,9 +24,9 @@ namespace mlib {
   is freed using the 'signal' function.
 */
 
-///Constructor
-mutex::mutex (const std::string& name) :
-  syncbase (name)
+/// Constructor
+mutex::mutex (const std::string& name)
+  : syncbase (name)
 {
 #ifdef MLIB_HAS_UTF8_LIB
   HANDLE h = CreateMutexW (NULL, FALSE, !name.empty () ? utf8::widen (name).c_str () : NULL);
@@ -44,8 +45,9 @@ mutex::mutex (const std::string& name) :
 mutex::operator bool ()
 {
   bool result = syncbase::operator bool ();
-  if (result) signal ();
+  if (result)
+    signal ();
   return result;
 }
 
-}
+} // namespace mlib

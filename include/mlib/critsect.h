@@ -2,11 +2,11 @@
 /*!
   \file critsect.h criticalsection and lock classes
 
-	(c) Mircea Neacsu 1999
+  (c) Mircea Neacsu 1999
 
 */
 
-#if __has_include ("defs.h")
+#if __has_include("defs.h")
 #include "defs.h"
 #endif
 
@@ -32,9 +32,9 @@ public:
 private:
   CRITICAL_SECTION section;
 
-  //critical sections cannot be copied or assigned
+  // critical sections cannot be copied or assigned
   criticalsection (const criticalsection&) = delete;
-  criticalsection& operator =(const criticalsection&) = delete;
+  criticalsection& operator= (const criticalsection&) = delete;
 };
 
 /*!
@@ -44,8 +44,8 @@ private:
 
   Used in conjunction with criticalsection objects, locks simplify
   critical sections' management by taking advantage the automatic
-  destruction of static objects in C++. 
-  
+  destruction of static objects in C++.
+
   Use it as in example below:
 \code
   criticalsection section;  //Initialize critical section object
@@ -67,71 +67,64 @@ private:
 class lock
 {
 public:
-  ///Acquire critical section
+  /// Acquire critical section
   lock (criticalsection& cs);
 
-  ///Copy constructor
+  /// Copy constructor
   lock (const lock& t);
 
-  ///Leave critical section
+  /// Leave critical section
   ~lock ();
 
 private:
   criticalsection& section;
 };
 
-///Initializes critical section object
-inline
-criticalsection::criticalsection () 
-{ 
-  InitializeCriticalSection (&section); 
-}
-
-///Deletes the critical section object
-inline
-criticalsection::~criticalsection () 
+/// Initializes critical section object
+inline criticalsection::criticalsection ()
 {
-  DeleteCriticalSection (&section); 
+  InitializeCriticalSection (&section);
 }
 
-///Enter critical section
-inline 
-void criticalsection::enter () 
-{ 
-  EnterCriticalSection (&section); 
+/// Deletes the critical section object
+inline criticalsection::~criticalsection ()
+{
+  DeleteCriticalSection (&section);
 }
 
-///Return \b true if critical section was entered
-inline 
-bool criticalsection::try_enter () 
-{ 
-  return (TryEnterCriticalSection (&section) != 0); 
+/// Enter critical section
+inline void criticalsection::enter ()
+{
+  EnterCriticalSection (&section);
 }
 
-///Leave critical section
-inline
-void criticalsection::leave () 
-{ 
-  LeaveCriticalSection (&section); 
+/// Return \b true if critical section was entered
+inline bool criticalsection::try_enter ()
+{
+  return (TryEnterCriticalSection (&section) != 0);
 }
 
-inline
-lock::lock (criticalsection& cs) : section (cs) 
-{ 
-  section.enter (); 
+/// Leave critical section
+inline void criticalsection::leave ()
+{
+  LeaveCriticalSection (&section);
 }
 
-inline
-lock::lock (const lock& t) : section (t.section) 
-{ 
-  section.enter (); 
+inline lock::lock (criticalsection& cs)
+  : section (cs)
+{
+  section.enter ();
 }
 
-inline
-lock::~lock () 
-{ 
-  section.leave(); 
+inline lock::lock (const lock& t)
+  : section (t.section)
+{
+  section.enter ();
 }
 
-
+inline lock::~lock ()
+{
+  section.leave ();
 }
+
+} // namespace mlib

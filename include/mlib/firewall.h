@@ -1,6 +1,6 @@
 #pragma once
 
-#if __has_include ("defs.h")
+#if __has_include("defs.h")
 #include "defs.h"
 #endif
 
@@ -21,9 +21,9 @@ public:
   bool is_enabled ();
   bool is_port_enabled (int portnum, bool tcp);
   bool has_port (int portnum, bool tcp);
-  bool has_app (const char *appname);
-  erc add_app (const char *appname, const char *filename);
-  erc add_port (int portnum, bool tcp, const char *name);
+  bool has_app (const char* appname);
+  erc add_app (const char* appname, const char* filename);
+  erc add_port (int portnum, bool tcp, const char* name);
   erc set_port (int portnum, bool tcp, bool enable);
 
 private:
@@ -32,6 +32,6 @@ private:
   INetFwProfile* fwprofile;
 };
 
-extern errfac *fw_errptr;
+extern errfac* fw_errptr;
 
-};
+}; // namespace mlib

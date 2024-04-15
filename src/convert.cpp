@@ -3,8 +3,8 @@
 
   (c) Mircea Neacsu 2017
 */
-#include <mlib/convert.h>
-#include <mlib/ipow.h>
+#include <mlib/mlib.h>
+#pragma hdrstop
 #include <utf8/utf8.h>
 
 constexpr double epsilon = 1e-10;
@@ -16,15 +16,14 @@ double inline pow10 (int x)
   return ipow (10., x);
 }
 
-//safe replacement for sprintf to a string
-inline
-size_t strprintf (std::string& str, const char* fmt, ...)
+// safe replacement for sprintf to a string
+inline size_t strprintf (std::string& str, const char* fmt, ...)
 {
   va_list args;
   va_start (args, fmt);
   auto sz = vsnprintf (nullptr, 0, fmt, args);
-  str.resize (sz+1); //leave space for terminating null
-  sz = vsnprintf (const_cast<char*>(str.c_str ()), sz+1, fmt, args);
+  str.resize (sz + 1); // leave space for terminating null
+  sz = vsnprintf (const_cast<char*> (str.c_str ()), sz + 1, fmt, args);
   str.resize (sz);
   return sz;
 }
@@ -44,8 +43,8 @@ double deg_reduce (double value)
 std::string degtoa (double degrees, int flags, int precision)
 {
   std::string str;
-  char  sign;
-  int   deg_width, width;
+  char sign;
+  int deg_width, width;
 
   width = precision + 3;
   if (flags & LL_LAT)
@@ -62,22 +61,21 @@ std::string degtoa (double degrees, int flags, int precision)
   degrees = fabs (degrees);
   if (flags & LL_SEC)
   {
-    double  dd, mm;
+    double dd, mm;
     degrees = modf (modf (degrees + .5 * pow10 (-precision - 1) / 3600., &dd) * 60., &mm) * 60.;
-    strprintf (str, u8"%0*.0lf°%02.0lf'%0*.*lf\"%c", deg_width, dd, mm, width, precision,
-      degrees, sign);
+    strprintf (str, u8"%0*.0lf°%02.0lf'%0*.*lf\"%c", deg_width, dd, mm, width, precision, degrees,
+               sign);
   }
   else if (flags & LL_MIN)
   {
-    double  dd;
+    double dd;
     degrees = modf (degrees + .5 * pow10 (-precision - 1) / 60., &dd) * 60.;
     strprintf (str, u8"%0*.lf°%0*.*lf\'%c", deg_width, dd, width, precision, degrees, sign);
   }
   else
   {
     width = deg_width + precision + 1;
-    strprintf (str, u8"%0*.*lf°%c", width, precision, degrees + .5 * pow10 (-precision - 1),
-      sign);
+    strprintf (str, u8"%0*.*lf°%c", width, precision, degrees + .5 * pow10 (-precision - 1), sign);
   }
 
   return str;
@@ -94,8 +92,8 @@ std::string degtoa (double degrees, int flags, int precision)
 */
 double atodeg (const std::string& str)
 {
-  int     mm;
-  double  val, ss;
+  int mm;
+  double val, ss;
   char* ptrm;
 
   if (str.empty ())
@@ -105,7 +103,7 @@ double atodeg (const std::string& str)
 
   int dd = (int)strtol (cstr, &ptrm, 10);
   int sign = (dd < 0) ? -1 : 1;
-  dd = abs (dd);
+  dd = ::abs (dd);
 
   if (toupper (*ptrm) == 'D' || utf8::rune (ptrm) == U'°')
   {
@@ -127,14 +125,13 @@ double atodeg (const std::string& str)
       val = dd + mm / 60.;
   }
   else if (*ptrm == '.')
-    val = abs(stof (str));
+    val = ::abs (stof (str));
   else
     val = dd;
-  if (val != 0. && (str.find('S') != std::string::npos
-                 || str.find ('W') != std::string::npos))
+  if (val != 0. && (str.find ('S') != std::string::npos || str.find ('W') != std::string::npos))
     val = -val;
 
-  return val*sign;
+  return val * sign;
 }
 
-} //end namespace
+} // namespace mlib

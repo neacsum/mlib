@@ -1,10 +1,11 @@
 /*!
   \file syncbase.cpp Member functions of syncbase class
 
-  (c) Mircea Neacsu 1999-2017
+  (c) Mircea Neacsu 1999-2024
 
 */
-#include <mlib/syncbase.h>
+#include <mlib/mlib.h>
+#pragma hdrstop
 
 namespace mlib {
 /*!
@@ -35,11 +36,10 @@ namespace mlib {
 /// Default constructor
 syncbase::syncbase ()
   : hl (NULL)
-{
-}
+{}
 
 /// Protected constructor
-syncbase::syncbase (const std::string&  a_name)
+syncbase::syncbase (const std::string& a_name)
   : hl (new handle_life)
   , name_ (a_name)
 {
@@ -48,8 +48,8 @@ syncbase::syncbase (const std::string&  a_name)
 }
 
 /// Copy constructor
-syncbase::syncbase (const syncbase& other) :
-name_ (other.name_)
+syncbase::syncbase (const syncbase& other)
+  : name_ (other.name_)
 {
   hl = other.hl;
   if (hl)
@@ -57,8 +57,8 @@ name_ (other.name_)
 }
 
 /// Move constructor
-syncbase::syncbase (syncbase&& other) noexcept:
-  name_ (other.name_)
+syncbase::syncbase (syncbase&& other) noexcept
+  : name_ (other.name_)
 {
   hl = other.hl;
   other.hl = 0;
@@ -78,10 +78,10 @@ syncbase::~syncbase ()
 }
 
 /// Assignment operator
-syncbase& syncbase::operator =(const syncbase& rhs)
+syncbase& syncbase::operator= (const syncbase& rhs)
 {
   if (&rhs == this)
-    return *this;       //trivial assignment
+    return *this; // trivial assignment
 
   if (hl && --hl->lives == 0)
   {
@@ -97,10 +97,10 @@ syncbase& syncbase::operator =(const syncbase& rhs)
 }
 
 /// Move assignment operator
-syncbase& syncbase::operator = (syncbase&& rhs) noexcept
+syncbase& syncbase::operator= (syncbase&& rhs) noexcept
 {
   if (&rhs == this)
-    return *this;       //trivial assignment
+    return *this; // trivial assignment
 
   if (hl && --hl->lives == 0)
   {
@@ -115,14 +115,11 @@ syncbase& syncbase::operator = (syncbase&& rhs) noexcept
   return *this;
 }
 
-
 /// Equality operator
-int syncbase::operator ==(const syncbase& rhs) const
+int syncbase::operator== (const syncbase& rhs) const
 {
-  return (!hl && !rhs.hl) 
-    || ((hl && rhs.hl) && (hl->handle_ == rhs.hl->handle_));
+  return (!hl && !rhs.hl) || ((hl && rhs.hl) && (hl->handle_ == rhs.hl->handle_));
 }
-
 
 /// Change object's handle. Closes the previous one.
 void syncbase::set_handle (HANDLE h)
@@ -140,4 +137,4 @@ void syncbase::set_handle (HANDLE h)
   hl->handle_ = h;
 }
 
-}
+} // namespace mlib

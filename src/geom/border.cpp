@@ -4,7 +4,8 @@
   (c) Mircea Neacsu 2017
 */
 
-#include <mlib/border.h>
+#include <mlib/mlib.h>
+#pragma hdrstop
 #include <stdio.h>
 #include <algorithm>
 #include <utf8/utf8.h>
@@ -12,14 +13,14 @@
 using namespace std;
 
 /*!
-  \defgroup geom Geometry 
+  \defgroup geom Geometry
   \brief Geometry concepts and algorithms
 */
 
 namespace mlib {
 
 /*!
-  \class Border 
+  \class Border
   \ingroup geom
   \brief Representation of a simple, non-intersecting polygon that
   partitions the 2D space in two regions.
@@ -45,14 +46,14 @@ Border::Border ()
 /*!
   Load a border object from a text file.
 */
-Border::Border (const char *fname)
+Border::Border (const char* fname)
 {
   dpoint p;
 
   closing.x = 0;
   closing.y = 0;
   closing_outside = 0;
-  FILE *f = utf8::fopen (fname, "r");
+  FILE* f = utf8::fopen (fname, "r");
   if (!f)
     return;
 
@@ -104,18 +105,18 @@ bool Border::inside (double x, double y)
   deque<dpoint>::iterator pj = vertex.end ();
 
   if (pi == pj)
-    return 0;   //empty border
+    return 0; // empty border
 
   pj--;
 
   while (pi != vertex.end ())
   {
-    if (((pi->y > y) != (pj->y > y)) &&
-      (x < (pj->x - pi->x) * (y - pi->y) / (pj->y - pi->y) + pi->x))
+    if (((pi->y > y) != (pj->y > y))
+        && (x < (pj->x - pi->x) * (y - pi->y) / (pj->y - pi->y) + pi->x))
       c = !c;
     pj = pi++;
   }
   return (c != closing_outside);
 }
 
-}
+} // namespace mlib

@@ -4,10 +4,9 @@
   (c) Mircea Neacsu 2022. All rights reserved.
 */
 
-#include <mlib/asset.h>
-#include <mlib/rdir.h>
-#include <mlib/trace.h>
-#include <windows.h>
+#include <mlib/mlib.h>
+#pragma hdrstop
+#include <utf8/utf8.h>
 
 using namespace std;
 
@@ -52,34 +51,33 @@ const void* asset::data ()
 bool asset::write (const std::string& path)
 {
   if (name.empty ())
-    return false; //cannot write assets without a filename
+    return false; // cannot write assets without a filename
 
-  //Load resource
+  // Load resource
   if (!loaded)
     load ();
 
   if (!loaded)
-    return false; //load failed
+    return false; // load failed
 
   string tmp = path;
   int rc;
 
-  //Root path must be terminated with '\' or '\\'
+  // Root path must be terminated with '\' or '\\'
   if (tmp.back () != '/' && tmp.back () != '\\')
     tmp.push_back ('\\');
 
-  //Name cannot start with '/' or '\\'
+  // Name cannot start with '/' or '\\'
   int pstart = 0;
   if (name.front () == '/' || name.front () == '\\')
     pstart++;
 
-
-  //Make sure all folders on path exist. If not we create them now
+  // Make sure all folders on path exist. If not we create them now
   size_t pend = name.find_last_of ("/\\");
   if (pend != string::npos)
     tmp += name.substr (pstart, pend);
   if ((rc = r_mkdir (tmp)) && rc != EEXIST)
-    return false; //could not create path
+    return false; // could not create path
 
   if (pend != string::npos)
     tmp += name.substr (pend);
@@ -87,7 +85,7 @@ bool asset::write (const std::string& path)
     tmp += name;
   if (keep && utf8::access (tmp, 0))
   {
-    //permanent asset exists. Don't overwrite it (just pretend)
+    // permanent asset exists. Don't overwrite it (just pretend)
     written = true;
     return true;
   }
@@ -112,8 +110,7 @@ void asset::load ()
   sz = 0;
 
   HMODULE handle = GetModuleHandle (NULL);
-  HRSRC rc = FindResource (handle, MAKEINTRESOURCE (id),
-    MAKEINTRESOURCE (RESFILE));
+  HRSRC rc = FindResource (handle, MAKEINTRESOURCE (id), MAKEINTRESOURCE (RESFILE));
   if (!rc)
     return;
 
@@ -126,5 +123,4 @@ void asset::load ()
   loaded = true;
 }
 
-
-}
+} // namespace mlib

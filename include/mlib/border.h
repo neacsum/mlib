@@ -4,7 +4,7 @@
 
   (c) Mircea Neacsu 2017
 */
-#if __has_include ("defs.h")
+#if __has_include("defs.h")
 #include "defs.h"
 #endif
 
@@ -14,22 +14,20 @@
 
 namespace mlib {
 
-
 class Border
 {
 public:
-
   Border ();
-  Border (const char *fname);
+  Border (const char* fname);
   void add (double x, double y);
   void close (double x, double y);
-  
+
   bool inside (double x, double y);
 
 private:
-  std::deque <dpoint> vertex;
+  std::deque<dpoint> vertex;
   dpoint closing;
   int closing_outside;
 };
 
-}
+} // namespace mlib

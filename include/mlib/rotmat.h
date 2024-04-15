@@ -5,7 +5,7 @@
   (c) Mircea Neacsu 2017. All rights reserved.
 */
 
-#if __has_include ("defs.h")
+#if __has_include("defs.h")
 #include "defs.h"
 #endif
 
@@ -34,7 +34,7 @@ public:
   void rotate (double& x, double& y, double& z) const;
 
   /// Rotate a vector containing the x, y, z coordinates
-  void rotate (double *vec) const;
+  void rotate (double* vec) const;
 
   /// Return reference to rotation matrix (3x3)
   double (&matrix ())[3][3];
@@ -49,5 +49,4 @@ inline double (&RotMat::matrix ())[3][3]
   return r;
 }
 
-
-}
+} // namespace mlib

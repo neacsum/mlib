@@ -3,12 +3,8 @@
 
     (c) Mircea Neacsu 2019
 */
-#ifndef UNICODE
-#define UNICODE
-#endif
-
-#include <mlib/rdir.h>
-#include <mlib/trace.h>
+#include <mlib/mlib.h>
+#pragma hdrstop
 #include <assert.h>
 #include <utf8/utf8.h>
 
@@ -26,11 +22,11 @@ namespace mlib {
 */
 int r_mkdir (const std::string& dir)
 {
-  assert (!dir.empty());
+  assert (!dir.empty ());
 
   string ldir;
-  auto p = dir.begin();
-  while (p != dir.end())
+  auto p = dir.begin ();
+  while (p != dir.end ())
   {
     if (*p == '\\' || *p == '/')
     {
@@ -45,7 +41,7 @@ int r_mkdir (const std::string& dir)
 
   if (ldir.back () != '\\' && ldir.back () != '/')
   {
-    //take care of last path segment
+    // take care of last path segment
     if (utf8::access (ldir, 0))
       return EEXIST;
     else
@@ -66,9 +62,9 @@ int r_mkdir (const std::string& dir)
 */
 int r_rmdir (const std::string& dir)
 {
-  assert (!dir.empty());
+  assert (!dir.empty ());
 
-  string ldir(dir);
+  string ldir (dir);
   if (ldir.back () == '\\' || ldir.back () == '/')
     ldir.pop_back ();
 
@@ -77,7 +73,7 @@ int r_rmdir (const std::string& dir)
     if (!utf8::rmdir (ldir))
       return ENOTEMPTY;
 
-    //erase another path segment
+    // erase another path segment
     while (!ldir.empty () && ldir.back () != '\\' && ldir.back () != '/')
       ldir.pop_back ();
 
@@ -86,11 +82,9 @@ int r_rmdir (const std::string& dir)
 
     ldir.pop_back ();
 
-    if (ldir.back () == ':'
-     || ldir == "."
-     || ldir == "..")
+    if (ldir.back () == ':' || ldir == "." || ldir == "..")
       return 0;
   }
 }
 
-}
+} // namespace mlib

@@ -8,7 +8,7 @@
 #include <vector>
 #include <string>
 
-#if __has_include ("defs.h")
+#if __has_include("defs.h")
 #include "defs.h"
 #endif
 
@@ -18,4 +18,4 @@ bool SerEnum_UsingCreateFile (std::vector<int>& ports);
 bool SerEnum_UsingSetupAPI (std::vector<int>& ports, std::vector<std::string>& names);
 bool SerEnum_UsingRegistry (std::vector<int>& ports);
 
-}
+} // namespace mlib

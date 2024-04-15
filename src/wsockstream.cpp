@@ -6,14 +6,12 @@
 
 /// \file wsockstream.cpp Implementation of sock and sock-derived classes
 
-//comment this line if you want debug messages from this module
+// comment this line if you want debug messages from this module
 #undef _TRACE
 
-#include <mlib/wsockstream.h>
-#include <mlib/inaddr.h>
-#include <mlib/trace.h>
-
-#pragma comment (lib, "ws2_32.lib")
+#include <mlib/mlib.h>
+#pragma hdrstop
+#pragma comment(lib, "ws2_32.lib")
 
 namespace mlib {
 
@@ -27,23 +25,22 @@ namespace mlib {
 class sock_facility : public errfac
 {
 public:
-  sock_facility () : errfac ("SOCKSTREAM ERROR") {};
+  sock_facility ()
+    : errfac ("SOCKSTREAM ERROR"){};
   void log (const erc& e) const override;
   std::string message (const erc& e) const override;
 };
 
 sock_facility the_errors;
 
-int sock_initializer_counter=0;
+int sock_initializer_counter = 0;
 
 /*!
   \defgroup sockets Networking Objects
 */
 
-
-///The initialization object
+/// The initialization object
 static sock_initializer init;
-
 
 /*!
   \class sock
@@ -56,8 +53,8 @@ static sock_initializer init;
 /*!
   Create a sock object from a socket handle.
 */
-sock::sock (SOCKET soc) :
-  sl (nullptr)
+sock::sock (SOCKET soc)
+  : sl (nullptr)
 {
   if (soc != INVALID_SOCKET)
   {
@@ -67,7 +64,6 @@ sock::sock (SOCKET soc) :
   TRACE9 ("sock::sock (SOCKET %x)", sl->handle);
 }
 
-
 /*!
   Construct a sock object for the specified domain.
   \param  type      socket type (SOCK_DGRAM or SOCK_STREAM)
@@ -76,12 +72,12 @@ sock::sock (SOCKET soc) :
 
   Throws an exception if the socket cannot be created.
 */
-sock::sock (int type, int domain, int proto) : 
-  sl (nullptr)
+sock::sock (int type, int domain, int proto)
+  : sl (nullptr)
 {
   SOCKET h;
-  if ((h = ::socket (domain, type, proto)) == INVALID_SOCKET) 
-    last_error().raise ();
+  if ((h = ::socket (domain, type, proto)) == INVALID_SOCKET)
+    last_error ().raise ();
 
   sl = new sock_ref;
   sl->handle = h;
@@ -120,12 +116,12 @@ sock::sock (sock&& sb)
 
   The left hand object shares the handle of the right hand object.
 */
-sock& sock::operator = (const sock& rhs)
+sock& sock::operator= (const sock& rhs)
 {
   if (this == &rhs)
-    return *this;       //trivial assignment
-  
-  close (); //close previous handle
+    return *this; // trivial assignment
+
+  close (); // close previous handle
 
   if ((sl = rhs.sl) != nullptr)
   {
@@ -136,12 +132,12 @@ sock& sock::operator = (const sock& rhs)
 }
 
 /// Move assignment
-sock &sock::operator= (sock &&rhs)
+sock& sock::operator= (sock&& rhs)
 {
   if (this == &rhs)
     return *this; // trivial assignment
 
-  close (); //close previous handle
+  close (); // close previous handle
 
   sl = rhs.sl;
   rhs.sl = nullptr;
@@ -169,7 +165,7 @@ sock::~sock ()
 
 /*!
   Open the socket.
-  
+
   If the socket was previously opened it calls first close().
 */
 erc sock::open (int type, int domain, int proto)
@@ -178,9 +174,9 @@ erc sock::open (int type, int domain, int proto)
   if (sl && sl->handle != INVALID_SOCKET)
   {
     if (--sl->ref_count == 0)
-      closesocket (sl->handle); //no other references to this handle
+      closesocket (sl->handle); // no other references to this handle
     else
-      sl = nullptr; 
+      sl = nullptr;
   }
   if (!sl)
     sl = new sock_ref;
@@ -190,11 +186,10 @@ erc sock::open (int type, int domain, int proto)
   return erc::success;
 }
 
-
 /*!
   Close socket.
 */
-erc sock::close()
+erc sock::close ()
 {
   if (sl && sl->handle != INVALID_SOCKET)
   {
@@ -218,8 +213,8 @@ erc sock::close()
   Return the local name for the object.
 
   This function is especially useful when a connect() call has been made without
-  doing a bind first or after calling bind() without an explicit address. 
-  name function provides the only way to determine the local association 
+  doing a bind first or after calling bind() without an explicit address.
+  name function provides the only way to determine the local association
   that has been set by the system.
 */
 erc sock::name (inaddr& addr) const
@@ -228,7 +223,7 @@ erc sock::name (inaddr& addr) const
     return erc (WSAENOTSOCK, erc::error, sock::errors);
 
   sockaddr sa;
-  int len = sizeof(sa);
+  int len = sizeof (sa);
   if (getsockname (sl->handle, &sa, &len) == SOCKET_ERROR)
     return last_error ();
   addr = sa;
@@ -236,7 +231,7 @@ erc sock::name (inaddr& addr) const
 }
 
 /*!
-  Retrieves the name of the peer to which the socket is connected. 
+  Retrieves the name of the peer to which the socket is connected.
   The socket must be connected.
 */
 erc sock::peer (inaddr& addr) const
@@ -245,7 +240,7 @@ erc sock::peer (inaddr& addr) const
     return erc (WSAENOTSOCK, erc::error, sock::errors);
 
   sockaddr sa;
-  int len = sizeof(sa);
+  int len = sizeof (sa);
   if (getpeername (sl->handle, &sa, &len) == SOCKET_ERROR)
     return last_error ();
   addr = sa;
@@ -260,28 +255,28 @@ erc sock::bind (const inaddr& sa) const
   assert (sl && sl->handle != INVALID_SOCKET);
 
   TRACE8 ("sock::bind (%x) to %s:%d", sl->handle, sa.ntoa (), sa.port ());
-  if (::bind (sl->handle, sa, sizeof(sa)) == SOCKET_ERROR)
+  if (::bind (sl->handle, sa, sizeof (sa)) == SOCKET_ERROR)
     return last_error ();
   return erc::success;
 }
 
 /*!
   Associates a local address with the socket.
-  
-  Winsock assigns a unique port to the socket. The application can use 
+
+  Winsock assigns a unique port to the socket. The application can use
   name() after calling bind to learn the address and the port that has been
   assigned to it.
 */
-erc sock::bind() const
+erc sock::bind () const
 {
   if (!sl || sl->handle == INVALID_SOCKET)
     return erc (WSAENOTSOCK, erc::error, sock::errors);
 
   sockaddr sa;
-  memset (&sa, 0, sizeof(sa));
+  memset (&sa, 0, sizeof (sa));
   sa.sa_family = AF_INET;
 
-  if (::bind (sl->handle, &sa, sizeof(sa)) == SOCKET_ERROR)
+  if (::bind (sl->handle, &sa, sizeof (sa)) == SOCKET_ERROR)
     return last_error ();
   return erc::success;
 }
@@ -317,13 +312,13 @@ erc sock::connect (const inaddr& peer, int wp_sec) const
   The function waits the specified interval for a connecting peer.
   If no connection request is made the function returns WSAETIMEDOUT.
 */
-erc sock::accept (sock &client, int wp_sec, inaddr *addr) const
+erc sock::accept (sock& client, int wp_sec, inaddr* addr) const
 {
   if (!sl || sl->handle == INVALID_SOCKET)
     return erc (WSAENOTSOCK, erc::error, sock::errors);
 
   sockaddr sa;
-  int len = sizeof(sa);
+  int len = sizeof (sa);
   if (is_readready (wp_sec))
     client = sock (::accept (sl->handle, &sa, &len));
   else
@@ -333,7 +328,7 @@ erc sock::accept (sock &client, int wp_sec, inaddr *addr) const
   }
   if (addr)
     *addr = sa;
-  return last_error();
+  return last_error ();
 }
 
 /*!
@@ -345,28 +340,26 @@ erc sock::accept (sock &client, int wp_sec, inaddr *addr) const
   \return Number of characters received or EOF if connection closed by peer.
 
 */
-size_t sock::recv (void *buf, size_t len, mflags msgf) const
+size_t sock::recv (void* buf, size_t len, mflags msgf) const
 {
   if (!sl || sl->handle == INVALID_SOCKET)
     throw erc (WSAENOTSOCK, erc::error, sock::errors);
 
-  int rval = ::recv (sl->handle, (char *)buf, (int)len, msgf);
+  int rval = ::recv (sl->handle, (char*)buf, (int)len, msgf);
   if (rval == SOCKET_ERROR)
   {
-    int what =  WSAGetLastError();
+    int what = WSAGetLastError ();
     if (what == WSAEWOULDBLOCK)
     {
       TRACE8 ("sock::recv - EWOULDBLOCK");
       return 0;
     }
-    else if (what == WSAECONNABORTED 
-          || what == WSAECONNRESET 
-          || what == WSAETIMEDOUT
-          || what == WSAESHUTDOWN)
+    else if (what == WSAECONNABORTED || what == WSAECONNRESET || what == WSAETIMEDOUT
+             || what == WSAESHUTDOWN)
       return EOF;
     last_error ().raise ();
   }
-  return (rval==0) ? EOF: rval;
+  return (rval == 0) ? EOF : rval;
 }
 
 /*!
@@ -379,17 +372,17 @@ size_t sock::recv (void *buf, size_t len, mflags msgf) const
   \return Number of characters received or EOF if connection closed by peer.
 
 */
-size_t sock::recvfrom (sockaddr &sa, void *buf, size_t len, mflags msgf) const
+size_t sock::recvfrom (sockaddr& sa, void* buf, size_t len, mflags msgf) const
 {
   if (!sl || sl->handle == INVALID_SOCKET)
     throw erc (WSAENOTSOCK, erc::error, sock::errors);
 
   int rval;
-  int sa_len = sizeof(sa);
-  
-  if ((rval = ::recvfrom (sl->handle, (char*) buf, (int)len, msgf, &sa, &sa_len)) == SOCKET_ERROR)
+  int sa_len = sizeof (sa);
+
+  if ((rval = ::recvfrom (sl->handle, (char*)buf, (int)len, msgf, &sa, &sa_len)) == SOCKET_ERROR)
   {
-    int what =  WSAGetLastError();
+    int what = WSAGetLastError ();
     if (what == WSAEWOULDBLOCK)
     {
       TRACE8 ("sock::recv - EWOULDBLOCK");
@@ -399,7 +392,7 @@ size_t sock::recvfrom (sockaddr &sa, void *buf, size_t len, mflags msgf) const
       return EOF;
     last_error ().raise ();
   }
-  return (rval==0) ? (size_t)EOF: rval;
+  return (rval == 0) ? (size_t)EOF : rval;
 }
 
 /*!
@@ -408,22 +401,22 @@ size_t sock::recvfrom (sockaddr &sa, void *buf, size_t len, mflags msgf) const
   \param  len     length of buffer.
   \param  msgf    flags (MSG_OOB or MSG_DONTROUTE)
 
-  The function returns the number of characters actually sent or EOF if 
+  The function returns the number of characters actually sent or EOF if
   connection was closed by peer.
 */
-size_t sock::send (const void *buf, size_t len, mflags msgf) const
+size_t sock::send (const void* buf, size_t len, mflags msgf) const
 {
   if (!sl || sl->handle == INVALID_SOCKET)
     throw erc (WSAENOTSOCK, erc::error, sock::errors);
 
   size_t wlen = 0;
-  const char *cp = (const char *)buf;
-  while (len>0) 
+  const char* cp = (const char*)buf;
+  while (len > 0)
   {
     int wval;
     if ((wval = ::send (sl->handle, cp, (int)len, msgf)) == SOCKET_ERROR)
     {
-      int what =  WSAGetLastError();
+      int what = WSAGetLastError ();
       if (what == WSAETIMEDOUT)
         return 0;
       else if (what == WSAECONNABORTED || what == WSAECONNRESET)
@@ -444,22 +437,22 @@ size_t sock::send (const void *buf, size_t len, mflags msgf) const
   \param  len     length of buffer
   \param  msgf    flags (MSG_OOB or MSG_DONTROUTE)
 
-  The function returns the number of characters actually sent or EOF if 
+  The function returns the number of characters actually sent or EOF if
   connection was closed by peer.
 */
-size_t sock::sendto (const sockaddr &sa, const void *buf, size_t len, mflags msgf) const
+size_t sock::sendto (const sockaddr& sa, const void* buf, size_t len, mflags msgf) const
 {
   if (!sl || sl->handle == INVALID_SOCKET)
     throw erc (WSAENOTSOCK, erc::error, sock::errors);
 
   int wlen = 0;
-  const char *cp = (const char *)buf;
-  while (len>0) 
+  const char* cp = (const char*)buf;
+  while (len > 0)
   {
     int wval;
-    if ((wval = ::sendto (sl->handle, cp, (int)len, msgf, &sa, sizeof(sa))) == SOCKET_ERROR) 
+    if ((wval = ::sendto (sl->handle, cp, (int)len, msgf, &sa, sizeof (sa))) == SOCKET_ERROR)
     {
-      int what =  WSAGetLastError();
+      int what = WSAGetLastError ();
       if (what == WSAETIMEDOUT)
         return 0;
       else if (what == WSAECONNABORTED || what == WSAECONNRESET)
@@ -480,9 +473,9 @@ size_t sock::sendto (const sockaddr &sa, const void *buf, size_t len, mflags msg
   socket to become "readable".
 
   If the socket is currently in the listen state, it will be marked as readable
-  if an incoming connection request has been received such that accept() 
+  if an incoming connection request has been received such that accept()
   is guaranteed to complete without blocking. For other sockets, readability
-  means that queued data is available for reading such that a call to recv() or 
+  means that queued data is available for reading such that a call to recv() or
   recvfrom() is guaranteed not to block.
 */
 bool sock::is_readready (int wp_sec, int wp_usec) const
@@ -493,11 +486,11 @@ bool sock::is_readready (int wp_sec, int wp_usec) const
   fd_set fds;
   FD_ZERO (&fds);
   FD_SET (sl->handle, &fds);
-  
-  timeval tv = { wp_sec, wp_usec };
-  
-  int ret = ::select (FD_SETSIZE, &fds, 0, 0, (wp_sec < 0) ? 0: &tv);
-  if (ret == SOCKET_ERROR) 
+
+  timeval tv = {wp_sec, wp_usec};
+
+  int ret = ::select (FD_SETSIZE, &fds, 0, 0, (wp_sec < 0) ? 0 : &tv);
+  if (ret == SOCKET_ERROR)
   {
     last_error ().raise ();
     return false;
@@ -510,10 +503,10 @@ bool sock::is_readready (int wp_sec, int wp_usec) const
 
   If wp_sec or wp_usec are not 0, the function waits the specified time for the
   socket to become "writable".
-  
-  If the socket is processing a connect call, the socket is writable if the 
-  connection establishment successfully completes. If the socket is not 
-  processing a connect call, being writable means a send() or sendto() 
+
+  If the socket is processing a connect call, the socket is writable if the
+  connection establishment successfully completes. If the socket is not
+  processing a connect call, being writable means a send() or sendto()
   are guaranteed to succeed.
 */
 bool sock::is_writeready (int wp_sec, int wp_usec) const
@@ -524,10 +517,10 @@ bool sock::is_writeready (int wp_sec, int wp_usec) const
   fd_set fds;
   FD_ZERO (&fds);
   FD_SET (sl->handle, &fds);
-  timeval tv = { wp_sec, wp_usec };
-  
-  int ret = ::select (FD_SETSIZE, 0, &fds, 0, (wp_sec < 0) ? 0: &tv);
-  if (ret == SOCKET_ERROR) 
+  timeval tv = {wp_sec, wp_usec};
+
+  int ret = ::select (FD_SETSIZE, 0, &fds, 0, (wp_sec < 0) ? 0 : &tv);
+  if (ret == SOCKET_ERROR)
   {
     last_error ().raise ();
     return false;
@@ -547,11 +540,11 @@ bool sock::is_exceptionpending (int wp_sec, int wp_usec) const
 
   fd_set fds;
   FD_ZERO (&fds);
-  FD_SET  (sl->handle, &fds);
-  timeval tv = { wp_sec, wp_usec};
-  
-  int ret = ::select (FD_SETSIZE, 0, 0, &fds, (wp_sec < 0) ? 0: &tv);
-  if (ret == SOCKET_ERROR) 
+  FD_SET (sl->handle, &fds);
+  timeval tv = {wp_sec, wp_usec};
+
+  int ret = ::select (FD_SETSIZE, 0, 0, &fds, (wp_sec < 0) ? 0 : &tv);
+  if (ret == SOCKET_ERROR)
   {
     last_error ().raise ();
     return false;
@@ -585,49 +578,44 @@ erc sock::shutdown (shuthow sh) const
 
   if (::shutdown (sl->handle, sh) == SOCKET_ERROR)
     return last_error ();
-	
-  return erc::success;		
+
+  return erc::success;
 }
-
-
-
-
 
 //---------------------------- sockbuf class --------------------------------//
 /*!
   \class sockbuf
   \ingroup sockets
 
-  You can simultaneously read and write into a sockbuf just like you can 
+  You can simultaneously read and write into a sockbuf just like you can
   listen and talk through a telephone. Hence, the read and the write buffers
   are different.
-  
+
   Read:
   eback() points to the start of the get area.
   The unread chars are gptr() to egptr().
-  
+
   eback() is set to base() so that pbackfail()
   is called only when there is no place to
   putback a char. And pbackfail() always returns EOF.
-  
+
   Write:
   pbase() points to the start of the put area
   The unflushed chars are `pbase() - pptr()`
   epptr() points to the end of the write buffer.
-  
+
   Output is flushed whenever one of the following conditions
   holds:
   (1) `pptr() == epptr()`
   (2) EOF is written
- 
+
  Unbuffered:
   Input buffer size is assumed to be of size 1 and output buffer is of size 0.
   That is, `egptr() <= base()+1` and `epptr() == pbase()`.
 */
 
-
 ///  Build a sockbuf object from an existing socket
-sockbuf::sockbuf (SOCKET s) 
+sockbuf::sockbuf (SOCKET s)
   : sock (s)
   , x_flags (0)
 {
@@ -656,7 +644,7 @@ sockbuf::sockbuf (const sockbuf& sb)
   , x_flags (sb.x_flags)
 {
   if (x_flags & flags::allocbuf)
-    setbuf (0, (int)(const_cast<sockbuf &> (sb).epptr () - const_cast<sockbuf &> (sb).pbase ()));
+    setbuf (0, (int)(const_cast<sockbuf&> (sb).epptr () - const_cast<sockbuf&> (sb).pbase ()));
 }
 
 /*!
@@ -664,9 +652,9 @@ sockbuf::sockbuf (const sockbuf& sb)
 
   Maintains current buffering mode
 */
-sockbuf& sockbuf::operator = (const sockbuf& rhs)
+sockbuf& sockbuf::operator= (const sockbuf& rhs)
 {
-  sock::operator =(rhs);
+  sock::operator= (rhs);
   std::streambuf::operator= (rhs);
   x_flags = (x_flags & flags::allocbuf) | (rhs.x_flags & ~flags::allocbuf);
   return *this;
@@ -678,29 +666,28 @@ sockbuf::~sockbuf ()
   if (is_open ())
   {
     overflow ();
-    shutdown (shut_readwrite).deactivate (); //ignore any errors
-    close ().deactivate (); //ignore errors
+    shutdown (shut_readwrite).deactivate (); // ignore any errors
+    close ().deactivate ();                  // ignore errors
   }
 
   if (x_flags & flags::allocbuf)
   {
-    delete [] pbase();
-    delete [] eback();
+    delete[] pbase ();
+    delete[] eback ();
   }
 }
-
 
 /*!
   Return 0 if all chars flushed or -1 if error
 */
 int sockbuf::sync ()
 {
-  if (pptr () <= pbase ()) 
-    return 0;                                     //unbuffered or empty buffer
-  if (!(x_flags & flags::no_writes)) 
+  if (pptr () <= pbase ())
+    return 0; // unbuffered or empty buffer
+  if (!(x_flags & flags::no_writes))
   {
-    size_t wlen   = pptr () - pbase ();
-    size_t wval   = send (pbase (), wlen);
+    size_t wlen = pptr () - pbase ();
+    size_t wval = send (pbase (), wlen);
     setp (pbase (), epptr ());
     if (wval == wlen)
       return 0;
@@ -717,13 +704,13 @@ int sockbuf::sync ()
 */
 std::streambuf* sockbuf::setbuf (char* buf, std::streamsize sz)
 {
-  overflow(EOF);                                  //flush current output buffer
-  
-  //switch to unbuffered mode
+  overflow (EOF); // flush current output buffer
+
+  // switch to unbuffered mode
   if (x_flags & flags::allocbuf)
   {
-    delete []eback();
-    delete []pbase();
+    delete[] eback ();
+    delete[] pbase ();
   }
   setp (NULL, NULL);
   setg (NULL, NULL, NULL);
@@ -731,16 +718,16 @@ std::streambuf* sockbuf::setbuf (char* buf, std::streamsize sz)
   ibsize = 0;
   if (!buf)
   {
-    //automatic buffer - allocate separate input and output buffers
+    // automatic buffer - allocate separate input and output buffers
     x_flags |= flags::allocbuf;
-    char *ptr = new char[sz+1];
-    setp (ptr, ptr+sz);
-    ptr = new char[sz];
+    char* ptr = new char[(size_t)sz + 1];
+    setp (ptr, ptr + sz);
+    ptr = new char[(size_t)sz];
     setg (ptr, ptr + sz, ptr + sz);
     ibsize = (int)sz;
   }
   else
-    setp (buf, buf + sz - 1);   // user specified buffer used only for output
+    setp (buf, buf + sz - 1); // user specified buffer used only for output
   return this;
 }
 
@@ -749,17 +736,17 @@ std::streambuf* sockbuf::setbuf (char* buf, std::streamsize sz)
 */
 int sockbuf::underflow ()
 {
-  if (x_flags & flags::no_reads) 
-    return EOF;                                   //reads blocked for this socket
-  
-  if (gptr () < egptr ()) 
-    return *(unsigned char*)gptr ();              //return available char from buffer
-  
+  if (x_flags & flags::no_reads)
+    return EOF; // reads blocked for this socket
+
+  if (gptr () < egptr ())
+    return *(unsigned char*)gptr (); // return available char from buffer
+
   if (eback ())
   {
-    //buffered mode
+    // buffered mode
     size_t rval = recv (eback (), ibsize);
-    if (rval != (size_t)EOF) 
+    if (rval != (size_t)EOF)
     {
       setg (eback (), eback (), eback () + rval);
       return rval ? *(unsigned char*)gptr () : EOF;
@@ -768,7 +755,7 @@ int sockbuf::underflow ()
   }
   else
   {
-    //unbuffered mode
+    // unbuffered mode
     unsigned char ch;
     size_t rval = recv (&ch, 1);
     if (rval == (size_t)EOF || rval == 0)
@@ -783,10 +770,10 @@ int sockbuf::underflow ()
 */
 int sockbuf::overflow (int c)
 {
-  if (x_flags & flags::no_writes) 
-    return EOF;           //socket blocked for writing, can't do anything
+  if (x_flags & flags::no_writes)
+    return EOF; // socket blocked for writing, can't do anything
 
-  if (sync () == EOF)     //flush output
+  if (sync () == EOF) // flush output
     return EOF;
 
   if (c == EOF)
@@ -794,13 +781,13 @@ int sockbuf::overflow (int c)
 
   if (pbase ())
   {
-    //buffered mode
-    *pptr () = (char) c;
+    // buffered mode
+    *pptr () = (char)c;
     pbump (1);
   }
   else
   {
-    //unbuffered mode
+    // unbuffered mode
     unsigned char ch = (unsigned char)c;
     size_t rval = send (&ch, 1);
     if (rval == (size_t)EOF || rval == 0)
@@ -822,7 +809,7 @@ std::streamsize sockbuf::showmanyc ()
   \ingroup sockets
 
   This is a wrapper around WSAStartup/WSACleanup functions.
-  When the first instance is created it calls WSAStartup and WSACleanup is 
+  When the first instance is created it calls WSAStartup and WSACleanup is
   called when the last instance is destroyed.
 
   It uses the "Nifty Counter" (https://en.wikibooks.org/wiki/More_C%2B%2B_Idioms/Nifty_Counter)
@@ -831,7 +818,7 @@ std::streamsize sockbuf::showmanyc ()
   of the static object `sock_nifty_counter`. Because it is a static object there
   will be one such object in each translation unit that includes the header file.
   Moreover, because it is declared before any other global object in that translation
-  unit, sock_nifty_counter constructor will be called first. 
+  unit, sock_nifty_counter constructor will be called first.
 
 */
 
@@ -841,17 +828,17 @@ sock_initializer::sock_initializer ()
   TRACE9 ("sock_initializer::sock_initializer cnt=%d", sock_initializer_counter);
   if (sock_initializer_counter++ == 0)
   {
-    WSADATA wsadata; 
-    int err = WSAStartup (MAKEWORD(2,0), &wsadata);
+    WSADATA wsadata;
+    int err = WSAStartup (MAKEWORD (2, 0), &wsadata);
     TRACE8 ("sock_initializer - WSAStartup result = %d", err);
 
-    //Set default error handling facility
+    // Set default error handling facility
     sock::errors = &the_errors;
   }
 }
 
 /// Last instance calls WSACleanup
-sock_initializer::~sock_initializer()
+sock_initializer::~sock_initializer ()
 {
   if (--sock_initializer_counter == 0)
   {
@@ -861,9 +848,11 @@ sock_initializer::~sock_initializer()
   TRACE9 ("sock_initializer::~sock_initializer cnt=%d", sock_initializer_counter);
 }
 
-
-//Create an entry in the error table
-#define ENTRY(A) {A, #A}
+// Create an entry in the error table
+#define ENTRY(A)                                                                                   \
+  {                                                                                                \
+    A, #A                                                                                          \
+  }
 
 /*!
   Return the error message text.
@@ -872,9 +861,10 @@ sock_initializer::~sock_initializer()
 */
 std::string sock_facility::message (const erc& e) const
 {
-  static struct errtab {
+  static struct errtab
+  {
     int code;
-    const char *str;
+    const char* str;
   } errors[] = {
     ENTRY (WSA_INVALID_HANDLE),
     ENTRY (WSA_NOT_ENOUGH_MEMORY),
@@ -960,7 +950,7 @@ std::string sock_facility::message (const erc& e) const
 
   int ec = e.code ();
   int i;
-  for (i=0; errors[i].code && errors[i].code != ec; i++)
+  for (i = 0; errors[i].code && errors[i].code != ec; i++)
     ;
   return errors[i].str;
 }
@@ -971,11 +961,10 @@ std::string sock_facility::message (const erc& e) const
 void sock_facility::log (const erc& e) const
 {
   auto str = message (e);
-  if (!str.empty())
+  if (!str.empty ())
     dprintf ("%s  - %s(%d)", name ().c_str (), str.c_str (), e.code ());
   else
-    dprintf ("%s - %d", name().c_str(), e.code());
+    dprintf ("%s - %d", name ().c_str (), e.code ());
 }
 
-}
-
+} // namespace mlib

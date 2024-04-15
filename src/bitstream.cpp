@@ -3,7 +3,8 @@
 
   (c) Mircea Neacsu 2017
 */
-#include <mlib/bitstream.h>
+#include <mlib/mlib.h>
+#pragma hdrstop
 
 using namespace std;
 
@@ -11,10 +12,10 @@ namespace mlib {
 
 /*!
   \class bitstream
-  
+
   This class allows reading and writing of bit fields from or to a byte stream.
   It allows for different byte encodings using the protected encode/decode functions.
-  
+
   \remarks Maximum field width is limited to 32 bits.
 */
 
@@ -22,14 +23,12 @@ namespace mlib {
   \param str    Underlining iostream
   \param pack   Number of bits per byte
 */
-bitstream::bitstream (std::iostream& str, unsigned int pack) 
+bitstream::bitstream (std::iostream& str, unsigned int pack)
   : packing (pack)
-  , s(str)
+  , s (str)
   , nbits (0)
-  , buffer(0)
-{
-}
-
+  , buffer (0)
+{}
 
 /*!
   Read a single bit from stream. If there are no more bits available in current
@@ -49,7 +48,7 @@ bool bitstream::read ()
     decode (buffer, next);
     nbits = packing;
   }
-  bool val = buffer & (1<<(packing-1));
+  bool val = buffer & (1 << (packing - 1));
   nbits--;
   buffer <<= 1;
   return val;
@@ -58,7 +57,7 @@ bool bitstream::read ()
 /*!
   If it has accumulated enough bits calls #encode function to encode them and
   writes a new byte to underlining stream.
-  
+
   \param val    Bit value to write
 
 */
@@ -98,13 +97,13 @@ void bitstream::flush ()
 /*!
   Invokes #write function repeatedly to write each bit.
 
-  \param val    Value to write (0 to 2<sup>sz</sup>-1 ) 
-  \param sz     Width of bit field  
+  \param val    Value to write (0 to 2<sup>sz</sup>-1 )
+  \param sz     Width of bit field
 */
 void bitstream::mwrite (int val, unsigned int sz)
 {
-  unsigned int mask = 1<<(sz-1);
-  for (unsigned int i=0; i<sz; i++)
+  unsigned int mask = 1 << (sz - 1);
+  for (unsigned int i = 0; i < sz; i++)
   {
     write (val & mask);
     mask >>= 1;
@@ -114,15 +113,15 @@ void bitstream::mwrite (int val, unsigned int sz)
 /*!
   Invokes #read function repeatedly to read all bits.
 
-  \param sz         Width of bit field  
-  \param sign       "true" if bit field should be interpreted as a signed value.  
+  \param sz         Width of bit field
+  \param sign       "true" if bit field should be interpreted as a signed value.
   \return           value (0 to 2<sup>sz</sup>-1 or -2<sup>sz-1</sup> to 2<sup>sz-1</sup>)
 
 */
 int bitstream::mread (unsigned int sz, bool sign)
 {
-  int val = read()? (sign?-1:1) : 0;
-  for (unsigned int i = 1; i<sz; i++)
+  int val = read () ? (sign ? -1 : 1) : 0;
+  for (unsigned int i = 1; i < sz; i++)
   {
     val <<= 1;
     if (read ())
@@ -132,6 +131,4 @@ int bitstream::mread (unsigned int sz, bool sign)
   return val;
 }
 
-
-}
-
+} // namespace mlib

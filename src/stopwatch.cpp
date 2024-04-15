@@ -4,14 +4,13 @@
   (c) Mircea Neacsu 2017
 */
 
-
-#include <mlib/stopwatch.h>
+#include <mlib/mlib.h>
+#pragma hdrstop
 #include <assert.h>
 
 namespace mlib {
 
 LARGE_INTEGER stopwatch::freq;
-
 
 /// Constructor
 stopwatch::stopwatch ()
@@ -45,7 +44,7 @@ double stopwatch::msecLap ()
   LARGE_INTEGER tlap;
   QueryPerformanceCounter (&tlap);
   assert (tbeg.QuadPart);
-  return (double)(tlap.QuadPart - tbeg.QuadPart) / freq.QuadPart*1000.;
+  return (double)(tlap.QuadPart - tbeg.QuadPart) / freq.QuadPart * 1000.;
 }
 
 /// Return total duration in milliseconds between start and stop
@@ -53,7 +52,7 @@ double stopwatch::msecEnd ()
 {
   assert (tbeg.QuadPart);
   assert (tend.QuadPart);
-  return (double)(tend.QuadPart - tbeg.QuadPart) / freq.QuadPart*1000.;
+  return (double)(tend.QuadPart - tbeg.QuadPart) / freq.QuadPart * 1000.;
 }
 
-}
+} // namespace mlib

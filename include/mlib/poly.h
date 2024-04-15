@@ -5,7 +5,7 @@
   (c) Mircea Neacsu 2020
 */
 
-#if __has_include ("defs.h")
+#if __has_include("defs.h")
 #include "defs.h"
 #endif
 
@@ -47,7 +47,7 @@ T poly (T x, const T* coeff, int n)
   This template function will generate a new instantiation for each array size.
 */
 template <typename T, size_t N>
-T poly (T x, std::array<T, N>coeff)
+T poly (T x, std::array<T, N> coeff)
 {
   return poly (x, coeff.data (), (int)N);
 }
@@ -61,9 +61,9 @@ T poly (T x, std::array<T, N>coeff)
           coeff[N-1]*x^(N-1) + coeff[N-2]*x^(N-2) + ... + coeff[1]*x + coeff[0]
 */
 template <typename T>
-T poly (T x, std::vector<T>coeff)
+T poly (T x, std::vector<T> coeff)
 {
-  return poly (x, coeff.data (), (int)coeff.size());
+  return poly (x, coeff.data (), (int)coeff.size ());
 }
 
-}
+} // namespace mlib

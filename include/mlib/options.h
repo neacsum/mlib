@@ -21,7 +21,7 @@
 #include <string>
 #include <vector>
 
-#if __has_include ("defs.h")
+#if __has_include("defs.h")
 #include "defs.h"
 #endif
 
@@ -38,8 +38,8 @@ public:
   void set_options (std::vector<const char*>& list);
   void add_option (const char* descr);
 
-  int parse (int argc, const char* const *argv, int *stop=0);
-  bool next (std::string& opt, std::string& optarg, char sep='|');
+  int parse (int argc, const char* const* argv, int* stop = 0);
+  bool next (std::string& opt, std::string& optarg, char sep = '|');
   bool next (std::string& opt, std::vector<std::string>& optarg);
   int getopt (const std::string& option, std::string& optarg, char sep = '|') const;
   int getopt (const std::string& option, std::vector<std::string>& optarg) const;
@@ -52,32 +52,32 @@ public:
   const std::string& appname () const;
 
 private:
-  struct opt {
-    char oshort;                    //short form
-    std::string olong;              //long form
-    char flag;                      //argument type
-    std::string arg_descr;          //argument description
-    std::vector<std::string> arg;   //actual argument(s)
-    int count;                      //number of occurrences
+  struct opt
+  {
+    char oshort;                  // short form
+    std::string olong;            // long form
+    char flag;                    // argument type
+    std::string arg_descr;        // argument description
+    std::vector<std::string> arg; // actual argument(s)
+    int count;                    // number of occurrences
   };
 
-  std::vector<opt>::const_iterator find_option(const std::string& opt) const;
-  std::vector<opt>::const_iterator find_option(char opt) const;
+  std::vector<opt>::const_iterator find_option (const std::string& opt) const;
+  std::vector<opt>::const_iterator find_option (char opt) const;
   void format_arg (std::string& str, const opt& option, char sep) const;
 
   std::vector<opt> optlist;
-  std::vector<opt> cmd; 
+  std::vector<opt> cmd;
   std::vector<opt>::iterator nextop;
   std::string app;
 };
 
 /*!
   Return program name
-  
+
   This is the content of `argv[0]` without any path or extension.
 */
-inline
-const std::string& OptParser::appname () const
+inline const std::string& OptParser::appname () const
 {
   return app;
 }
@@ -87,8 +87,7 @@ const std::string& OptParser::appname () const
   Check if command line has an option
   \param  option  long or short form of the option
 */
-inline
-bool OptParser::hasopt (const std::string& option) const
+inline bool OptParser::hasopt (const std::string& option) const
 {
   return find_option (option) != cmd.end ();
 }
@@ -97,8 +96,7 @@ bool OptParser::hasopt (const std::string& option) const
   Check if command line has an option
   \param  option  short form of the option
 */
-inline
-bool OptParser::hasopt (char option) const
+inline bool OptParser::hasopt (char option) const
 {
   return find_option (option) != cmd.end ();
 }
@@ -114,24 +112,22 @@ bool OptParser::hasopt (char option) const
   \return  number of occurrences on command line
 */
 
-inline
-int OptParser::getopt(const std::string& option, std::vector<std::string>& optarg) const
+inline int OptParser::getopt (const std::string& option, std::vector<std::string>& optarg) const
 {
-  optarg.clear();
-  auto p = find_option(option);
-  if (p == cmd.end())
+  optarg.clear ();
+  auto p = find_option (option);
+  if (p == cmd.end ())
     return 0;
 
   optarg = p->arg;
   return p->count;
 }
 
-inline
-int OptParser::getopt(char option, std::vector<std::string>& optarg) const
+inline int OptParser::getopt (char option, std::vector<std::string>& optarg) const
 {
-  optarg.clear();
-  auto p = find_option(option);
-  if (p == cmd.end())
+  optarg.clear ();
+  auto p = find_option (option);
+  if (p == cmd.end ())
     return 0;
 
   optarg = p->arg;
@@ -139,4 +135,4 @@ int OptParser::getopt(char option, std::vector<std::string>& optarg) const
 }
 ///@}
 
-}
+} // namespace mlib

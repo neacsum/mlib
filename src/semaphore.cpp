@@ -4,7 +4,8 @@
   (c) Mircea Neacsu 1999
 
 */
-#include <mlib/semaphore.h>
+#include <mlib/mlib.h>
+#pragma hdrstop
 #include <assert.h>
 
 #if __has_include(<utf8/utf8.h>)
@@ -23,7 +24,7 @@ namespace mlib {
   positive.
 */
 
-/*! 
+/*!
   \param limit  maximum limit for counter
   \param name   object's name
 */
@@ -53,8 +54,8 @@ semaphore::operator bool ()
 {
   bool result = syncbase::operator bool ();
   if (result)
-    signal();
+    signal ();
   return result;
 }
 
-}
+} // namespace mlib

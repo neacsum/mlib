@@ -4,38 +4,33 @@
 
     (c) Mircea Neacsu. 2004-2017
 */
-#ifndef UNICODE
-#define UNICODE
-#endif
-
-#include <mlib/shmem.h>
-#include <mlib/trace.h>
+#include <mlib/mlib.h>
+#pragma hdrstop
 
 #include <assert.h>
 #include <utf8/utf8.h>
 
 namespace mlib {
 
-/*! 
+/*!
   Default constructor.
 
   The shared memory area (SMA) must be opened before use.
 */
-shmem_base::shmem_base () :
- name_ (NULL),
- mem (NULL),
- file (NULL),
- wrex (INVALID_HANDLE_VALUE),
- rdgate (INVALID_HANDLE_VALUE),
- in_rdlock (0),
- in_wrlock (0),
- mem_created (false),
- rtmo_ (INFINITE),
- wtmo_ (INFINITE),
- sz (0),
- syn (0)
-{
-}
+shmem_base::shmem_base ()
+  : name_ (NULL)
+  , mem (NULL)
+  , file (NULL)
+  , wrex (INVALID_HANDLE_VALUE)
+  , rdgate (INVALID_HANDLE_VALUE)
+  , in_rdlock (0)
+  , in_wrlock (0)
+  , mem_created (false)
+  , rtmo_ (INFINITE)
+  , wtmo_ (INFINITE)
+  , sz (0)
+  , syn (0)
+{}
 
 /*!
   Create and open a SMA
@@ -43,18 +38,18 @@ shmem_base::shmem_base () :
   \param nam    name of SMA
   \param sz_    size of SMA (not including size of synchronization stuff)
 */
-shmem_base::shmem_base (const std::string& nam, size_t sz_) :
- file (NULL),
- mem (NULL),
- wrex (INVALID_HANDLE_VALUE),
- rdgate (INVALID_HANDLE_VALUE),
- in_rdlock (0),
- in_wrlock (0),
- mem_created (false),
- rtmo_ (INFINITE),
- wtmo_ (INFINITE),
- sz (sz_),
- syn (0)
+shmem_base::shmem_base (const std::string& nam, size_t sz_)
+  : file (NULL)
+  , mem (NULL)
+  , wrex (INVALID_HANDLE_VALUE)
+  , rdgate (INVALID_HANDLE_VALUE)
+  , in_rdlock (0)
+  , in_wrlock (0)
+  , mem_created (false)
+  , rtmo_ (INFINITE)
+  , wtmo_ (INFINITE)
+  , sz (sz_)
+  , syn (0)
 {
   open (nam, sz_);
 }
@@ -64,7 +59,7 @@ shmem_base::shmem_base (const std::string& nam, size_t sz_) :
 
   If SMA was opened, close it now.
 */
-shmem_base::~shmem_base()
+shmem_base::~shmem_base ()
 {
   close ();
   TRACE9 ("shmem_base destructor done");
@@ -84,43 +79,44 @@ shmem_base::~shmem_base()
 bool shmem_base::open (const std::string& nam, size_t sz_)
 {
   close ();
-  assert (!nam.empty());
-  name_= nam;
+  assert (!nam.empty ());
+  name_ = nam;
 
-  std::wstring wname = utf8::widen(name_);
+  std::wstring wname = utf8::widen (name_);
   std::wstring tmp;
-  try {
+  try
+  {
     tmp = wname + L".MEM";
     sz = sz_;
-    file = CreateFileMapping (INVALID_HANDLE_VALUE,         //memory based
-                              NULL,                         //security
-                              PAGE_READWRITE,               //protection
-                              0, (DWORD)(sz+sizeof(syncblk)), //size MSW and LSW
-                              tmp.c_str());                   //name
+    file = CreateFileMapping (INVALID_HANDLE_VALUE,              // memory based
+                              NULL,                              // security
+                              PAGE_READWRITE,                    // protection
+                              0, (DWORD)(sz + sizeof (syncblk)), // size MSW and LSW
+                              tmp.c_str ());                     // name
     DWORD ret = GetLastError ();
     if (!file)
     {
-      TRACE2 ("shmem_base::open(%s) CreateFileMapping failed!", name_.c_str());
+      TRACE2 ("shmem_base::open(%s) CreateFileMapping failed!", name_.c_str ());
       throw ret;
     }
-  
+
     mem_created = (ret != ERROR_ALREADY_EXISTS);
 
     syn = (syncblk*)MapViewOfFile (file, FILE_MAP_ALL_ACCESS, 0, 0, 0);
     if (!syn)
     {
-      TRACE2 ("shmem_base::open(%s) MapViewOfFile failed!", name_.c_str());
-      throw GetLastError();
+      TRACE2 ("shmem_base::open(%s) MapViewOfFile failed!", name_.c_str ());
+      throw GetLastError ();
     }
 
     /* data is after the sync block */
     mem = syn + 1;
     tmp = wname + L".EVT";
-    rdgate = CreateEvent (NULL, TRUE, TRUE, tmp.c_str());
+    rdgate = CreateEvent (NULL, TRUE, TRUE, tmp.c_str ());
     if (mem_created)
       syn->rdgate = rdgate;
     tmp = wname + L".MUT";
-    wrex = CreateMutex (NULL, FALSE, tmp.c_str());
+    wrex = CreateMutex (NULL, FALSE, tmp.c_str ());
     if (mem_created)
     {
       syn->wrex = wrex;
@@ -128,8 +124,10 @@ bool shmem_base::open (const std::string& nam, size_t sz_)
       syn->wrid = 0;
       memset (mem, 0, sz);
     }
-  } catch (DWORD& x) {
-    TRACE2 ("shmem_base::open(%s) Error %ld", name_.c_str(), x);
+  }
+  catch (DWORD& x)
+  {
+    TRACE2 ("shmem_base::open(%s) Error %ld", name_.c_str (), x);
     close ();
     return false;
   }
@@ -142,8 +140,8 @@ bool shmem_base::open (const std::string& nam, size_t sz_)
 bool shmem_base::close ()
 {
   assert (!in_rdlock && !in_wrlock);
-  if (!name_.empty())
-    TRACE9 ("shmem_base::close (%s)", name_.c_str());
+  if (!name_.empty ())
+    TRACE9 ("shmem_base::close (%s)", name_.c_str ());
   if (syn)
     UnmapViewOfFile (syn);
   if (file)
@@ -173,7 +171,7 @@ bool shmem_base::rdlock ()
 {
   assert (syn);
 
-  if (in_rdlock || in_wrlock) //write lock has also read semantics
+  if (in_rdlock || in_wrlock) // write lock has also read semantics
   {
     TRACE9 ("shmem_base::rdlock - in_rdlock=%d in_wrlock=%d", in_rdlock, in_wrlock);
     InterlockedIncrement (&syn->rc);
@@ -224,7 +222,7 @@ bool shmem_base::wrlock ()
 
   InterlockedIncrement (&syn->wc);
   in_wrlock++;
-  if ((res=WaitForSingleObject (wrex, wtmo_)) == WAIT_OBJECT_0)
+  if ((res = WaitForSingleObject (wrex, wtmo_)) == WAIT_OBJECT_0)
   {
     DWORD endt;
     TRACE9 ("shmem_base::wrlock - Acquired wrex");
@@ -234,7 +232,7 @@ bool shmem_base::wrlock ()
       endt = GetTickCount () + wtmo_;
     else
       endt = INFINITE;
-    while ((syn->rc > in_rdlock) && (GetTickCount() < endt))
+    while ((syn->rc > in_rdlock) && (GetTickCount () < endt))
       Sleep (0);
     if (syn->rc == in_rdlock)
     {
@@ -257,7 +255,7 @@ bool shmem_base::wrlock ()
   }
   else if (res == WAIT_TIMEOUT)
   {
-    assert (syn->wc > 1); 
+    assert (syn->wc > 1);
     InterlockedDecrement (&syn->wc);
     in_wrlock--;
   }
@@ -285,22 +283,22 @@ void shmem_base::wrunlock ()
 }
 
 /// Write new data into the SMA
-void shmem_base::put (const void *data)
+void shmem_base::put (const void* data)
 {
-  memcpy (dataptr(), data, size() );
+  memcpy (dataptr (), data, size ());
 }
 
 /// Retrieve current content of SMA
-void shmem_base::get (void *data)
+void shmem_base::get (void* data)
 {
-  memcpy (data, dataptr(), size());
+  memcpy (data, dataptr (), size ());
 }
 
 /*!
   Obtain writer lock and update SMA
   \param pData pointer to data to write in SMA
 */
-bool shmem_base::write (const void *pData)
+bool shmem_base::write (const void* pData)
 {
   assert (syn);
 
@@ -317,7 +315,7 @@ bool shmem_base::write (const void *pData)
   Obtain a reader lock and retrieve SMA content
   \param pData pointer to data
 */
-bool shmem_base::read (void * pData)
+bool shmem_base::read (void* pData)
 {
   assert (syn);
 
@@ -330,5 +328,4 @@ bool shmem_base::read (void * pData)
   return false;
 }
 
-}
-
+} // namespace mlib

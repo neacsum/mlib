@@ -3,7 +3,7 @@
 /*!
   \file mutex.h mutex class definition.
 
-	(c) Mircea Neacsu 1999
+  (c) Mircea Neacsu 1999
 */
 
 #include "syncbase.h"
@@ -19,7 +19,9 @@ public:
 };
 
 /// Signal the mutex
-inline
-void mutex::signal () { ReleaseMutex (handle ()); }
+inline void mutex::signal ()
+{
+  ReleaseMutex (handle ());
+}
 
-};
+}; // namespace mlib

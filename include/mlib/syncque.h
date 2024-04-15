@@ -5,7 +5,7 @@
 */
 #pragma once
 
-#if __has_include ("defs.h")
+#if __has_include("defs.h")
 #include "defs.h"
 #endif
 
@@ -14,8 +14,7 @@
 #include "critsect.h"
 #include "stopwatch.h"
 
-namespace mlib 
-{
+namespace mlib {
 /*!
   A template class that implements a "synchronous queue", in effect a mailbox
   that can store one "message", created by a producer thread, until consumed
@@ -33,9 +32,10 @@ template <class M>
 class sync_queue
 {
 public:
-
-  ///Create a synchronous queue
-  sync_queue () : message(nullptr) {}
+  /// Create a synchronous queue
+  sync_queue ()
+    : message (nullptr)
+  {}
 
   /// Put new element in queue
   void produce (const M& obj)
@@ -68,13 +68,11 @@ public:
   }
 
 private:
-
-  criticalsection update;   ///< critical section protects queue's integrity
-  semaphore prod_sema;      ///< producers' semaphore counts waiting producers
-  semaphore cons_sema;      ///< consumers' semaphore counts waiting consumers
-  const M* message; 
+  criticalsection update; ///< critical section protects queue's integrity
+  semaphore prod_sema;    ///< producers' semaphore counts waiting producers
+  semaphore cons_sema;    ///< consumers' semaphore counts waiting consumers
+  const M* message;
 };
-
 
 /*!
   A template class that implements "asynchronous queues".
@@ -85,12 +83,12 @@ private:
   \note The default size of async_queue is `INFINITE` and it can grow up to the
   available memory.
 */
-template <class M, class C=std::deque<M>> 
+template <class M, class C = std::deque<M>>
 class async_queue : protected std::queue<M, C>
 {
 public:
   /// Crates a queue with the given maximum size
-  async_queue (size_t limit_ = INFINITE) 
+  async_queue (size_t limit_ = INFINITE)
     : limit (limit_)
   {
     if (limit > 0 && limit < INFINITE)
@@ -104,7 +102,7 @@ public:
     if (limit < INFINITE)
     {
       // Bounded queue. See if there is enough space to produce
-      stopwatch t; //need a stopwatch to count cumulated wait time
+      stopwatch t; // need a stopwatch to count cumulated wait time
       if (timeout != INFINITE)
         t.start ();
       update.enter ();
@@ -128,9 +126,9 @@ public:
     else
     {
       // Unbounded queue. Producer will always be successful
-      lock l (update);            //take control of the queue
-      std::queue<M, C>::push (obj); //put a copy of the object at the end
-      cons_sema.signal ();        //and signal the semaphore
+      lock l (update);              // take control of the queue
+      std::queue<M, C>::push (obj); // put a copy of the object at the end
+      cons_sema.signal ();          // and signal the semaphore
     }
     return true;
   }
@@ -150,7 +148,7 @@ public:
         update.leave ();
         t_wait = timeout - (int)t.msecLap ();
         // give up or wait for a producer
-        if (t_wait <= 0 || cons_sema.wait (t_wait) == WAIT_TIMEOUT )
+        if (t_wait <= 0 || cons_sema.wait (t_wait) == WAIT_TIMEOUT)
           return false;
         update.enter ();
       }
@@ -163,24 +161,24 @@ public:
         while (1)
         {
           update.leave ();
-          cons_sema.wait ();        //wait for a producer
+          cons_sema.wait (); // wait for a producer
           update.enter ();
           if (!std::queue<M, C>::empty ())
             break;
         }
       }
     }
-    result = std::queue<M, C>::front ();  //get the message
+    result = std::queue<M, C>::front (); // get the message
     std::queue<M, C>::pop ();
     if (limit != INFINITE)
-      prod_sema.signal ();  //signal producers there is space available
+      prod_sema.signal (); // signal producers there is space available
 
     update.leave ();
     return true;
   }
 
   /// Return _true_ if queue is empty
-  bool empty()
+  bool empty ()
   {
     lock l (update);
     return std::queue<M, C>::empty ();
@@ -193,7 +191,7 @@ public:
     return (std::queue<M, C>.size () == limit);
   }
 
-  /// Return queue size 
+  /// Return queue size
   size_t size ()
   {
     lock l (update);
@@ -202,11 +200,9 @@ public:
 
 protected:
   size_t limit;
-  semaphore prod_sema;      ///< producers' semaphore counts down until queue is full
-  semaphore cons_sema;      ///< consumers' semaphore counts down until queue is empty
-  criticalsection update;   ///< critical section protects queue's integrity
+  semaphore prod_sema;    ///< producers' semaphore counts down until queue is full
+  semaphore cons_sema;    ///< consumers' semaphore counts down until queue is empty
+  criticalsection update; ///< critical section protects queue's integrity
 };
 
-
-
-}  //end namespace
+} // namespace mlib

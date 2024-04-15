@@ -5,7 +5,7 @@
 */
 #pragma once
 
-#if __has_include ("defs.h")
+#if __has_include("defs.h")
 #include "defs.h"
 #endif
 
@@ -30,4 +30,4 @@ private:
   LARGE_INTEGER tbeg, tend;
 };
 
-}
+} // namespace mlib

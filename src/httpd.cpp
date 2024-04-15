@@ -3,9 +3,8 @@
 
   (c) Mircea Neacsu 2007-2017. All rights reserved.
 */
-#include <mlib/httpd.h>
-#include <mlib/trace.h>
-#include <mlib/base64.h>
+#include <mlib/mlib.h>
+#pragma hdrstop
 
 #if __has_include(<utf8/utf8.h>)
 #define MLIB_HAS_UTF8_LIB
@@ -17,66 +16,64 @@
 using namespace std;
 using namespace mlib;
 
-//Defaults
-#define HTTPD_DEFAULT_URI "index.html"          //!< Default URL
-#define HTTPD_SERVER_NAME "MNCS_HTTPD 1.0"      //!< Default server name
+// Defaults
+#define HTTPD_DEFAULT_URI "index.html"     //!< Default URL
+#define HTTPD_SERVER_NAME "MNCS_HTTPD 1.0" //!< Default server name
 
 /// Timeout interval while waiting for a client response
-#define HTTPD_TIMEOUT     30
+#define HTTPD_TIMEOUT 30
 
 /// Max length of a form parameter
 #define MAX_PAR 1024
 
 #ifdef _MSC_VER
-#pragma warning (disable:4996)
+#pragma warning(disable : 4996)
 #endif
 
 namespace mlib {
 
-///Table of known mime types
+/// Table of known mime types
 static struct smime
 {
-  const char *suffix;
-  const char *type;
+  const char* suffix;
+  const char* type;
   bool shtml;
-} knowntypes[] = {
-  { "txt",    "text/plain", false },
-  { "htm",    "text/html", false },
-  { "html",   "text/html", false },
-  { "shtml",  "text/html", true },
-  { "shtm",   "text/html", true },
-  { "css",    "text/css", false },
-  { "xml",    "text/xml", false },
-  { "json",   "text/json", false },
-  { "gif",    "image/gif", false },
-  { "jpg",    "image/jpeg", false },
-  { "jpeg",   "image/jpeg", false },
-  { "png",    "image/png", false },
-  { "ico",    "image/png", false },
-  { "svg",    "image/svg+xml", false },
-  { "bmp",    "image/bmp", false },
-  { "pdf",    "application/pdf", false },
-  { "xslt",   "application/xml", false },
-  { "js",     "application/x-javascript", false },
-  { 0, 0, false }
-};
+} knowntypes[] = {{"txt", "text/plain", false},
+                  {"htm", "text/html", false},
+                  {"html", "text/html", false},
+                  {"shtml", "text/html", true},
+                  {"shtm", "text/html", true},
+                  {"css", "text/css", false},
+                  {"xml", "text/xml", false},
+                  {"json", "text/json", false},
+                  {"gif", "image/gif", false},
+                  {"jpg", "image/jpeg", false},
+                  {"jpeg", "image/jpeg", false},
+                  {"png", "image/png", false},
+                  {"ico", "image/png", false},
+                  {"svg", "image/svg+xml", false},
+                  {"bmp", "image/bmp", false},
+                  {"pdf", "application/pdf", false},
+                  {"xslt", "application/xml", false},
+                  {"js", "application/x-javascript", false},
+                  {0, 0, false}};
 
 static bool file_exists (char* path);
-static int fmt2type (const char *fmt);
+static int fmt2type (const char* fmt);
 
-//TODO - replace with string versions. Make visible and add tests
-static int url_decode (char *buf);
-static int match (const char *str1, const char *str2);
-static int hexbyte (char *bin, const char *str);
-static int hexdigit (char *bin, char c);
+// TODO - replace with string versions. Make visible and add tests
+static int url_decode (char* buf);
+static int match (const char* str1, const char* str2);
+static int hexbyte (char* bin, const char* str);
+static int hexdigit (char* bin, char c);
 
 //-----------------------------------------------------------------------------
 /*!
   \class http_connection
   \ingroup  sockets
 
-  This is the thread created by the httpd server object in response to a new 
-  connection request. 
+  This is the thread created by the httpd server object in response to a new
+  connection request.
 
   After construction, the thread is started automatically by the server and it
   begins listening to its connection socket and process HTTP requests. When the
@@ -92,7 +89,7 @@ static int hexdigit (char *bin, char c);
 
   Most of the public functions are designed for the benefit of user handler
   functions. The handler function is called before sending any type of reply to
-  the HTTP client. 
+  the HTTP client.
 */
 
 /*!
@@ -118,8 +115,7 @@ http_connection::http_connection (sock& socket, httpd& server)
   , content_len (-1)
   , query_parsed (false)
   , body_parsed (false)
-{
-}
+{}
 
 /*!
   Thread run loop.
@@ -132,15 +128,16 @@ void http_connection::run ()
 #if defined(MLIB_TRACE)
   inaddr addr;
   ws->peer (addr);
-  TRACE8 ("http_connection::run - Connection from %s", addr.hostname ().c_str());
+  TRACE8 ("http_connection::run - Connection from %s", addr.hostname ().c_str ());
 #endif
-  try {
+  try
+  {
     while (1)
     {
       bool req_ok = false;
       req_len = 0;
       content_len = -1;
-      char *ptr = request;
+      char* ptr = request;
       bool eol_seen = false;
       iheaders.clear ();
       oheaders.clear ();
@@ -150,22 +147,21 @@ void http_connection::run ()
       delete body;
       body = 0;
 
-      //Accumulate HTTP request
+      // Accumulate HTTP request
       while (req_len < HTTPD_MAX_HEADER)
       {
-        //wait for chars.
+        // wait for chars.
         *ptr = ws.get ();
 
         if (ws.eof ())
-          return;  //client closed 
+          return; // client closed
 
         if (!ws.good ())
         {
 #if defined(MLIB_TRACE)
           inaddr addr;
           ws->peer (addr);
-          TRACE2 ("http_connection::run - timeout peer %s",
-            addr.hostname ().c_str());
+          TRACE2 ("http_connection::run - timeout peer %s", addr.hostname ().c_str ());
 #endif
           respond (408);
           return;
@@ -194,14 +190,14 @@ void http_connection::run ()
 #if defined(MLIB_TRACE)
         inaddr addr;
         ws->peer (addr);
-        TRACE2 ("http_connection::run - Request too long (%d) peer %s",
-          req_len, addr.hostname ().c_str());
+        TRACE2 ("http_connection::run - Request too long (%d) peer %s", req_len,
+                addr.hostname ().c_str ());
 #endif
         respond (413);
         return;
       }
 
-      *ptr = 0;   //NULL terminated
+      *ptr = 0; // NULL terminated
 
       response_sent = false;
       if (req_ok && parse_url () && parse_headers ())
@@ -209,11 +205,10 @@ void http_connection::run ()
         int auth_stat = do_auth ();
         if (auth_stat > 0)
         {
-          if (!strcmpi (get_method (), "POST")
-           || !strcmpi (get_method (), "PUT"))
+          if (!strcmpi (get_method (), "POST") || !strcmpi (get_method (), "PUT"))
           {
-            //read request body
-            const char *cl = get_ihdr ("Content-Length");
+            // read request body
+            const char* cl = get_ihdr ("Content-Length");
             if (cl)
               content_len = atoi (cl);
             if (content_len > 0)
@@ -230,25 +225,26 @@ void http_connection::run ()
       }
       else
       {
-        respond (400);  //malformed request
+        respond (400); // malformed request
         return;
       }
 
-      //should close connection?
-      const char *ph;
-      if (!get_ohdr ("Content-Length")  //could not generate content length (shtml pages)
-        || ((ph = get_ihdr ("Connection")) && !strcmpi (ph, "Close"))  //client wants to close
-        || ((ph = get_ohdr ("Connection")) && !strcmpi (ph, "Close"))) //server wants to close
+      // should close connection?
+      const char* ph;
+      if (!get_ohdr ("Content-Length") // could not generate content length (shtml pages)
+          || ((ph = get_ihdr ("Connection")) && !strcmpi (ph, "Close"))  // client wants to close
+          || ((ph = get_ohdr ("Connection")) && !strcmpi (ph, "Close"))) // server wants to close
         return;
       ws.flush ();
     }
   }
-  catch (erc &err) {
+  catch (erc& err)
+  {
     respond (500);
     TRACE ("http_connection errcode=%d\n", err.code ());
   }
-  
-  //all cleanup is done by term function
+
+  // all cleanup is done by term function
 }
 
 void http_connection::term ()
@@ -256,7 +252,7 @@ void http_connection::term ()
 #if defined(MLIB_TRACE)
   inaddr addr;
   ws->peer (addr);
-  TRACE8 ("http_connection::term - Closed connection to %s", addr.hostname ().c_str());
+  TRACE8 ("http_connection::term - Closed connection to %s", addr.hostname ().c_str ());
 #endif
   parent.close_connection (*ws.rdbuf ());
   thread::term ();
@@ -266,7 +262,7 @@ void http_connection::term ()
   Check if uri is covered by a server realm and if user has credentials for
   said realm.
 
-  \return 
+  \return
     0   = Missing authorization (401)
    -1   = Bad authorization (501)
     1   = all good
@@ -285,12 +281,12 @@ int http_connection::do_auth ()
     return 0;
   }
 
-  const char *ptr = ah->second.c_str();
+  const char* ptr = ah->second.c_str ();
   if (strnicmp (ptr, "Basic ", 6))
   {
-    //Other auth methods
+    // Other auth methods
     TRACE8 ("Authorization: %s", ptr);
-    respond (501); //not implemented
+    respond (501); // not implemented
     return -1;
   }
 
@@ -298,14 +294,14 @@ int http_connection::do_auth ()
   char buf[256];
   size_t outsz = base64dec (ptr, buf);
   buf[outsz] = 0;
-  char *pwd = strchr (buf, ':');
+  char* pwd = strchr (buf, ':');
   if (pwd)
     *pwd++ = 0;
   else
     pwd = buf;
-  if (!parent.authenticate (realm.c_str(), buf, pwd))
+  if (!parent.authenticate (realm.c_str (), buf, pwd))
   {
-    //invalid credential
+    // invalid credential
     TRACE2 ("http_connection: Invalid credentials user %s", buf);
     serve401 (realm.c_str ());
     return 0;
@@ -314,9 +310,10 @@ int http_connection::do_auth ()
   return 1;
 }
 
-void http_connection::serve401 (const char *realm)
+void http_connection::serve401 (const char* realm)
 {
-  static const char* std401 = "<HTML><HEAD><TITLE>401 Unauthorized</TITLE></HEAD>"
+  static const char* std401 =
+    "<HTML><HEAD><TITLE>401 Unauthorized</TITLE></HEAD>"
     "<BODY><H4>401 Unauthorized!</H4>Authorization required.</BODY></HTML>";
   char len[10];
   char challenge[256];
@@ -326,7 +323,7 @@ void http_connection::serve401 (const char *realm)
 
   add_ohdr ("WWW-Authenticate", challenge);
 
-  sprintf(len, "%d", (int)strlen(std401));
+  sprintf (len, "%d", (int)strlen (std401));
   add_ohdr ("Content-Length", len);
   add_ohdr ("Content-Type", "text/html");
   respond (401);
@@ -338,32 +335,32 @@ void http_connection::serve401 (const char *realm)
 */
 void http_connection::process_valid_request ()
 {
-  //check first if there is any handler registered for this uri
+  // check first if there is any handler registered for this uri
   if (parent.invoke_handler (uri, *this))
   {
     TRACE9 ("handler done");
     return;
   }
 
-  //set timeout to whatever client wants
-  const char *ka;
+  // set timeout to whatever client wants
+  const char* ka;
   if (ka = get_ihdr ("Keep-Alive"))
   {
-    int kaval = min (atoi(ka), 600);
+    int kaval = min (atoi (ka), 600);
     ws->recvtimeout (kaval);
   }
 
-  //try to see if we can serve a file
+  // try to see if we can serve a file
   char fullpath[_MAX_PATH];
   if (!parent.find_alias (uri, fullpath))
   {
-    strcpy (fullpath, parent.docroot());
+    strcpy (fullpath, parent.docroot ());
     strcat (fullpath, uri);
   }
 
-  if (fullpath[strlen(fullpath)-1] == '/' || fullpath[strlen(fullpath)-1] == '\\')
+  if (fullpath[strlen (fullpath) - 1] == '/' || fullpath[strlen (fullpath) - 1] == '\\')
     strcat (fullpath, parent.default_uri ());
-  if (file_exists(fullpath))
+  if (file_exists (fullpath))
   {
     bool shtml = false;
     int ret;
@@ -390,14 +387,14 @@ void http_connection::process_valid_request ()
 void http_connection::serve404 (const char* text)
 {
   static const char* std404 = "<html><head><title>Page not found</title></head>"
-    "<body><h1>Oops! 404 - File not found</h1>"
-    "<p>The page you requested was not found.</body></html>";
+                              "<body><h1>Oops! 404 - File not found</h1>"
+                              "<p>The page you requested was not found.</body></html>";
 
   char len[10];
   if (!text)
     text = std404;
 
-  sprintf(len, "%d", (int)strlen(text));
+  sprintf (len, "%d", (int)strlen (text));
   add_ohdr ("Content-Length", len);
   add_ohdr ("Content-Type", "text/html");
   respond (404);
@@ -406,7 +403,7 @@ void http_connection::serve404 (const char* text)
 
 bool http_connection::parse_headers ()
 {
-  char *ptr = headers;
+  char* ptr = headers;
   char *val, *next;
   while (ptr && *ptr)
   {
@@ -417,12 +414,12 @@ bool http_connection::parse_headers ()
         val++;
       if (next = strchr (val, '\n'))
         *next++ = 0;
-      string key(ptr);
+      string key (ptr);
       string value;
       if (iheaders.find (key) != iheaders.end ())
-        value = iheaders[key] + ',' + string(val);
+        value = iheaders[key] + ',' + string (val);
       else
-        value = string(val);
+        value = string (val);
       iheaders[key] = value;
       ptr = next;
     }
@@ -434,7 +431,7 @@ bool http_connection::parse_headers ()
 
 bool http_connection::parse_body ()
 {
-  //check if we have what to parse
+  // check if we have what to parse
   if (!body)
     return false;
 
@@ -446,7 +443,7 @@ bool http_connection::parse_body ()
     body_parsed = true;
     return true;
   }
-  //TODO - add parsing of other content types
+  // TODO - add parsing of other content types
   return false;
 }
 
@@ -454,7 +451,7 @@ bool http_connection::parse_body ()
 void http_connection::parse_query ()
 {
   if (query_parsed)
-    return; //don't repeat parsing
+    return; // don't repeat parsing
   parse_urlparams (query, qparams);
   query_parsed = true;
 }
@@ -529,16 +526,16 @@ bool http_connection::has_bparam (const char* key)
   \return 0 if successful or one of the following values:
   \retval -1 socket write failure
   \retval -2 file open error
-  
+
   As we don't know the size of the response, the file is sent without a
   "Content-Length" header.
 */
 int http_connection::serve_shtml (const std::string& full_path)
 {
 #ifdef MLIB_HAS_UTF8_LIB
-  FILE *fn = utf8::fopen (full_path, "rS");
+  FILE* fn = utf8::fopen (full_path, "rS");
 #else
-  FILE* fn = fopen (full_path.c_str(), "rS");
+  FILE* fn = fopen (full_path.c_str (), "rS");
 #endif
   if (fn == NULL)
     return -2;
@@ -547,7 +544,7 @@ int http_connection::serve_shtml (const std::string& full_path)
   if (!strcmpi (get_method (), "HEAD"))
   {
     fclose (fn);
-    return 0; //don't send body in response to a HEAD request
+    return 0; // don't send body in response to a HEAD request
   }
   int parser_state = 0;
   char ssi_buf[256];
@@ -557,38 +554,38 @@ int http_connection::serve_shtml (const std::string& full_path)
   static char ssi_end[] = "-->";
   while (!feof (fn))
   {
-    char c = fgetc(fn);
+    char c = fgetc (fn);
     if (feof (fn))
       break;
     if (!ws.good ())
       return -1;
     switch (parser_state)
     {
-    case 0:     //search for SSI intro sequence
+    case 0: // search for SSI intro sequence
       if (c == ssi_intro[ssi_seq])
       {
         ssi_seq++;
         if (!ssi_intro[ssi_seq])
         {
           parser_state = 1;
-          ssi_seq = 0;    //reuse counter for end sequence
+          ssi_seq = 0; // reuse counter for end sequence
           ssi_len = 0;
         }
       }
       else
       {
-        //dump any accumulated sequence
-        for (int i=0; i<ssi_seq; i++)
+        // dump any accumulated sequence
+        for (int i = 0; i < ssi_seq; i++)
           ws << ssi_intro[i];
         ssi_seq = 0;
         ws << c;
       }
       break;
 
-    case 1:     //accumulate chars between SSI markers
+    case 1: // accumulate chars between SSI markers
       if (c == ssi_end[ssi_seq])
       {
-        //may reach end of request
+        // may reach end of request
         ssi_seq++;
         if (!ssi_end[ssi_seq])
         {
@@ -601,14 +598,14 @@ int http_connection::serve_shtml (const std::string& full_path)
       }
       else
       {
-        //SSI request continues
-        for (int i=0; i<ssi_seq; i++)
+        // SSI request continues
+        for (int i = 0; i < ssi_seq; i++)
         {
-          if (ssi_len < sizeof(ssi_buf)-1)
+          if (ssi_len < sizeof (ssi_buf) - 1)
             ssi_buf[ssi_len++] = ssi_end[i];
           else
           {
-            //malformed SSI request
+            // malformed SSI request
             ssi_buf[ssi_len] = 0;
             ws << ssi_intro;
             ws << ssi_buf;
@@ -623,9 +620,9 @@ int http_connection::serve_shtml (const std::string& full_path)
         if (parser_state == 1)
         {
           ssi_buf[ssi_len++] = c;
-          if (ssi_len == sizeof(ssi_buf)-1)
+          if (ssi_len == sizeof (ssi_buf) - 1)
           {
-            //malformed SSI request
+            // malformed SSI request
             ssi_buf[ssi_len] = 0;
             ws << ssi_intro;
             ws << ssi_buf;
@@ -642,7 +639,7 @@ int http_connection::serve_shtml (const std::string& full_path)
   return 0;
 }
 
-void http_connection::process_ssi (const char *req)
+void http_connection::process_ssi (const char* req)
 {
   while (*req && *req == ' ')
     req++;
@@ -653,14 +650,14 @@ void http_connection::process_ssi (const char *req)
     char buf[256];
     while (req)
     {
-      req = strstr(req, "var=\"");
+      req = strstr (req, "var=\"");
       if (req)
       {
         req += 5;
-        int i=0;
+        int i = 0;
         while (*req && *req != '\"')
           buf[i++] = *req++;
-        buf[i] =0;
+        buf[i] = 0;
         if (*req)
           ws << parent.get_var (buf);
       }
@@ -672,18 +669,18 @@ void http_connection::process_ssi (const char *req)
   Send the content of a buffer.
 
   \param  src_buff buffer to send
-  \param  sz buffer length 
+  \param  sz buffer length
 
   \return 0 if successful or one of the following codes:
   \retval HTTPD_ERR_WRITE  - socket write failure
 
   The buffer is preceded by "Content-Length" header.
 */
-int http_connection::serve_buffer(const BYTE *src_buff, size_t sz)
+int http_connection::serve_buffer (const BYTE* src_buff, size_t sz)
 {
   int ret = HTTPD_OK;
 
-  //find file size
+  // find file size
   unsigned int len;
   len = (unsigned int)sz;
   TRACE8 ("http_connection::serve_buffer - size %d", len);
@@ -691,11 +688,11 @@ int http_connection::serve_buffer(const BYTE *src_buff, size_t sz)
   sprintf (flen, "%d", len);
   add_ohdr ("Content-Length", flen);
   respond (200);
-  const BYTE *buf = src_buff;
+  const BYTE* buf = src_buff;
   unsigned int cnt = 0;
-  while (cnt<len)
+  while (cnt < len)
   {
-    int out = cnt+1024<len?1024:len-cnt;
+    int out = cnt + 1024 < len ? 1024 : len - cnt;
     ws.write ((const char*)buf, out);
     if (!ws.good ())
     {
@@ -703,8 +700,8 @@ int http_connection::serve_buffer(const BYTE *src_buff, size_t sz)
       ret = HTTPD_ERR_WRITE;
       break;
     }
-    cnt+=out;
-    buf+=out;
+    cnt += out;
+    buf += out;
   }
 
   return ret;
@@ -741,21 +738,21 @@ int http_connection::serve_file (const std::string& full_path)
 {
   int ret = HTTPD_OK;
 #ifdef MLIB_HAS_UTF8_LIB
-  FILE *fin = utf8::fopen (full_path, "rbS");
+  FILE* fin = utf8::fopen (full_path, "rbS");
 #else
-  FILE* fin = fopen (full_path.c_str(), "rbS");
+  FILE* fin = fopen (full_path.c_str (), "rbS");
 #endif
   if (!fin)
   {
-    TRACE2 ("File %s - open error", full_path.c_str());
+    TRACE2 ("File %s - open error", full_path.c_str ());
     return HTTPD_ERR_FOPEN;
   }
-  //find file size
+  // find file size
   unsigned int len;
   fseek (fin, 0, SEEK_END);
   len = ftell (fin);
   fseek (fin, 0, SEEK_SET);
-  TRACE8 ("http_connection::serve_file - File %s size %d", full_path.c_str(), len);
+  TRACE8 ("http_connection::serve_file - File %s size %d", full_path.c_str (), len);
   char flen[30];
   sprintf (flen, "%d", len);
   add_ohdr ("Content-Length", flen);
@@ -786,23 +783,23 @@ int http_connection::serve_file (const std::string& full_path)
   return ret;
 }
 
-bool http_connection::parse_url()
+bool http_connection::parse_url ()
 {
-  //Request-Line   = Method SP Request-URI SP HTTP-Version CRLF
-  char *ptr = request;
+  // Request-Line   = Method SP Request-URI SP HTTP-Version CRLF
+  char* ptr = request;
 
-  //method
+  // method
   while (*ptr != ' ' && *ptr != '\n' && *ptr)
     ptr++;
   if (*ptr != ' ')
     return false;
   *ptr++ = 0;
 
-  //SP
+  // SP
   while (*ptr == ' ')
     ptr++;
 
-  //Request-URI
+  // Request-URI
   uri = ptr;
   while (*ptr != ' ' && *ptr != '\n' && *ptr)
     ptr++;
@@ -810,11 +807,11 @@ bool http_connection::parse_url()
     return false;
   *ptr++ = 0;
 
-  //SP
+  // SP
   while (*ptr == ' ')
     ptr++;
 
-  //HTTP-Version
+  // HTTP-Version
   http_version = ptr;
   while (*ptr != '\n' && *ptr)
     ptr++;
@@ -822,10 +819,10 @@ bool http_connection::parse_url()
     return false;
   *ptr++ = 0;
 
-  //headers start on next line
+  // headers start on next line
   headers = ptr;
 
-  //parse URI
+  // parse URI
   if (*uri == '/')
     uri++;
   ptr = uri;
@@ -841,7 +838,7 @@ bool http_connection::parse_url()
     else
       ptr++;
   }
-  
+
   return true;
 }
 
@@ -851,10 +848,10 @@ bool http_connection::parse_url()
   \param  hdr   header name
   \param  value header value
 
-  To have any effect, this function should be called before calling the 
+  To have any effect, this function should be called before calling the
   response() (or serve_...) function as all headers are sent at that time.
 */
-void http_connection::add_ohdr (const char *hdr, const char *value)
+void http_connection::add_ohdr (const char* hdr, const char* value)
 {
   oheaders[hdr] = value;
 }
@@ -863,25 +860,25 @@ void http_connection::add_ohdr (const char *hdr, const char *value)
   Generate a HTTP redirect response to a new uri.
 
   \param  uri   redirected uri
-  \param  code  redirect code 
+  \param  code  redirect code
 */
-void http_connection::redirect (const char *uri, unsigned int code)
+void http_connection::redirect (const char* uri, unsigned int code)
 {
   if (!uri || !strlen (uri))
     uri = "/";
 
   add_ohdr ("Location", uri);
   respond (code);
-  if (code == 303 && strcmpi ("HEAD", get_method()))
+  if (code == 303 && strcmpi ("HEAD", get_method ()))
   {
     /* RFC7231 (https://tools.ietf.org/html/rfc7231#section-6.4.4) says:
      Except for responses to a HEAD request, the representation of a 303
      response ought to contain a short hypertext note with a hyperlink to
      the same URI reference provided in the Location header field
      */
-    ws << "<html><head><title>Document has moved</title></head>\r\n" \
-      "<body>Document has moved <a href=\"" << uri << "\">here</a></body></html>"
-      << endl;
+    ws << "<html><head><title>Document has moved</title></head>\r\n"
+          "<body>Document has moved <a href=\""
+       << uri << "\">here</a></body></html>" << endl;
   }
 }
 
@@ -902,48 +899,67 @@ void http_connection::redirect (const char *uri, unsigned int code)
 
   In subsequent calls it sends only connection headers (to support multi-part responses)
 */
-void http_connection::respond (unsigned int code, const char *reason)
+void http_connection::respond (unsigned int code, const char* reason)
 {
-  static struct {
+  static struct
+  {
     int code;
-    const char *text;
-  } respcodes[] = {
-    {100, "Continue"},                      {101, "Switching Protocols"},
-    {200, "OK"},                            {201, "Created"},
-    {202, "Accepted"},                      {203, "Non-Authoritative Information"},
-    {204, "No Content"},                    {205, "Reset Content"},
-    {206, "Partial Content"},               {300, "Multiple Choices"},
-    {301, "Moved Permanently"},             {302, "Found"},
-    {303, "See Other"},                     {304, "Not Modified"},
-    {305, "Use Proxy"},                     {307, "Temporary Redirect"},
-    {400, "Bad Request"},                   {401, "Unauthorized"},
-    {403, "Forbidden"},                     {404, "Not Found"},
-    {405, "Method Not Allowed"},            {406, "Not Acceptable"},
-    {407, "Proxy Authentication Required"}, {408, "Request Time-out"},
-    {409, "Conflict"},                      {410, "Gone"},
-    {411, "Length Required"},               {412, "Precondition Failed"},
-    {413, "Request Entity Too Large"},      {414, "Request-URI Too Large"},
-    {415, "Unsupported Media Type"},        {416, "Requested range not satisfiable"},
-    {417, "Expectation Failed"},            {500, "Internal Server Error"},
-    {501, "Not Implemented"},               {502, "Bad Gateway"},
-    {503, "Service Unavailable"},           {504, "Gateway Time-out"},
-    {505, "HTTP Version not supported"},    {0,0}
-  };
+    const char* text;
+  } respcodes[] = {{100, "Continue"},
+                   {101, "Switching Protocols"},
+                   {200, "OK"},
+                   {201, "Created"},
+                   {202, "Accepted"},
+                   {203, "Non-Authoritative Information"},
+                   {204, "No Content"},
+                   {205, "Reset Content"},
+                   {206, "Partial Content"},
+                   {300, "Multiple Choices"},
+                   {301, "Moved Permanently"},
+                   {302, "Found"},
+                   {303, "See Other"},
+                   {304, "Not Modified"},
+                   {305, "Use Proxy"},
+                   {307, "Temporary Redirect"},
+                   {400, "Bad Request"},
+                   {401, "Unauthorized"},
+                   {403, "Forbidden"},
+                   {404, "Not Found"},
+                   {405, "Method Not Allowed"},
+                   {406, "Not Acceptable"},
+                   {407, "Proxy Authentication Required"},
+                   {408, "Request Time-out"},
+                   {409, "Conflict"},
+                   {410, "Gone"},
+                   {411, "Length Required"},
+                   {412, "Precondition Failed"},
+                   {413, "Request Entity Too Large"},
+                   {414, "Request-URI Too Large"},
+                   {415, "Unsupported Media Type"},
+                   {416, "Requested range not satisfiable"},
+                   {417, "Expectation Failed"},
+                   {500, "Internal Server Error"},
+                   {501, "Not Implemented"},
+                   {502, "Bad Gateway"},
+                   {503, "Service Unavailable"},
+                   {504, "Gateway Time-out"},
+                   {505, "HTTP Version not supported"},
+                   {0, 0}};
 
   str_pairs::iterator idx;
-  if(code!=200)
-     TRACE ("response %d\n", code);
+  if (code != 200)
+    TRACE ("response %d\n", code);
   if (!response_sent)
   {
     int ic = 0;
     while (respcodes[ic].code && respcodes[ic].code != code)
       ic++;
     if (!respcodes[ic].code)
-      return;   //unknown code
+      return; // unknown code
 
-    ws << "HTTP/1.1 " << code << " " << (reason?reason:respcodes[ic].text) << "\r\n";
+    ws << "HTTP/1.1 " << code << " " << (reason ? reason : respcodes[ic].text) << "\r\n";
 
-    //output server headers
+    // output server headers
     lock l (parent.hdr_lock);
     idx = parent.out_headers.begin ();
     while (idx != parent.out_headers.end ())
@@ -953,10 +969,10 @@ void http_connection::respond (unsigned int code, const char *reason)
     }
     response_sent = true;
   }
-  //followed by our headers
+  // followed by our headers
   TRACE9 ("Sending connection headers");
-  idx = oheaders.begin();
-  while (idx != oheaders.end())
+  idx = oheaders.begin ();
+  while (idx != oheaders.end ())
   {
     ws << idx->first << ": " << idx->second << "\r\n";
     idx++;
@@ -967,17 +983,17 @@ void http_connection::respond (unsigned int code, const char *reason)
 
 /*!
   Returns the value of a request header.
-  
+
   \param  hdr   header name
   \return header value or 0 if the request does not have this header
 */
-const char *http_connection::get_ihdr(const char *hdr) const
+const char* http_connection::get_ihdr (const char* hdr) const
 {
   char tmp[256];
   strcpy (tmp, hdr);
-  auto idx = iheaders.find (_strlwr(tmp));
+  auto idx = iheaders.find (_strlwr (tmp));
   if (idx != iheaders.end ())
-    return idx->second.c_str();
+    return idx->second.c_str ();
 
   return 0;
 }
@@ -990,13 +1006,13 @@ const char *http_connection::get_ihdr(const char *hdr) const
 
   \return header field value or 0 if there is no such header defined.
 */
-const char *http_connection::get_ohdr(const char *hdr) const
+const char* http_connection::get_ohdr (const char* hdr) const
 {
   lock l (parent.hdr_lock);
   auto idx = parent.out_headers.find (hdr);
   if (idx != parent.out_headers.end ())
     return idx->second.c_str ();
-  
+
   auto idx1 = oheaders.find (hdr);
   if (idx1 != oheaders.end ())
     return idx1->second.c_str ();
@@ -1009,16 +1025,16 @@ const char *http_connection::get_ohdr(const char *hdr) const
   \param part_type value of the 'Content-Type' header
   \param bound part boundary string
 */
-void http_connection::respond_part (const char *part_type, const char *bound)
+void http_connection::respond_part (const char* part_type, const char* bound)
 {
   part_boundary = bound;
-  string mpart(part_type);
+  string mpart (part_type);
   mpart += ";boundary=";
   mpart += part_boundary;
-  add_ohdr ("Content-Type", mpart.c_str());
+  add_ohdr ("Content-Type", mpart.c_str ());
   respond (200);
   ws << "--" << part_boundary << "\r\n";
-  ws.flush();
+  ws.flush ();
 }
 
 /*!
@@ -1029,8 +1045,8 @@ void http_connection::respond_part (const char *part_type, const char *bound)
 */
 void http_connection::respond_next (bool last)
 {
-  if (part_boundary.empty())
-    return; //misuse
+  if (part_boundary.empty ())
+    return; // misuse
   ws << "\r\n--" << part_boundary;
   if (last)
   {
@@ -1069,7 +1085,7 @@ void http_connection::respond_next (bool last)
 
   - document root is current folder (".")
   - default url is HTTPD_DEFAULT
-  - server name is HTTPD_SERVER_NAME  
+  - server name is HTTPD_SERVER_NAME
 */
 httpd::httpd (unsigned short port, unsigned int maxconn)
   : tcpserver (port, HTTPD_SERVER_NAME, maxconn)
@@ -1087,9 +1103,8 @@ httpd::httpd (unsigned short port, unsigned int maxconn)
 /*!
   Destructor
 */
-httpd::~httpd()
-{
-}
+httpd::~httpd ()
+{}
 
 /*!
   Change server name.
@@ -1097,7 +1112,7 @@ httpd::~httpd()
 
   This string is returned in the "Server" HTTP header.
 */
-void httpd::name (const char *nam)
+void httpd::name (const char* nam)
 {
   if (nam)
     add_ohdr ("Server", nam);
@@ -1112,7 +1127,7 @@ void httpd::name (const char *nam)
   Derived classes can override this function to return objects derived from
   http_connection class.
 */
-http_connection* httpd::make_thread(sock& connection)
+http_connection* httpd::make_thread (sock& connection)
 {
   return new http_connection (connection, *this);
 }
@@ -1125,17 +1140,17 @@ http_connection* httpd::make_thread(sock& connection)
   Server response headers are always sent as part of the HTTP answer.
   In addition each connection object can add it's own headers.
 */
-void httpd::add_ohdr (const char *hdr, const char *value)
+void httpd::add_ohdr (const char* hdr, const char* value)
 {
   lock l (hdr_lock);
-  out_headers [hdr] = value;
+  out_headers[hdr] = value;
 }
 
 /*!
   Remove a server response header.
   \param hdr    Header name
 */
-void httpd::remove_ohdr (const char *hdr)
+void httpd::remove_ohdr (const char* hdr)
 {
   lock l (hdr_lock);
   auto idx = out_headers.find (hdr);
@@ -1155,7 +1170,7 @@ void httpd::remove_ohdr (const char *hdr)
 */
 void httpd::add_handler (const char* uri, uri_handler func, void* info)
 {
-  handle_info hi = { func, info };
+  handle_info hi = {func, info};
   handlers.emplace (string (uri), hi);
 }
 
@@ -1165,13 +1180,13 @@ void httpd::add_handler (const char* uri, uri_handler func, void* info)
   \param  type  MIME type
   \param  shtml true if SSI processing should be enabled for this file type
 */
-void httpd::add_mime_type (const char *ext, const char *type, bool shtml)
+void httpd::add_mime_type (const char* ext, const char* type, bool shtml)
 {
   mimetype t;
   deque<mimetype>::iterator ptr = types.begin ();
   while (ptr != types.end ())
   {
-    if ( !strcmpi (ptr->suffix.c_str(), ext))
+    if (!strcmpi (ptr->suffix.c_str (), ext))
     {
       ptr->type = type;
       ptr->shtml = shtml;
@@ -1191,13 +1206,13 @@ void httpd::add_mime_type (const char *ext, const char *type, bool shtml)
   Remove a file type from the MIME type table
   \param ext    filename extension
 */
-void httpd::delete_mime_type (const char *ext)
+void httpd::delete_mime_type (const char* ext)
 {
   deque<mimetype>::iterator ptr = types.begin ();
-  ptr++;  //the first (default value) cannot be deleted
+  ptr++; // the first (default value) cannot be deleted
   while (ptr != types.end ())
   {
-    if ( !strcmpi (ptr->suffix.c_str(), ext))
+    if (!strcmpi (ptr->suffix.c_str (), ext))
     {
       types.erase (ptr);
       return;
@@ -1212,7 +1227,7 @@ void httpd::delete_mime_type (const char *ext)
   \param realm    protection realm
   \param uri      starting path
 */
-void httpd::add_realm (const char *realm, const char *uri)
+void httpd::add_realm (const char* realm, const char* uri)
 {
   if (*uri == '/')
     uri++;
@@ -1226,47 +1241,49 @@ void httpd::add_realm (const char *realm, const char *uri)
   \param pwd user password
   \return _true_ if successful or _false_ if realm doesn't exist
 */
-bool httpd::add_user (const char *realm, const char *username, const char *pwd)
+bool httpd::add_user (const char* realm, const char* username, const char* pwd)
 {
   if (realms.find (realm) == realms.end ())
-    return false;   //no such realm
+    return false; // no such realm
   user inf;
   inf.name = username;
   inf.pwd = pwd;
   multimap<string, user>::iterator it = credentials.find (realm);
-  if (it == credentials.end())
+  if (it == credentials.end ())
   {
-    pair<string, user> p(realm, inf);
+    pair<string, user> p (realm, inf);
     credentials.insert (p);
   }
   else
   {
-    while (it != credentials.end() && it->first == realm)
+    while (it != credentials.end () && it->first == realm)
     {
       if (it->second.name == username)
       {
-        it->second.pwd = pwd; //change password
+        it->second.pwd = pwd; // change password
         return true;
       }
       it++;
     }
-    pair<string, user> p(realm, inf);
+    pair<string, user> p (realm, inf);
     credentials.insert (p);
   }
 
   return true;
 }
 
-bool httpd::remove_user(const char *realm, const char *username)
+bool httpd::remove_user (const char* realm, const char* username)
 {
-  if (realms.find(realm) == realms.end())
-    return false;   //no such realm
+  if (realms.find (realm) == realms.end ())
+    return false; // no such realm
 
-  multimap<string, user>::iterator it = credentials.find(realm);
-  
-  while (it != credentials.end() && it->first == realm) {
-    if (it->second.name == username) {
-      credentials.erase(it);	// remove user
+  multimap<string, user>::iterator it = credentials.find (realm);
+
+  while (it != credentials.end () && it->first == realm)
+  {
+    if (it->second.name == username)
+    {
+      credentials.erase (it); // remove user
       return true;
     }
     it++;
@@ -1283,7 +1300,7 @@ bool httpd::remove_user(const char *realm, const char *username)
 
 */
 
-bool httpd::is_protected (const char *uri, string& realm)
+bool httpd::is_protected (const char* uri, string& realm)
 {
   if (*uri == '/')
     uri++;
@@ -1291,7 +1308,7 @@ bool httpd::is_protected (const char *uri, string& realm)
   auto it = realms.begin ();
   while (it != realms.end ())
   {
-    int n = match (uri, it->second.c_str());
+    int n = match (uri, it->second.c_str ());
     if (n == it->second.length () && n > len)
     {
       len = n;
@@ -1306,11 +1323,11 @@ bool httpd::is_protected (const char *uri, string& realm)
   Verify user credentials for a realm.
   \return     true if user is authorized for the realm
 */
-bool httpd::authenticate (const char *realm, const char *user, const char *pwd)
+bool httpd::authenticate (const char* realm, const char* user, const char* pwd)
 {
   auto it = credentials.find (realm);
   if (it == credentials.end ())
-    return false;   //no such realm
+    return false; // no such realm
   while (it != credentials.end () && it->first == realm)
   {
     if (it->second.name == user && it->second.pwd == pwd)
@@ -1322,20 +1339,20 @@ bool httpd::authenticate (const char *realm, const char *user, const char *pwd)
 
 /*!
   Invoke a user defined URI handler
-  \param  uri    URI that triggered the handler invocation 
+  \param  uri    URI that triggered the handler invocation
   \param  client connection thread
 
   \return the result of calling the user handler or 0 if there is no handler
           set for the URI.
 
 */
-int httpd::invoke_handler (const char *uri, http_connection& client)
+int httpd::invoke_handler (const char* uri, http_connection& client)
 {
   int ret = 0;
   auto idx = handlers.find (uri);
-  if (idx != handlers.end())
+  if (idx != handlers.end ())
   {
-    lock l(*idx->second.in_use);
+    lock l (*idx->second.in_use);
     TRACE9 ("Invoking handler for %s", uri);
     ret = idx->second.h (uri, client, idx->second.nfo);
     TRACE9 ("Handler done (%d)", ret);
@@ -1349,7 +1366,7 @@ int httpd::invoke_handler (const char *uri, http_connection& client)
   \param  uri     name in URI space
   \param  path    mapped local file path
 */
-void httpd::add_alias (const char *uri, const char *path)
+void httpd::add_alias (const char* uri, const char* path)
 {
   aliases[uri] = path;
 }
@@ -1364,19 +1381,19 @@ void httpd::add_alias (const char *uri, const char *path)
   After processing the alias table, any part of the original URI that was not
   mapped is appended to the resulting path. For instance if the alias table
   contains an entry mapping "doc" to "documentation" and docroot is set as
-  "c:\local_folder\", an URI like "/doc/project1/filename.html" will be mapped to 
+  "c:\local_folder\", an URI like "/doc/project1/filename.html" will be mapped to
   "c:\local_folder\documentation\project1\filename.html".
 */
-bool httpd::find_alias (const char *uri, char *path)
+bool httpd::find_alias (const char* uri, char* path)
 {
-  auto idx = aliases.begin();
+  auto idx = aliases.begin ();
   while (idx != aliases.end ())
   {
-    size_t len = idx->first.length();
+    size_t len = idx->first.length ();
     if (!strncmp (idx->first.c_str (), uri, len) && uri[len] == '/')
     {
-      strcpy (path, idx->second.c_str());
-      strcat (path, uri+len);
+      strcpy (path, idx->second.c_str ());
+      strcat (path, uri + len);
       return true;
     }
     idx++;
@@ -1397,10 +1414,10 @@ bool httpd::find_alias (const char *uri, char *path)
   \endverbatim
 
   When the page is served the SSI construct is replaced by the current value of
-  the named variable, eventually multiplied by \a multiplier factor and formatted 
+  the named variable, eventually multiplied by \a multiplier factor and formatted
   as text using the \a fmt string.
 */
-void httpd::add_var(const char *name, const char *fmt, void *addr, double multiplier)
+void httpd::add_var (const char* name, const char* fmt, void* addr, double multiplier)
 {
   struct var_info vi = {fmt, addr, multiplier};
   lock l (varlock);
@@ -1411,28 +1428,42 @@ void httpd::add_var(const char *name, const char *fmt, void *addr, double multip
   Return the current string representation of a variable.
   \param name variable name
 */
-string httpd::get_var(const char *name)
+string httpd::get_var (const char* name)
 {
   lock l (varlock);
-  if (variables.find (name) != variables.end())
+  if (variables.find (name) != variables.end ())
   {
     struct var_info vi = variables[name];
     char buf[256];
-    int vt = fmt2type (vi.fmt.c_str());
+    int vt = fmt2type (vi.fmt.c_str ());
 
     switch (vt)
     {
-    case 0:   sprintf (buf, vi.fmt.c_str(), vi.addr); break;
-    case 1:   sprintf (buf, vi.fmt.c_str(), *(int*)vi.addr); break;
-    case 2:   sprintf (buf, vi.fmt.c_str(), *(long*)vi.addr); break;
-    case 3:   sprintf (buf, vi.fmt.c_str(), (vi.multiplier == 0.)?*(float*)vi.addr :(*(float*)vi.addr * (float)vi.multiplier) ); break;
-    case 4:   sprintf (buf, vi.fmt.c_str(), (vi.multiplier == 0.)?*(double*)vi.addr:(*(double*)vi.addr * vi.multiplier) ); break;
-    default:  buf[0] = 0;
+    case 0:
+      sprintf (buf, vi.fmt.c_str (), vi.addr);
+      break;
+    case 1:
+      sprintf (buf, vi.fmt.c_str (), *(int*)vi.addr);
+      break;
+    case 2:
+      sprintf (buf, vi.fmt.c_str (), *(long*)vi.addr);
+      break;
+    case 3:
+      sprintf (buf, vi.fmt.c_str (),
+               (vi.multiplier == 0.) ? *(float*)vi.addr
+                                     : (*(float*)vi.addr * (float)vi.multiplier));
+      break;
+    case 4:
+      sprintf (buf, vi.fmt.c_str (),
+               (vi.multiplier == 0.) ? *(double*)vi.addr : (*(double*)vi.addr * vi.multiplier));
+      break;
+    default:
+      buf[0] = 0;
     }
-    return string(buf);
+    return string (buf);
   }
   else
-    return string("none");
+    return string ("none");
 }
 
 /*!
@@ -1441,7 +1472,7 @@ string httpd::get_var(const char *name)
 void httpd::docroot (const char* path)
 {
   root = path;
-  //make sure it's (back)slash terminated
+  // make sure it's (back)slash terminated
   if (root.back () != '\\' && root.back () != '/')
     root.push_back ('/');
 }
@@ -1453,30 +1484,30 @@ void httpd::docroot (const char* path)
 
   \return MIME type
 */
-const char *httpd::guess_mimetype (const char *file, bool& shtml)
+const char* httpd::guess_mimetype (const char* file, bool& shtml)
 {
-  const char *ext = strrchr (file, '.');
+  const char* ext = strrchr (file, '.');
   auto ptr = types.begin ();
 
   if (ext)
   {
     ext++;
-    while (ptr != types.end () && strcmpi (ptr->suffix.c_str(), ext))
+    while (ptr != types.end () && strcmpi (ptr->suffix.c_str (), ext))
       ptr++;
     if (ptr != types.end ())
     {
       shtml = ptr->shtml;
-      return ptr->type.c_str();
+      return ptr->type.c_str ();
     }
   }
   shtml = false;
-  return types[0].type.c_str();
+  return types[0].type.c_str ();
 }
 
-/// Check if file exists and can be read 
-bool file_exists (char *path)
+/// Check if file exists and can be read
+bool file_exists (char* path)
 {
-  //normalize forward slashes to backslashes
+  // normalize forward slashes to backslashes
   char* p = path;
   while (*p)
   {
@@ -1502,49 +1533,59 @@ bool file_exists (char *path)
   \retval  5 - character
   \retval -1 - unknown
 */
-int fmt2type (const char *fmt)
+int fmt2type (const char* fmt)
 {
   int ret = -1;
-  fmt = strchr(fmt, '%');
+  fmt = strchr (fmt, '%');
   if (fmt)
   {
-    fmt += strcspn (fmt, "sfegidxuc"); //points to first format char or end of string
+    fmt += strcspn (fmt, "sfegidxuc"); // points to first format char or end of string
     switch (*fmt)
     {
-      case 's':   ret = 0; break;  //string
-      case 'c':   ret = 5; break;
-      case 'f':
-      case 'e':
-      case 'g':   ret = (tolower(*(fmt-1))=='l')? 4:3; break; //float
+    case 's':
+      ret = 0;
+      break; // string
+    case 'c':
+      ret = 5;
+      break;
+    case 'f':
+    case 'e':
+    case 'g':
+      ret = (tolower (*(fmt - 1)) == 'l') ? 4 : 3;
+      break; // float
 
-      case 0:     ret = -1; break; //unknown
+    case 0:
+      ret = -1;
+      break; // unknown
 
-      default:    ret = (tolower(*(fmt-1))=='l')? 2:1; break; //integer
+    default:
+      ret = (tolower (*(fmt - 1)) == 'l') ? 2 : 1;
+      break; // integer
     }
   }
   return ret;
 }
 
-int hexdigit (char *bin, char c)
+int hexdigit (char* bin, char c)
 {
-  c = toupper(c);
-  if (c >= '0' && c <='9')
-    *bin = c - '0'; 
+  c = toupper (c);
+  if (c >= '0' && c <= '9')
+    *bin = c - '0';
   else if (c >= 'A' && c <= 'F')
-    *bin = c - 'A'+10;
+    *bin = c - 'A' + 10;
   else
-     return 0;
+    return 0;
 
   return 1;
 }
 
-int hexbyte (char *bin, const char *str)
+int hexbyte (char* bin, const char* str)
 {
   char d1, d2;
 
-  //first digit
+  // first digit
   if (!hexdigit (&d1, *str++) || !hexdigit (&d2, *str++))
-     return 0;
+    return 0;
   *bin = (d1 << 4) | d2;
   return 1;
 }
@@ -1555,7 +1596,7 @@ int hexbyte (char *bin, const char *str)
 
   \return 1 if successful, 0 otherwise
 */
-int url_decode (char *buf)
+int url_decode (char* buf)
 {
   char *in, *out;
 
@@ -1583,7 +1624,7 @@ int url_decode (char *buf)
   Return number of matching characters at beginning of str1 and str2.
   Comparison is case insensitive.
 */
-int match (const char *str1, const char *str2)
+int match (const char* str1, const char* str2)
 {
   int n = 0;
   while (*str1 && *str2 && tolower (*str1++) == tolower (*str2++))
@@ -1597,8 +1638,7 @@ void parse_urlparams (const char* par_str, str_pairs& params)
   char *ptr, *val, *next;
   char k[MAX_PAR], v[MAX_PAR];
 
-
-  char *dup = strdup (par_str);
+  char* dup = strdup (par_str);
   for (ptr = dup; ptr && *ptr; ptr = next)
   {
     next = strchr (ptr, '&');
@@ -1620,4 +1660,4 @@ void parse_urlparams (const char* par_str, str_pairs& params)
   free (dup);
 }
 
-}
+} // namespace mlib

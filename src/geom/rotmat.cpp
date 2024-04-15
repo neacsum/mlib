@@ -3,15 +3,15 @@
 
   (c) Mircea Neacsu 2017. All rights reserved.
 */
-#include <mlib/rotmat.h>
+#include <mlib/mlib.h>
+#pragma hdrstop
 #include <math.h>
 
 namespace mlib {
 
-RotMat::RotMat () 
+RotMat::RotMat ()
   : r{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}
-{
-}
+{}
 
 /*!
   Create a rotation matrix with specified rotation angles.
@@ -53,7 +53,7 @@ void RotMat::z_rotation (double angle)
   multiply (rz);
 }
 
-void RotMat::rotate (double *vec) const
+void RotMat::rotate (double* vec) const
 {
   double t[3];
   for (int i = 0; i < 3; i++)
@@ -69,9 +69,13 @@ void RotMat::rotate (double *vec) const
 void RotMat::rotate (double& x, double& y, double& z) const
 {
   double t[3];
-  t[0] = x; t[1] = y; t[2] = z;
+  t[0] = x;
+  t[1] = y;
+  t[2] = z;
   rotate (t);
-  x = t[0]; y = t[1]; z = t[2];
+  x = t[0];
+  y = t[1];
+  z = t[2];
 }
 
 void RotMat::multiply (double m[3][3])
@@ -91,4 +95,4 @@ void RotMat::multiply (double m[3][3])
       r[i][j] = t[i][j];
 }
 
-}
+} // namespace mlib

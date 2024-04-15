@@ -38,7 +38,7 @@ public:
 class manual_event : public event
 {
 public:
-  explicit manual_event (bool signaled = false, const std::string &name = std::string ())
+  explicit manual_event (bool signaled = false, const std::string& name = std::string ())
     : event (true, signaled, name){};
 };
 
@@ -46,7 +46,7 @@ public:
 class auto_event : public event
 {
 public:
-  explicit auto_event (bool signaled = false, const std::string &name = std::string ())
+  explicit auto_event (bool signaled = false, const std::string& name = std::string ())
     : event (false, signaled, name){};
 
   /// Check if event is signaled
@@ -56,8 +56,7 @@ public:
 /*!
   Automatic events are set back to signaled state because testing resets them.
 */
-inline
-bool auto_event::is_signaled ()
+inline bool auto_event::is_signaled ()
 {
   bool result = syncbase::is_signaled ();
   if (result)
@@ -65,5 +64,4 @@ bool auto_event::is_signaled ()
   return result;
 }
 
-};  //end namespace
-
+}; // namespace mlib

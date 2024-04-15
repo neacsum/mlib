@@ -3,9 +3,17 @@ TabWidth:        2
 IndentWidth:     2
 ConstructorInitializerIndentWidth: 2
 ContinuationIndentWidth: 2
+ColumnLimit: 100
+PointerAlignment: Left
+SortIncludes: Never
 SpaceBeforeParens: Always
-BraceWrapping:
-  AfterNamespace:  false
 BreakBeforeBinaryOperators: NonAssignment
 BreakConstructorInitializers: BeforeComma
-ColumnLimit: 100
+BraceWrapping:
+  AfterNamespace:  false
+  SplitEmptyFunction: false
+AlignConsecutiveMacros:
+  Enabled: true
+AlwaysBreakTemplateDeclarations: Yes
+# AlwaysBreakAfterReturnType: TopLevel
+

@@ -19,7 +19,7 @@
   </pre>
 */
 
-#if __has_include ("defs.h")
+#if __has_include("defs.h")
 #include "defs.h"
 #endif
 
@@ -27,7 +27,6 @@
 
 namespace mlib {
 
-int convex_hull(dpoint *p, int n);
+int convex_hull (dpoint* p, int n);
 
 }
-

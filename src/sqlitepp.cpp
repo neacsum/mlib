@@ -5,8 +5,8 @@
   \brief Object-oriented wrappers for SQLITE3 functions.
 
   This is a thin wrapper for SQLITE API. The API is wrapped in two objects,
-  Database and Query. 
-  
+  Database and Query.
+
   <h3>Compile-time Options</h3>
   Some of the functions in these wrappers depend on optional support in the
   SQLITE code. Consequently, the amalgamation has to be compiled with matching
@@ -15,31 +15,31 @@
 
   The amalgamation is compiled with the flag `/D "SQLITE_CUSTOM_INCLUDE=mlib/defs.h"`
   on the command line. Any desired compile-time options can hence be set in the
-  `mlib/defs.h` file. 
+  `mlib/defs.h` file.
 */
+#include <mlib/mlib.h>
+#pragma hdrstop
 #include <stdio.h>
-#include <mlib/sqlitepp.h>
-#include <mlib/trace.h>
 #include <assert.h>
 
 using namespace std;
 
-#define STR(X) #X
+#define STR(X)         #X
 #define STRINGERIZE(X) STR (X)
 
 namespace mlib {
 
-void set_erc_message (erc &err, sqlite3 *db);
+void set_erc_message (erc& err, sqlite3* db);
 
 errfac the_errors ("SQLITEPP");
-errfac *sqlite_errors = &the_errors;
+errfac* sqlite_errors = &the_errors;
 
-  /*!
-  \class Database
+/*!
+\class Database
 
-  The Database class is a wrapper around the <a href="http://sqlite.org/c3ref/sqlite3.html">sqlite3</a>
-  handle returned by sqlite_open_v2 function.
-  \ingroup sqlite
+The Database class is a wrapper around the <a
+href="http://sqlite.org/c3ref/sqlite3.html">sqlite3</a> handle returned by sqlite_open_v2 function.
+\ingroup sqlite
 */
 
 //-----------------------------------------------------------------------------
@@ -47,23 +47,22 @@ errfac *sqlite_errors = &the_errors;
   The default constructor is used to create an object that is not yet connected
   to a database. It has to be connected using the open() function.
 */
-Database::Database()
-{
-}
+Database::Database ()
+{}
 
 /*!
   \param  name      database name
   \param  flags     open flags
 */
-Database::Database(const std::string& name, openflags flags)
+Database::Database (const std::string& name, openflags flags)
 {
-  sqlite3 *pdb;
+  sqlite3* pdb;
   int rc = sqlite3_open_v2 (name.c_str (), &pdb, static_cast<int> (flags), 0);
   db.reset (pdb, sqlite3_close);
   if ((rc) != SQLITE_OK)
   {
     erc err (rc, erc::error, sqlite_errors);
-    set_erc_message (err, handle());
+    set_erc_message (err, handle ());
     db.reset ();
     err.raise ();
   }
@@ -71,20 +70,20 @@ Database::Database(const std::string& name, openflags flags)
 
 /*!
   Perform a copy operation using the [SQLITE Backup API](https://sqlite.org/backup.html).
-  
+
   Both databases should be opened.
 */
-Database& Database::copy(Database& src)
+Database& Database::copy (Database& src)
 {
   int rc;
   if (db && src.db)
   {
-    auto bkp = sqlite3_backup_init (handle(), "main", src, "main");
+    auto bkp = sqlite3_backup_init (handle (), "main", src, "main");
     if (!bkp)
     {
-      rc = sqlite3_errcode (handle());
+      rc = sqlite3_errcode (handle ());
       erc err (rc, erc::error, sqlite_errors);
-      set_erc_message (err, handle());
+      set_erc_message (err, handle ());
       err.raise ();
     }
     else
@@ -101,7 +100,7 @@ Database& Database::copy(Database& src)
   else
   {
     erc err (SQLITE_MISUSE, erc::error, sqlite_errors);
-    err.message ("Error " STRINGERIZE(SQLITE_MISUSE) " database is not opened");
+    err.message ("Error " STRINGERIZE (SQLITE_MISUSE) " database is not opened");
     err.raise (); // one db is not opened
   }
   return *this;
@@ -115,7 +114,7 @@ Database& Database::copy(Database& src)
 */
 string Database::filename (const string& schema) const
 {
-  const char *pfn = 0;
+  const char* pfn = 0;
   if (db)
     pfn = sqlite3_db_filename (handle (), schema.c_str ());
   return pfn ? pfn : string ();
@@ -134,15 +133,14 @@ std::string Database::schema (int n) const
   const char* psch = 0;
   if (db)
     psch = sqlite3_db_name (handle (), n);
-  return psch? psch : string ();
+  return psch ? psch : string ();
 }
 
 /*!
   Returns FALSE only for connected read-write databases.
   If database is not connected or it is read-only, returns TRUE.
 */
-bool
-Database::is_readonly ()
+bool Database::is_readonly ()
 {
   if (db)
     return (sqlite3_db_readonly (handle (), "main") == 1);
@@ -150,32 +148,31 @@ Database::is_readonly ()
     return true;
 }
 
-
 /*!
   If the object is associated with another connection, the previous connection
   is closed and a new one is opened.
   \param name     Database name
   \param flags    Combination of openflags flags
 */
-erc Database::open (const string &name, openflags flags)
+erc Database::open (const string& name, openflags flags)
 {
-  sqlite3 *pdb;
-  auto rc = sqlite3_open_v2(name.c_str(), &pdb, static_cast<int>(flags), 0);
+  sqlite3* pdb;
+  auto rc = sqlite3_open_v2 (name.c_str (), &pdb, static_cast<int> (flags), 0);
   db.reset (pdb, sqlite3_close);
   if (rc != SQLITE_OK)
   {
     erc err (rc, erc::error, sqlite_errors);
-    set_erc_message (err, handle());
+    set_erc_message (err, handle ());
     return err;
   }
-  else 
+  else
     return erc::success;
 }
 
 erc Database::close ()
 {
   if (db)
-    db.reset();
+    db.reset ();
   return erc::success;
 }
 
@@ -185,7 +182,7 @@ erc Database::exec (const string& sql)
   if ((rc = sqlite3_exec (handle (), sql.c_str (), 0, 0, 0)) != SQLITE_OK)
   {
     auto ret = erc (rc, erc::error, sqlite_errors);
-    set_erc_message (ret, handle());
+    set_erc_message (ret, handle ());
     return ret;
   }
   else
@@ -197,7 +194,7 @@ erc Database::exec (const string& sql)
 
   The function  returns a `checked<Query>` object that can be tested.
 */
-checked<Query> Database::make_query (const std::string &sql)
+checked<Query> Database::make_query (const std::string& sql)
 {
   Query q (*this);
   erc ret;
@@ -205,10 +202,10 @@ checked<Query> Database::make_query (const std::string &sql)
   if ((rc = sqlite3_prepare_v2 (handle (), sql.c_str (), -1, &q.stmt, 0)) != SQLITE_OK)
   {
     erc err (rc, erc::error, sqlite_errors);
-    set_erc_message (err, handle());
+    set_erc_message (err, handle ());
     ret = err;
   }
-  return {std::move(q), ret};
+  return {std::move (q), ret};
 }
 
 /*!
@@ -224,28 +221,28 @@ checked<Query> Database::make_query_multiple (std::string& sql)
   if ((rc = sqlite3_prepare_v2 (handle (), sql.c_str (), -1, &q.stmt, &tail)) != SQLITE_OK)
   {
     erc err (rc, erc::error, sqlite_errors);
-    set_erc_message (err, handle());
+    set_erc_message (err, handle ());
     ret = err;
   }
   else
     sql = tail;
-  return {std::move(q), ret};
+  return {std::move (q), ret};
 }
 
 int Database::extended_error ()
 {
   assert (db);
-  return sqlite3_extended_errcode (handle());
+  return sqlite3_extended_errcode (handle ());
 }
 
-erc Database::flush()
+erc Database::flush ()
 {
-  assert(db);
-  int rc = sqlite3_db_cacheflush(handle());
+  assert (db);
+  int rc = sqlite3_db_cacheflush (handle ());
   if (rc != SQLITE_OK)
   {
     erc err (rc, erc::error, sqlite_errors);
-    set_erc_message (err, handle());
+    set_erc_message (err, handle ());
     return err;
   }
   return erc::success;
@@ -254,14 +251,14 @@ erc Database::flush()
 //-----------------------------------------------------------------------------
 /*!
   \class Query
-  The Query class is a wrapper around a prepared <a href="http://sqlite.org/c3ref/stmt.html">sqlite3</a>
-  statement.
+  The Query class is a wrapper around a prepared <a
+href="http://sqlite.org/c3ref/stmt.html">sqlite3</a> statement.
 
   The class provides a number of overloaded \c bind functions that can be used to
   bind parameters specified either by name or by number  (first parameter is 1)
   to values of different types.
-  
-  All bind functions return a reference to the object allowing them to be syntactically 
+
+  All bind functions return a reference to the object allowing them to be syntactically
   chained as in the following example:
 \code
   Query  (db, "INSERT INTO table (col1, col2) VALUES (:param1, :param2);")
@@ -280,12 +277,12 @@ erc Database::flush()
   \param  db      database connection
   \param  sql     SQL statement. It can be empty, in which case the query is
                   attached to a database but the SQL has to be set later using
-                  the string assignment operator. 
+                  the string assignment operator.
 */
-Query::Query(Database &db, const std::string& sql) :
-  stmt (0),
-  dbase(db),
-  col_mapped (false)
+Query::Query (Database& db, const std::string& sql)
+  : stmt (0)
+  , dbase (db)
+  , col_mapped (false)
 {
   if (!sql.empty ())
   {
@@ -299,15 +296,14 @@ Query::Query(Database &db, const std::string& sql) :
   }
 }
 
-Query::Query (const Query &other)
+Query::Query (const Query& other)
   : stmt (other.stmt)
-  , dbase (other.dbase) 
+  , dbase (other.dbase)
   , col_mapped (other.col_mapped)
   , index (other.index)
-{
-}
+{}
 
-Query::Query(Query&& other)
+Query::Query (Query&& other)
   : stmt (other.stmt)
   , col_mapped (other.col_mapped)
   , index (other.index)
@@ -315,28 +311,28 @@ Query::Query(Query&& other)
 {
   other.stmt = 0;
   other.col_mapped = false;
-  other.index.clear();
+  other.index.clear ();
 }
 
-Query& Query::operator=(Query&& rhs)
+Query& Query::operator= (Query&& rhs)
 {
   if (stmt)
-    sqlite3_finalize(stmt);
+    sqlite3_finalize (stmt);
 
   stmt = rhs.stmt;
   rhs.stmt = nullptr;
 
-  dbase= rhs.dbase;
-  
+  dbase = rhs.dbase;
+
   col_mapped = rhs.col_mapped;
   index = rhs.index;
-  rhs.index.clear();
+  rhs.index.clear ();
   rhs.dbase = Database ();
 
   return *this;
 }
 
-Query &Query::operator= (const Query &rhs)
+Query& Query::operator= (const Query& rhs)
 {
   if (&rhs != this)
   {
@@ -352,7 +348,7 @@ Query &Query::operator= (const Query &rhs)
   return *this;
 }
 
-Query::~Query()
+Query::~Query ()
 {
   if (stmt)
     sqlite3_finalize (stmt);
@@ -363,7 +359,7 @@ Query::~Query()
   If a previous statement was attached to the object, it is finalized before the
   new statement is prepared.
 */
-Query& Query::operator =(const std::string& sql)
+Query& Query::operator= (const std::string& sql)
 {
   int rc;
   if (!dbase)
@@ -386,19 +382,18 @@ Query& Query::operator =(const std::string& sql)
 std::string Query::sql () const
 {
   if (!stmt)
-    return std::string();
+    return std::string ();
   else
     return sqlite3_sql (stmt);
 }
 
-
 /*!
   When a new row of results is available the function returns SQLITE_ROW. When
-  there are no more result the function returns SQLITE_DONE. Both codes are 
+  there are no more result the function returns SQLITE_DONE. Both codes are
   wrapped in \ref erc objects with priority level `ERROR_PRI_INFO` that normally don't throw
   an exception. Any other error is return at the normal priority level `erc::error`.
- */ 
-erc Query::step()
+ */
+erc Query::step ()
 {
   int rc = sqlite3_step (stmt);
 
@@ -410,7 +405,7 @@ erc Query::step()
   return err;
 }
 
-erc Query::reset()
+erc Query::reset ()
 {
   return check_errors (sqlite3_reset (stmt));
 }
@@ -430,29 +425,29 @@ void Query::clear ()
 }
 
 //  ---------------------------------------------------------------------------
-/*! 
+/*!
   \name Bind functions
   SQL statement can have parameters specified by number (`?` or `?nnn`) or
   by name (`:aaa` or `@aaa` or `$aaa`) where `nnn` is a number (starting from 1)
   and `aaa` is an alphanumeric identifier. Bind functions assign values to
   these parameters.
 
-  If the parameter with that name or number is not found the functions throw 
+  If the parameter with that name or number is not found the functions throw
   an \ref erc with code `SQLITE_RANGE`.
 */
-///@{  
+///@{
 
 /// Bind a parameter specified by number to a character string
 Query& Query::bind (int par, const std::string& str)
 {
-  check_errors (sqlite3_bind_text (stmt, par, str.c_str(), -1, SQLITE_TRANSIENT));
+  check_errors (sqlite3_bind_text (stmt, par, str.c_str (), -1, SQLITE_TRANSIENT));
   return *this;
 }
 
 /// Bind a parameter specified by name to a character string
 Query& Query::bind (const std::string& parname, const std::string& str)
 {
-  int idx = sqlite3_bind_parameter_index (stmt, parname.c_str());
+  int idx = sqlite3_bind_parameter_index (stmt, parname.c_str ());
   return bind (idx, str);
 }
 
@@ -466,7 +461,7 @@ Query& Query::bind (int par, int val)
 /// Bind a parameter specified by name to a floating point value
 Query& Query::bind (const std::string& parname, double val)
 {
-  int idx = sqlite3_bind_parameter_index (stmt, parname.c_str());
+  int idx = sqlite3_bind_parameter_index (stmt, parname.c_str ());
   return bind (idx, val);
 }
 
@@ -480,7 +475,7 @@ Query& Query::bind (int par, double val)
 /// Bind a parameter specified by name to a large integer
 Query& Query::bind (const std::string& parname, __int64 val)
 {
-  int idx = sqlite3_bind_parameter_index (stmt, parname.c_str());
+  int idx = sqlite3_bind_parameter_index (stmt, parname.c_str ());
   return bind (idx, val);
 }
 
@@ -494,11 +489,11 @@ Query& Query::bind (int par, __int64 val)
 /// Bind a parameter specified by name to an integer value
 Query& Query::bind (const std::string& parname, int val)
 {
-  int idx = sqlite3_bind_parameter_index (stmt, parname.c_str());
+  int idx = sqlite3_bind_parameter_index (stmt, parname.c_str ());
   return bind (idx, val);
 }
 
-/*! 
+/*!
   Bind a parameter specified by number to an arbitrary memory area (BLOB)
   \param  par parameter index (starting from 1)
   \param  val pointer to BLOB
@@ -506,7 +501,7 @@ Query& Query::bind (const std::string& parname, int val)
 
   The function makes a local copy of the value so user can free it immediately.
 */
-Query& Query::bind (int par, void *val, int len)
+Query& Query::bind (int par, void* val, int len)
 {
   int rc;
   if (len == 0 || !val)
@@ -517,7 +512,7 @@ Query& Query::bind (int par, void *val, int len)
   return *this;
 }
 
-/*! 
+/*!
   Bind a parameter specified by name to an arbitrary memory area (BLOB)
   \param  parname parameter name
   \param  val pointer to BLOB
@@ -525,9 +520,9 @@ Query& Query::bind (int par, void *val, int len)
 
   The function makes a local copy of the value so user can free it immediately.
 */
-Query& Query::bind (const std::string& parname, void *val, int len)
+Query& Query::bind (const std::string& parname, void* val, int len)
 {
-  int idx = sqlite3_bind_parameter_index (stmt, parname.c_str());
+  int idx = sqlite3_bind_parameter_index (stmt, parname.c_str ());
   return bind (idx, val, len);
 }
 
@@ -537,7 +532,7 @@ Query& Query::bind (const std::string& parname, void *val, int len)
 */
 Query& Query::bind (const std::string& parname, const SYSTEMTIME& val)
 {
-  int idx = sqlite3_bind_parameter_index (stmt, parname.c_str());
+  int idx = sqlite3_bind_parameter_index (stmt, parname.c_str ());
   return bind (idx, val);
 }
 
@@ -551,12 +546,12 @@ Query& Query::bind (int par, const SYSTEMTIME& val)
   sprintf (text, "%4d-%02d-%02d", val.wYear, val.wMonth, val.wDay);
   if (val.wHour != 0 || val.wMinute != 0 || val.wSecond != 0 || val.wMilliseconds != 0)
   {
-    char *ptr = text+strlen(text);
+    char* ptr = text + strlen (text);
     sprintf (ptr, "T%02d:%02d:%02d", val.wHour, val.wMinute, val.wSecond);
 
     if (val.wMilliseconds != 0)
     {
-      ptr = text + strlen(text);
+      ptr = text + strlen (text);
       sprintf (ptr, ".%03d", val.wMilliseconds);
     }
   }
@@ -565,15 +560,15 @@ Query& Query::bind (int par, const SYSTEMTIME& val)
 }
 
 /// Reset all parameters to NULL values.
-Query& Query::clear_bindings()
+Query& Query::clear_bindings ()
 {
   check_errors (sqlite3_clear_bindings (stmt));
   return *this;
 }
-///@}  
+///@}
 
 ///  \name Other column functions
-///@{  
+///@{
 /*!
   Return data type for a column specified by name or number.
   \retval SQLITE_INTEGER  64-bit signed integer
@@ -614,9 +609,9 @@ int Query::column_size (const std::string& colname) const
   If the query is a SELECT statement and `nc` is a table column (not an
   expression or subquery) the function returns  the declared type of the table
   column. Otherwise the function returns an empty string.
-  
+
   The returned string is always UTF-8 encoded.
-  
+
   Example:
 \code
   Database db("");                          // create in-memory database
@@ -648,7 +643,7 @@ std::string Query::decl_type (int nc) const
 */
 std::string Query::decl_type (const std::string& colname) const
 {
-  return sqlite3_column_decltype (stmt, find_col(colname));
+  return sqlite3_column_decltype (stmt, find_col (colname));
 }
 
 #ifdef SQLITE_ENABLE_COLUMN_METADATA
@@ -701,7 +696,7 @@ std::string Query::table_name (int nc) const
 */
 std::string Query::table_name (const std::string& colname) const
 {
-  return sqlite3_column_table_name (stmt, find_col(colname));
+  return sqlite3_column_table_name (stmt, find_col (colname));
 }
 
 /*!
@@ -767,26 +762,25 @@ std::string Query::database_name (const std::string& colname) const
   Return column name.
 
   \param nc - column number
-  
-  If the query is a SELECT statement and \p nc is a valid column number, 
+
+  If the query is a SELECT statement and \p nc is a valid column number,
   the function returns the name of the column. Otherwise the function returns
   an empty string. The name of a result column is the value of the `AS` clause
   for that column, if there is an `AS` clause. If there is no `AS` clause then
   the name of the column is unspecified and may change from one release of SQLite
-  to the next. 
-  
+  to the next.
+
   The returned string is always UTF-8 encoded.
 */
-  std::string Query::column_name(int nc) const
+std::string Query::column_name (int nc) const
 {
-  if (0 < nc && nc < sqlite3_column_count(stmt))
-    return sqlite3_column_name(stmt, nc);
-  return std::string();
+  if (0 < nc && nc < sqlite3_column_count (stmt))
+    return sqlite3_column_name (stmt, nc);
+  return std::string ();
 }
 #endif
 
 ///@}
-
 
 //-----------------------------------------------------------------------------
 /*!  \name Data retrieval functions
@@ -796,22 +790,21 @@ std::string Query::database_name (const std::string& colname) const
 
   Note that column name *does not* include table name. If you need to disambiguate
   column names, use an `AS` clause in the `SELECT` statement.
-  
+
   If a column with that name cannot be found, the functions throw an \ref erc
   with code `SQLITE_RANGE`.
 
   For a detailed discussion of the conversions applied see
   <a href="http://sqlite.org/c3ref/column_blob.html">SQLITE documentation</a>
 */
-///@{  
-
+///@{
 
 /*!
   Return column value converted to an integer
 
   The following rules apply:
   - `NULL` value is converted to 0
-  - `REAL` value is rounded to nearest integer 
+  - `REAL` value is rounded to nearest integer
   - `TEXT` or BLOB value is converted to number. Longest possible prefix of the
      value that can be interpreted as an integer number is extracted and the
      remainder ignored. Any leading spaces are ignored.
@@ -832,9 +825,9 @@ int Query::column_int (const std::string& colname) const
 
   If the column is `NULL`, the result is an empty string.
 */
-string Query::column_str(int nc) const
+string Query::column_str (int nc) const
 {
-  char *str = (char*)sqlite3_column_text(stmt, nc);
+  char* str = (char*)sqlite3_column_text (stmt, nc);
   if (str)
     return string (str);
   else
@@ -848,18 +841,18 @@ string Query::column_str (const std::string& colname) const
 }
 
 /*!
-  Return a pointer to a NULL-terminated text with the column content. 
+  Return a pointer to a NULL-terminated text with the column content.
   The memory for the string is freed automatically.
 
   If the column value is `NULL` the result is a `NULL` pointer
 */
-const char *Query::column_text (int nc) const
+const char* Query::column_text (int nc) const
 {
   return (const char*)sqlite3_column_text (stmt, nc);
 }
 
 /// \copydoc column_text
-const char *Query::column_text (const std::string& colname) const
+const char* Query::column_text (const std::string& colname) const
 {
   return column_text (find_col (colname));
 }
@@ -871,7 +864,7 @@ const char *Query::column_text (const std::string& colname) const
   - `NULL` value is converted to 0.0
   - `INTEGER` value is promoted to double
   - `TEXT` or BLOB value is converted to number. Longest possible prefix of the
-     value that can be interpreted as a real number is extracted and the 
+     value that can be interpreted as a real number is extracted and the
      remainder ignored. Any leading spaces are ignored.
 */
 double Query::column_double (int nc) const
@@ -925,7 +918,8 @@ const void* Query::column_blob (const std::string& colname) const
 /*!
   Return a SYSTEMTIME structure with the column content.
 */
-SYSTEMTIME Query::column_time (int nc) const
+SYSTEMTIME
+Query::column_time (int nc) const
 {
   SYSTEMTIME st;
   float sec;
@@ -933,8 +927,8 @@ SYSTEMTIME Query::column_time (int nc) const
   const char* pstr = (const char*)sqlite3_column_text (stmt, nc);
   if (pstr)
   {
-    sscanf (pstr, "%hd-%hd-%hd %hd:%hd:%f",
-      &st.wYear, &st.wMonth, &st.wDay, &st.wHour, &st.wMinute, &sec);
+    sscanf (pstr, "%hd-%hd-%hd %hd:%hd:%f", &st.wYear, &st.wMonth, &st.wDay, &st.wHour, &st.wMinute,
+            &sec);
     st.wSecond = (int)sec;
     st.wMilliseconds = (int)((sec - st.wSecond) * 1000.);
   }
@@ -942,23 +936,23 @@ SYSTEMTIME Query::column_time (int nc) const
 }
 
 /// \copydoc column_time
-SYSTEMTIME Query::column_time (const std::string& colname) const
+SYSTEMTIME
+Query::column_time (const std::string& colname) const
 {
   return column_time (find_col (colname));
 }
 
 ///@}
 
-
 //---
-void Query::map_columns() const
+void Query::map_columns () const
 {
   if (col_mapped)
     return;
   int nc = sqlite3_column_count (stmt);
-  for (int i=0; i<nc; i++)
+  for (int i = 0; i < nc; i++)
   {
-    const char *n = sqlite3_column_name(stmt, i);
+    const char* n = sqlite3_column_name (stmt, i);
     if (n)
       index[n] = i;
   }
@@ -972,9 +966,8 @@ int Query::find_col (const std::string& colname) const
 
   if (index.find (colname) == index.end ())
   {
-    erc err(SQLITE_RANGE, erc::error, sqlite_errors);
-    string s = "Error " STRINGERIZE(SQLITE_RANGE)
-               " column '" + colname + "' not found ";
+    erc err (SQLITE_RANGE, erc::error, sqlite_errors);
+    string s = "Error " STRINGERIZE (SQLITE_RANGE) " column '" + colname + "' not found ";
     err.message (s);
     err.raise ();
   }
@@ -1004,11 +997,11 @@ erc Query::check_errors (int rc)
   \param  err       Error code
   \param  db        Database connection handle
 */
-static void set_erc_message (erc &err, sqlite3 *db)
+static void set_erc_message (erc& err, sqlite3* db)
 {
   if (db)
   {
-    const char *file = sqlite3_db_filename (db, "main");
+    const char* file = sqlite3_db_filename (db, "main");
     string s = "Error " + to_string (err.code ()) + ' ' + sqlite3_errmsg (db);
     if (file && strlen (file))
       s += " Database: " + string (file);

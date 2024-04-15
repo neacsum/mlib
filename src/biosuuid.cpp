@@ -4,13 +4,11 @@
   (c) Mircea Neacsu 2011. All rights reserved.
 
 */
-#include <windows.h>
+#include <mlib/mlib.h>
+#pragma hdrstop
 #include <sysinfoapi.h>
 
-#include <mlib/biosuuid.h>
-
 namespace mlib {
-
 
 /*!
   Get BIOS UUID in a 16 byte array.
@@ -18,10 +16,11 @@ namespace mlib {
   \return `true` if successful, `false` otherwise
 
   The BIOS UUID is a unique number tied to the motherboard. This function uses
-  the [GetSystemFirmwareTable](https://docs.microsoft.com/en-us/windows/win32/api/sysinfoapi/nf-sysinfoapi-getsystemfirmwaretable)
+  the
+  [GetSystemFirmwareTable](https://docs.microsoft.com/en-us/windows/win32/api/sysinfoapi/nf-sysinfoapi-getsystemfirmwaretable)
   function to retrieve the UUID is in the *System Information* table.
 */
-bool biosuuid (unsigned char *uuid)
+bool biosuuid (unsigned char* uuid)
 {
   /*
     SMBIOS Structure header as described at
@@ -36,27 +35,28 @@ bool biosuuid (unsigned char *uuid)
     BYTE data[1];
   };
 
-  //Structure needed to get the SMBIOS table using GetSystemFirmwareTable API.
-  struct RawSMBIOSData {
-    BYTE  Used20CallingMethod;
-    BYTE  SMBIOSMajorVersion;
-    BYTE  SMBIOSMinorVersion;
-    BYTE  DmiRevision;
-    DWORD  Length;
-    BYTE  SMBIOSTableData[1];
+  // Structure needed to get the SMBIOS table using GetSystemFirmwareTable API.
+  struct RawSMBIOSData
+  {
+    BYTE Used20CallingMethod;
+    BYTE SMBIOSMajorVersion;
+    BYTE SMBIOSMinorVersion;
+    BYTE DmiRevision;
+    DWORD Length;
+    BYTE SMBIOSTableData[1];
   };
 
   bool result = false;
-  
-  RawSMBIOSData *smb=nullptr;
-  BYTE *data;
+
+  RawSMBIOSData* smb = nullptr;
+  BYTE* data;
 
   DWORD size = 0;
 
   // Get size of BIOS table
   size = GetSystemFirmwareTable ('RSMB', 0, smb, size);
   if (!size)
-    return false; //GetSystemFirmwareTable failed for some unknown reason
+    return false; // GetSystemFirmwareTable failed for some unknown reason
   smb = (RawSMBIOSData*)malloc (size);
 
   // Get BIOS table
@@ -66,27 +66,29 @@ bool biosuuid (unsigned char *uuid)
     return false; // could not get BIOS table
   }
 
-  //Go through BIOS structures
+  // Go through BIOS structures
   data = smb->SMBIOSTableData;
   while (data < smb->SMBIOSTableData + smb->Length)
   {
-    BYTE *next;
-    dmi_header *h = (dmi_header*)data;
+    BYTE* next;
+    dmi_header* h = (dmi_header*)data;
 
     if (h->length < 4)
       break;
 
-    //Search for System Information structure with type 0x01 (see para 7.2)
+    // Search for System Information structure with type 0x01 (see para 7.2)
     if (h->type == 0x01 && h->length >= 0x19)
     {
-      data += 0x08; //UUID is at offset 0x08
+      data += 0x08; // UUID is at offset 0x08
 
       // check if there is a valid UUID (not all 0x00 or all 0xff)
       bool all_zero = true, all_one = true;
       for (int i = 0; i < 16 && (all_zero || all_one); i++)
       {
-        if (data[i] != 0x00) all_zero = false;
-        if (data[i] != 0xFF) all_one = false;
+        if (data[i] != 0x00)
+          all_zero = false;
+        if (data[i] != 0xFF)
+          all_one = false;
       }
       if (!all_zero && !all_one)
       {
@@ -108,10 +110,10 @@ bool biosuuid (unsigned char *uuid)
       break;
     }
 
-    //skip over formatted area
+    // skip over formatted area
     next = data + h->length;
 
-    //skip over unformatted area of the structure (marker is 0000h)
+    // skip over unformatted area of the structure (marker is 0000h)
     while (next < smb->SMBIOSTableData + smb->Length && (next[0] != 0 || next[1] != 0))
       next++;
     next += 2;
@@ -122,4 +124,4 @@ bool biosuuid (unsigned char *uuid)
   return result;
 }
 
-} // end namespace
+} // namespace mlib

@@ -5,7 +5,7 @@
 */
 #pragma once
 
-#if __has_include ("defs.h")
+#if __has_include("defs.h")
 #include "defs.h"
 #endif
 
@@ -14,13 +14,14 @@
 namespace mlib {
 
 /// Calculator for statistical parameters of a distribution
-class statpars {
+class statpars
+{
 public:
   statpars (int nmax = 0);
   statpars (std::vector<double> vec);
 
   void add (double val);
-  void add (double *vals, int count);
+  void add (double* vals, int count);
   void add (std::vector<double> v);
   void clear ();
   int count ();
@@ -40,8 +41,7 @@ private:
 };
 
 /// Add a value to the calculator
-inline
-void statpars::add (double val)
+inline void statpars::add (double val)
 {
   if (nmax && values.size () == nmax)
   {
@@ -54,24 +54,21 @@ void statpars::add (double val)
 }
 
 /// Add multiple values to calculator
-inline
-void statpars::add (double *vals, int count)
+inline void statpars::add (double* vals, int count)
 {
   for (int i = 0; i < count; i++)
     add (vals[i]);
 }
 
 /// Add a vector of values
-inline
-void statpars::add (std::vector<double> vals)
+inline void statpars::add (std::vector<double> vals)
 {
   for (double v : vals)
     add (v);
 }
 
 /// Return distribution's average (first order moment)
-inline 
-double statpars::average ()
+inline double statpars::average ()
 {
   if (!values.empty ())
     return sum / values.size ();
@@ -80,8 +77,7 @@ double statpars::average ()
 }
 
 /// Return distribution's variance (2nd order moment)
-inline
-double statpars::variance ()
+inline double statpars::variance ()
 {
   if (!calc)
     calculate ();
@@ -89,8 +85,7 @@ double statpars::variance ()
 }
 
 /// Return standard deviation (square root of variance)
-inline
-double statpars::stdev ()
+inline double statpars::stdev ()
 {
   if (!calc)
     calculate ();
@@ -98,8 +93,7 @@ double statpars::stdev ()
 }
 
 /// Return average absolute deviation also called "mean absolute deviation" (MAD)
-inline 
-double statpars::mad ()
+inline double statpars::mad ()
 {
   if (!calc)
     calculate ();
@@ -107,8 +101,7 @@ double statpars::mad ()
 }
 
 /// Return skewness (3rd order moment)
-inline
-double statpars::skewness ()
+inline double statpars::skewness ()
 {
   if (!calc)
     calculate ();
@@ -116,8 +109,7 @@ double statpars::skewness ()
 }
 
 /// Return kurtosis (4th order moment)
-inline
-double statpars::kurtosis ()
+inline double statpars::kurtosis ()
 {
   if (!calc)
     calculate ();
@@ -125,20 +117,17 @@ double statpars::kurtosis ()
 }
 
 /// Return number of samples
-inline
-int statpars::count ()
+inline int statpars::count ()
 {
   return (int)values.size ();
 }
 
 /// Calculator reset
-inline
-void statpars::clear ()
+inline void statpars::clear ()
 {
   values.clear ();
   calc = false;
   sum = 0.;
 }
 
-}
-
+} // namespace mlib

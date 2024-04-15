@@ -4,8 +4,8 @@
   (c) Mircea Neacsu 2022. All rights reserved.
 */
 
-#include <mlib/json.h>
-#include <mlib/trace.h>
+#include <mlib/mlib.h>
+#pragma hdrstop
 #include <istream>
 #include <ostream>
 #include <sstream>
@@ -25,7 +25,8 @@ node null_node;
 node::node (type t_)
   : t (t_)
 {
-  switch (t) {
+  switch (t)
+  {
   case type::object:
     new (&obj) nodes_map ();
     break;
@@ -33,7 +34,7 @@ node::node (type t_)
     new (&arr) nodes_array ();
     break;
   case type::string:
-    new (&str)std::string ();
+    new (&str) std::string ();
     break;
   case type::numeric:
     num = 0.;
@@ -52,25 +53,24 @@ node::node (const node& other)
   {
   case type::object:
     new (&obj) nodes_map ();
-    for (auto n = other.obj.begin(); n != other.obj.end (); ++n)
-      obj.emplace (n->first, make_unique<node> (n->second.get()));
+    for (auto n = other.obj.begin (); n != other.obj.end (); ++n)
+      obj.emplace (n->first, make_unique<node> (n->second.get ()));
     break;
-  case type::array:
+  case type::array: {
+    new (&arr) nodes_array (other.arr.size ());
+    size_t i = 0;
+    for (auto n = other.arr.begin (); n != other.arr.end (); ++n, ++i)
     {
-      new (&arr) nodes_array (other.arr.size ());
-      size_t i = 0;
-      for (auto n = other.arr.begin (); n != other.arr.end (); ++n, ++i)
-      {
-        auto v = n->get ();
-        arr[i] = make_unique<node> (*v);
-      }
-      break;
+      auto v = n->get ();
+      arr[i] = make_unique<node> (*v);
     }
+    break;
+  }
   case type::numeric:
     num = other.num;
     break;
   case type::string:
-    new (&str)std::string ();
+    new (&str) std::string ();
     str = other.str;
     break;
   case type::boolean:
@@ -94,7 +94,7 @@ node::~node ()
 }
 
 /// Principal assignment operator
-node& node::operator=(const node& rhs)
+node& node::operator= (const node& rhs)
 {
   if (&rhs != this)
   {
@@ -107,8 +107,8 @@ node& node::operator=(const node& rhs)
         obj.emplace (n->first, make_unique<node> (*n->second));
       break;
     case type::array:
-      for (size_t i = 0; i < rhs.arr.size(); i++)
-        arr.emplace_back (make_unique<node>(*rhs.arr[i]));
+      for (size_t i = 0; i < rhs.arr.size (); i++)
+        arr.emplace_back (make_unique<node> (*rhs.arr[i]));
       break;
     case type::string:
       str = rhs.str;
@@ -125,7 +125,7 @@ node& node::operator=(const node& rhs)
 }
 
 /// Move assignment operator
-node& node::operator =(node&& rhs)
+node& node::operator= (node&& rhs)
 {
   if (&rhs != this)
   {
@@ -138,9 +138,9 @@ node& node::operator =(node&& rhs)
 /*!
   Return value of an object node element.
 
-  If \p name doesn't exist, it is appended to node. 
+  If \p name doesn't exist, it is appended to node.
 */
-node& node::operator[](const std::string& name)
+node& node::operator[] (const std::string& name)
 {
   if (t == type::null)
   {
@@ -166,7 +166,7 @@ node& node::operator[](const std::string& name)
 
   If element doesn't exist it throws an ERR_JSON_MISSING exception.
 */
-const node& node::operator[](const std::string& name) const
+const node& node::operator[] (const std::string& name) const
 {
   if (t != type::object)
     mlib::erc (ERR_JSON_INVTYPE, mlib::erc::error, errors).raise ();
@@ -187,10 +187,12 @@ const node& node::at (const std::string& name) const
   if (t != type::object)
     mlib::erc (ERR_JSON_INVTYPE, mlib::erc::error, errors).raise ();
 
-  try {
+  try
+  {
     return *obj.at (name);
   }
-  catch (std::out_of_range) {
+  catch (std::out_of_range)
+  {
     mlib::erc (ERR_JSON_MISSING, mlib::erc::critical, errors).raise ();
     return null_node;
   }
@@ -201,7 +203,7 @@ const node& node::at (const std::string& name) const
 
   If element doesn't exist the array is extended with null elements.
 */
-node& node::operator[](size_t index)
+node& node::operator[] (size_t index)
 {
   if (t == type::null)
   {
@@ -213,15 +215,15 @@ node& node::operator[](size_t index)
 
   if (index >= arr.size ())
   {
-    //extend array
+    // extend array
     auto old_size = arr.size ();
     if (index < max_array_size - 1)
       arr.resize (index + 1);
     else
       mlib::erc (ERR_JSON_TOOMANY, mlib::erc::error, errors).raise ();
 
-    //add null nodes
-    for (auto i=old_size; i<=index; i++)
+    // add null nodes
+    for (auto i = old_size; i <= index; i++)
       arr[i] = std::make_unique<node> ();
   }
   return *arr[index];
@@ -232,7 +234,7 @@ node& node::operator[](size_t index)
 
   If element doesn't exist throws an ERR_JSON_MISSING exception.
 */
-const node& node::operator[](size_t index) const
+const node& node::operator[] (size_t index) const
 {
   if (t != type::array)
     mlib::erc (ERR_JSON_INVTYPE, mlib::erc::error, errors).raise ();
@@ -248,22 +250,24 @@ const node& node::operator[](size_t index) const
 
   If element doesn't exist throws an ERR_JSON_MISSING exception.
 */
-const node& node::at(size_t index) const
+const node& node::at (size_t index) const
 {
   if (t != type::array)
     mlib::erc (ERR_JSON_INVTYPE, mlib::erc::error, errors).raise ();
 
-  try {
+  try
+  {
     return *arr.at (index);
   }
-  catch (std::out_of_range) {
+  catch (std::out_of_range)
+  {
     mlib::erc (ERR_JSON_MISSING, mlib::erc::critical, errors).raise ();
     return null_node;
   }
 }
 
 /// Equality operator
-bool node::operator==(const node& other) const
+bool node::operator== (const node& other) const
 {
   if (t == other.t)
   {
@@ -271,17 +275,15 @@ bool node::operator==(const node& other) const
     {
     case type::object:
       return (obj.size () == other.obj.size ())
-        && std::equal (obj.begin (), obj.end (), other.obj.begin (), other.obj.end (),
-          [](auto const& n, auto const& m) ->bool {
-            return (n.first == m.first) && (*n.second == *m.second);
-          });
+             && std::equal (obj.begin (), obj.end (), other.obj.begin (), other.obj.end (),
+                            [] (auto const& n, auto const& m) -> bool {
+                              return (n.first == m.first) && (*n.second == *m.second);
+                            });
 
     case type::array:
-      return (arr.size() == other.arr.size())
-        && std::equal (arr.begin (), arr.end (), other.arr.begin (), other.arr.end (),
-          [](auto const& n, auto const& m) ->bool {
-            return *n == *m;
-          });
+      return (arr.size () == other.arr.size ())
+             && std::equal (arr.begin (), arr.end (), other.arr.begin (), other.arr.end (),
+                            [] (auto const& n, auto const& m) -> bool { return *n == *m; });
 
     case type::numeric:
       return num == other.num;
@@ -354,8 +356,8 @@ static std::string token (istream& is)
   int i = 0;
   tok.reserve (10);
 
-  while (i++ < 10 && isalpha(is.peek ()))
-    tok.push_back (is.get());
+  while (i++ < 10 && isalpha (is.peek ()))
+    tok.push_back (is.get ());
 
   return tok;
 }
@@ -367,7 +369,7 @@ static erc parse_num (istream& is, double& num)
 {
   num = 0;
   double dec = 1.;
-  int exp=0, expsign = 1;
+  int exp = 0, expsign = 1;
 
   char c = skipws (is);
   int sign = (c == '-') ? -1 : 1;
@@ -377,7 +379,8 @@ static erc parse_num (istream& is, double& num)
   // integer part
   if ('1' <= c && c <= '9')
   {
-    do {
+    do
+    {
       num = num * 10 + (c - '0');
       c = is.get ();
     } while (isdigit (c));
@@ -387,7 +390,7 @@ static erc parse_num (istream& is, double& num)
   else
     return erc (ERR_JSON_INPUT, mlib::erc::error, errors);
 
-  //fraction
+  // fraction
   if (c == '.')
   {
     c = is.get ();
@@ -406,7 +409,7 @@ static erc parse_num (istream& is, double& num)
     return erc::success;
   }
 
-  //exponent
+  // exponent
   c = is.get ();
   if (c == '+')
     c = is.get ();
@@ -418,7 +421,8 @@ static erc parse_num (istream& is, double& num)
   if (!isdigit (c))
     return erc (ERR_JSON_INPUT, mlib::erc::error, errors);
 
-  do {
+  do
+  {
     exp = exp * 10 + (c - '0');
     c = is.get ();
   } while (isdigit (c));
@@ -537,7 +541,7 @@ erc node::read (std::istream& is)
       if (ret.code () != 0)
         return ret;
 
-      if ((c= skipws (is)) == ']')
+      if ((c = skipws (is)) == ']')
         return erc::success;
       else if (c != ',')
         return erc (ERR_JSON_INPUT, mlib::erc::error, errors);
@@ -614,13 +618,13 @@ erc node::read (std::istream& is)
 erc node::read (const std::string& s)
 {
   stringstream ss (s);
-  
+
   erc ret = read (ss);
   if (ret.code ())
     return ret;
   if (peekws (ss) != char_traits<char>::eof ())
     return erc (ERR_JSON_INPUT, mlib::erc::error, errors);
-    
+
   return erc::success;
 }
 
@@ -632,13 +636,27 @@ static void quote (ostream& os, const std::string& s, bool quote_slash)
   {
     switch (chr)
     {
-    case '\b':  os << "\\b"; break;
-    case '\f':  os << "\\f"; break;
-    case '\n':  os << "\\n"; break;
-    case '\r':  os << "\\r"; break;
-    case '\t':  os << "\\t"; break;
-    case '\\':  os << "\\\\"; break;
-    case '"':   os << "\\\""; break;
+    case '\b':
+      os << "\\b";
+      break;
+    case '\f':
+      os << "\\f";
+      break;
+    case '\n':
+      os << "\\n";
+      break;
+    case '\r':
+      os << "\\r";
+      break;
+    case '\t':
+      os << "\\t";
+      break;
+    case '\\':
+      os << "\\\\";
+      break;
+    case '"':
+      os << "\\\"";
+      break;
     case '/':
       if (quote_slash)
         os << "\\/";
@@ -651,14 +669,14 @@ static void quote (ostream& os, const std::string& s, bool quote_slash)
         os << (char)chr;
       else if (chr < ' ' && chr < 0xffff)
       {
-        //controls & basic multilingual plane
+        // controls & basic multilingual plane
         char buf[8];
         sprintf (buf, "\\u%04x", (unsigned int)chr);
         os << buf;
       }
       else
       {
-        //supplemental multilingual planes
+        // supplemental multilingual planes
         wstring ws = utf8::widen (utf8::narrow (&chr, 1));
         char buf[16];
         sprintf (buf, "\\u%04x\\u%04x", ws[0], ws[1]);
@@ -669,7 +687,7 @@ static void quote (ostream& os, const std::string& s, bool quote_slash)
   }
 }
 
-//formatting flags
+// formatting flags
 int ostream_flags = ios_base::xalloc ();
 /*
   Structure of formatting flags word (long):
@@ -684,7 +702,7 @@ int ostream_flags = ios_base::xalloc ();
   \param flags formatting flags
   \param spaces number of spaces to indent. If 0 uses tabs instead of spaces
   \param level starting indentation level
-*/ 
+*/
 erc node::write (std::ostream& os, int flags, int spaces, int level) const
 {
   string fill;
@@ -692,7 +710,7 @@ erc node::write (std::ostream& os, int flags, int spaces, int level) const
   if (spaces == 0)
     fill.resize (level, '\t');
   else
-    fill.resize (spaces*level, ' ');
+    fill.resize (spaces * level, ' ');
 
   switch (t)
   {
@@ -703,7 +721,7 @@ erc node::write (std::ostream& os, int flags, int spaces, int level) const
       os << endl;
       os << fill;
     }
-    for (auto ptr = obj.begin (); ptr != obj.end (); )
+    for (auto ptr = obj.begin (); ptr != obj.end ();)
     {
       os << '"';
       quote (os, ptr->first, (flags & JSON_FMT_QUOTESLASH) != 0);
@@ -728,7 +746,7 @@ erc node::write (std::ostream& os, int flags, int spaces, int level) const
       os << endl;
       os << fill;
     }
-    for (auto ptr = arr.begin (); ptr != arr.end (); )
+    for (auto ptr = arr.begin (); ptr != arr.end ();)
     {
       (*ptr++)->write (os, flags, spaces, level);
       if (ptr != arr.end ())
@@ -785,15 +803,14 @@ double node::to_num () const
   {
   case type::numeric:
     return num;
-  case type::string:
-    {
-      char* end;
-      double d = strtod (str.c_str (), &end);
-      if (!*end)
-        return d;
-    }
+  case type::string: {
+    char* end;
+    double d = strtod (str.c_str (), &end);
+    if (!*end)
+      return d;
+  }
   case type::null:
-      return 0;
+    return 0;
   case type::boolean:
     return logic ? 1. : 0.;
   }
@@ -825,8 +842,8 @@ bool node::to_bool () const
     return logic;
   if (t == type::string)
   {
-    auto s = utf8::tolower(str);
-    if (s == "false" || s== "0" || s == "off")
+    auto s = utf8::tolower (str);
+    if (s == "false" || s == "0" || s == "off")
       return false;
     if (s == "true" || s == "1" || s == "on")
       return true;
@@ -844,7 +861,6 @@ void indenter (std::ios_base& os, int spaces)
   os.iword (ostream_flags) |= (JSON_FMT_INDENT << 8) | spaces;
 }
 
-
 std::ostream& noindent (std::ostream& os)
 {
   os.iword (ostream_flags) &= ~(JSON_FMT_INDENT << 8);
@@ -852,7 +868,7 @@ std::ostream& noindent (std::ostream& os)
 }
 
 /// Write a JSON object to a stream
-std::ostream& operator << (std::ostream& os, const node& n)
+std::ostream& operator<< (std::ostream& os, const node& n)
 {
   long fmt = os.iword (json::ostream_flags);
   n.write (os, fmt >> 8, fmt & 0xff);
@@ -860,7 +876,7 @@ std::ostream& operator << (std::ostream& os, const node& n)
 }
 
 /// Read a JSON node from a stream
-std::istream& operator >> (std::istream& is, node& n)
+std::istream& operator>> (std::istream& is, node& n)
 {
   n.clear ();
   erc ret = n.read (is);
@@ -872,7 +888,4 @@ std::istream& operator >> (std::istream& is, node& n)
   return is;
 }
 
-
-} // end json namespace
-
-
+} // namespace json

@@ -24,28 +24,36 @@ constexpr int max_object_names = 8192;
 /// Maximum string length
 constexpr int max_string_length = 8192;
 
-
-//Formatting flags
-#define JSON_FMT_INDENT     0x01      //!< Indent JSON string when writing
-#define JSON_FMT_QUOTESLASH 0x02      //!< Quote all solidus ('/') characters
+// Formatting flags
+#define JSON_FMT_INDENT     0x01 //!< Indent JSON string when writing
+#define JSON_FMT_QUOTESLASH 0x02 //!< Quote all solidus ('/') characters
 
 // JSON error codes
-#define ERR_JSON_INVTYPE    -1    //!< invalid node type
-#define ERR_JSON_TOOMANY    -2    //!< too many descendants
-#define ERR_JSON_ITERTYPE   -3    //!< invalid iterator type
-#define ERR_JSON_ITERPOS    -4    //!< invalid iterator position
-#define ERR_JSON_INPUT      -5    //!< invalid character in input stream
-#define ERR_JSON_SIZE       -7    //!< invalid element size
-#define ERR_JSON_MISSING    -8    //!< invalid index or key on const node 
+#define ERR_JSON_INVTYPE  -1 //!< invalid node type
+#define ERR_JSON_TOOMANY  -2 //!< too many descendants
+#define ERR_JSON_ITERTYPE -3 //!< invalid iterator type
+#define ERR_JSON_ITERPOS  -4 //!< invalid iterator position
+#define ERR_JSON_INPUT    -5 //!< invalid character in input stream
+#define ERR_JSON_SIZE     -7 //!< invalid element size
+#define ERR_JSON_MISSING  -8 //!< invalid index or key on const node
 
 /// Error facility for JSON errors
 extern mlib::errfac* errors;
 
 /// JSON node types
-enum class type { null, object, array, numeric, string, boolean };
+enum class type
+{
+  null,
+  object,
+  array,
+  numeric,
+  string,
+  boolean
+};
 
 /// Representation of a JSON node
-class node {
+class node
+{
 public:
   using pnode = std::unique_ptr<node>;
   using nodes_map = std::map<const std::string, pnode>;
@@ -63,7 +71,7 @@ public:
   node (const std::vector<T>& vec);
 
   template <class T>
-  node (const T& t, decltype(&T::to_json)* = nullptr);
+  node (const T& t, decltype (&T::to_json)* = nullptr);
 
   node (const node& other);
   node (node&& other);
@@ -71,15 +79,18 @@ public:
 
   /// node iterator
   template <bool C_>
-  class iterator_type {
+  class iterator_type
+  {
   public:
-    //Following typedefs must exist to allow instantiation of std::iterator_traits
+    // Following typedefs must exist to allow instantiation of std::iterator_traits
     using difference_type = std::ptrdiff_t;
     using value_type = node;
-    using reference = typename std::conditional_t< C_, node const&, node& >;
-    using pointer = typename std::conditional_t< C_, const node*, node* >;
-    using obj_iter = typename std::conditional_t< C_, nodes_map::const_iterator, nodes_map::iterator>;
-    using arr_iter = typename std::conditional_t< C_, nodes_array::const_iterator, nodes_array::iterator>;
+    using reference = typename std::conditional_t<C_, node const&, node&>;
+    using pointer = typename std::conditional_t<C_, const node*, node*>;
+    using obj_iter =
+      typename std::conditional_t<C_, nodes_map::const_iterator, nodes_map::iterator>;
+    using arr_iter =
+      typename std::conditional_t<C_, nodes_array::const_iterator, nodes_array::iterator>;
     using iterator_category = std::bidirectional_iterator_tag;
 
     // Copy constructor
@@ -95,7 +106,7 @@ public:
     }
 
     // Destructor
-    ~iterator_type<C_> () 
+    ~iterator_type<C_> ()
     {
       if (target.t == type::object)
         (&objit)->~obj_iter ();
@@ -104,7 +115,7 @@ public:
     }
 
     /// Dereference value
-    reference operator *()
+    reference operator* ()
     {
       if (target.t == type::object)
       {
@@ -121,11 +132,11 @@ public:
       else if (at_end)
         mlib::erc (ERR_JSON_ITERPOS, mlib::erc::error, errors).raise ();
 
-      return const_cast<json::node&>(target);
+      return const_cast<json::node&> (target);
     }
 
     /// Value pointer
-    pointer operator ->()
+    pointer operator->()
     {
       if (target.t == type::object)
       {
@@ -141,7 +152,7 @@ public:
       }
       else if (at_end)
         mlib::erc (ERR_JSON_ITERPOS, mlib::erc::error, errors).raise ();
-      return const_cast<json::node *> (&target);
+      return const_cast<json::node*> (&target);
     }
 
     /// Object name
@@ -154,14 +165,14 @@ public:
       return objit->first;
     }
 
-    ///Increment operator (postfix)
-    iterator_type<C_> operator ++ (int)
+    /// Increment operator (postfix)
+    iterator_type<C_> operator++ (int)
     {
       iterator_type<C_> tmp = *this;
       if (target.t == type::object)
         objit.operator++ ();
       else if (target.t == type::array)
-        arrit.operator ++();
+        arrit.operator++ ();
       else if (!at_end)
         at_end = true;
       else
@@ -169,13 +180,13 @@ public:
       return tmp;
     }
 
-    ///Increment operator (prefix)
-    iterator_type<C_>& operator ++ ()
+    /// Increment operator (prefix)
+    iterator_type<C_>& operator++ ()
     {
       if (target.t == type::object)
         objit.operator++ ();
       else if (target.t == type::array)
-        arrit.operator ++();
+        arrit.operator++ ();
       else if (!at_end)
         at_end = true;
       else
@@ -184,8 +195,8 @@ public:
       return *this;
     }
 
-    ///Decrement operator (postfix)
-    iterator_type<C_> operator -- (int)
+    /// Decrement operator (postfix)
+    iterator_type<C_> operator-- (int)
     {
       iterator_type<C_> tmp = *this;
       if (target.t == type::object)
@@ -199,13 +210,13 @@ public:
       return tmp;
     }
 
-    ///Decrement operator (prefix)
-    iterator_type<C_> operator -- ()
+    /// Decrement operator (prefix)
+    iterator_type<C_> operator-- ()
     {
       if (target.t == type::object)
         objit.operator-- ();
       else if (target.t == type::array)
-        arrit.operator --();
+        arrit.operator-- ();
       else if (at_end)
         at_end = false;
       else
@@ -213,8 +224,8 @@ public:
       return *this;
     }
 
-    ///Equality operator
-    bool operator == (const iterator_type<C_>& other) const
+    /// Equality operator
+    bool operator== (const iterator_type<C_>& other) const
     {
       if (&target != &other.target)
         return false;
@@ -226,31 +237,27 @@ public:
         return (at_end == other.at_end);
     }
 
-    ///Inequality operator
-    bool operator != (const iterator_type<C_>& other) const
+    /// Inequality operator
+    bool operator!= (const iterator_type<C_>& other) const
     {
-      return !operator ==(other);
+      return !operator== (other);
     }
 
   private:
     iterator_type<C_> (const node& n, bool end)
       : target (n)
       , at_end (end)
-    {
-    }
+    {}
 
-    iterator_type<C_> (const node& n, const arr_iter& it) 
+    iterator_type<C_> (const node& n, const arr_iter& it)
       : target (n)
       , arrit (it)
-    {
-
-    }
+    {}
 
     iterator_type (const node& n, const obj_iter& it)
       : target (n)
       , objit (it)
-    {
-    }
+    {}
 
     union {
       obj_iter objit;
@@ -266,15 +273,15 @@ public:
   typedef iterator_type<true> const_iterator;
 
   // ------------------ Assignments -------------------------------------------
-  //principal assignment operator
-  node& operator = (const node& rhs);
-  
-  //move assignment operator
-  node& operator = (node&& rhs);
+  // principal assignment operator
+  node& operator= (const node& rhs);
+
+  // move assignment operator
+  node& operator= (node&& rhs);
 
   /// Assignment operator
-  template <class T, typename B = decltype(&T::to_json)>
-  node& operator = (const T& t)
+  template <class T, typename B = decltype (&T::to_json)>
+  node& operator= (const T& t)
   {
     clear ();
     t.to_json (*this);
@@ -290,7 +297,7 @@ public:
   }
 
   /// Numeric assignment
-  template <typename T, typename B = std::enable_if_t< std::is_arithmetic_v<T> > >
+  template <typename T, typename B = std::enable_if_t<std::is_arithmetic_v<T>>>
   node& operator= (T n)
   {
     clear (type::numeric);
@@ -314,7 +321,7 @@ public:
     return *this;
   }
 
-  //type conversions
+  // type conversions
   explicit operator std::string () const;
   explicit operator const char* () const;
   explicit operator double () const;
@@ -326,14 +333,14 @@ public:
   std::string to_str () const;
   bool to_bool () const;
 
-  //indexing
-  node& operator [](const std::string& name);
-  const node& operator [](const std::string& name) const;
+  // indexing
+  node& operator[] (const std::string& name);
+  const node& operator[] (const std::string& name) const;
   node& at (const std::string& name);
   const node& at (const std::string& name) const;
 
-  node& operator [](size_t index);
-  const node& operator [](size_t index) const;
+  node& operator[] (size_t index);
+  const node& operator[] (size_t index) const;
   node& at (size_t index);
   const node& at (size_t index) const;
 
@@ -343,16 +350,16 @@ public:
   iterator end ();
 
   //(in)equality operators
-  bool operator == (const node& other) const;
-  bool operator != (const node& other) const;
+  bool operator== (const node& other) const;
+  bool operator!= (const node& other) const;
 
-  //streaming (encoding/decoding)
+  // streaming (encoding/decoding)
   mlib::erc read (std::istream& s);
   mlib::erc read (const std::string& s);
   mlib::erc write (std::ostream& os, int flags = 0, int spaces = 0, int level = 0) const;
-  mlib::erc write (std::string& s, int flags = 0, int spaces=0) const;
+  mlib::erc write (std::string& s, int flags = 0, int spaces = 0) const;
 
-  //other operations
+  // other operations
   bool has (const std::string& name) const;
   void erase (const std::string& name);
   void clear (type t = type::null);
@@ -360,7 +367,6 @@ public:
   int size () const;
 
 private:
-
   type t;
   union {
     nodes_map obj;
@@ -371,58 +377,52 @@ private:
   };
 };
 
-
 /// Constructor for a string type node
 inline node::node (const std::string& s)
   : t (type::string)
   , str (s)
-{
-}
+{}
 
 /// Alternate constructor for a string node
 inline node::node (const char* s)
   : t (type::string)
   , str (s)
-{
-}
+{}
 
 /// Constructor for a numeric node
 inline node::node (double d)
   : t (type::numeric)
   , num (d)
-{
-}
+{}
 
-///Alternate constructor for a numeric node
+/// Alternate constructor for a numeric node
 inline node::node (int d)
   : t (type::numeric)
   , num (d)
-{
-}
+{}
 
 /// Constructor for a boolean node
 inline node::node (bool b)
   : t (type::boolean)
   , logic (b)
-{
-}
+{}
 
-///Constructor from a vector
+/// Constructor from a vector
 template <typename T>
 node::node (const std::vector<T>& vec)
   : t (type::array)
 {
-  new (&obj)nodes_array ();
+  new (&obj) nodes_array ();
   for (size_t i = 0; i < vec.size (); ++i)
-    arr.emplace_back (std::make_unique<node>(vec[i]));
+    arr.emplace_back (std::make_unique<node> (vec[i]));
 }
 
 /// Constructor from an object
 template <class T>
-node::node (const T& t, decltype(&T::to_json)*)
-  : t(type::object)
+node::node (const T& t, decltype (&T::to_json)*)
+  : t (type::object)
 {
-  new (&obj)nodes_map ();
+  new (&obj) nodes_map ();
   t.to_json (*this);
 }
 
@@ -513,23 +513,39 @@ inline node::operator bool () const
 /// Remove previous node content
 inline void node::clear (type t_)
 {
-  //clear previous content
+  // clear previous content
   switch (t)
   {
-  case type::object:  (&obj)->~nodes_map ();    break;
-  case type::array:   (&arr)->~nodes_array ();  break;
-  case type::string:  (&str)->~basic_string (); break;
+  case type::object:
+    (&obj)->~nodes_map ();
+    break;
+  case type::array:
+    (&arr)->~nodes_array ();
+    break;
+  case type::string:
+    (&str)->~basic_string ();
+    break;
   }
-    
+
   t = t_;
-  //initialize new type
+  // initialize new type
   switch (t)
   {
-  case type::object:  new (&obj)nodes_map ();   break;
-  case type::array:   new (&arr)nodes_array (); break;
-  case type::string:  new (&str)std::string (); break;
-  case type::numeric: num = 0.;                 break;
-  case type::boolean: logic = false;            break;
+  case type::object:
+    new (&obj) nodes_map ();
+    break;
+  case type::array:
+    new (&arr) nodes_array ();
+    break;
+  case type::string:
+    new (&str) std::string ();
+    break;
+  case type::numeric:
+    num = 0.;
+    break;
+  case type::boolean:
+    logic = false;
+    break;
   }
 }
 
@@ -542,15 +558,16 @@ inline type node::kind () const
 /// Return number of direct descendants
 inline int node::size () const
 {
-  return (t == type::object) ? (int)obj.size () :
-         (t == type::array) ? (int)arr.size () : 
-         (t != type::null)? 1 : 0;
+  return (t == type::object)  ? (int)obj.size ()
+         : (t == type::array) ? (int)arr.size ()
+         : (t != type::null)  ? 1
+                              : 0;
 }
 
 /// inequality operator
-inline bool node::operator!=(const node& other) const
+inline bool node::operator!= (const node& other) const
 {
-  return !operator ==(other);
+  return !operator== (other);
 }
 
 /*!
@@ -558,10 +575,9 @@ inline bool node::operator!=(const node& other) const
 
   If element doesn't exist it throws an ERR_JSON_MISSING exception.
 */
-inline
-node& node::at (const std::string& name)
+inline node& node::at (const std::string& name)
 {
-  return const_cast<node&>(static_cast<const node&>(*this).at (name));
+  return const_cast<node&> (static_cast<const node&> (*this).at (name));
 }
 
 /*!
@@ -569,37 +585,43 @@ node& node::at (const std::string& name)
 
   If element doesn't exist it throws an ERR_JSON_MISSING exception.
 */
-inline
-node& node::at (size_t index)
+inline node& node::at (size_t index)
 {
-  return const_cast<node&>(static_cast<const node&>(*this).at (index));
+  return const_cast<node&> (static_cast<const node&> (*this).at (index));
 }
 
 // manipulators
 #ifdef _MSC_VER
 void indenter (std::ios_base& os, int spaces);
 
-inline std::_Smanip<int>
-  spaces (int nspc) { return std::_Smanip<int> (&indenter, nspc); }
+inline std::_Smanip<int> spaces (int nspc)
+{
+  return std::_Smanip<int> (&indenter, nspc);
+}
 
-inline std::ostream& indent (std::ostream& os) { indenter (os, 2); return os; };
-inline std::ostream& tabs (std::ostream& os) { indenter (os, 0); return os; };
+inline std::ostream& indent (std::ostream& os)
+{
+  indenter (os, 2);
+  return os;
+};
+inline std::ostream& tabs (std::ostream& os)
+{
+  indenter (os, 0);
+  return os;
+};
 std::ostream& noindent (std::ostream& os);
 #endif
 
-std::ostream& operator << (std::ostream& os, const node& n);
-std::istream& operator >> (std::istream& is, node& n);
+std::ostream& operator<< (std::ostream& os, const node& n);
+std::istream& operator>> (std::istream& is, node& n);
 
 /// Assign array value to a node
 template <typename T>
 void to_json (node& n, const std::vector<T>& vec)
 {
   n.clear (type::array);
-  for (int i = 0; i < vec.size(); ++i)
+  for (int i = 0; i < vec.size (); ++i)
     n[i] = vec[i];
 }
 
-
-} //namespace json
-
-
+} // namespace json

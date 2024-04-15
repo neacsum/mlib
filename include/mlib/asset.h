@@ -5,7 +5,7 @@
 */
 #pragma once
 
-#if __has_include ("defs.h")
+#if __has_include("defs.h")
 #include "defs.h"
 #endif
 
@@ -14,7 +14,7 @@
 
 #ifndef RESFILE
 /// Resource type for asset files
-#define RESFILE   256
+#define RESFILE 256
 #endif
 
 namespace mlib {
@@ -50,16 +50,18 @@ private:
   \param id_ resource ID
   \param persist if `true` do not delete disk file when asset object is destructed
 */
-inline
-asset::asset (int id_, const std::string& name_, bool persist)
-  : name (name_), id (id_), written (false), keep(persist), loaded(false), sz (0), ptr (nullptr)
-{
-}
-
+inline asset::asset (int id_, const std::string& name_, bool persist)
+  : name (name_)
+  , id (id_)
+  , written (false)
+  , keep (persist)
+  , loaded (false)
+  , sz (0)
+  , ptr (nullptr)
+{}
 
 /// Destructor. Delete asset file if it exists
-inline
-asset::~asset ()
+inline asset::~asset ()
 {
   if (written && !keep)
     remove ();
@@ -70,8 +72,7 @@ asset::~asset ()
 
   File is deleted even if this is a persistent asset.
 */
-inline
-bool asset::remove ()
+inline bool asset::remove ()
 {
   if (written)
   {
@@ -82,9 +83,8 @@ bool asset::remove ()
 }
 
 /// Return size of asset (in bytes)
-inline
-size_t asset::size ()
+inline size_t asset::size ()
 {
   return sz;
 }
-} //mlib namespace
+} // namespace mlib

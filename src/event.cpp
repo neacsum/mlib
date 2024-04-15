@@ -6,11 +6,8 @@
 
 ///  \file event.cpp event class implementation.
 
-#ifndef UNICODE
-#define UNICODE
-#endif
-
-#include <mlib/event.h>
+#include <mlib/mlib.h>
+#pragma hdrstop
 #include <assert.h>
 
 #if __has_include(<utf8/utf8.h>)
@@ -31,12 +28,13 @@ namespace mlib {
   function.
 */
 
-///Constructor for event objects
-event::event (bool manual, bool signaled, const std::string& name) :
-  syncbase (name)
+/// Constructor for event objects
+event::event (bool manual, bool signaled, const std::string& name)
+  : syncbase (name)
 {
 #ifdef MLIB_HAS_UTF8_LIB
-  HANDLE h = CreateEventW (NULL, manual, signaled, !name.empty () ? utf8::widen (name).c_str () : NULL);
+  HANDLE h =
+    CreateEventW (NULL, manual, signaled, !name.empty () ? utf8::widen (name).c_str () : NULL);
 #else
   HANDLE h = CreateEventA (NULL, manual, signaled, !name.empty () ? name.c_str () : NULL);
 #endif
@@ -44,4 +42,4 @@ event::event (bool manual, bool signaled, const std::string& name) :
   set_handle (h);
 }
 
-}
+} // namespace mlib

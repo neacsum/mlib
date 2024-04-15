@@ -5,7 +5,7 @@
     (c) Mircea Neacsu 2004-2017
 */
 
-#if __has_include ("defs.h")
+#if __has_include("defs.h")
 #include "defs.h"
 #endif
 
@@ -14,59 +14,86 @@
 
 namespace mlib {
 
-///Base class for shared memory objects
+/// Base class for shared memory objects
 class shmem_base
 {
 public:
-  //constructors/destructor
+  // constructors/destructor
   shmem_base ();
   shmem_base (const std::string& name, size_t size);
-  virtual ~shmem_base();
+  virtual ~shmem_base ();
 
-  //open/close
+  // open/close
   virtual bool open (const std::string& name, size_t size);
   virtual bool close ();
 
-  bool    created () const      {return mem_created;};
-  bool    is_opened () const    {return mem != NULL;};
-  size_t  size () const         {return sz;};
-  const std::string& name () const     { return name_; };
-  
-  //get/set function for read/write timeout
-  void    wtmo (DWORD msec)     {wtmo_ = msec;};
-  DWORD   wtmo () const         {return wtmo_;};
-  void    rtmo (DWORD msec)     {rtmo_ = msec;};
-  DWORD   rtmo () const         {return rtmo_;};
+  bool created () const
+  {
+    return mem_created;
+  };
+  bool is_opened () const
+  {
+    return mem != NULL;
+  };
+  size_t size () const
+  {
+    return sz;
+  };
+  const std::string& name () const
+  {
+    return name_;
+  };
 
-  //data access function
-  virtual bool    write (const void * data);
-  virtual bool    read (void * data);
+  // get/set function for read/write timeout
+  void wtmo (DWORD msec)
+  {
+    wtmo_ = msec;
+  };
+  DWORD wtmo () const
+  {
+    return wtmo_;
+  };
+  void rtmo (DWORD msec)
+  {
+    rtmo_ = msec;
+  };
+  DWORD rtmo () const
+  {
+    return rtmo_;
+  };
+
+  // data access function
+  virtual bool write (const void* data);
+  virtual bool read (void* data);
 
 protected:
-  //Lock control
-  bool    rdlock ();
-  void    rdunlock ();
-  bool    wrlock ();
-  void    wrunlock ();
+  // Lock control
+  bool rdlock ();
+  void rdunlock ();
+  bool wrlock ();
+  void wrunlock ();
 
-  //Unprotected data access functions. Use always together with lock control functions
-  virtual void get (void *data);
-  virtual void put (const void *data);
-  void *dataptr () const        {return mem;};
+  // Unprotected data access functions. Use always together with lock control functions
+  virtual void get (void* data);
+  virtual void put (const void* data);
+  void* dataptr () const
+  {
+    return mem;
+  };
 
 private:
-#pragma pack (push, 1)
+#pragma pack(push, 1)
   /// variables used for access synchronization
   struct syncblk
   {
-    HANDLE wrex;            ///< writers exclusion mutex
-    HANDLE rdgate;          ///< readers blocking event
-    DWORD wrid;             ///< thread id of writer
-    //    long rdreq;             ///< requesting readers 
-    LONG rc;                ///< active readers
-    LONG wc;                ///< active writers
+    HANDLE wrex;   ///< writers exclusion mutex
+    HANDLE rdgate; ///< readers blocking event
+    DWORD wrid;    ///< thread id of writer
+    //    long rdreq;             ///< requesting readers
+    LONG rc; ///< active readers
+    LONG wc; ///< active writers
   };
-#pragma pack (pop)
+#pragma pack(pop)
 
   std::string name_;
   LONG in_rdlock;
@@ -76,46 +103,63 @@ private:
   HANDLE rdgate, wrex;
   DWORD rtmo_, wtmo_;
   size_t sz;
-  struct syncblk *syn;
-  void *mem;
+  struct syncblk* syn;
+  void* mem;
 };
 
-///Shared memory area with support for single-writer multiple-readers
-template<class S, class B=shmem_base> class shmem : public B
+/// Shared memory area with support for single-writer multiple-readers
+template <class S, class B = shmem_base>
+class shmem : public B
 {
 public:
   shmem ();
-  shmem (const char *name);
-  bool open (const char *name, size_t sz = sizeof(S));
-  void operator >>(S& data);
-  void operator <<(const S& data);
+  shmem (const char* name);
+  bool open (const char* name, size_t sz = sizeof (S));
+  void operator>> (S& data);
+  void operator<< (const S& data);
 
 protected:
-  S* dataptr() const {return (S*)B::dataptr();};
+  S* dataptr () const
+  {
+    return (S*)B::dataptr ();
+  };
 
-  template<class S, class B> friend class lockr;
-  template<class S, class B> friend class lockw;
+  template <class S, class B>
+  friend class lockr;
+  template <class S, class B>
+  friend class lockw;
 };
 
 /// Default constructor
-template<class S, class B>
-shmem<S, B>::shmem () : B () {};
+template <class S, class B>
+shmem<S, B>::shmem ()
+  : B (){};
 
 /// Creates and opens a shared memory area with the given name
-template<class S, class B>
-shmem<S, B>::shmem (const char *name) : B (name, sizeof (S)) {};
+template <class S, class B>
+shmem<S, B>::shmem (const char* name)
+  : B (name, sizeof (S)){};
 
 /// Opens a shared memory area
-template<class S, class B>
-bool shmem<S, B>::open (const char *name, size_t sz) { return B::open (name, sz); };
+template <class S, class B>
+bool shmem<S, B>::open (const char* name, size_t sz)
+{
+  return B::open (name, sz);
+};
 
 /// Read the content of shared memory area
-template<class S, class B>
-void shmem<S, B>::operator >>(S& data) {this->read (&data);};
+template <class S, class B>
+void shmem<S, B>::operator>> (S& data)
+{
+  this->read (&data);
+};
 
 /// Update (write) the content of a shared memory area
-template<class S, class B>
-void shmem<S, B>::operator <<(const S& data) {this->write (&data);};
+template <class S, class B>
+void shmem<S, B>::operator<< (const S& data)
+{
+  this->write (&data);
+};
 
 /*!
   Smart read pointer for a shared memory area.
@@ -141,21 +185,32 @@ void shmem<S, B>::operator <<(const S& data) {this->write (&data);};
   a const pointer to the structure in the shared memory area.
 */
 
-template<class S, class B=shmem_base> class lockr
+template <class S, class B = shmem_base>
+class lockr
 {
 public:
   lockr (shmem<S, B>& mem_);
-  ~lockr () {mem.rdunlock ();};
+  ~lockr ()
+  {
+    mem.rdunlock ();
+  };
 
-  const S* operator ->() {return const_cast <const S*>(mem.dataptr());};
-  operator const S*() {return const_cast <const S*>(mem.dataptr());};
+  const S* operator->()
+  {
+    return const_cast<const S*> (mem.dataptr ());
+  };
+  operator const S* ()
+  {
+    return const_cast<const S*> (mem.dataptr ());
+  };
+
 private:
-
   shmem<S, B>& mem;
 };
 
-template<class S, class B>
-lockr<S, B>::lockr (shmem<S, B>& mem_) : mem(mem_) 
+template <class S, class B>
+lockr<S, B>::lockr (shmem<S, B>& mem_)
+  : mem (mem_)
 {
   if (!mem.rdlock ())
     throw std::runtime_error ("rdlock failure");
@@ -184,23 +239,35 @@ lockr<S, B>::lockr (shmem<S, B>& mem_) : mem(mem_)
   a (non-const) pointer to the structure in the shared memory area.
 */
 
-template<class S, class B=shmem_base> class lockw
+template <class S, class B = shmem_base>
+class lockw
 {
 public:
   lockw (shmem<S, B>& mem_);
-  ~lockw () {mem.wrunlock ();};
+  ~lockw ()
+  {
+    mem.wrunlock ();
+  };
 
-  S* operator ->() {return mem.dataptr();};
-  operator S*() {return mem.dataptr();};
+  S* operator->()
+  {
+    return mem.dataptr ();
+  };
+  operator S* ()
+  {
+    return mem.dataptr ();
+  };
+
 private:
   shmem<S, B>& mem;
 };
 
-template<class S, class B>
-lockw<S, B>::lockw (shmem<S, B>& mem_) : mem(mem_) 
+template <class S, class B>
+lockw<S, B>::lockw (shmem<S, B>& mem_)
+  : mem (mem_)
 {
   if (!mem.wrlock ())
     throw std::runtime_error ("wrlock failed");
 };
 
-}
+} // namespace mlib

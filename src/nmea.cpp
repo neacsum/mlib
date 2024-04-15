@@ -4,8 +4,8 @@
   (c) Mircea Neacsu 2019
 */
 
-#include <mlib/nmea.h>
-#include <mlib/convert.h>
+#include <mlib/mlib.h>
+#pragma hdrstop
 #include <string.h>
 #include <stdlib.h>
 
@@ -16,29 +16,27 @@ namespace mlib {
 */
 
 /// parsing context for NMEA-0183 parser
-class parse_context {
+class parse_context
+{
 public:
-  parse_context (const char *buf);
+  parse_context (const char* buf);
   ~parse_context ();
-  char *token ();
+  char* token ();
 
 private:
-  char *lcl;            //local copy of string to parse
-  char *toparse;        //parsing position in local string
-  char saved;           //char replaced with NULL
-
+  char* lcl;     // local copy of string to parse
+  char* toparse; // parsing position in local string
+  char saved;    // char replaced with NULL
 };
 
 /// Constructor for a parsing context
-inline
-parse_context::parse_context (const char *buf)
+inline parse_context::parse_context (const char* buf)
 {
   toparse = lcl = _strdup (buf);
   saved = 0;
 };
 
-inline
-parse_context::~parse_context ()
+inline parse_context::~parse_context ()
 {
   free (lcl);
 };
@@ -51,9 +49,9 @@ parse_context::~parse_context ()
     and we don't want to skip over consecutive empty fields.
 
 */
-char *parse_context::token ()
+char* parse_context::token ()
 {
-  char *ret;
+  char* ret;
   if (saved)
   {
     *toparse = saved;
@@ -70,20 +68,26 @@ char *parse_context::token ()
   return ret;
 }
 
-#define NEXT_TOKEN(A, B) if ((A = ctx.token()) == NULL)  return B
-#define NEXT_VALIDTOKEN(A, B) if ((A = ctx.token()) == NULL || !strlen(A))  return B
-#define IFPAR(par, exp) if (par) *par = (exp)
-
+#define NEXT_TOKEN(A, B)                                                                           \
+  if ((A = ctx.token ()) == NULL)                                                                  \
+  return B
+#define NEXT_VALIDTOKEN(A, B)                                                                      \
+  if ((A = ctx.token ()) == NULL || !strlen (A))                                                   \
+  return B
+#define IFPAR(par, exp)                                                                            \
+  if (par)                                                                                         \
+  *par = (exp)
 
 /*!
   Compute the checksum of a NMEA sentence
 
   \return
-  - false = if an incorrect checksum was found or the sentence doesn't start with '$' or '!' characters.
+  - false = if an incorrect checksum was found or the sentence doesn't start with '$' or '!'
+  characters.
   - true  = if the checksum is correct or inexistent.
 */
 
-bool nmea_checksum (const char *buf)
+bool nmea_checksum (const char* buf)
 {
   char cks;
   char hex_cks[2];
@@ -98,9 +102,9 @@ bool nmea_checksum (const char *buf)
     cks ^= *buf++;
   }
   if (*buf == 0x0d)
-    return true;            /* No checksum in sentence */
+    return true; /* No checksum in sentence */
   else if (*buf != '*')
-    return false;           /* Neither <CR> nor checksum field */
+    return false; /* Neither <CR> nor checksum field */
   else
   {
     buf++;
@@ -122,14 +126,14 @@ bool nmea_checksum (const char *buf)
 
     Returned value is always in meters.
 */
-int dbs (const char *buf, double *depth)
+int dbs (const char* buf, double* depth)
 {
   double feet = 0.0, meters = 0.0, fathoms = 0.0;
   bool ft, mt, fh;
   ft = mt = fh = false;
   parse_context ctx (buf);
 
-  char *tok = ctx.token ();
+  char* tok = ctx.token ();
   if (!tok || memcmp (tok + 3, "DBS", 3))
     return 0;
   NEXT_TOKEN (tok, 0);
@@ -162,14 +166,17 @@ int dbs (const char *buf, double *depth)
 
   if (depth)
   {
-    if (mt) *depth = meters;
-    else if (ft) *depth = feet * 0.3048;
-    else if (fh) *depth = fathoms * 1.8288;
-    else *depth = 0.;
+    if (mt)
+      *depth = meters;
+    else if (ft)
+      *depth = feet * 0.3048;
+    else if (fh)
+      *depth = fathoms * 1.8288;
+    else
+      *depth = 0.;
   }
   return 3;
 }
-
 
 /*!
   NMEA-0183 DBT sentence
@@ -185,14 +192,14 @@ int dbs (const char *buf, double *depth)
 
     This sentence is obsolete.
 */
-int dbt (const char *buf, double *depth)
+int dbt (const char* buf, double* depth)
 {
   double feet = 0.0, meters = 0.0, fathoms = 0.0;
   bool ft, mt, fh;
   ft = mt = fh = false;
   parse_context ctx (buf);
 
-  char *tok = ctx.token ();
+  char* tok = ctx.token ();
   if (!tok || memcmp (tok + 3, "DBT", 3))
     return 0;
   NEXT_TOKEN (tok, 0);
@@ -225,10 +232,14 @@ int dbt (const char *buf, double *depth)
 
   if (depth)
   {
-    if (mt) *depth = meters;
-    else if (ft) *depth = feet * 0.3048;
-    else if (fh) *depth = fathoms * 1.8288;
-    else *depth = 0.;
+    if (mt)
+      *depth = meters;
+    else if (ft)
+      *depth = feet * 0.3048;
+    else if (fh)
+      *depth = fathoms * 1.8288;
+    else
+      *depth = 0.;
   }
   return 2;
 }
@@ -238,11 +249,11 @@ int dbt (const char *buf, double *depth)
 
   $ttDPT,dep,offset,range
 */
-int dpt (const char *buf, double *depth, double *offset, double *range)
+int dpt (const char* buf, double* depth, double* offset, double* range)
 {
   parse_context ctx (buf);
 
-  char *tok = ctx.token ();
+  char* tok = ctx.token ();
   if (!tok || memcmp (tok + 3, "DPT", 3))
     return 0;
   NEXT_VALIDTOKEN (tok, 0);
@@ -254,7 +265,6 @@ int dpt (const char *buf, double *depth, double *offset, double *range)
   return 3;
 }
 
-
 /**
   NMEA-0183 GGA sentence.
 
@@ -265,12 +275,12 @@ int dpt (const char *buf, double *depth, double *offset, double *range)
   \note
     Height is ellipsoidal.
 */
-int gga (const char *buf, double *lat, double *lon, double *time, double *height,
-  double *undul, double *dop, int *sat, int *mode, double *age, int *station)
+int gga (const char* buf, double* lat, double* lon, double* time, double* height, double* undul,
+         double* dop, int* sat, int* mode, double* age, int* station)
 {
   parse_context ctx (buf);
 
-  char *tok = ctx.token ();
+  char* tok = ctx.token ();
   if (!tok || memcmp (tok + 3, "GGA", 3))
     return 0;
 
@@ -279,11 +289,13 @@ int gga (const char *buf, double *lat, double *lon, double *time, double *height
   NEXT_TOKEN (tok, 0);
   IFPAR (lat, DMD2rad (atof (tok)));
   NEXT_TOKEN (tok, 0);
-  if (lat && *tok && *tok == 'S') *lat *= -1.;
+  if (lat && *tok && *tok == 'S')
+    *lat *= -1.;
   NEXT_TOKEN (tok, 0);
   IFPAR (lon, DMD2rad (atof (tok)));
   NEXT_TOKEN (tok, 0);
-  if (lon && *tok && *tok == 'W') *lon *= -1.;
+  if (lon && *tok && *tok == 'W')
+    *lon *= -1.;
   NEXT_TOKEN (tok, 0);
   IFPAR (mode, atoi (tok));
   NEXT_TOKEN (tok, 0);
@@ -292,13 +304,13 @@ int gga (const char *buf, double *lat, double *lon, double *time, double *height
   IFPAR (dop, atof (tok));
   NEXT_TOKEN (tok, 0);
   IFPAR (height, atof (tok));
-  NEXT_TOKEN (tok, 0);    //'M'
+  NEXT_TOKEN (tok, 0); //'M'
   NEXT_TOKEN (tok, 0);
   double val = atof (tok);
   IFPAR (undul, val);
   if (height)
     *height += val;
-  NEXT_TOKEN (tok, 0);  //'M'
+  NEXT_TOKEN (tok, 0); //'M'
   NEXT_TOKEN (tok, 2);
   IFPAR (age, atof (tok));
   NEXT_TOKEN (tok, 0);
@@ -319,18 +331,18 @@ int gga (const char *buf, double *lat, double *lon, double *time, double *height
     This is not a true NMEA standard sentence, however it is generated by quite a few
     GPS units.
 */
-int ggk (const char *buf, double *lat, double *lon, double *time, double *height,
-  double *dop, int *sat, int *mode)
+int ggk (const char* buf, double* lat, double* lon, double* time, double* height, double* dop,
+         int* sat, int* mode)
 {
   parse_context ctx (buf);
 
-  char *tok = ctx.token ();
+  char* tok = ctx.token ();
   if (!tok || memcmp (tok + 3, "GGK", 3))
     return 0;
 
   NEXT_VALIDTOKEN (tok, 0);
   IFPAR (time, atof (tok));
-  NEXT_TOKEN (tok, 0);        //date
+  NEXT_TOKEN (tok, 0); // date
   NEXT_TOKEN (tok, 0);
   IFPAR (lat, DMD2rad (atof (tok)));
   NEXT_TOKEN (tok, 0);
@@ -347,10 +359,10 @@ int ggk (const char *buf, double *lat, double *lon, double *time, double *height
   IFPAR (sat, atoi (tok));
   NEXT_TOKEN (tok, 0);
   IFPAR (dop, atof (tok));
-  NEXT_TOKEN (tok, 1);            //height is optional
+  NEXT_TOKEN (tok, 1); // height is optional
   if (height)
   {
-    //POS MV sends ellipsoidal height prefixed with "EHT"
+    // POS MV sends ellipsoidal height prefixed with "EHT"
     if (!strncmp (tok, "EHT", 3))
       tok += 3;
     *height = atof (tok);
@@ -369,31 +381,36 @@ int ggk (const char *buf, double *lat, double *lon, double *time, double *height
     - 2 newer version 2 (missing mode field)
     - 3 version 3
 */
-int gll (const char *buf, double *lat, double *lon, double *time, int *mode)
+int gll (const char* buf, double* lat, double* lon, double* time, int* mode)
 {
   parse_context ctx (buf);
 
-  char *tok = ctx.token ();
+  char* tok = ctx.token ();
   if (!tok || memcmp (tok + 3, "GLL", 3))
     return 0;
 
   NEXT_TOKEN (tok, 0);
   IFPAR (lat, DMD2rad (atof (tok)));
   NEXT_TOKEN (tok, 0);
-  if (lat && *tok && *tok == 'S') *lat *= -1.;
+  if (lat && *tok && *tok == 'S')
+    *lat *= -1.;
   NEXT_TOKEN (tok, 0);
   IFPAR (lon, DMD2rad (atof (tok)));
   NEXT_TOKEN (tok, 0);
-  if (lon && *tok && *tok == 'W') *lon *= -1.;
+  if (lon && *tok && *tok == 'W')
+    *lon *= -1.;
   NEXT_TOKEN (tok, 1);
   IFPAR (time, atof (tok));
   NEXT_TOKEN (tok, 0);
   NEXT_TOKEN (tok, 2);
   if (mode)
   {
-    if (*tok == 'A') *mode = 1;
-    else if (*tok == 'D') *mode = 2;
-    else *mode = 0;
+    if (*tok == 'A')
+      *mode = 1;
+    else if (*tok == 'D')
+      *mode = 2;
+    else
+      *mode = 0;
   }
   return 3;
 }
@@ -408,12 +425,12 @@ int gll (const char *buf, double *lat, double *lon, double *time, int *mode)
   \note
     Height is ellipsoidal.
 */
-int gns (const char *buf, double *time, double *lat, double *lon, int *mode, int *sat,
-  double *dop, double *height, double *age, int *station)
+int gns (const char* buf, double* time, double* lat, double* lon, int* mode, int* sat, double* dop,
+         double* height, double* age, int* station)
 {
   parse_context ctx (buf);
 
-  char *tok = ctx.token ();
+  char* tok = ctx.token ();
   if (!tok || memcmp (tok + 3, "GNS", 3))
     return 0;
 
@@ -422,11 +439,13 @@ int gns (const char *buf, double *time, double *lat, double *lon, int *mode, int
   NEXT_TOKEN (tok, 0);
   IFPAR (lat, DMD2rad (atof (tok)));
   NEXT_TOKEN (tok, 0);
-  if (lat && *tok && *tok == 'S') *lat *= -1.;
+  if (lat && *tok && *tok == 'S')
+    *lat *= -1.;
   NEXT_TOKEN (tok, 0);
   IFPAR (lon, DMD2rad (atof (tok)));
   NEXT_TOKEN (tok, 0);
-  if (lon && *tok && *tok == 'W') *lon *= -1.;
+  if (lon && *tok && *tok == 'W')
+    *lon *= -1.;
   NEXT_TOKEN (tok, 0);
   IFPAR (mode, atoi (tok));
   NEXT_TOKEN (tok, 0);
@@ -435,14 +454,14 @@ int gns (const char *buf, double *time, double *lat, double *lon, int *mode, int
   IFPAR (dop, atof (tok));
   NEXT_TOKEN (tok, 0);
   IFPAR (height, atof (tok));
-  NEXT_TOKEN (tok, 0);    //'M'
+  NEXT_TOKEN (tok, 0); //'M'
   NEXT_TOKEN (tok, 0);
   if (height)
   {
     double undul = atof (tok);
     *height += undul;
   }
-  NEXT_TOKEN (tok, 0);  //'M'
+  NEXT_TOKEN (tok, 0); //'M'
   NEXT_TOKEN (tok, 2);
   IFPAR (age, atof (tok));
   NEXT_TOKEN (tok, 0);
@@ -452,12 +471,11 @@ int gns (const char *buf, double *time, double *lat, double *lon, int *mode, int
 
 /*!
   NMEA-0183 GSA sentence
-  
+
   GNSS DOP and Active Satellites
 
-  GNSS receiver operating mode, satellites used in the navigation solution reported by the GGA or GNS
-  sentence, and DOP values.
-\verbatim
+  GNSS receiver operating mode, satellites used in the navigation solution reported by the GGA or
+GNS sentence, and DOP values. \verbatim
     $--GSA,a,x,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,x.x,x.x,x.x<CR><LF>
            | | |                                 |  |   |   |
            | | |                                 |  |   |   +-- VDOP
@@ -471,11 +489,11 @@ int gns (const char *buf, double *time, double *lat, double *lon, int *mode, int
                                      A = Automatic, allowed to automatically switch 2D/3D
 \endverbatim
 */
-int gsa (const char *buf, int *hmode, int *fmode, int *sv, double *pdop, double *hdop, double *vdop)
+int gsa (const char* buf, int* hmode, int* fmode, int* sv, double* pdop, double* hdop, double* vdop)
 {
   parse_context ctx (buf);
 
-  char *tok = ctx.token ();
+  char* tok = ctx.token ();
   if (!tok || memcmp (tok + 3, "GSA", 3))
     return 0;
 
@@ -505,12 +523,12 @@ int gsa (const char *buf, int *hmode, int *fmode, int *sv, double *pdop, double 
 
   $ttGST,time,rms,semimaj,semimin,orient,stdlat,stdlon,stdh
 */
-int gst (const char *buf, double *time, double *rms, double *smaj, double *smin,
-  double *orient, double *stdlat, double *stdlon, double *stdh)
+int gst (const char* buf, double* time, double* rms, double* smaj, double* smin, double* orient,
+         double* stdlat, double* stdlon, double* stdh)
 {
   parse_context ctx (buf);
 
-  char *tok = ctx.token ();
+  char* tok = ctx.token ();
   if (!tok || memcmp (tok + 3, "GST", 3))
     return 0;
   NEXT_VALIDTOKEN (tok, 0);
@@ -549,12 +567,12 @@ int gst (const char *buf, double *time, double *rms, double *smaj, double *smin,
          +---------------------- Total number of messages
 \endverbatim
 */
-int gsv (const char *buf, int *tmsg, int *msg, int *count, int *sv, int *az, int *elev, int *snr)
+int gsv (const char* buf, int* tmsg, int* msg, int* count, int* sv, int* az, int* elev, int* snr)
 {
   parse_context ctx (buf);
 
   int nmsg;
-  char *tok = ctx.token ();
+  char* tok = ctx.token ();
   if (!tok || memcmp (tok + 3, "GSV", 3))
     return 0;
 
@@ -570,13 +588,17 @@ int gsv (const char *buf, int *tmsg, int *msg, int *count, int *sv, int *az, int
   for (int i = 0; i < 4; i++)
   {
     NEXT_TOKEN (tok, 1);
-    if (sv) sv[nmsg * 4 + i] = atoi (tok);
+    if (sv)
+      sv[nmsg * 4 + i] = atoi (tok);
     NEXT_TOKEN (tok, 0);
-    if (elev) elev[nmsg * 4 + i] = atoi (tok);
+    if (elev)
+      elev[nmsg * 4 + i] = atoi (tok);
     NEXT_TOKEN (tok, 0);
-    if (az) az[nmsg * 4 + i] = atoi (tok);
+    if (az)
+      az[nmsg * 4 + i] = atoi (tok);
     NEXT_TOKEN (tok, 0);
-    if (snr) snr[nmsg * 4 + i] = atoi (tok);
+    if (snr)
+      snr[nmsg * 4 + i] = atoi (tok);
   }
 
   return 1;
@@ -590,11 +612,11 @@ int gsv (const char *buf, int *tmsg, int *msg, int *count, int *sv, int *az, int
   \note
     This sentence is obsolete.
 */
-int gxp (const char *buf, double *lat, double *lon, double *time, int *wp)
+int gxp (const char* buf, double* lat, double* lon, double* time, int* wp)
 {
   parse_context ctx (buf);
 
-  char *tok = ctx.token ();
+  char* tok = ctx.token ();
   if (!tok || memcmp (tok + 3, "GXP", 3))
     return 0;
 
@@ -603,11 +625,13 @@ int gxp (const char *buf, double *lat, double *lon, double *time, int *wp)
   NEXT_TOKEN (tok, 0);
   IFPAR (lat, DMD2rad (atof (tok)));
   NEXT_TOKEN (tok, 0);
-  if (lat && *tok && *tok == 'S') *lat *= -1.;
+  if (lat && *tok && *tok == 'S')
+    *lat *= -1.;
   NEXT_TOKEN (tok, 0);
   IFPAR (lon, DMD2rad (atof (tok)));
   NEXT_TOKEN (tok, 0);
-  if (lon && *tok && *tok == 'W') *lon *= -1.;
+  if (lon && *tok && *tok == 'W')
+    *lon *= -1.;
   NEXT_TOKEN (tok, 0);
   IFPAR (wp, atoi (tok));
   return 1;
@@ -621,23 +645,25 @@ int gxp (const char *buf, double *lat, double *lon, double *time, int *wp)
     magnetic = hdg + dev
     true = magnetic + var
 */
-int hdg (const char *buf, double *head, double *dev, double *var)
+int hdg (const char* buf, double* head, double* dev, double* var)
 {
   parse_context ctx (buf);
 
-  char *tok = ctx.token ();
+  char* tok = ctx.token ();
   if (!tok || memcmp (tok + 3, "HDG", 3))
     return 0;
   NEXT_VALIDTOKEN (tok, 0);
-  IFPAR (head, atof (tok)*D2R);
+  IFPAR (head, atof (tok) * D2R);
   NEXT_TOKEN (tok, 0);
-  IFPAR (dev, atof (tok)*D2R);
+  IFPAR (dev, atof (tok) * D2R);
   NEXT_TOKEN (tok, 0);
-  if (dev && *tok == 'W') *dev *= -1.;
+  if (dev && *tok == 'W')
+    *dev *= -1.;
   NEXT_TOKEN (tok, 0);
-  IFPAR (var, atof (tok)*D2R);
+  IFPAR (var, atof (tok) * D2R);
   NEXT_TOKEN (tok, 0);
-  if (var && *tok == 'W') *var *= -1.;
+  if (var && *tok == 'W')
+    *var *= -1.;
   return 3;
 }
 
@@ -649,15 +675,15 @@ int hdg (const char *buf, double *head, double *dev, double *var)
   \note
     This sentence is obsolete
 */
-int hdm (const char *buf, double *head)
+int hdm (const char* buf, double* head)
 {
   parse_context ctx (buf);
 
-  char *tok = ctx.token ();
+  char* tok = ctx.token ();
   if (!tok || memcmp (tok + 3, "HDM", 3))
     return 0;
   NEXT_VALIDTOKEN (tok, 0);
-  IFPAR (head, atof (tok)*D2R);
+  IFPAR (head, atof (tok) * D2R);
   NEXT_TOKEN (tok, 0);
   if (*tok && *tok != 'M')
     return 0;
@@ -671,15 +697,15 @@ int hdm (const char *buf, double *head)
   \note
     This sentence is obsolete
 */
-int hdt (const char *buf, double *head)
+int hdt (const char* buf, double* head)
 {
   parse_context ctx (buf);
 
-  char *tok = ctx.token ();
+  char* tok = ctx.token ();
   if (!tok || memcmp (tok + 3, "HDT", 3))
     return 0;
   NEXT_VALIDTOKEN (tok, 0);
-  IFPAR (head, atof (tok)*D2R);
+  IFPAR (head, atof (tok) * D2R);
   NEXT_TOKEN (tok, 0);
   if (*tok && *tok != 'T')
     return 0;
@@ -710,18 +736,19 @@ int hdt (const char *buf, double *head)
   - M           Meter (fixed text "M")
   - hh          Checksum
 */
-int llq (const char *buf, double *time, double *x, double *y, int *mode, int *sat, double *dop, double *height)
+int llq (const char* buf, double* time, double* x, double* y, int* mode, int* sat, double* dop,
+         double* height)
 {
   parse_context ctx (buf);
 
-  char *tok = ctx.token ();
+  char* tok = ctx.token ();
   if (!tok || memcmp (tok + 3, "LLQ", 3))
     return 0;
 
   NEXT_TOKEN (tok, 0);
   IFPAR (time, atof (tok));
   NEXT_TOKEN (tok, 0);
-  NEXT_TOKEN (tok, 0);      //date
+  NEXT_TOKEN (tok, 0); // date
   IFPAR (x, atof (tok));
   NEXT_TOKEN (tok, 0);
   if (*tok != 'M')
@@ -786,32 +813,31 @@ int llq (const char *buf, double *time, double *x, double *y, int *mode, int *sa
                         2 = RTK fixed integer position
 \endverbatim
 */
-int pashr (const char *buf, double *time, double *hdg, double *pitch, double *roll,
-  double *heave, double *roll_std, double *pitch_std, double *hdg_std,
-  int *flag_h, int *flag_i)
+int pashr (const char* buf, double* time, double* hdg, double* pitch, double* roll, double* heave,
+           double* roll_std, double* pitch_std, double* hdg_std, int* flag_h, int* flag_i)
 {
   parse_context ctx (buf);
 
-  char *tok = ctx.token ();
+  char* tok = ctx.token ();
   if (!tok || memcmp (tok, "$PASHR", 6))
     return 0;
   NEXT_TOKEN (tok, 0);
   IFPAR (time, atof (tok));
   NEXT_TOKEN (tok, 0);
-  IFPAR (hdg, atof (tok)*D2R);
-  NEXT_TOKEN (tok, 0);          //T
+  IFPAR (hdg, atof (tok) * D2R);
+  NEXT_TOKEN (tok, 0); // T
   NEXT_TOKEN (tok, 0);
-  IFPAR (roll, atof (tok)*D2R);
+  IFPAR (roll, atof (tok) * D2R);
   NEXT_TOKEN (tok, 0);
-  IFPAR (pitch, atof (tok)*D2R);
+  IFPAR (pitch, atof (tok) * D2R);
   NEXT_TOKEN (tok, 0);
   IFPAR (heave, atof (tok));
   NEXT_TOKEN (tok, 0);
-  IFPAR (roll_std, atof (tok)*D2R);
+  IFPAR (roll_std, atof (tok) * D2R);
   NEXT_TOKEN (tok, 0);
-  IFPAR (pitch_std, atof (tok)*D2R);
+  IFPAR (pitch_std, atof (tok) * D2R);
   NEXT_TOKEN (tok, 0);
-  IFPAR (hdg_std, atof (tok)*D2R);
+  IFPAR (hdg_std, atof (tok) * D2R);
 
   NEXT_TOKEN (tok, 0);
   IFPAR (flag_h, atoi (tok));
@@ -829,11 +855,11 @@ int pashr (const char *buf, double *time, double *hdg, double *pitch, double *ro
     - N = GPS derived heading
     - G = gyro heading
 */
-int psathpr (const char *buf, double *time, double *head, double *pitch, double *roll, char *type)
+int psathpr (const char* buf, double* time, double* head, double* pitch, double* roll, char* type)
 {
   parse_context ctx (buf);
 
-  char *tok = ctx.token ();
+  char* tok = ctx.token ();
   if (!tok || memcmp (tok, "$PSAT", 5))
     return 0;
   NEXT_TOKEN (tok, 0);
@@ -842,7 +868,7 @@ int psathpr (const char *buf, double *time, double *head, double *pitch, double 
   NEXT_VALIDTOKEN (tok, 0);
   IFPAR (time, atof (tok));
   NEXT_TOKEN (tok, 0);
-  IFPAR (head, atof (tok)*D2R);
+  IFPAR (head, atof (tok) * D2R);
   NEXT_TOKEN (tok, 0);
   if (strlen (tok))
     IFPAR (pitch, atof (tok));
@@ -879,7 +905,7 @@ int psathpr (const char *buf, double *time, double *head, double *pitch, double 
                    - 10: OmniSTAR HP/XP solution
                    - 11: OmniSTAR VBS solution
                    - 12: Location RTK solution
-                   - 13: Beacon DGPS  
+                   - 13: Beacon DGPS
   - xx          = Number of Satellites in use
   - x.x         = PDOP
   - xx.x        = Ellipsoidal height.
@@ -894,12 +920,12 @@ int psathpr (const char *buf, double *time, double *head, double *pitch, double 
 \endverbatim
 
 */
-int ptnlggk (const char *buf, double *lat, double *lon, double *time, double *height,
-  double *dop, int *sat, int *mode)
+int ptnlggk (const char* buf, double* lat, double* lon, double* time, double* height, double* dop,
+             int* sat, int* mode)
 {
   parse_context ctx (buf);
 
-  char *tok = ctx.token ();
+  char* tok = ctx.token ();
   if (!tok || memcmp (tok, "$PTNL", 5))
     return 0;
   NEXT_TOKEN (tok, 0);
@@ -907,15 +933,17 @@ int ptnlggk (const char *buf, double *lat, double *lon, double *time, double *he
     return 0;
   NEXT_VALIDTOKEN (tok, 0);
   IFPAR (time, atof (tok));
-  NEXT_TOKEN (tok, 0);        //date
+  NEXT_TOKEN (tok, 0); // date
   NEXT_TOKEN (tok, 0);
   IFPAR (lat, DMD2rad (atof (tok)));
   NEXT_TOKEN (tok, 0);
-  if (lat && *tok && *tok == 'S') *lat *= -1.;
+  if (lat && *tok && *tok == 'S')
+    *lat *= -1.;
   NEXT_TOKEN (tok, 0);
   IFPAR (lon, DMD2rad (atof (tok)));
   NEXT_TOKEN (tok, 0);
-  if (lon && *tok && *tok == 'W') *lon *= -1.;
+  if (lon && *tok && *tok == 'W')
+    *lon *= -1.;
   NEXT_TOKEN (tok, 0);
   IFPAR (mode, atoi (tok));
   NEXT_TOKEN (tok, 0);
@@ -934,27 +962,29 @@ int ptnlggk (const char *buf, double *lat, double *lon, double *time, double *he
 
   \note This sentence is obsolete.
 */
-int ptnlqa (const char *buf, double *sigman, double *sigmae, double *smaj,
-  double *smin, double *orient)
+int ptnlqa (const char* buf, double* sigman, double* sigmae, double* smaj, double* smin,
+            double* orient)
 {
   parse_context ctx (buf);
 
-  char *tok = ctx.token ();
+  char* tok = ctx.token ();
   if (!tok || memcmp (tok, "$PTNL", 5))
     return 0;
   NEXT_TOKEN (tok, 0);
   if (memcmp (tok, "QA", 2))
     return 0;
-  NEXT_TOKEN (tok, 0);      //time??
+  NEXT_TOKEN (tok, 0); // time??
   NEXT_TOKEN (tok, 0);
   IFPAR (sigman, atof (tok));
   NEXT_TOKEN (tok, 0);
   IFPAR (sigmae, atof (tok));
-  NEXT_TOKEN (tok, 0);      //what?
+  NEXT_TOKEN (tok, 0); // what?
   NEXT_TOKEN (tok, 0);
   double unit = atof (tok);
-  if (sigman) *sigman *= unit;
-  if (sigmae) *sigmae *= unit;
+  if (sigman)
+    *sigman *= unit;
+  if (sigmae)
+    *sigmae *= unit;
   NEXT_TOKEN (tok, 0);
   IFPAR (smaj, atof (tok));
   NEXT_TOKEN (tok, 0);
@@ -969,43 +999,47 @@ int ptnlqa (const char *buf, double *sigman, double *sigmae, double *smaj,
 
   $ttRMC,time,stat,lat,N/S,lon,E/W,speed,head,date,magvar,E/W,mode
 */
-int rmc (const char *buf, double *lat, double *lon, double *time, double *speed, double *head, int *date, int *mode)
+int rmc (const char* buf, double* lat, double* lon, double* time, double* speed, double* head,
+         int* date, int* mode)
 {
   parse_context ctx (buf);
 
-  char *tok = ctx.token ();
+  char* tok = ctx.token ();
   if (!tok || memcmp (tok + 3, "RMC", 3))
     return 0;
 
   NEXT_VALIDTOKEN (tok, 0);
   IFPAR (time, atof (tok));
-  NEXT_TOKEN (tok, 0);    //status
+  NEXT_TOKEN (tok, 0); // status
   if (*tok && *tok != 'A' && *tok != 'V')
     return 0;
   NEXT_TOKEN (tok, 0);
   IFPAR (lat, DMD2rad (atof (tok)));
   NEXT_TOKEN (tok, 0);
-  if (lat && *tok && *tok == 'S') *lat *= -1.;
+  if (lat && *tok && *tok == 'S')
+    *lat *= -1.;
   NEXT_TOKEN (tok, 0);
   IFPAR (lon, DMD2rad (atof (tok)));
   NEXT_TOKEN (tok, 0);
-  if (lon && *tok && *tok == 'W') *lon *= -1.;
+  if (lon && *tok && *tok == 'W')
+    *lon *= -1.;
   NEXT_TOKEN (tok, 0);
   IFPAR (speed, atof (tok));
   NEXT_TOKEN (tok, 0);
-  IFPAR (head, atof (tok)*D2R);
+  IFPAR (head, atof (tok) * D2R);
   NEXT_TOKEN (tok, 0);
   IFPAR (date, atoi (tok));
-  NEXT_TOKEN (tok, 0);      //skip magnetic variation
+  NEXT_TOKEN (tok, 0); // skip magnetic variation
   NEXT_TOKEN (tok, 0);
   if (*tok && *tok != 'E' && *tok != 'W')
     return 0;
   NEXT_TOKEN (tok, 2);
-  IFPAR (mode, (*tok == 'A') ? 1 :
-    (*tok == 'D') ? 2 :
-    (*tok == 'P') ? 3 :
-    (*tok == 'R') ? 4 :
-    (*tok == 'F') ? 5 : 0);
+  IFPAR (mode, (*tok == 'A')   ? 1
+               : (*tok == 'D') ? 2
+               : (*tok == 'P') ? 3
+               : (*tok == 'R') ? 4
+               : (*tok == 'F') ? 5
+                               : 0);
   return 3;
 }
 
@@ -1029,19 +1063,18 @@ int rmc (const char *buf, double *lat, double *lon, double *time, double *speed,
   - hhmmss = UTC time
   - acq = acquisition status
 */
-int ttm (const char *buf, double *utc, int *num, char *name, double *dist, double *brg,
-  int *relbrg, double *speed, double *cog, int *relcog, double *cpa, double *tcpa,
-  int *stat)
+int ttm (const char* buf, double* utc, int* num, char* name, double* dist, double* brg, int* relbrg,
+         double* speed, double* cog, int* relcog, double* cpa, double* tcpa, int* stat)
 {
   parse_context ctx (buf);
 
-  char *tok = ctx.token ();
+  char* tok = ctx.token ();
   if (!tok || memcmp (tok + 3, "TTM", 3))
     return 0;
 
   NEXT_TOKEN (tok, 0);
   if (atoi (tok) < 0)
-    return 0;   //garbage
+    return 0; // garbage
   IFPAR (num, atoi (tok));
   NEXT_TOKEN (tok, 0);
   IFPAR (dist, atof (tok));
@@ -1079,9 +1112,8 @@ int ttm (const char *buf, double *utc, int *num, char *name, double *dist, doubl
     strcpy (name, tok);
   NEXT_TOKEN (tok, 0);
   if (stat)
-    *stat = (*tok == 'L') ? 1 :
-    (*tok == 'Q') ? 2 : 0;
-  NEXT_TOKEN (tok, 0);    //reference target;
+    *stat = (*tok == 'L') ? 1 : (*tok == 'Q') ? 2 : 0;
+  NEXT_TOKEN (tok, 0); // reference target;
   NEXT_TOKEN (tok, 0);
   IFPAR (utc, atof (tok));
 
@@ -1096,11 +1128,11 @@ int ttm (const char *buf, double *utc, int *num, char *name, double *dist, doubl
   True heading takes precedence over magnetic heading. Speed value in knots
   takes precedence over value in km/h.
 */
-int vtg (const char *buf, double *speed, double *head)
+int vtg (const char* buf, double* speed, double* head)
 {
   parse_context ctx (buf);
 
-  char *tok = ctx.token ();
+  char* tok = ctx.token ();
   bool th, sk;
   th = sk = false;
   if (!tok || memcmp (tok + 3, "VTG", 3))
@@ -1109,7 +1141,7 @@ int vtg (const char *buf, double *speed, double *head)
   NEXT_VALIDTOKEN (tok, 0);
   if (head)
   {
-    *head = atof (tok)*D2R;
+    *head = atof (tok) * D2R;
     th = true;
   }
   NEXT_TOKEN (tok, 0);
@@ -1117,7 +1149,7 @@ int vtg (const char *buf, double *speed, double *head)
     return 0;
   NEXT_TOKEN (tok, 0);
   if (head && !th && *tok)
-    *head = atof (tok)*D2R;
+    *head = atof (tok) * D2R;
   NEXT_TOKEN (tok, 0);
   if (*tok && *tok != 'M')
     return 0;
@@ -1132,7 +1164,7 @@ int vtg (const char *buf, double *speed, double *head)
     return 0;
   NEXT_TOKEN (tok, 0);
   if (speed && !sk && *tok)
-    *speed = atof (tok)*0.539957;
+    *speed = atof (tok) * 0.539957;
   NEXT_TOKEN (tok, 0);
   if (*tok && *tok != 'K')
     return 0;
@@ -1146,11 +1178,12 @@ int vtg (const char *buf, double *speed, double *head)
 
   UTC = local +loch + locm/60
 */
-int zda (const char *buf, double *time, unsigned short *day, unsigned short *month, unsigned short *year)
+int zda (const char* buf, double* time, unsigned short* day, unsigned short* month,
+         unsigned short* year)
 {
   parse_context ctx (buf);
 
-  char *tok = ctx.token ();
+  char* tok = ctx.token ();
   if (!tok || memcmp (tok + 3, "ZDA", 3))
     return 0;
 
@@ -1172,4 +1205,4 @@ int zda (const char *buf, double *time, unsigned short *day, unsigned short *mon
 }
 
 /// @}
-}
+} // namespace mlib

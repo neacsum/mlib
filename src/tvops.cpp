@@ -1,20 +1,20 @@
 /*!
   \file tvops.cpp Operations on timeval structure.
 
-  (c) Mircea Neacsu 2002. All rights reserved.
+  (c) Mircea Neacsu 2002-2024. All rights reserved.
 
 */
 
-#include <mlib/tvops.h>
+#include <mlib/mlib.h>
+#pragma hdrstop
 #include <assert.h>
-
 
 /// \addtogroup tvops Operations with timeval structures
 /// @{
 
 /// 100ns intervals between 1/1/1601 and 1/1/1970 as reported by SystemTimeToFileTime()
-#define FILETIME_1970     0x019db1ded53e8000
-#define ONE_SECOND ((long)1000000)
+#define FILETIME_1970 0x019db1ded53e8000
+#define ONE_SECOND    ((long)1000000)
 
 ///  Convert from UTC system time to Unix time scale (UTC form 01/01/70)
 timeval fromsystime (const SYSTEMTIME& st)
@@ -33,14 +33,13 @@ timeval fromsystime (const SYSTEMTIME& st)
 void tosystime (const timeval& tv, SYSTEMTIME* st)
 {
   assert (tv.tv_usec > -ONE_SECOND && tv.tv_usec < ONE_SECOND);
-  __int64 ft = (__int64)tv.tv_sec * 10000000i64 + (__int64)tv.tv_usec*10i64;
+  __int64 ft = (__int64)tv.tv_sec * 10000000i64 + (__int64)tv.tv_usec * 10i64;
   ft += FILETIME_1970;
   FileTimeToSystemTime ((FILETIME*)&ft, st);
 }
 
-
 /// Return time zone bias
-timeval zone_bias()
+timeval zone_bias ()
 {
   static timeval bias = {0, 1};
   if (bias.tv_usec != 0)
@@ -62,7 +61,7 @@ timeval zone_bias()
 void tolocaltime (const timeval& tv, SYSTEMTIME* st)
 {
   assert (tv.tv_usec > -ONE_SECOND && tv.tv_usec < ONE_SECOND);
-  __int64 ft = (__int64)tv.tv_sec * 10000000i64 + (__int64)tv.tv_usec*10i64;
+  __int64 ft = (__int64)tv.tv_sec * 10000000i64 + (__int64)tv.tv_usec * 10i64;
   ft += FILETIME_1970;
   ft -= (__int64)zone_bias ().tv_sec * 10000000i64;
   FileTimeToSystemTime ((FILETIME*)&ft, st);
@@ -76,29 +75,27 @@ void normalize (timeval& tv)
 {
   if (tv.tv_usec >= ONE_SECOND)
   {
-    do 
+    do
     {
       tv.tv_sec++;
       tv.tv_usec -= ONE_SECOND;
-    }
-    while (tv.tv_usec >= ONE_SECOND);
+    } while (tv.tv_usec >= ONE_SECOND);
   }
-  else if (tv.tv_usec <= -ONE_SECOND) 
+  else if (tv.tv_usec <= -ONE_SECOND)
   {
-    do 
+    do
     {
       tv.tv_sec--;
       tv.tv_usec += ONE_SECOND;
-    }
-    while (tv.tv_usec <= -ONE_SECOND);
+    } while (tv.tv_usec <= -ONE_SECOND);
   }
 
-  if (tv.tv_sec >= 1 && tv.tv_usec < 0) 
+  if (tv.tv_sec >= 1 && tv.tv_usec < 0)
   {
     tv.tv_sec--;
     tv.tv_usec += ONE_SECOND;
   }
-  else if (tv.tv_sec < 0 && tv.tv_usec > 0) 
+  else if (tv.tv_sec < 0 && tv.tv_usec > 0)
   {
     tv.tv_sec++;
     tv.tv_usec -= ONE_SECOND;

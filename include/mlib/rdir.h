@@ -5,7 +5,7 @@
 */
 #pragma once
 
-#if __has_include ("defs.h")
+#if __has_include("defs.h")
 #include "defs.h"
 #endif
 
@@ -16,4 +16,4 @@ namespace mlib {
 int r_mkdir (const std::string& dir);
 int r_rmdir (const std::string& dir);
 
-}
+} // namespace mlib

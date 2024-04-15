@@ -6,7 +6,7 @@
   (c) Mircea Neacsu 2019
 */
 
-#if __has_include ("defs.h")
+#if __has_include("defs.h")
 #include "defs.h"
 #endif
 #include <assert.h>
@@ -29,8 +29,8 @@ T ipow (T base, int exp)
   return result;
 }
 
-/// Specialization for double, can handle negative exponents 
-template<>
+/// Specialization for double, can handle negative exponents
+template <>
 inline double ipow (double base, int exp)
 {
   if (exp < 0)
@@ -49,4 +49,4 @@ inline double ipow (double base, int exp)
   return result;
 }
 
-}
+} // namespace mlib

@@ -2,7 +2,7 @@
   \file chull.cpp Find convex hull for a set of points
 
   http://cm.bell-labs.com/who/clarkson/2dch.c
- 
+
   Ken Clarkson wrote this.  Copyright (c) 1996 by AT&T..
   Permission to use, copy, modify, and distribute this software for any
   purpose without fee is hereby granted, provided that this entire notice
@@ -16,7 +16,6 @@
 
 */
 
-
 /*
  * two-dimensional convex hull
  * read points from stdin,
@@ -25,42 +24,43 @@
  *      by their numbers in input order
  */
 
+#include <mlib/mlib.h>
+#pragma hdrstop
 
 #include <stdlib.h>
 
-#include <mlib/chull.h>
 
 namespace mlib {
 
-
-static int ccw (dpoint *P, int i, int j, int k)
+static int ccw (dpoint* P, int i, int j, int k)
 {
-  double  a = (P + i)->x - (P + j)->x,
-    b = (P + i)->y - (P + j)->y,
-    c = (P + k)->x - (P + j)->x,
-    d = (P + k)->y - (P + j)->y;
-  return a*d - b*c <= 0;     /* true if points i, j, k counterclockwise */
+  double a = (P + i)->x - (P + j)->x, b = (P + i)->y - (P + j)->y, c = (P + k)->x - (P + j)->x,
+         d = (P + k)->y - (P + j)->y;
+  return a * d - b * c <= 0; /* true if points i, j, k counterclockwise */
 }
 
-static int cmpl (const void *a, const void *b)
+static int cmpl (const void* a, const void* b)
 {
   double v;
-  v = reinterpret_cast<const dpoint*>(a)->x - reinterpret_cast<const dpoint*>(b)->x;
-  if (v > 0) return 1;
-  if (v < 0) return -1;
-  v = reinterpret_cast<const dpoint*>(a)->y - reinterpret_cast<const dpoint*>(b)->y;
-  if (v > 0) return 1;
-  if (v < 0) return -1;
+  v = reinterpret_cast<const dpoint*> (a)->x - reinterpret_cast<const dpoint*> (b)->x;
+  if (v > 0)
+    return 1;
+  if (v < 0)
+    return -1;
+  v = reinterpret_cast<const dpoint*> (a)->y - reinterpret_cast<const dpoint*> (b)->y;
+  if (v > 0)
+    return 1;
+  if (v < 0)
+    return -1;
   return 0;
 }
 
-static int cmph(const void *a, const void *b) 
+static int cmph (const void* a, const void* b)
 {
-  return cmpl(b,a);
+  return cmpl (b, a);
 }
 
-
-static int make_chain (dpoint* V, int n, int (*cmp)(const void*, const void*))
+static int make_chain (dpoint* V, int n, int (*cmp) (const void*, const void*))
 {
   int i, j, s = 1;
   dpoint t;
@@ -68,9 +68,13 @@ static int make_chain (dpoint* V, int n, int (*cmp)(const void*, const void*))
   qsort (V, n, sizeof (dpoint), cmp);
   for (i = 2; i < n; i++)
   {
-    for (j = s; j >= 1 && ccw (V, i, j, j - 1); j--){}
+    for (j = s; j >= 1 && ccw (V, i, j, j - 1); j--)
+    {
+    }
     s = j + 1;
-    t = V[s]; V[s] = V[i]; V[i] = t;
+    t = V[s];
+    V[s] = V[i];
+    V[i] = t;
   }
   return s;
 }
@@ -95,13 +99,12 @@ static int make_chain (dpoint* V, int n, int (*cmp)(const void*, const void*))
  using floating point.
 
 */
-int convex_hull (dpoint *P, int n)
+int convex_hull (dpoint* P, int n)
 {
-  int u = make_chain (P, n, cmpl);    /* make lower hull */
-  if (!u) 
+  int u = make_chain (P, n, cmpl); /* make lower hull */
+  if (!u)
     return 0;
-  return u + make_chain (P + u, n - u + 1, cmph);  /* make upper hull */
+  return u + make_chain (P + u, n - u + 1, cmph); /* make upper hull */
 }
 
-}
-
+} // namespace mlib

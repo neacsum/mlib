@@ -7,6 +7,6 @@
 namespace mlib {
 
 /// Retrieve BIOS UUUID.
-bool biosuuid (unsigned char *uuid);
+bool biosuuid (unsigned char* uuid);
 
-}
+} // namespace mlib

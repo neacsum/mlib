@@ -2,21 +2,17 @@
   \file log.cpp Implementation of syslog functions.
 
 */
-#ifndef UNICODE
-#define UNICODE
-#endif
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 
-#include <mlib/log.h>
+#include <mlib/mlib.h>
+#pragma hdrstop
 #include <psapi.h>
-#include <mlib/trace.h>
 #include <stdio.h>
 #include <utf8/utf8.h>
 
-
 #ifdef _MSC_VER
-# pragma comment (lib, "psapi.lib")
-# pragma comment (lib, "ws2_32.lib")
+#pragma comment(lib, "psapi.lib")
+#pragma comment(lib, "ws2_32.lib")
 #endif
 
 /*!
@@ -30,49 +26,47 @@
 
 #define LOG_DGRAM_SIZE 1024
 
+#define SERVER_INI_KEY "LogServername"
+#define FILE_INI_KEY   "LogFilename"
+#define FLAGS_INI_KEY  "LogOptions"
+#define PRI_INI_KEY    "LogPriorityMask"
 
-#define SERVER_INI_KEY        "LogServername"
-#define FILE_INI_KEY          "LogFilename"
-#define FLAGS_INI_KEY         "LogOptions"
-#define PRI_INI_KEY           "LogPriorityMask"
-
-#define DEFAULT_FLAGS         0               //only UDP data log
-#define DEFAULT_PRIMASK       0xff            //everything
-#define DEFAULT_SERVERNAME    "localhost"
-#define DEFAULT_FACILITY      LOG_USER
+#define DEFAULT_FLAGS      0    // only UDP data log
+#define DEFAULT_PRIMASK    0xff // everything
+#define DEFAULT_SERVERNAME "localhost"
+#define DEFAULT_FACILITY   LOG_USER
 
 static char local_hostname[_MAX_PATH];
 
 int log_defaultopt = DEFAULT_FLAGS;
 int log_defaultmask = DEFAULT_PRIMASK;
-char log_servhostname[_MAX_PATH] = { DEFAULT_SERVERNAME };
+char log_servhostname[_MAX_PATH] = {DEFAULT_SERVERNAME};
 char log_fname[_MAX_PATH];
 
-
-//logger data
-struct LOG {
+// logger data
+struct LOG
+{
   DWORD pid;
-  int mask;       //priority mask
-  int facility;   //default facility
+  int mask;     // priority mask
+  int facility; // default facility
   int option;
-  FILE *file;
+  FILE* file;
   SOCKADDR_IN sa_logger;
   SOCKET sock;
-  char *ident;
+  char* ident;
   char str_pid[10];
 };
 
-static LOG *proclog = 0;    //default process log
+static LOG* proclog = 0; // default process log
 
-static const char *month[] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun",
-  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+static const char* month[] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                              "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
 
-//prototypes
-static void logger_addr (LOG *plog);
+// prototypes
+static void logger_addr (LOG* plog);
 static void init ();
 static void dnit ();
-static const char *processname (char *name);
-
+static const char* processname (char* name);
 
 static void init ()
 {
@@ -80,7 +74,7 @@ static void init ()
   DWORD namesz = 0;
   wchar_t whost[_MAX_PATH];
   if (proclog)
-    return;     //been here before
+    return; // been here before
 
   atexit (dnit);
   whost[0] = 0;
@@ -88,7 +82,7 @@ static void init ()
 
   if (WSAStartup (MAKEWORD (2, 2), &wsd))
   {
-    //failed to initialize WINSOCK - will have to live with netbios and files
+    // failed to initialize WINSOCK - will have to live with netbios and files
     GetComputerNameW (whost, &namesz);
   }
   else
@@ -98,7 +92,7 @@ static void init ()
   }
   strcpy (local_hostname, utf8::narrow (whost).c_str ());
   proclog = (LOG*)malloc (sizeof (LOG));
-  //init LOG structure
+  // init LOG structure
   memset (proclog, 0, sizeof (LOG));
   proclog->pid = GetCurrentProcessId ();
   proclog->mask = log_defaultmask;
@@ -115,22 +109,21 @@ static void dnit ()
   proclog = 0;
 }
 
-
-static const char *processname (char *name)
+static const char* processname (char* name)
 {
   static char pname[256];
   static bool got_pname = false;
-  
+
   if (!got_pname)
   {
-    char *p;
+    char* p;
     wchar_t wpn[256];
-    if (!GetModuleBaseNameW (GetCurrentProcess(), 0, wpn, _countof(wpn)))
+    if (!GetModuleBaseNameW (GetCurrentProcess (), 0, wpn, _countof (wpn)))
       strcpy (pname, "unknown");
     else
     {
-      strncpy (pname, utf8::narrow(wpn).c_str(), sizeof(pname)-1);
-      pname[sizeof(pname)-1] = 0;
+      strncpy (pname, utf8::narrow (wpn).c_str (), sizeof (pname) - 1);
+      pname[sizeof (pname) - 1] = 0;
     }
     if (p = strchr (pname, '.'))
       *p = 0;
@@ -141,26 +134,24 @@ static const char *processname (char *name)
   return pname;
 }
 
-
-
-/**  
+/**
   \ingroup syslog
   \param ident      string prepended to every message, typically
                     set to the program name.
 
-  \param option     flags which control the operation of subsequent calls 
+  \param option     flags which control the operation of subsequent calls
                     to syslog().
 
-  \param facility   establishes a default to be used if none is specified 
+  \param facility   establishes a default to be used if none is specified
                     in subsequent calls to syslog()
 
   The use of openlog is optional; it will automatically be called by syslog()
   if necessary, in which case \p ident will default to NULL.
 
-  If \p ident is NULL, or if openlog is not called, the default identification 
+  If \p ident is NULL, or if openlog is not called, the default identification
   string used in syslog messages will be the program name.
 
-  You can cause the syslog to drop the reference to \p ident and go back to the 
+  You can cause the syslog to drop the reference to \p ident and go back to the
   default string (the program name), by calling closelog().
 */
 void openlog (const char* ident, int option, int facility)
@@ -170,17 +161,17 @@ void openlog (const char* ident, int option, int facility)
 
   if (ident)
     proclog->ident = strdup (ident);
-  proclog->facility = facility? facility : DEFAULT_FACILITY;
+  proclog->facility = facility ? facility : DEFAULT_FACILITY;
   proclog->option = option | log_defaultopt;
   proclog->sock = INVALID_SOCKET;
-  if( proclog->option & LOGOPT_PID )
-    _snprintf( proclog->str_pid, sizeof(proclog->str_pid), "[%lu]", GetCurrentProcessId() );
+  if (proclog->option & LOGOPT_PID)
+    _snprintf (proclog->str_pid, sizeof (proclog->str_pid), "[%lu]", GetCurrentProcessId ());
   else
     proclog->str_pid[0] = 0;
 
   if (proclog->option & LOGOPT_FILE)
   {
-    if (!strlen(log_fname))
+    if (!strlen (log_fname))
       _snprintf (log_fname, MAX_PATH, "%s\\%s.log", getenv ("localappdata"), proclog->ident);
 
     proclog->file = fopen (log_fname, "ac");
@@ -189,8 +180,8 @@ void openlog (const char* ident, int option, int facility)
   if (!(proclog->option & LOGOPT_NOUDP))
   {
     logger_addr (proclog);
-    proclog->sock = socket( AF_INET, SOCK_DGRAM, 0 );
-    if( INVALID_SOCKET == proclog->sock )
+    proclog->sock = socket (AF_INET, SOCK_DGRAM, 0);
+    if (INVALID_SOCKET == proclog->sock)
       goto done;
 
     if (proclog->sa_logger.sin_addr.S_un.S_addr == INADDR_BROADCAST)
@@ -200,8 +191,7 @@ void openlog (const char* ident, int option, int facility)
     }
   }
 
-done:
-  ;
+done:;
 }
 
 static void logger_addr (LOG* plog)
@@ -237,8 +227,8 @@ use_default:
 
 /*!
   \ingroup syslog
-  closelog also resets the identification string for syslog messages back to 
-  the default, if openlog was called with a non-NULL argument to ident. 
+  closelog also resets the identification string for syslog messages back to
+  the default, if openlog was called with a non-NULL argument to ident.
   The default identification string is the program name.
 */
 void closelog ()
@@ -279,7 +269,7 @@ void closelog ()
   priority, as in the following example:
 
           LOG_MAKEPRI(LOG_USER, LOG_WARNING)
- 
+
   Example:
 \verbatim
        syslog (LOG_MAKEPRI(LOG_USER, LOG_ERROR),
@@ -304,15 +294,15 @@ void syslog (int facility_priority, const char* fmt, ...)
 
   va_start (ap, fmt);
   GetLocalTime (&stm);
-  len = sprintf (datagram, "<%d>%s %2d %02d:%02d:%02d %s %s%s: ",
-                 facility_priority,
-                 month[stm.wMonth - 1], stm.wDay, stm.wHour, stm.wMinute, stm.wSecond,
-                 local_hostname,
-                 proclog->ident ? proclog->ident : processname (0), proclog->str_pid);
+  len =
+    sprintf (datagram, "<%d>%s %2d %02d:%02d:%02d %s %s%s: ", facility_priority,
+             month[stm.wMonth - 1], stm.wDay, stm.wHour, stm.wMinute, stm.wSecond, local_hostname,
+             proclog->ident ? proclog->ident : processname (0), proclog->str_pid);
   vsnprintf (datagram + len, LOG_DGRAM_SIZE - len, fmt, ap);
 
   if (proclog->sock != INVALID_SOCKET)
-    sendto (proclog->sock, datagram, (int)strlen (datagram), 0, (SOCKADDR*)&proclog->sa_logger, sizeof (SOCKADDR_IN));
+    sendto (proclog->sock, datagram, (int)strlen (datagram), 0, (SOCKADDR*)&proclog->sa_logger,
+            sizeof (SOCKADDR_IN));
 
   strcat (datagram, "\n");
   if (proclog->option & LOGOPT_OUTDEBUG)
@@ -323,7 +313,6 @@ void syslog (int facility_priority, const char* fmt, ...)
     fwrite (datagram, sizeof (char), strlen (datagram), proclog->file);
     fflush (proclog->file);
   }
-
 }
 
 bool syslog_debug (const char* fmt, ...)
@@ -333,50 +322,50 @@ bool syslog_debug (const char* fmt, ...)
   int len;
   char datagram[LOG_DGRAM_SIZE + 3];
   if (!proclog)
-    openlog(NULL, 0, 0);
+    openlog (NULL, 0, 0);
 
-  int prm = LOG_MASK(LOG_DEBUG);
+  int prm = LOG_MASK (LOG_DEBUG);
   if (!(prm & proclog->mask))
-    return false; //not logging debug messages
+    return false; // not logging debug messages
 
   int facility_priority = proclog->facility | LOG_DEBUG;
 
-  va_start(ap, fmt);
-  GetLocalTime(&stm);
-  len = sprintf(datagram, "<%d>%s %2d %02d:%02d:%02d %s %s%s: ",
-                facility_priority,
-                month[stm.wMonth - 1], stm.wDay, stm.wHour, stm.wMinute, stm.wSecond,
-                local_hostname,
-                proclog->ident ? proclog->ident : processname(0), proclog->str_pid);
-  vsnprintf(datagram + len, LOG_DGRAM_SIZE - len, fmt, ap);
+  va_start (ap, fmt);
+  GetLocalTime (&stm);
+  len =
+    sprintf (datagram, "<%d>%s %2d %02d:%02d:%02d %s %s%s: ", facility_priority,
+             month[stm.wMonth - 1], stm.wDay, stm.wHour, stm.wMinute, stm.wSecond, local_hostname,
+             proclog->ident ? proclog->ident : processname (0), proclog->str_pid);
+  vsnprintf (datagram + len, LOG_DGRAM_SIZE - len, fmt, ap);
 
   if (proclog->sock != INVALID_SOCKET)
-    sendto(proclog->sock, datagram, (int)strlen(datagram), 0, (SOCKADDR*)&proclog->sa_logger, sizeof(SOCKADDR_IN));
+    sendto (proclog->sock, datagram, (int)strlen (datagram), 0, (SOCKADDR*)&proclog->sa_logger,
+            sizeof (SOCKADDR_IN));
 
-  strcat(datagram, "\n");
+  strcat (datagram, "\n");
   if (proclog->option & LOGOPT_OUTDEBUG)
-    OutputDebugString(utf8::widen(datagram).c_str());
+    OutputDebugString (utf8::widen (datagram).c_str ());
 
   if (proclog->file)
   {
-    fwrite(datagram, sizeof(char), strlen(datagram), proclog->file);
-    fflush(proclog->file);
+    fwrite (datagram, sizeof (char), strlen (datagram), proclog->file);
+    fflush (proclog->file);
   }
   return true;
 }
 
 /*!
   \ingroup syslog
-  The setlogmask() function sets this logmask for the current process, 
-  and returns the previous mask. If the mask argument is 0, 
-  the current logmask is not modified. 
+  The setlogmask() function sets this logmask for the current process,
+  and returns the previous mask. If the mask argument is 0,
+  the current logmask is not modified.
 
-  A process has a log priority mask that determines which calls to syslog 
-  may be logged. All other calls will be ignored. Logging is enabled for the 
-  priorities that have the corresponding bit set in mask. 
+  A process has a log priority mask that determines which calls to syslog
+  may be logged. All other calls will be ignored. Logging is enabled for the
+  priorities that have the corresponding bit set in mask.
 
-  setlogmask sets a mask (the "logmask") that determines which future syslog 
-  calls shall be ignored.  You can use setlogmask to specify that messages of 
+  setlogmask sets a mask (the "logmask") that determines which future syslog
+  calls shall be ignored.  You can use setlogmask to specify that messages of
   particular priorities shall be ignored in the future.
 
   If a program has not called setlogmask, the default mask loaded from the INI
@@ -388,32 +377,32 @@ bool syslog_debug (const char* fmt, ...)
   Note that the logmask exists entirely independently of opening and closing
   of Syslog connections.
 
-  mask is a bit string with one bit corresponding to each of the possible 
-  message priorities. If the bit is on, syslog handles messages of that 
+  mask is a bit string with one bit corresponding to each of the possible
+  message priorities. If the bit is on, syslog handles messages of that
   priority normally. If it is off, syslog discards messages of that priority.
-  
-  Use the message priority values described in <log.h> and the LOG_MASK or 
+
+  Use the message priority values described in <log.h> and the LOG_MASK or
   LOG_UPTO macros to  construct an appropriate mask value, as in this example:
 
     LOG_MASK(LOG_EMERG) | LOG_MASK(LOG_ERROR)
-         
+
   or
 
     ~(LOG_MASK(LOG_INFO))
-         
-  The LOG_UPTO macro generates a mask with the bits on for 
+
+  The LOG_UPTO macro generates a mask with the bits on for
   a certain priority and all priorities above it:
 
     LOG_UPTO(LOG_ERROR)
-         
-  The unfortunate naming of the macro is due to the fact that internally, 
-  higher numbers are used for lower message priorities.   
+
+  The unfortunate naming of the macro is due to the fact that internally,
+  higher numbers are used for lower message priorities.
 */
 int setlogmask (int mask)
 {
   int prev;
 
-  prev = proclog?proclog->mask : log_defaultmask;
+  prev = proclog ? proclog->mask : log_defaultmask;
   if (mask)
   {
     log_defaultmask = mask;
@@ -426,9 +415,9 @@ int setlogmask (int mask)
 /**
   \ingroup syslog
   \param opt can be any combination of LOGOPT_... values.
-  
+
   For instance
-\verbatim    
+\verbatim
     setlogoption (LOGOPT_FILE | LOGOPT_NOUDP)
 \endverbatim
   turns on file logging and turns off sending of UDP data.
@@ -439,7 +428,7 @@ int setlogopt (int opt)
 {
   int prev;
 
-  prev = proclog?proclog->option : log_defaultopt;
+  prev = proclog ? proclog->option : log_defaultopt;
   log_defaultopt = opt;
   if (proclog)
     proclog->option = opt;
