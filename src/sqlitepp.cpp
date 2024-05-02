@@ -411,8 +411,6 @@ erc Query::reset ()
 }
 
 /*!
-  Finalizes the statement and removes the database connection.
-
   Statements are automatically finalized when Query objects are destructed or
   assigned a new SQL text. Occasionally user might need to manually clear a
   query (for instance if he needs to close a database connection).

@@ -227,6 +227,7 @@ public:
   /// Reset statement to initial state
   erc reset ();
 
+  ///  Finalizes the statement and removes the database connection.
   void clear ();
 
 private:
