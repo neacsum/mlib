@@ -32,7 +32,7 @@ private:
 /// Constructor for a parsing context
 inline parse_context::parse_context (const char* buf)
 {
-  toparse = lcl = _strdup (buf);
+  toparse = lcl = strdup (buf);
   saved = 0;
 };
 

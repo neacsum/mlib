@@ -30,3 +30,16 @@
 #endif
 
 #define SQLITE_ENABLE_COLUMN_METADATA
+
+//Standard types
+typedef unsigned long DWORD;
+typedef int BOOL;
+typedef unsigned char BYTE;
+typedef unsigned short WORD;
+typedef float FLOAT;
+
+typedef int INT;
+typedef unsigned int UINT;
+
+#include <stdint.h>
+#include <stddef.h>

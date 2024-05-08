@@ -80,6 +80,7 @@ and
 #include <mlib/mlib.h>
 #pragma hdrstop
 #include <ctype.h>
+#include <cstring>
 #include <assert.h>
 #include <filesystem>
 
@@ -268,8 +269,8 @@ int OptParser::parse (int argc, const char* const* argv, int* stop)
         i++;
         break;
       }
-      op =
-        find_if (op, optlist.end (), [&ptr] (auto& o) { return !strcmp (ptr, o.olong.c_str ()); });
+      op = find_if (op, optlist.end (), 
+            [&ptr] (auto& o) { return !strcmp (ptr, o.olong.c_str ()); });
       option.olong = ptr;
       if (op != optlist.end ())
         option.oshort = op->oshort;
@@ -282,7 +283,8 @@ int OptParser::parse (int argc, const char* const* argv, int* stop)
     else
     {
       // short option(s)
-      op = find_if (op, optlist.end (), [&ptr] (auto& o) { return o.oshort == *ptr; });
+      op = find_if (op, optlist.end (), 
+            [&ptr] (auto& o) { return o.oshort == *ptr; });
       if (op == optlist.end ())
       {
         ret = 1; // unknown option
@@ -299,8 +301,8 @@ int OptParser::parse (int argc, const char* const* argv, int* stop)
           goto done;
         }
         cmd.push_back (option);
-        op =
-          find_if (optlist.begin (), optlist.end (), [&ptr] (auto& o) { return o.oshort == *ptr; });
+        op = find_if (optlist.begin (), optlist.end (), 
+              [&ptr] (auto& o) { return o.oshort == *ptr; });
         if (op == optlist.end ())
         {
           ret = 1; // unknown option

@@ -8,16 +8,10 @@
 #pragma hdrstop
 #include <stdio.h>
 #include <stdarg.h>
-
-static INIT_ONCE dpr_init = INIT_ONCE_STATIC_INIT;
-static CRITICAL_SECTION dpr_cs;
-
-// Initialization function executed by InitOnceExecuteOnce
-BOOL CALLBACK dpr_inifun (PINIT_ONCE, PVOID, PVOID*)
-{
-  InitializeCriticalSection (&dpr_cs);
-  return true;
-}
+#include <thread>
+#include <mutex>
+#include <sstream>
+#include <cstring>
 
 /*!
   printf style function writes messages using OutputDebugString.
@@ -32,15 +26,20 @@ BOOL CALLBACK dpr_inifun (PINIT_ONCE, PVOID, PVOID*)
 
 bool dprintf (const char* fmt, ...)
 {
+  static std::mutex dpr_lock;
+
   char buffer[MAX_DPRINTF_CHARS];
   size_t sz;
   int r;
-  wchar_t* out;
-  InitOnceExecuteOnce (&dpr_init, dpr_inifun, NULL, NULL);
-
   va_list params;
   va_start (params, fmt);
+#ifdef _WINDOWS_
   sprintf_s (buffer, "[%x] ", GetCurrentThreadId ());
+#else
+  std::stringstream s;
+  s << '[' << std::this_thread::get_id () << ']';
+  strcpy (buffer, s.str ().c_str ());
+#endif
   sz = sizeof (buffer) - strlen (buffer) - 2; // reserve space for final \0 and \n
   r = vsnprintf (buffer + strlen (buffer), sz, fmt, params);
   va_end (params);
@@ -48,17 +47,26 @@ bool dprintf (const char* fmt, ...)
     return false; // for some reason we cannot print
   if ((size_t)r > sz - 1)
     buffer[MAX_DPRINTF_CHARS - 2] = 0; // print was truncated
+#ifdef _WINDOWS_
   strcat_s (buffer, "\n");
+  wchar_t* out;
 
   int wsz = MultiByteToWideChar (CP_UTF8, 0, buffer, -1, 0, 0);
   if (wsz && (out = (wchar_t*)malloc (wsz * sizeof (wchar_t))))
   {
     MultiByteToWideChar (CP_UTF8, 0, buffer, -1, out, wsz);
-    EnterCriticalSection (&dpr_cs);
-    OutputDebugString (out);
-    LeaveCriticalSection (&dpr_cs);
+    {
+      std::lock_guard<std::mutex> l (dpr_lock);
+      OutputDebugString (out);
+    }
     free (out);
     return true;
   }
   return false;
+#else
+  strcat (buffer, "\n");
+  std::lock_guard<std::mutex> l (dpr_lock);
+  fputs (buffer, stderr);
+  return true;
+#endif
 }

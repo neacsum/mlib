@@ -5,6 +5,7 @@
 */
 #include <mlib/mlib.h>
 #pragma hdrstop
+#include <cstring>
 
 namespace mlib {
 
