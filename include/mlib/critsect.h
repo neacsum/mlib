@@ -9,6 +9,7 @@
 #if __has_include("defs.h")
 #include "defs.h"
 #endif
+#include "safe_winsock.h"
 
 namespace mlib {
 

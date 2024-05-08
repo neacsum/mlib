@@ -11,7 +11,7 @@
 #include "defs.h"
 #endif
 
-#include <winsock2.h>
+#include "safe_winsock.h"
 #include <ostream>
 
 #include "errorcode.h"

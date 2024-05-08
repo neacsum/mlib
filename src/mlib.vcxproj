@@ -195,6 +195,7 @@
     <ClInclude Include="..\include\mlib\rdir.h" />
     <ClInclude Include="..\include\mlib\ringbuf.h" />
     <ClInclude Include="..\include\mlib\rotmat.h" />
+    <ClInclude Include="..\include\mlib\safe_winsock.h" />
     <ClInclude Include="..\include\mlib\semaphore.h" />
     <ClInclude Include="..\include\mlib\serenum.h" />
     <ClInclude Include="..\include\mlib\shmem.h" />

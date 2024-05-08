@@ -9,6 +9,8 @@
 #include "defs.h"
 #endif
 
+#include "safe_winsock.h"
+
 #ifndef _INC_WINDOWS
 #include <windows.h>
 #endif

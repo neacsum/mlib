@@ -14,7 +14,7 @@
 #include <memory>
 #include <cassert>
 
-#include <Winsock2.h>
+#include "safe_winsock.h"
 #include <sqlite3/sqlite3.h>
 #include "errorcode.h"
 

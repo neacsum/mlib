@@ -4,7 +4,7 @@
 #include "defs.h"
 #endif
 
-#include <Winsock2.h>
+#include "safe_winsock.h"
 
 #include <netfw.h>
 #include "errorcode.h"

@@ -153,6 +153,9 @@
     <ClInclude Include="..\include\mlib\asset.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\mlib\safe_winsock.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="base64.cpp">
