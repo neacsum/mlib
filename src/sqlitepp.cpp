@@ -29,7 +29,7 @@ using namespace std;
 
 namespace mlib {
 
-void set_erc_message (erc& err, sqlite3* db);
+static void set_erc_message (erc& err, sqlite3* db);
 
 errfac the_errors ("SQLITEPP");
 errfac* sqlite_errors = &the_errors;
@@ -471,14 +471,14 @@ Query& Query::bind (int par, double val)
 }
 
 /// Bind a parameter specified by name to a large integer
-Query& Query::bind (const std::string& parname, __int64 val)
+Query& Query::bind (const std::string& parname, sqlite3_int64 val)
 {
   int idx = sqlite3_bind_parameter_index (stmt, parname.c_str ());
   return bind (idx, val);
 }
 
 /// Bind a parameter specified by number to a large integer
-Query& Query::bind (int par, __int64 val)
+Query& Query::bind (int par, sqlite3_int64 val)
 {
   check_errors (sqlite3_bind_int64 (stmt, par, val));
   return *this;
@@ -524,6 +524,7 @@ Query& Query::bind (const std::string& parname, void* val, int len)
   return bind (idx, val, len);
 }
 
+#ifdef _WIN32
 /*!
   Bind a parameter specified by name to a `SYSTEMTIME` value.
   The value is written in a format compatible with SQLITE `strftime` function
@@ -556,6 +557,7 @@ Query& Query::bind (int par, const SYSTEMTIME& val)
   check_errors (sqlite3_bind_text (stmt, par, text, -1, SQLITE_TRANSIENT));
   return *this;
 }
+#endif
 
 /// Reset all parameters to NULL values.
 Query& Query::clear_bindings ()
@@ -886,13 +888,13 @@ double Query::column_double (const std::string& colname) const
      value that can be interpreted as an integer number is extracted and the
      remainder ignored. Any leading spaces are ignored.
 */
-__int64 Query::column_int64 (int nc) const
+sqlite3_int64 Query::column_int64 (int nc) const
 {
   return sqlite3_column_int64 (stmt, nc);
 }
 
 /// \copydoc column_int64
-__int64 Query::column_int64 (const std::string& colname) const
+sqlite3_int64 Query::column_int64 (const std::string& colname) const
 {
   return column_int64 (find_col (colname));
 }
@@ -913,6 +915,7 @@ const void* Query::column_blob (const std::string& colname) const
   return column_blob (find_col (colname));
 }
 
+#ifdef _WIN32
 /*!
   Return a SYSTEMTIME structure with the column content.
 */
@@ -939,6 +942,7 @@ Query::column_time (const std::string& colname) const
 {
   return column_time (find_col (colname));
 }
+#endif
 
 ///@}
 

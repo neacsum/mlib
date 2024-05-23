@@ -13,10 +13,15 @@
 #include <map>
 #include <memory>
 #include <cassert>
+#include <cstring>
 
 #include "safe_winsock.h"
 #include <sqlite3/sqlite3.h>
 #include "errorcode.h"
+
+#ifndef _WIN32
+//#include <strings.h>
+#endif
 
 #if (defined(_MSVC_LANG) && _MSVC_LANG < 202002L)                                                  \
   || (!defined(_MSVC_LANG) && (__cplusplus < 202002L))
@@ -83,13 +88,13 @@ public:
   }
 
   /// Return rowid of last successful insert
-  __int64 last_rowid ();
+  sqlite3_int64 last_rowid ();
 
   /// Return number of records changed by last query
-  __int64 changes ();
+  sqlite3_int64 changes ();
 
   /// Return total number of changes since database was opened
-  __int64 total_changes ();
+  sqlite3_int64 total_changes ();
 
   /// Open database connection
   erc open (const std::string& name, openflags flags = openflags::create);
@@ -170,12 +175,14 @@ public:
   Query& bind (const std::string& parname, int val);
   Query& bind (int par, double val);
   Query& bind (const std::string& parname, double val);
-  Query& bind (int par, __int64 val);
-  Query& bind (const std::string& parname, __int64 val);
+  Query& bind (int par, sqlite3_int64 val);
+  Query& bind (const std::string& parname, sqlite3_int64 val);
   Query& bind (int par, void* val, int len);
   Query& bind (const std::string& parname, void* val, int len);
+#ifdef _WIN32
   Query& bind (int par, const SYSTEMTIME& st);
   Query& bind (const std::string& parname, const SYSTEMTIME& st);
+#endif
 
   Query& clear_bindings ();
 
@@ -191,14 +198,16 @@ public:
   double column_double (int nc) const;
   double column_double (const std::string& colname) const;
 
-  __int64 column_int64 (int nc) const;
-  __int64 column_int64 (const std::string& name) const;
+  sqlite3_int64 column_int64 (int nc) const;
+  sqlite3_int64 column_int64 (const std::string& name) const;
 
   const void* column_blob (int nc) const;
   const void* column_blob (const std::string& name) const;
 
+#ifdef _WIN32
   SYSTEMTIME column_time (int nc) const;
   SYSTEMTIME column_time (const std::string& name) const;
+#endif
 
   int column_type (int nc) const;
   int column_type (const std::string& colname) const;
@@ -250,19 +259,19 @@ private:
 };
 
 /*==================== INLINE FUNCTIONS ===========================*/
-inline __int64 Database::last_rowid ()
+inline sqlite3_int64 Database::last_rowid ()
 {
   assert (db);
   return sqlite3_last_insert_rowid (db.get ());
 }
 
-inline __int64 Database::changes ()
+inline sqlite3_int64 Database::changes ()
 {
   assert (db);
   return sqlite3_changes64 (db.get ());
 }
 
-inline __int64 mlib::Database::total_changes ()
+inline sqlite3_int64 mlib::Database::total_changes ()
 {
   assert (db);
   return sqlite3_total_changes64 (db.get ());
@@ -283,9 +292,14 @@ inline int Query::columns ()
   return sqlite3_column_count (stmt);
 }
 
+
 inline bool Query::iless::operator() (const std::string& left, const std::string& right) const
 {
-  return _stricmp (left.c_str (), right.c_str ()) < 0;
+#ifdef _WIN32
+  return _strcmpi (left.c_str (), right.c_str ()) < 0;
+#else
+  return strcasecmp (left.c_str (), right.c_str ()) < 0;
+#endif
 }
 
 /*!

@@ -62,10 +62,10 @@
 
 namespace mlib {
 
+class errfac;
+
 class erc
 {
-  friend class errfac;
-
 public:
   /// Error levels (borrowed from BSD Unix)
   enum level
@@ -80,7 +80,7 @@ public:
     emerg     //!< always    logged,       thrown
   };
   erc ();
-  explicit erc (int value, level priority = level::error, const errfac* f = nullptr);
+  explicit erc (int value, level priority = level::error, const mlib::errfac* f = nullptr);
   erc (const erc& other);
   erc (erc&& other);
 

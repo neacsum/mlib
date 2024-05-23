@@ -9,6 +9,7 @@
 #include <istream>
 #include <ostream>
 #include <sstream>
+#include <cstring>
 #include <utf8/utf8.h>
 
 using namespace std;

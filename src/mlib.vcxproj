@@ -259,7 +259,7 @@
     <ClCompile Include="statpars.cpp" />
     <ClCompile Include="stopwatch.cpp" />
     <ClCompile Include="syncbase.cpp" />
-    <ClCompile Include="tcpserv.cpp" />
+    <ClCompile Include="tcpserver.cpp" />
     <ClCompile Include="thread.cpp" />
     <ClCompile Include="tvops.cpp" />
     <ClCompile Include="wsockstream.cpp" />

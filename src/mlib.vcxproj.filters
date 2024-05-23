@@ -221,7 +221,7 @@
     <ClCompile Include="syncbase.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="tcpserv.cpp">
+    <ClCompile Include="tcpserver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="thread.cpp">

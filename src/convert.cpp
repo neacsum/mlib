@@ -70,12 +70,14 @@ std::string degtoa (double degrees, int flags, int precision)
   {
     double dd;
     degrees = modf (degrees + .5 * pow10 (-precision - 1) / 60., &dd) * 60.;
-    strprintf (str, u8"%0*.lf°%0*.*lf\'%c", deg_width, dd, width, precision, degrees, sign);
+    strprintf (str, u8"%0*.lf°%0*.*lf\'%c", deg_width, dd, width, precision, degrees,
+               sign);
   }
   else
   {
     width = deg_width + precision + 1;
-    strprintf (str, u8"%0*.*lf°%c", width, precision, degrees + .5 * pow10 (-precision - 1), sign);
+    strprintf (str, u8"%0*.*lf°%c", width, precision,
+               degrees + .5 * pow10 (-precision - 1), sign);
   }
 
   return str;

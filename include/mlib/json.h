@@ -94,7 +94,7 @@ public:
     using iterator_category = std::bidirectional_iterator_tag;
 
     // Copy constructor
-    iterator_type<C_> (const iterator_type<C_>& other)
+    iterator_type (const iterator_type& other)
       : target (other.target)
     {
       if (target.t == type::object)
@@ -106,7 +106,7 @@ public:
     }
 
     // Destructor
-    ~iterator_type<C_> ()
+    ~iterator_type ()
     {
       if (target.t == type::object)
         (&objit)->~obj_iter ();
@@ -244,12 +244,12 @@ public:
     }
 
   private:
-    iterator_type<C_> (const node& n, bool end)
+    iterator_type (const node& n, bool end)
       : target (n)
       , at_end (end)
     {}
 
-    iterator_type<C_> (const node& n, const arr_iter& it)
+    iterator_type (const node& n, const arr_iter& it)
       : target (n)
       , arrit (it)
     {}
@@ -590,13 +590,24 @@ inline node& node::at (size_t index)
   return const_cast<node&> (static_cast<const node&> (*this).at (index));
 }
 
+struct omanip
+{
+  omanip (void (*fn)(std::ios_base&, int), int val) : pfun(fn), arg(val) {}
+  void (* pfun)(std::ios_base&, int);
+  int arg;
+
+  friend std::ostream& operator << (std::ostream& strm, const omanip& manip) {
+    (*manip.pfun) (strm, manip.arg);
+    return strm;
+  }
+};
+
 // manipulators
-#ifdef _MSC_VER
 void indenter (std::ios_base& os, int spaces);
 
-inline std::_Smanip<int> spaces (int nspc)
+inline omanip spaces (int nspc)
 {
-  return std::_Smanip<int> (&indenter, nspc);
+  return omanip (&indenter, nspc);
 }
 
 inline std::ostream& indent (std::ostream& os)
@@ -610,7 +621,6 @@ inline std::ostream& tabs (std::ostream& os)
   return os;
 };
 std::ostream& noindent (std::ostream& os);
-#endif
 
 std::ostream& operator<< (std::ostream& os, const node& n);
 std::istream& operator>> (std::istream& is, node& n);

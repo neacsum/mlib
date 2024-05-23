@@ -36,7 +36,7 @@ public:
     using iterator_category = std::bidirectional_iterator_tag;
 
     /// Default constructor
-    iterator_type<C_> ()
+    iterator_type ()
       : ring (nullptr)
       , pos (0)
     {}
@@ -175,7 +175,7 @@ public:
     }
 
   private:
-    iterator_type<C_> (const ring_buffer* ring_, size_t pos_)
+    iterator_type (const ring_buffer* ring_, size_t pos_)
       : ring (ring_)
       , pos (pos_)
     {}

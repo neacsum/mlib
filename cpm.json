@@ -3,7 +3,8 @@
   "git": "git@github.com:neacsum/mlib.git",
   "https": "https://github.com/neacsum/mlib.git",
   "build": [
-    {"cmd": "build.bat", "args": ["lib"]}
+    {"os": "windows", "cmd": "build.bat", "args": ["lib"]},
+    {"os": "linux", "cmd": "cmake", "args": ["--workflow", "--preset", "x64"]}
   ], 
   "depends": [
     {

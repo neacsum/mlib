@@ -53,7 +53,11 @@ Border::Border (const char* fname)
   closing.x = 0;
   closing.y = 0;
   closing_outside = 0;
+#if defined(_WIN32)
   FILE* f = utf8::fopen (fname, "r");
+#else
+  FILE* f = fopen (fname, "r");
+#endif
   if (!f)
     return;
 
