@@ -54,8 +54,11 @@ node::node (const node& other)
   {
   case type::object:
     new (&obj) nodes_map ();
-    for (auto n = other.obj.begin (); n != other.obj.end (); ++n)
-      obj.emplace (n->first, make_unique<node> (n->second.get ()));
+    for (auto& n : other.obj)
+    {
+      auto v = n.second.get ();
+      obj.emplace (n.first, make_unique<node> (*v));
+    }
     break;
   case type::array: {
     new (&arr) nodes_array (other.arr.size ());
@@ -63,7 +66,7 @@ node::node (const node& other)
     for (auto n = other.arr.begin (); n != other.arr.end (); ++n, ++i)
     {
       auto v = n->get ();
-      arr[i] = make_unique<node> (*v);
+      arr [i] = make_unique<node> (*v);
     }
     break;
   }
@@ -104,12 +107,13 @@ node& node::operator= (const node& rhs)
     switch (t)
     {
     case type::object:
-      for (auto n = rhs.obj.begin (); n != rhs.obj.end (); ++n)
-        obj.emplace (n->first, make_unique<node> (*n->second));
+      for (auto& n : rhs.obj)
+        obj.emplace (n.first, make_unique<node> (*n.second));
       break;
     case type::array:
-      for (size_t i = 0; i < rhs.arr.size (); i++)
-        arr.emplace_back (make_unique<node> (*rhs.arr[i]));
+      new (&arr) nodes_array (rhs.arr.size ());
+      for (size_t i = 0; i < rhs.arr.size (); ++i)
+        arr[i] = make_unique<node> (*rhs.arr[i]);
       break;
     case type::string:
       str = rhs.str;

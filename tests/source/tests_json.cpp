@@ -83,6 +83,25 @@ TEST (quoted_string_outside_bmp)
   CHECK_EQUAL (in, out);
 }
 
+TEST (copy_constructor)
+{
+  string in = R"({
+    "encoding" : "UTF-8",
+    "plug-ins" : [
+      "python",
+        "c++",
+        "ruby"
+    ] ,
+    "indent" : { "length" : 3, "use_space" : true }})";
+  json::node n1;
+  n1.read (in);
+
+  json::node n2(n1);
+  
+  CHECK_EQUAL (n1, n2);
+}
+
+
 TEST (move_constructor)
 {
   json::node n1;
