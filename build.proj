@@ -13,8 +13,10 @@
     </Target>
     <Target Name="tests" DependsOnTargets="lib">
         <MSBuild Projects="tests\mlib_test.vcxproj" Properties="SolutionDir=..\;Configuration=Debug;Platform=x64"/>  
-        <MSBuild Projects="tests\mlib_test.vcxproj" Properties="SolutionDir=..\;Configuration=Release;Platform=x64"/> 
+<!---        <MSBuild Projects="tests\mlib_test.vcxproj" Properties="SolutionDir=..\;Configuration=Release;Platform=x64"/> 
         <MSBuild Projects="tests\mlib_test.vcxproj" Properties="SolutionDir=..\;Configuration=Debug;Platform=x86"/>  
-        <MSBuild Projects="tests\mlib_test.vcxproj" Properties="SolutionDir=..\;Configuration=Release;Platform=x86"/>
+        <MSBuild Projects="tests\mlib_test.vcxproj" Properties="SolutionDir=..\;Configuration=Release;Platform=x86"/> -->
+        
+        <Exec Command="build\exe\x64\debug\mlib_test.exe build\exe\x64\debug\mlib_tests.xml"/>
     </Target>
 </Project>

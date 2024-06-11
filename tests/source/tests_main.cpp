@@ -2,24 +2,38 @@
 #include <mlib/mlib.h>
 #pragma hdrstop
 #include <fstream>
+#include <filesystem>
 
 using namespace std;
 
 TEST_MAIN (int argc, char **argv)
 {
-  if (argc == 1)
+  std::cerr << "Running " << *argv++ << endl 
+    << "working directory is: " << std::filesystem::current_path() << endl;
+  --argc;
+  if (argc && (*argv)[0] == '-')
   {
-    string fname = argv[0];
-    auto p = fname.rfind ('\\') + 1;
-    fname.erase (p);
-    fname.append ("mlib_tests.xml");
-    cout << "Results file: " << fname << endl;
-    std::ofstream os (fname);
-    UnitTest::ReporterXml xml (os);
-    return UnitTest::RunAllTests (xml);
+    if (!strcmp (*argv, "-s") && argc > 1)
+    {
+      ++argv;
+      return UnitTest::RunSuite (*argv);
+    }
+    else
+    {
+      std::cerr << "Invalid syntax." << endl;
+      exit (-1);
+    }
+  }
+  if (argc)
+  {
+    std::filesystem::path xml_filename (*argv);
+    std::ofstream xml_stream (xml_filename);
+    UnitTest::ReporterXml xml (xml_stream);
+    std::cerr << "Output sent to " << std::filesystem::absolute (xml_filename) << endl;
+    return RunAllTests (xml);
   }
   else
-    return UnitTest::RunSuite (argv[1]);
+    return UnitTest::RunAllTests ();
 }
 
 SUITE (rotations)
