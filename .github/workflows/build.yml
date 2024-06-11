@@ -23,7 +23,9 @@ jobs:
         run: cpm -v --proto https -u https://github.com/neacsum/mlib.git -r $HOME mlib
         
       - name: Build and run tests
-        run: mlib/build.bat tests
+        shell: cmd
+        run: |
+          %USERPROFILE%\mlib\build.bat tests
         
       - name: Save tests result
         if: ${{ success() || failure() }}
