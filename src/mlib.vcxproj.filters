@@ -167,7 +167,7 @@
     <ClCompile Include="convert.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="crc32.c">
+    <ClCompile Include="crc32.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="event.cpp">

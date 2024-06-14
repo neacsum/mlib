@@ -4,14 +4,11 @@
 #include "defs.h"
 #endif
 
-#ifdef __cplusplus
-extern "C"
+namespace mlib 
 {
-#endif
 
 void crc32_update (BYTE byte, DWORD* crc);
 DWORD crc32 (const void* block, size_t sz);
 
-#ifdef __cplusplus
 }
-#endif
+

@@ -13,6 +13,11 @@
 using namespace mlib;
 using namespace std;
 
+// These are the values of DBL_EPSILON and DBL_MIN from Visual Studio.
+// GCC defines them in a form that cannot be used with STRINGIZE
+#define JSON_DBL_EPSILON 2.2204460492503131e-016
+#define JSON_DBL_MIN     2.2250738585072014e-308
+
 SUITE (Json)
 {
 
@@ -282,15 +287,16 @@ TEST (y_tests)
   //number double close to 0
   s = R"([-0.000000000000000000000000000000000000000000000000000000000000000000000000000001])";
   CHECK_EQUAL (erc::success, n.read (s));
-  CHECK_CLOSE (-1E-78, static_cast<double>(n[0]), DBL_EPSILON);
+  CHECK_CLOSE (-1E-78, static_cast<double>(n[0]), JSON_DBL_EPSILON);
 
   //Min positive value
-  s = "[" STRINGIZE (DBL_MIN) "]";
+  s = "[" STRINGIZE (JSON_DBL_MIN) "]";
+  cout << "s=" << s << endl;
   CHECK_EQUAL (erc::success, n.read (s));
-  CHECK_CLOSE (DBL_MIN, static_cast<double>(n[0]), DBL_EPSILON);
+  CHECK_CLOSE (JSON_DBL_MIN, static_cast<double>(n[0]), JSON_DBL_EPSILON);
 
   //smallest such that 1.0+DBL_EPSILON != 1.0
-  s = "[" STRINGIZE (DBL_EPSILON) "]";
+  s = "[" STRINGIZE (JSON_DBL_EPSILON) "]";
   CHECK_EQUAL (erc::success, n.read (s));
   CHECK (1.0 != 1.0 + static_cast<double>(n[0]));
 

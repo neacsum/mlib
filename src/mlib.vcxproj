@@ -218,7 +218,7 @@
     <ClCompile Include="biosuuid.cpp" />
     <ClCompile Include="bitstream.cpp" />
     <ClCompile Include="convert.cpp" />
-    <ClCompile Include="crc32.c">
+    <ClCompile Include="crc32.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>

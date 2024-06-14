@@ -6,7 +6,7 @@ target_sources(mlib PRIVATE
   base64.cpp
   bitstream.cpp
   convert.cpp
-  crc32.c
+  crc32.cpp
   dprintf.cpp
   json.cpp
   md5.c

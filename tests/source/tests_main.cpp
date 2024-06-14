@@ -16,6 +16,7 @@ TEST_MAIN (int argc, char **argv)
     if (!strcmp (*argv, "-s") && argc > 1)
     {
       ++argv;
+      UnitTest::GetDefaultReporter ().SetTrace (true);
       return UnitTest::RunSuite (*argv);
     }
     else

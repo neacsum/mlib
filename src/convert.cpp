@@ -23,7 +23,8 @@ inline size_t strprintf (std::string& str, const char* fmt, ...)
   va_start (args, fmt);
   auto sz = vsnprintf (nullptr, 0, fmt, args);
   str.resize (sz + 1); // leave space for terminating null
-  sz = vsnprintf (const_cast<char*> (str.c_str ()), sz + 1, fmt, args);
+  va_start (args, fmt);
+  sz = vsnprintf (const_cast<char*> (str.data ()), sz + 1, fmt, args);
   str.resize (sz);
   return sz;
 }
