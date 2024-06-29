@@ -31,7 +31,19 @@ public:
   std::string message (const erc& e) const override;
 };
 
-sock_facility the_errors;
+static sock_facility default_sockstream_errors;
+
+static errfac* errors = &default_sockstream_errors;
+
+errfac& sock::Errors ()
+{
+  return *errors;
+}
+
+void sock::Errors (errfac& facility)
+{
+  errors = &facility;
+}
 
 int sock_initializer_counter = 0;
 
@@ -220,7 +232,7 @@ erc sock::close ()
 erc sock::name (inaddr& addr) const
 {
   if (!sl || sl->handle == INVALID_SOCKET)
-    return erc (WSAENOTSOCK, erc::error, sock::errors);
+    return erc (WSAENOTSOCK, Errors());
 
   sockaddr sa;
   int len = sizeof (sa);
@@ -237,7 +249,7 @@ erc sock::name (inaddr& addr) const
 erc sock::peer (inaddr& addr) const
 {
   if (!sl || sl->handle == INVALID_SOCKET)
-    return erc (WSAENOTSOCK, erc::error, sock::errors);
+    return erc (WSAENOTSOCK, Errors());
 
   sockaddr sa;
   int len = sizeof (sa);
@@ -270,7 +282,7 @@ erc sock::bind (const inaddr& sa) const
 erc sock::bind () const
 {
   if (!sl || sl->handle == INVALID_SOCKET)
-    return erc (WSAENOTSOCK, erc::error, sock::errors);
+    return erc (WSAENOTSOCK, Errors());
 
   sockaddr sa;
   memset (&sa, 0, sizeof (sa));
@@ -292,14 +304,14 @@ erc sock::bind () const
 erc sock::connect (const inaddr& peer, int wp_sec) const
 {
   if (!sl || sl->handle == INVALID_SOCKET)
-    return erc (WSAENOTSOCK, erc::error, sock::errors);
+    return erc (WSAENOTSOCK, Errors());
 
   if (is_writeready (wp_sec))
   {
     ::connect (sl->handle, peer, sizeof (peer));
     return last_error ();
   }
-  return erc (WSAETIMEDOUT, erc::info, sock::errors);
+  return erc (WSAETIMEDOUT, Errors(), erc::info);
 }
 
 /*!
@@ -315,7 +327,7 @@ erc sock::connect (const inaddr& peer, int wp_sec) const
 erc sock::accept (sock& client, int wp_sec, inaddr* addr) const
 {
   if (!sl || sl->handle == INVALID_SOCKET)
-    return erc (WSAENOTSOCK, erc::error, sock::errors);
+    return erc (WSAENOTSOCK, Errors());
 
   sockaddr sa;
   int len = sizeof (sa);
@@ -324,7 +336,7 @@ erc sock::accept (sock& client, int wp_sec, inaddr* addr) const
   else
   {
     client = sock ();
-    return erc (WSAETIMEDOUT, erc::info, sock::errors);
+    return erc (WSAETIMEDOUT, Errors(), erc::info);
   }
   if (addr)
     *addr = sa;
@@ -343,7 +355,7 @@ erc sock::accept (sock& client, int wp_sec, inaddr* addr) const
 size_t sock::recv (void* buf, size_t len, mflags msgf) const
 {
   if (!sl || sl->handle == INVALID_SOCKET)
-    throw erc (WSAENOTSOCK, erc::error, sock::errors);
+    throw erc (WSAENOTSOCK, Errors());
 
   int rval = ::recv (sl->handle, (char*)buf, (int)len, msgf);
   if (rval == SOCKET_ERROR)
@@ -375,7 +387,7 @@ size_t sock::recv (void* buf, size_t len, mflags msgf) const
 size_t sock::recvfrom (sockaddr& sa, void* buf, size_t len, mflags msgf) const
 {
   if (!sl || sl->handle == INVALID_SOCKET)
-    throw erc (WSAENOTSOCK, erc::error, sock::errors);
+    throw erc (WSAENOTSOCK, Errors());
 
   int rval;
   int sa_len = sizeof (sa);
@@ -407,7 +419,7 @@ size_t sock::recvfrom (sockaddr& sa, void* buf, size_t len, mflags msgf) const
 size_t sock::send (const void* buf, size_t len, mflags msgf) const
 {
   if (!sl || sl->handle == INVALID_SOCKET)
-    throw erc (WSAENOTSOCK, erc::error, sock::errors);
+    throw erc (WSAENOTSOCK, Errors());
 
   size_t wlen = 0;
   const char* cp = (const char*)buf;
@@ -443,7 +455,7 @@ size_t sock::send (const void* buf, size_t len, mflags msgf) const
 size_t sock::sendto (const sockaddr& sa, const void* buf, size_t len, mflags msgf) const
 {
   if (!sl || sl->handle == INVALID_SOCKET)
-    throw erc (WSAENOTSOCK, erc::error, sock::errors);
+    throw erc (WSAENOTSOCK, Errors());
 
   int wlen = 0;
   const char* cp = (const char*)buf;
@@ -574,7 +586,7 @@ unsigned int sock::nread () const
 erc sock::shutdown (shuthow sh) const
 {
   if (!sl || sl->handle == INVALID_SOCKET)
-    return erc (WSAENOTSOCK, erc::error, sock::errors);
+    return erc (WSAENOTSOCK, Errors());
 
   if (::shutdown (sl->handle, sh) == SOCKET_ERROR)
     return last_error ();
@@ -833,7 +845,7 @@ sock_initializer::sock_initializer ()
     TRACE8 ("sock_initializer - WSAStartup result = %d", err);
 
     // Set default error handling facility
-    sock::errors = &the_errors;
+    errors = &default_sockstream_errors;
   }
 }
 

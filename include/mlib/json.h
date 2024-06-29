@@ -37,8 +37,11 @@ constexpr int max_string_length = 8192;
 #define ERR_JSON_SIZE     -7 //!< invalid element size
 #define ERR_JSON_MISSING  -8 //!< invalid index or key on const node
 
-/// Error facility for JSON errors
-extern mlib::errfac* errors;
+/// Return error facility used for JSON errors
+mlib::errfac& Errors ();
+
+/// Set error facility for JSON errors
+void Errors (mlib::errfac& facility);
 
 /// JSON node types
 enum class type
@@ -120,17 +123,17 @@ public:
       if (target.t == type::object)
       {
         if (objit == target.obj.end ())
-          mlib::erc (ERR_JSON_ITERPOS, mlib::erc::error, errors).raise ();
+          mlib::erc (ERR_JSON_ITERPOS, Errors()).raise ();
         return *objit->second;
       }
       else if (target.t == type::array)
       {
         if (arrit == target.arr.end ())
-          mlib::erc (ERR_JSON_ITERPOS, mlib::erc::error, errors).raise ();
+          mlib::erc (ERR_JSON_ITERPOS, Errors()).raise ();
         return **arrit;
       }
       else if (at_end)
-        mlib::erc (ERR_JSON_ITERPOS, mlib::erc::error, errors).raise ();
+        mlib::erc (ERR_JSON_ITERPOS, Errors()).raise ();
 
       return const_cast<json::node&> (target);
     }
@@ -141,17 +144,17 @@ public:
       if (target.t == type::object)
       {
         if (objit == target.obj.end ())
-          mlib::erc (ERR_JSON_ITERPOS, mlib::erc::error, errors).raise ();
+          mlib::erc (ERR_JSON_ITERPOS, Errors()).raise ();
         return objit->second.get ();
       }
       else if (target.t == type::array)
       {
         if (arrit == target.arr.end ())
-          mlib::erc (ERR_JSON_ITERPOS, mlib::erc::error, errors).raise ();
+          mlib::erc (ERR_JSON_ITERPOS, Errors()).raise ();
         return arrit->get ();
       }
       else if (at_end)
-        mlib::erc (ERR_JSON_ITERPOS, mlib::erc::error, errors).raise ();
+        mlib::erc (ERR_JSON_ITERPOS, Errors()).raise ();
       return const_cast<json::node*> (&target);
     }
 
@@ -159,9 +162,9 @@ public:
     const std::string& name () const
     {
       if (target.t != type::object)
-        mlib::erc (ERR_JSON_ITERTYPE, mlib::erc::error, errors).raise ();
+        mlib::erc (ERR_JSON_ITERTYPE, Errors()).raise ();
       if (objit == target.obj.end ())
-        mlib::erc (ERR_JSON_ITERPOS, mlib::erc::error, errors).raise ();
+        mlib::erc (ERR_JSON_ITERPOS, Errors()).raise ();
       return objit->first;
     }
 
@@ -176,7 +179,7 @@ public:
       else if (!at_end)
         at_end = true;
       else
-        mlib::erc (ERR_JSON_ITERPOS, mlib::erc::error, errors).raise ();
+        mlib::erc (ERR_JSON_ITERPOS, Errors()).raise ();
       return tmp;
     }
 
@@ -190,7 +193,7 @@ public:
       else if (!at_end)
         at_end = true;
       else
-        mlib::erc (ERR_JSON_ITERPOS, mlib::erc::error, errors).raise ();
+        mlib::erc (ERR_JSON_ITERPOS, Errors()).raise ();
 
       return *this;
     }
@@ -206,7 +209,7 @@ public:
       else if (at_end)
         at_end = false;
       else
-        mlib::erc (ERR_JSON_ITERPOS, mlib::erc::error, errors).raise ();
+        mlib::erc (ERR_JSON_ITERPOS, Errors()).raise ();
       return tmp;
     }
 
@@ -220,7 +223,7 @@ public:
       else if (at_end)
         at_end = false;
       else
-        mlib::erc (ERR_JSON_ITERPOS, mlib::erc::error, errors).raise ();
+        mlib::erc (ERR_JSON_ITERPOS, Errors()).raise ();
       return *this;
     }
 
@@ -483,7 +486,7 @@ inline node::operator std::string () const
 inline node::operator const char* () const
 {
   if (t != type::string)
-    mlib::erc (ERR_JSON_INVTYPE, mlib::erc::error, errors).raise ();
+    mlib::erc (ERR_JSON_INVTYPE, Errors()).raise ();
   return str.c_str ();
 }
 

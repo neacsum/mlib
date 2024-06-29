@@ -118,9 +118,13 @@ public:
   void         linger (bool on_off, unsigned short seconds) const;
   bool         linger (unsigned short* seconds = 0) const;
 
+  /// Return error facility used by all sock-derived classes.
+  static errfac& Errors ();
+
+  /// Set the error facility use by all sock-derived classes 
+  static void Errors (errfac& facitlity);
+
 protected:
-  /// Error facility used by all sock derived classes.
-  static errfac* errors;
   static erc   last_error ();
 
 private:
@@ -266,8 +270,6 @@ static struct sock_initializer
   ~sock_initializer ();
 } sock_nifty_counter;
 
-inline errfac* sock::errors;
-
 /*==================== INLINE FUNCTIONS ===========================*/
 
 /// Default constructor creates a closed socket
@@ -291,7 +293,7 @@ inline bool sock::is_open () const
 inline erc sock::connect (const inaddr& peer) const
 {
   if (!sl || sl->handle == INVALID_SOCKET)
-    return erc (WSAENOTSOCK, erc::error, sock::errors);
+    return erc (WSAENOTSOCK, Errors());
 
   int ret = ::connect (sl->handle, peer, sizeof (peer));
   if (ret == SOCKET_ERROR)
@@ -304,7 +306,7 @@ inline erc sock::connect (const inaddr& peer) const
 inline erc sock::accept (sock& client, inaddr* addr) const
 {
   if (!sl || sl->handle == INVALID_SOCKET)
-    return erc (WSAENOTSOCK, erc::error, sock::errors);
+    return erc (WSAENOTSOCK, Errors());
 
   sockaddr sa;
   int len = sizeof (sa);
@@ -318,7 +320,7 @@ inline erc sock::accept (sock& client, inaddr* addr) const
 inline erc sock::listen (int num) const
 {
   if (!sl || sl->handle == INVALID_SOCKET)
-    return erc (WSAENOTSOCK, erc::error, sock::errors);
+    return erc (WSAENOTSOCK, Errors());
 
   ::listen (sl->handle, num);
   return last_error ();
@@ -361,7 +363,7 @@ size_t sock::sendto (const sockaddr& sa, std::basic_string<T> buf, mflags msgf) 
 inline int sock::sendtimeout (int wp_sec) const
 {
   if (!sl || sl->handle == INVALID_SOCKET)
-    return erc (WSAENOTSOCK, erc::error, sock::errors);
+    return erc (WSAENOTSOCK, Errors());
 
   int oldwtmo;
   int optlen = sizeof (int);
@@ -375,7 +377,7 @@ inline int sock::sendtimeout (int wp_sec) const
 inline int sock::sendtimeout () const
 {
   if (!sl || sl->handle == INVALID_SOCKET)
-    return erc (WSAENOTSOCK, erc::error, sock::errors);
+    return erc (WSAENOTSOCK, Errors());
 
   int oldwtmo;
   int optlen = sizeof (int);
@@ -391,7 +393,7 @@ inline int sock::sendtimeout () const
 inline int sock::recvtimeout (int wp_sec) const
 {
   if (!sl || sl->handle == INVALID_SOCKET)
-    return erc (WSAENOTSOCK, erc::error, sock::errors);
+    return erc (WSAENOTSOCK, Errors());
 
   int oldrtmo;
   int optlen = sizeof (int);
@@ -405,7 +407,7 @@ inline int sock::recvtimeout (int wp_sec) const
 inline int sock::recvtimeout () const
 {
   if (!sl || sl->handle == INVALID_SOCKET)
-    return erc (WSAENOTSOCK, erc::error, sock::errors);
+    return erc (WSAENOTSOCK, Errors());
 
   int oldrtmo;
   int optlen = sizeof (int);
@@ -425,7 +427,7 @@ inline int sock::recvtimeout () const
 inline int sock::getopt (int op, void* buf, int len, int level) const
 {
   if (!sl || sl->handle == INVALID_SOCKET)
-    return erc (WSAENOTSOCK, erc::error, sock::errors);
+    return erc (WSAENOTSOCK, Errors());
 
   int rlen = len;
   if (::getsockopt (sl->handle, level, op, (char*)buf, &rlen) == SOCKET_ERROR)
@@ -443,7 +445,7 @@ inline int sock::getopt (int op, void* buf, int len, int level) const
 inline erc sock::setopt (int op, void* buf, int len, int level) const
 {
   if (!sl || sl->handle == INVALID_SOCKET)
-    return erc (WSAENOTSOCK, erc::error, sock::errors);
+    return erc (WSAENOTSOCK, Errors());
 
   if (::setsockopt (sl->handle, level, op, (char*)buf, len) == SOCKET_ERROR)
     return last_error ();
@@ -614,7 +616,7 @@ inline void sock::recvbufsz (size_t sz) const
 inline void sock::blocking (bool on_off)
 {
   if (!sl || sl->handle == INVALID_SOCKET)
-    throw erc (WSAENOTSOCK, erc::error, sock::errors);
+    throw erc (WSAENOTSOCK, Errors());
 
   unsigned long mode = on_off ? 0 : 1;
   if (ioctlsocket (sl->handle, FIONBIO, &mode) == SOCKET_ERROR)
@@ -639,7 +641,7 @@ inline void sock::blocking (bool on_off)
 inline erc sock::setevent (HANDLE evt, long mask) const
 {
   if (!sl || sl->handle == INVALID_SOCKET)
-    return erc (WSAENOTSOCK, erc::error, sock::errors);
+    return erc (WSAENOTSOCK, Errors());
 
   if (WSAEventSelect (sl->handle, (WSAEVENT)evt, mask) == SOCKET_ERROR)
     return last_error ();
@@ -655,7 +657,7 @@ inline erc sock::setevent (HANDLE evt, long mask) const
 inline long sock::enumevents () const
 {
   if (!sl || sl->handle == INVALID_SOCKET)
-    throw erc (WSAENOTSOCK, erc::error, sock::errors);
+    throw erc (WSAENOTSOCK, Errors());
 
   WSANETWORKEVENTS netev;
   if (WSAEnumNetworkEvents (sl->handle, NULL, &netev) == SOCKET_ERROR)
@@ -689,7 +691,7 @@ inline erc sock::last_error ()
   if (!code)
     return erc::success;
   else
-    return erc (code, erc::error, sock::errors);
+    return erc (code, Errors());
 }
 
 /*!

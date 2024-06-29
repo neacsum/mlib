@@ -182,7 +182,7 @@ erc JSONBridge::serialize_node (json::node& n, dict_cptr v, size_t index)
 
   default:
     TRACE ("Unexpected entry type %d", v->type);
-    return erc (ERR_JSON_DICSTRUC, erc::error, json::errors);
+    return erc (ERR_JSON_DICSTRUC, json::Errors());
   }
   return erc::success;
 }

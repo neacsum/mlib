@@ -80,7 +80,8 @@ public:
     emerg     //!< always    logged,       thrown
   };
   erc ();
-  explicit erc (int value, level priority = level::error, const mlib::errfac* f = nullptr);
+  explicit erc (int value, level priority = level::error);
+  explicit erc (int value, const mlib::errfac& facility, level priority = level::error);
   erc (const erc& other);
   erc (erc&& other);
 
@@ -120,7 +121,7 @@ private:
   int priority_ : 4;
   mutable int active : 1;
 
-  const errfac* facility_;
+  const errfac& facility_;
   std::string msg;
 
   friend class errfac;
@@ -210,9 +211,8 @@ public:
   {}
 
   ///
-  checked (const T& obj_, int value = 0, erc::level pri_ = erc::level::error,
-           const errfac* fac_ = nullptr)
-    : erc (value, pri_, fac_)
+  checked (const T& obj_, int value = 0, erc::level pri_ = erc::level::error)
+    : erc (value, pri_)
     , obj (obj_)
   {}
 
@@ -220,14 +220,10 @@ public:
     : erc (std::move (err))
     , obj (std::move (obj_))
   {}
+
   checked (T&& obj_, const erc& err)
     : erc (err)
     , obj (std::move (obj_))
-  {}
-  checked (T&& obj_, int value = 0, erc::level pri_ = erc::level::error,
-           const errfac* fac_ = nullptr)
-    : erc (value, pri_, fac_)
-    , obj (obj_)
   {}
 
   /// Copy constructor
@@ -425,16 +421,25 @@ inline erc::erc ()
   : value{0}
   , priority_{none}
   , active{false}
-  , facility_{&errfac::Default ()}
+  , facility_{errfac::Default ()}
+{}
+
+///  Ctor for a real erc using default error facility
+inline erc::erc (int v, level l)
+  : value{v}
+  , priority_{(unsigned short)l}
+  , facility_{errfac::Default ()}
+  , active{true}
 {}
 
 ///  Ctor for a real erc
-inline erc::erc (int v, level l, const errfac* f)
+inline erc::erc (int v, const mlib::errfac& f, level l)
   : value{v}
   , priority_{(unsigned short)l}
-  , facility_{f ? f : &errfac::Default ()}
+  , facility_{f}
   , active{true}
 {}
+
 /*!
   Copy constructor removes the activity flag of the original object.
 
@@ -494,10 +499,10 @@ inline erc& erc::operator= (const erc& rhs)
     int rhs_active = rhs.active;
     rhs.active = 0; // prevent rhs from throwing if we throw
     if (active && priority_)
-      facility_->raise (*this);
+      facility_.raise (*this);
     value = rhs.value;
     priority_ = rhs.priority_;
-    facility_ = rhs.facility_;
+    const_cast<errfac&> (facility_) = rhs.facility_;
     msg = rhs.msg;
     active = rhs_active;
   }
@@ -518,10 +523,10 @@ inline erc& erc::operator= (erc&& rhs)
     bool rhs_active = rhs.active;
     rhs.active = 0; // prevent rhs from throwing if we throw
     if (active && value && priority_)
-      facility_->raise (*this);
+      facility_.raise (*this);
     value = rhs.value;
     priority_ = rhs.priority_;
-    facility_ = rhs.facility_;
+    const_cast<errfac&>(facility_) = rhs.facility_;
     msg = rhs.msg;
     active = rhs_active;
   }
@@ -540,7 +545,7 @@ inline bool erc::is_active () const
 
 inline const errfac& erc::facility () const
 {
-  return *facility_;
+  return facility_;
 }
 
 /*!
@@ -556,7 +561,7 @@ inline bool erc::operator== (const erc& other) const
   active = false;
   if ((!priority_ || !value) && (!other.priority_ || !other.value))
     return true; // success values are the same
-  if (facility_ == other.facility_ && priority_ == other.priority_ && value == other.value)
+  if (&facility_ == &other.facility_ && priority_ == other.priority_ && value == other.value)
     return true;
 
   return false;
@@ -580,7 +585,7 @@ inline bool erc::operator!= (const erc& other) const
 inline void erc::raise () const
 {
   if (value && active && priority_)
-    facility_->raise (*this);
+    facility_.raise (*this);
 }
 
 /*!
@@ -602,7 +607,7 @@ inline int erc::code () const
 */
 inline std::string erc::message () const
 {
-  return msg.empty () ? facility_->message (*this) : msg;
+  return msg.empty () ? facility_.message (*this) : msg;
 }
 
 /// Set the message for this error.

@@ -17,8 +17,18 @@ using namespace mlib;
 
 namespace json {
 
-errfac json_errors ("JSON Error");
-errfac* errors = &json_errors;
+mlib::errfac default_json_errors ("JSON Error");
+mlib::errfac* json_errors = &default_json_errors;
+
+errfac& Errors ()
+{
+  return *json_errors;
+}
+
+void Errors (mlib::errfac& facility)
+{
+  json_errors = &facility;
+}
 
 node null_node;
 
@@ -153,7 +163,7 @@ node& node::operator[] (const std::string& name)
     new (&obj) nodes_map ();
   }
   else if (t != type::object)
-    mlib::erc (ERR_JSON_INVTYPE, mlib::erc::error, errors).raise ();
+    mlib::erc (ERR_JSON_INVTYPE, Errors()).raise ();
 
   auto p = obj.find (name);
   if (p == obj.end ())
@@ -161,7 +171,7 @@ node& node::operator[] (const std::string& name)
     if (obj.size () < max_object_names)
       p = obj.emplace (std::make_pair (name, std::make_unique<node> ())).first;
     else
-      mlib::erc (ERR_JSON_TOOMANY, mlib::erc::error, errors).raise ();
+      mlib::erc (ERR_JSON_TOOMANY, Errors()).raise ();
   }
   return *p->second;
 }
@@ -174,11 +184,11 @@ node& node::operator[] (const std::string& name)
 const node& node::operator[] (const std::string& name) const
 {
   if (t != type::object)
-    mlib::erc (ERR_JSON_INVTYPE, mlib::erc::error, errors).raise ();
+    mlib::erc (ERR_JSON_INVTYPE, Errors()).raise ();
 
   auto p = obj.find (name);
   if (p == obj.end ())
-    mlib::erc (ERR_JSON_MISSING, mlib::erc::error, errors).raise ();
+    mlib::erc (ERR_JSON_MISSING, Errors()).raise ();
   return *p->second;
 }
 
@@ -190,7 +200,7 @@ const node& node::operator[] (const std::string& name) const
 const node& node::at (const std::string& name) const
 {
   if (t != type::object)
-    mlib::erc (ERR_JSON_INVTYPE, mlib::erc::error, errors).raise ();
+    mlib::erc (ERR_JSON_INVTYPE, Errors()).raise ();
 
   try
   {
@@ -198,7 +208,7 @@ const node& node::at (const std::string& name) const
   }
   catch (std::out_of_range)
   {
-    mlib::erc (ERR_JSON_MISSING, mlib::erc::critical, errors).raise ();
+    mlib::erc (ERR_JSON_MISSING, Errors(), mlib::erc::critical).raise ();
     return null_node;
   }
 }
@@ -216,7 +226,7 @@ node& node::operator[] (size_t index)
     new (&arr) nodes_array ();
   }
   else if (t != type::array)
-    mlib::erc (ERR_JSON_INVTYPE, mlib::erc::error, errors).raise ();
+    mlib::erc (ERR_JSON_INVTYPE, Errors()).raise ();
 
   if (index >= arr.size ())
   {
@@ -225,7 +235,7 @@ node& node::operator[] (size_t index)
     if (index < max_array_size - 1)
       arr.resize (index + 1);
     else
-      mlib::erc (ERR_JSON_TOOMANY, mlib::erc::error, errors).raise ();
+      mlib::erc (ERR_JSON_TOOMANY, Errors()).raise ();
 
     // add null nodes
     for (auto i = old_size; i <= index; i++)
@@ -242,10 +252,10 @@ node& node::operator[] (size_t index)
 const node& node::operator[] (size_t index) const
 {
   if (t != type::array)
-    mlib::erc (ERR_JSON_INVTYPE, mlib::erc::error, errors).raise ();
+    mlib::erc (ERR_JSON_INVTYPE, Errors()).raise ();
 
   if (index >= arr.size ())
-    mlib::erc (ERR_JSON_MISSING, mlib::erc::error, errors).raise ();
+    mlib::erc (ERR_JSON_MISSING, Errors()).raise ();
 
   return *arr[index];
 }
@@ -258,7 +268,7 @@ const node& node::operator[] (size_t index) const
 const node& node::at (size_t index) const
 {
   if (t != type::array)
-    mlib::erc (ERR_JSON_INVTYPE, mlib::erc::error, errors).raise ();
+    mlib::erc (ERR_JSON_INVTYPE, Errors()).raise ();
 
   try
   {
@@ -266,7 +276,7 @@ const node& node::at (size_t index) const
   }
   catch (std::out_of_range)
   {
-    mlib::erc (ERR_JSON_MISSING, mlib::erc::critical, errors).raise ();
+    mlib::erc (ERR_JSON_MISSING, Errors(), mlib::erc::critical).raise ();
     return null_node;
   }
 }
@@ -393,7 +403,7 @@ static erc parse_num (istream& is, double& num)
   else if (c == '0')
     c = is.get ();
   else
-    return erc (ERR_JSON_INPUT, mlib::erc::error, errors);
+    return erc (ERR_JSON_INPUT, Errors());
 
   // fraction
   if (c == '.')
@@ -424,7 +434,7 @@ static erc parse_num (istream& is, double& num)
     c = is.get ();
   }
   if (!isdigit (c))
-    return erc (ERR_JSON_INPUT, mlib::erc::error, errors);
+    return erc (ERR_JSON_INPUT, Errors());
 
   do
   {
@@ -454,7 +464,7 @@ static erc parse_string (istream& is, std::string& s)
       return erc::success;
     }
     else if (c < 0x20 || c == char_traits<char>::eof ())
-      return erc (ERR_JSON_INPUT, mlib::erc::error, errors);
+      return erc (ERR_JSON_INPUT, Errors());
     else if (c == '\\')
     {
       c = is.get ();
@@ -492,20 +502,20 @@ static erc parse_string (istream& is, std::string& s)
           else if ('a' <= x && x <= 'f')
             c = (c << 4) + (x - 'a' + 10);
           else
-            return erc (ERR_JSON_INPUT, mlib::erc::error, errors);
+            return erc (ERR_JSON_INPUT, Errors());
         }
         ws.push_back (c);
         break;
 
       default:
-        return erc (ERR_JSON_INPUT, mlib::erc::error, errors);
+        return erc (ERR_JSON_INPUT, Errors());
         break;
       }
     }
     else
       ws.push_back (c);
   }
-  return erc (ERR_JSON_SIZE, mlib::erc::error, errors);
+  return erc (ERR_JSON_SIZE, Errors());
 }
 
 /*!
@@ -549,9 +559,9 @@ erc node::read (std::istream& is)
       if ((c = skipws (is)) == ']')
         return erc::success;
       else if (c != ',')
-        return erc (ERR_JSON_INPUT, mlib::erc::error, errors);
+        return erc (ERR_JSON_INPUT, Errors());
     }
-    return erc (ERR_JSON_TOOMANY, mlib::erc::error, errors);
+    return erc (ERR_JSON_TOOMANY, Errors());
 
   case '{':
     is.get ();
@@ -562,13 +572,13 @@ erc node::read (std::istream& is)
     for (int i = 0; i < max_object_names; i++)
     {
       if (c != '"')
-        return erc (ERR_JSON_INPUT, mlib::erc::error, errors);
+        return erc (ERR_JSON_INPUT, Errors());
       ret = parse_string (is, sval);
       if (ret.code () != 0)
         return ret;
       c = skipws (is);
       if (c != ':')
-        return erc (ERR_JSON_INPUT, mlib::erc::error, errors);
+        return erc (ERR_JSON_INPUT, Errors());
       auto n = obj.emplace (sval, std::make_unique<node> ()).first;
       ret = n->second->read (is);
       if (ret.code () != 0)
@@ -577,28 +587,28 @@ erc node::read (std::istream& is)
       if (c == '}')
         return erc::success;
       else if (c != ',')
-        return erc (ERR_JSON_INPUT, mlib::erc::error, errors);
+        return erc (ERR_JSON_INPUT, Errors());
       c = skipws (is);
     }
-    return erc (ERR_JSON_TOOMANY, mlib::erc::error, errors);
+    return erc (ERR_JSON_TOOMANY, Errors());
 
   case 't':
     if (token (is) != "true")
-      return erc (ERR_JSON_INPUT, mlib::erc::error, errors);
+      return erc (ERR_JSON_INPUT, Errors());
     clear (type::boolean);
     logic = true;
     return erc::success;
 
   case 'f':
     if (token (is) != "false")
-      return erc (ERR_JSON_INPUT, mlib::erc::error, errors);
+      return erc (ERR_JSON_INPUT, Errors());
     clear (type::boolean);
     logic = false;
     return erc::success;
 
   case 'n':
     if (token (is) != "null")
-      return erc (ERR_JSON_INPUT, mlib::erc::error, errors);
+      return erc (ERR_JSON_INPUT, Errors());
     clear ();
     return erc::success;
 
@@ -612,7 +622,7 @@ erc node::read (std::istream& is)
       num = numval;
       return erc::success;
     }
-    return erc (ERR_JSON_INPUT, mlib::erc::error, errors);
+    return erc (ERR_JSON_INPUT, Errors());
   }
 }
 
@@ -628,7 +638,7 @@ erc node::read (const std::string& s)
   if (ret.code ())
     return ret;
   if (peekws (ss) != char_traits<char>::eof ())
-    return erc (ERR_JSON_INPUT, mlib::erc::error, errors);
+    return erc (ERR_JSON_INPUT, Errors());
 
   return erc::success;
 }
@@ -820,7 +830,7 @@ double node::to_num () const
     return logic ? 1. : 0.;
   }
 
-  throw mlib::erc (ERR_JSON_INVTYPE, mlib::erc::error, errors);
+  throw mlib::erc (ERR_JSON_INVTYPE, Errors());
 }
 
 /*!
@@ -835,7 +845,7 @@ string node::to_str () const
   else if (t == type::boolean)
     return logic ? "true" : "false";
 
-  throw mlib::erc (ERR_JSON_INVTYPE, mlib::erc::error, errors);
+  throw mlib::erc (ERR_JSON_INVTYPE, Errors());
 }
 
 /*!
@@ -857,7 +867,7 @@ bool node::to_bool () const
   {
     return (num != 0);
   }
-  throw mlib::erc (ERR_JSON_INVTYPE, mlib::erc::error, errors);
+  throw mlib::erc (ERR_JSON_INVTYPE, Errors());
 }
 
 void indenter (std::ios_base& os, int spaces)
@@ -888,7 +898,7 @@ std::istream& operator>> (std::istream& is, node& n)
   if (ret.code () != 0)
     throw ret;
   if (n.kind () != json::type::array && n.kind () != json::type::object)
-    throw erc (ERR_JSON_INPUT, mlib::erc::error, json::errors);
+    throw erc (ERR_JSON_INPUT, json::Errors());
 
   return is;
 }

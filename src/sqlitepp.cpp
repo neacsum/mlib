@@ -31,8 +31,8 @@ namespace mlib {
 
 static void set_erc_message (erc& err, sqlite3* db);
 
-errfac the_errors ("SQLITEPP");
-errfac* sqlite_errors = &the_errors;
+errfac default_sqlitepp_errors ("SQLITEPP");
+errfac* Database::sqlite_errors = &default_sqlitepp_errors;
 
 /*!
 \class Database
@@ -61,7 +61,7 @@ Database::Database (const std::string& name, openflags flags)
   db.reset (pdb, sqlite3_close);
   if ((rc) != SQLITE_OK)
   {
-    erc err (rc, erc::error, sqlite_errors);
+    erc err (rc, Database::Errors());
     set_erc_message (err, handle ());
     db.reset ();
     err.raise ();
@@ -82,7 +82,7 @@ Database& Database::copy (Database& src)
     if (!bkp)
     {
       rc = sqlite3_errcode (handle ());
-      erc err (rc, erc::error, sqlite_errors);
+      erc err (rc, Database::Errors());
       set_erc_message (err, handle ());
       err.raise ();
     }
@@ -90,7 +90,7 @@ Database& Database::copy (Database& src)
     {
       if ((rc = sqlite3_backup_step (bkp, -1)) != SQLITE_DONE)
       {
-        erc err (rc, erc::error, sqlite_errors);
+        erc err (rc, Database::Errors ());
         set_erc_message (err, handle ());
         err.raise ();
       }
@@ -99,7 +99,7 @@ Database& Database::copy (Database& src)
   }
   else
   {
-    erc err (SQLITE_MISUSE, erc::error, sqlite_errors);
+    erc err (SQLITE_MISUSE, *sqlite_errors);
     err.message ("Error " STRINGERIZE (SQLITE_MISUSE) " database is not opened");
     err.raise (); // one db is not opened
   }
@@ -161,7 +161,7 @@ erc Database::open (const string& name, openflags flags)
   db.reset (pdb, sqlite3_close);
   if (rc != SQLITE_OK)
   {
-    erc err (rc, erc::error, sqlite_errors);
+    erc err (rc, *sqlite_errors);
     set_erc_message (err, handle ());
     return err;
   }
@@ -181,7 +181,7 @@ erc Database::exec (const string& sql)
   int rc;
   if ((rc = sqlite3_exec (handle (), sql.c_str (), 0, 0, 0)) != SQLITE_OK)
   {
-    auto ret = erc (rc, erc::error, sqlite_errors);
+    auto ret = erc (rc, *sqlite_errors);
     set_erc_message (ret, handle ());
     return ret;
   }
@@ -201,7 +201,7 @@ checked<Query> Database::make_query (const std::string& sql)
   int rc;
   if ((rc = sqlite3_prepare_v2 (handle (), sql.c_str (), -1, &q.stmt, 0)) != SQLITE_OK)
   {
-    erc err (rc, erc::error, sqlite_errors);
+    erc err (rc, Database::Errors());
     set_erc_message (err, handle ());
     ret = err;
   }
@@ -220,7 +220,7 @@ checked<Query> Database::make_query_multiple (std::string& sql)
   const char* tail;
   if ((rc = sqlite3_prepare_v2 (handle (), sql.c_str (), -1, &q.stmt, &tail)) != SQLITE_OK)
   {
-    erc err (rc, erc::error, sqlite_errors);
+    erc err (rc, Database::Errors ());
     set_erc_message (err, handle ());
     ret = err;
   }
@@ -241,7 +241,7 @@ erc Database::flush ()
   int rc = sqlite3_db_cacheflush (handle ());
   if (rc != SQLITE_OK)
   {
-    erc err (rc, erc::error, sqlite_errors);
+    erc err (rc, Database::Errors ());
     set_erc_message (err, handle ());
     return err;
   }
@@ -289,7 +289,7 @@ Query::Query (Database& db, const std::string& sql)
     int rc;
     if ((rc = sqlite3_prepare_v2 (dbase, sql.c_str (), -1, &stmt, 0)) != SQLITE_OK)
     {
-      erc err (rc, erc::error, sqlite_errors);
+      erc err (rc, Database::Errors ());
       set_erc_message (err, dbase);
       err.raise ();
     }
@@ -368,7 +368,7 @@ Query& Query::operator= (const std::string& sql)
     sqlite3_finalize (stmt);
   if ((rc = sqlite3_prepare_v2 (dbase, sql.c_str (), -1, &stmt, 0)) != SQLITE_OK)
   {
-    erc err (rc, erc::error, sqlite_errors);
+    erc err (rc, Database::Errors ());
     set_erc_message (err, dbase);
     err.raise ();
   }
@@ -398,9 +398,9 @@ erc Query::step ()
   int rc = sqlite3_step (stmt);
 
   if (rc == SQLITE_ROW || rc == SQLITE_DONE)
-    return erc (rc, erc::info, sqlite_errors);
+    return erc (rc, Database::Errors () , erc::info);
 
-  erc err (rc, erc::error, sqlite_errors);
+  erc err (rc, Database::Errors ());
   set_erc_message (err, dbase);
   return err;
 }
@@ -968,7 +968,7 @@ int Query::find_col (const std::string& colname) const
 
   if (index.find (colname) == index.end ())
   {
-    erc err (SQLITE_RANGE, erc::error, sqlite_errors);
+    erc err (SQLITE_RANGE, Database::Errors ());
     string s = "Error " STRINGERIZE (SQLITE_RANGE) " column '" + colname + "' not found ";
     err.message (s);
     err.raise ();
@@ -981,7 +981,7 @@ erc Query::check_errors (int rc)
 {
   if (rc != SQLITE_OK)
   {
-    erc err (rc, erc::error, sqlite_errors);
+    erc err (rc, Database::Errors ());
     set_erc_message (err, dbase);
     return err;
   }

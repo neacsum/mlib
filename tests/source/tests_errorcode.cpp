@@ -116,7 +116,7 @@ TEST (erc_message)
 errfac other{ "Bad Stuff" };
 erc ff (int i)
 {
-  return erc (i, erc::error, &other);
+  return erc (i, other, erc::error);
 }
 
 // erc objects using another facility

@@ -26,6 +26,9 @@ public:
   erc add_port (int portnum, bool tcp, const char* name);
   erc set_port (int portnum, bool tcp, bool enable);
 
+  static errfac& Errors ();
+  static void Errors (errfac& facility);
+
 private:
   INetFwMgr* fwmgr;
   INetFwPolicy* fwpolicy;
