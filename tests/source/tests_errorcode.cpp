@@ -209,8 +209,15 @@ TEST (checked_copy)
 {
   auto c1 = cc ("stuff", 1);
   checked<string> c2(c1);
-  CHECK_EQUAL (1, c2); //also reset the error code
-  CHECK_EQUAL ("stuff", c2->c_str ());
+
+  CHECK_EQUAL (1, c2); // also resets the error code ( !is_active() )
+
+  //although inactive, an error code throws as long as it's not erc::success
+  CHECK_THROW ("stuff" == c2->c_str (), erc);
+
+  // now error code is reset
+  c2 = erc::success;
+  CHECK_EQUAL ("stuff", *c2); 
 }
 
 TEST (checked_assignment)
@@ -218,13 +225,9 @@ TEST (checked_assignment)
   auto c1 = cc ("stuff", 1);
   checked<string> c2;
   c2 = c1;
-  CHECK_EQUAL (1, c2); // also reset the error code
-  CHECK_EQUAL ("stuff", c2->c_str ());
-    
-  checked<string> c3;
-  c3 = cc ("stuff", 1);
-  CHECK_EQUAL (1, c3);
-  CHECK_EQUAL ("stuff", c3->c_str ());
+  CHECK_EQUAL (1, c2);  // also resets the error code ( !is_active() )
+  // although inactive, an error code throws as long as it's not erc::success
+  CHECK_THROW ("stuff" == c2->c_str (), erc);    
 }
 
 checked<string> seterr (const string &s, int v)
@@ -242,6 +245,8 @@ TEST (checked_set_error)
   checked<string> d;
   d = c;
   CHECK_EQUAL (1, d);
+
+  d = erc::success;
   CHECK_EQUAL ("stuff", *d);
 }
 

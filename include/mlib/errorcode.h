@@ -104,8 +104,8 @@ public:
 
   void raise () const;
 
-  erc& reactivate ();
-  erc& deactivate ();
+  void reactivate () const;
+  void deactivate () const;
 
   int code () const;
 
@@ -273,28 +273,40 @@ public:
   /// Access the included T object
   T& operator* ()
   {
-    if (code () && is_active () && priority ())
+    if (code () && priority ())
+    {
+      reactivate ();
       raise ();
+    }
     return obj;
   }
 
   const T& operator* () const
   {
-    if (code () && is_active () && priority ())
+    if (code () && priority ())
+    {
+      reactivate ();
       raise ();
+    }
     return obj;
   }
 
   T* operator->()
   {
-    if (code () && is_active () && priority ())
+    if (code () && priority ())
+    {
+      reactivate ();
       raise ();
+    }
     return &obj;
   }
   const T* operator->() const
   {
-    if (value && active && priority ())
+    if (code () && priority ())
+    {
+      reactivate ();
       raise ();
+    }
     return &obj;
   }
   ///@}
@@ -586,7 +598,7 @@ inline void erc::raise () const
 {
   if (value && active && priority_)
     facility_.raise (*this);
-}
+  }
 
 /*!
   Return numerical value.
@@ -628,10 +640,9 @@ inline erc::operator int () const
 }
 
 ///  Similar to re-throwing an exception.
-inline erc& erc::reactivate ()
+inline void erc::reactivate () const
 {
   active = 1;
-  return *this;
 }
 
 /*!
@@ -639,10 +650,9 @@ inline erc& erc::reactivate ()
 
   Useful in catch clauses when we don't really care what the code value is.
 */
-inline erc& erc::deactivate ()
+inline void erc::deactivate () const
 {
   active = 0;
-  return *this;
 }
 
 /// The SUCCESS indicator
