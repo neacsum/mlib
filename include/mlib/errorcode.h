@@ -571,6 +571,7 @@ inline const errfac& erc::facility () const
 inline bool erc::operator== (const erc& other) const
 {
   active = false;
+  const_cast<erc&> (other).active = false;
   if ((!priority_ || !value) && (!other.priority_ || !other.value))
     return true; // success values are the same
   if (&facility_ == &other.facility_ && priority_ == other.priority_ && value == other.value)
