@@ -168,7 +168,10 @@ public:
   operator sqlite3_stmt* ();
 
   /// Assign SQL text to a query
-  Query& operator= (const std::string& sql);
+  Query& operator= (const std::string& str);
+
+  /// Assign SQL text to a query
+  Query& sql (const std::string& str);
 
   /// Retrieve SQL text
   std::string sql () const;
@@ -302,6 +305,15 @@ inline int Query::columns ()
   return sqlite3_column_count (stmt);
 }
 
+/*!
+  The object must have the database reference set before calling this function.
+  If a previous statement was attached to the object, it is finalized before the
+  new statement is prepared.
+*/
+inline Query& Query::operator= (const std::string& str)
+{
+  return sql (str);
+}
 
 inline bool Query::iless::operator() (const std::string& left, const std::string& right) const
 {

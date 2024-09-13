@@ -359,14 +359,14 @@ Query::~Query ()
   If a previous statement was attached to the object, it is finalized before the
   new statement is prepared.
 */
-Query& Query::operator= (const std::string& sql)
+Query& Query::sql (const std::string& str)
 {
   int rc;
   if (!dbase)
-    erc (SQLITE_MISUSE, erc::error).raise ();
+    erc (SQLITE_MISUSE, Database::Errors ()).raise ();
   if (stmt)
     sqlite3_finalize (stmt);
-  if ((rc = sqlite3_prepare_v2 (dbase, sql.c_str (), -1, &stmt, 0)) != SQLITE_OK)
+  if ((rc = sqlite3_prepare_v2 (dbase, str.c_str (), -1, &stmt, 0)) != SQLITE_OK)
   {
     erc err (rc, Database::Errors ());
     set_erc_message (err, dbase);
