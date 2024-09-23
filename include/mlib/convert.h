@@ -40,8 +40,18 @@ constexpr double operator"" _mas (long double mas)
   return mas * MAS;
 }
 
+constexpr double operator"" _mas (unsigned long long mas)
+{
+  return mas * MAS;
+}
+
 /// US survey foot literal operator  converts a value to meters
 constexpr double operator"" _ftus (long double ftus)
+{
+  return ftus * USFOOT2M;
+}
+
+constexpr double operator"" _ftus (unsigned long long ftus)
 {
   return ftus * USFOOT2M;
 }
@@ -77,7 +87,7 @@ constexpr double DMD2deg (double value)
   if (value < 0)
     value = -value;
   int deg = (int)(value / 10000.);
-  value -= -(double)deg * 10000;
+  value -= (double)deg * 10000;
   int min = (int)(value / 100.);
   value -= (double)min * 100.;
   return sign * (deg + min / 60. + value / 3600.);
