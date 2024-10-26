@@ -1,10 +1,10 @@
+/*
+    Copyright (c) Mircea Neacsu (2019-2024)
+    Part of mlib project licensed under MIT license.
+*/
 #pragma once
 
-/*!
-  \file   ipow.h Integer exponentiation function template
-
-  (c) Mircea Neacsu 2019
-*/
+///  \file   ipow.h Integer exponentiation function template
 
 #if __has_include("defs.h")
 #include "defs.h"
@@ -48,5 +48,20 @@ inline double ipow (double base, int exp)
   }
   return result;
 }
+
+/// Return squared value of argument: base²
+template <typename T>
+inline T squared (T base)
+{
+  return base * base;
+}
+
+/// Return the cubed value of argument: base³
+template <typename T>
+inline T cubed (T base)
+{
+  return base * base * base;
+}
+
 
 } // namespace mlib

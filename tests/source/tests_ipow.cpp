@@ -56,6 +56,72 @@ SUITE (ipow)
       " pow  - integer base, integer power - " << dt5 << endl;
   }
 
+  void go2 ()
+  {
+    UnitTest::Timer t;
+
+    t.Start ();
+    for (int i = 0; i < NMAX; i++)
+      ix = squared (i);
+    long long dt1 = t.GetTimeInUs ();
+    t.Start ();
+    for (int i = 0; i < NMAX; i++)
+      dx = squared ((double)i);
+    long long dt2 = t.GetTimeInUs ();
+    t.Start ();
+    for (int i = 0; i < NMAX; i++)
+      dx = pow ((double)i, 2);
+    long long dt3 = t.GetTimeInUs ();
+    t.Start ();
+    for (int i = 0; i < NMAX; i++)
+      dx = pow ((double)i, (double)2);
+    long long dt4 = t.GetTimeInUs ();
+    t.Start ();
+    for (int i = 0; i < NMAX; i++)
+      dx = pow (i, 2);
+    long long dt5 = t.GetTimeInUs ();
+
+    cout << "Squared results (usec): " << endl
+         << " squared - integer base - " << dt1 << endl
+         << " squared - double base - " << dt2 << endl
+         << " pow  - double base, integer power - " << dt3 << endl
+         << " pow  - double base, double power - " << dt4 << endl
+         << " pow  - integer base, integer power - " << dt5 << endl;
+  }
+
+  void go3 ()
+  {
+    UnitTest::Timer t;
+
+    t.Start ();
+    for (int i = 0; i < NMAX; i++)
+      ix = cubed (i);
+    long long dt1 = t.GetTimeInUs ();
+    t.Start ();
+    for (int i = 0; i < NMAX; i++)
+      dx = cubed ((double)i);
+    long long dt2 = t.GetTimeInUs ();
+    t.Start ();
+    for (int i = 0; i < NMAX; i++)
+      dx = pow ((double)i, 3);
+    long long dt3 = t.GetTimeInUs ();
+    t.Start ();
+    for (int i = 0; i < NMAX; i++)
+      dx = pow ((double)i, (double)3);
+    long long dt4 = t.GetTimeInUs ();
+    t.Start ();
+    for (int i = 0; i < NMAX; i++)
+      dx = pow (i, 3);
+    long long dt5 = t.GetTimeInUs ();
+
+    cout << "Cubed results (usec): " << endl
+         << " cubed - integer base - " << dt1 << endl
+         << " cubed - double base - " << dt2 << endl
+         << " pow  - double base, integer power - " << dt3 << endl
+         << " pow  - double base, double power - " << dt4 << endl
+         << " pow  - integer base, integer power - " << dt5 << endl;
+  }
+
   TEST (pow)
   {
     CHECK_EQUAL (pow (5, 6), ipow (5, 6));
@@ -66,6 +132,9 @@ SUITE (ipow)
   TEST (timing)
   {
     go (2);
+    go (3);
+    go2 ();
+    go3 ();
     go (32);
   }
 }
