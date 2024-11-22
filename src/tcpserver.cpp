@@ -30,7 +30,30 @@ namespace mlib {
   execute periodically.
 
   Being a thread itself, the tcpserver object has to be started by calling
-  the start() function
+  the start() function.
+
+  You can set the listening port either when the object is constructed or before
+  starting the server by calling the `bind()` function on the underlining socket.
+  The following two examples are equivalent:
+
+  Example 1:
+  \code{.cpp}
+    mlib::tcpserver srv (12345);
+
+    //...
+
+    srv.start ();
+  \endcode
+
+  Example 2:
+  \code{.cpp}
+    mlib::tcpserver srv;
+    srv.socket().bind (mlib::inaddr (INADDR_ANY, 12345));
+
+    //...
+
+    srv.start ();
+  \endcode
 */
 
 /*!

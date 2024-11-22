@@ -119,7 +119,7 @@ private:
 class httpd : public tcpserver
 {
 public:
-  httpd (unsigned short port = 0, unsigned int maxconn = 0);
+  explicit httpd (unsigned short port = 0, unsigned int maxconn = 0);
   ~httpd ();
 
   void add_ohdr (const char* hdr, const char* value);

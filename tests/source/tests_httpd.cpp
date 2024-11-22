@@ -10,9 +10,49 @@ using namespace std;
 SUITE (HttpServer)
 {
 
+TEST (Binding)
+{
+  httpd srv;
+  srv.socket ().bind (inaddr (INADDR_LOOPBACK, 12345));
+
+  inaddr self;
+  srv.socket ().name (self);
+
+  int port = self.port ();
+  CHECK_EQUAL (12345, port);
+
+  ofstream idx ("index.html");
+  idx << "<html><head><title>TEST Address Binding</title></head><body>Some stuff</body></html>\r\n";
+  idx.close ();
+  srv.docroot (".");
+  srv.start ();
+  auto client = thread ([&] () -> int {
+    inaddr srv_addr;
+    srv.socket ().name (srv_addr);
+    sockstream ws (inaddr (INADDR_LOOPBACK, port));
+    ws << "GET / HTTP/1.1" << endl << endl << flush;
+    ws->shutdown (sock::shut_write);
+    Sleep (100);
+    char text[1024];
+    ws.getline (text, sizeof (text));
+    cout << "Status line " << text << endl;
+    while (!ws.eof ())
+    {
+      ws.getline (text, sizeof (text));
+      cout << "Received line " << text << endl;
+    }
+
+    return 1;
+  });
+  client.start ();
+  CHECK_EQUAL (WAIT_OBJECT_0, client.wait (1000));
+  srv.terminate ();
+  remove ("index.html");
+}
+
 TEST (Auth)
 {
-  httpd srv (8080);
+  httpd srv;
   srv.add_realm ("Control", "/ctl");
   srv.add_user ("Control", "admin", "admin");
   srv.add_user ("Control", "Alice", "password");
@@ -29,7 +69,7 @@ TEST (Auth)
 
 TEST (AuthMatch)
 {
-  httpd srv (8080);
+  httpd srv;
   string realm;
   srv.add_realm ("Control", "/ctl");
   srv.add_realm ("Control1", "/ctl/inner");
