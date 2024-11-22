@@ -188,7 +188,7 @@ public:
   bool full ()
   {
     lock l (this->update);
-    return (std::queue<M, C>.size () == limit);
+    return (std::queue<M, C>::size () == limit);
   }
 
   /// Return queue size
