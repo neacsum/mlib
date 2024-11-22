@@ -18,9 +18,9 @@ namespace mlib {
   The shared memory area (SMA) must be opened before use.
 */
 shmem_base::shmem_base ()
-  : name_ (NULL)
+  : file (NULL) /* Initialized to NULL not INVALID_HANDLE_VALUE because
+                CreateFileMapping return NULL on failure */
   , mem (NULL)
-  , file (NULL)
   , wrex (INVALID_HANDLE_VALUE)
   , rdgate (INVALID_HANDLE_VALUE)
   , in_rdlock (0)
