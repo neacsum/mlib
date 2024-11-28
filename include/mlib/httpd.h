@@ -5,7 +5,7 @@
   (c) Mircea Neacsu 2007-2014. All rights reserved.
 */
 
-#include "tcpserv.h"
+#include "tcpserver.h"
 #include <string>
 #include <map>
 #include <deque>

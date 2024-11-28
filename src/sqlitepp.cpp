@@ -425,13 +425,22 @@ void Query::clear ()
 //  ---------------------------------------------------------------------------
 /*!
   \name Bind functions
-  SQL statement can have parameters specified by number (`?` or `?nnn`) or
+  SQL statements can have parameters specified by number (`?` or `?nnn`) or
   by name (`:aaa` or `@aaa` or `$aaa`) where `nnn` is a number (starting from 1)
-  and `aaa` is an alphanumeric identifier. Bind functions assign values to
+  and `aaa` is an alphanumeric identifier. `bind` functions assign values to
   these parameters.
 
-  If the parameter with that name or number is not found the functions throw
+  If a parameter with that name or number is not found the functions throw
   an \ref erc with code `SQLITE_RANGE`.
+
+  All `bind` functions return a reference to the query object, allowing them
+  to be chained together like in the following example:
+  \code
+  Query q(db, "SELECT name FROM table WHERE (price > :price and kind = :kind)");
+
+  q.bind (":price", 5)
+   .bind (":kind", "toy"); //select all toys with price > 5
+  \endcode
 */
 ///@{
 

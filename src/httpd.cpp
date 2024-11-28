@@ -1381,8 +1381,8 @@ void httpd::add_alias (const char* uri, const char* path)
   After processing the alias table, any part of the original URI that was not
   mapped is appended to the resulting path. For instance if the alias table
   contains an entry mapping "doc" to "documentation" and docroot is set as
-  "c:\local_folder\", an URI like "/doc/project1/filename.html" will be mapped to
-  "c:\local_folder\documentation\project1\filename.html".
+  "c:\\local_folder\\", an URI like "/doc/project1/filename.html" will be mapped to
+  "c:\\local_folder\\documentation\\project1\\filename.html".
 */
 bool httpd::find_alias (const char* uri, char* path)
 {

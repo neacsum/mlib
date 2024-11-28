@@ -31,9 +31,11 @@ int main(int argc, char** argv)
   if (argc == 1)
   {
     cout << "Usage:" << endl;
-    cout << parser.synopsis() << endl;
-    cout << "Where:" << endl
-      << parser.description() << endl;
+    cout << '\t' << parser.appname () << " [options] <other arguments>" << endl
+         << endl <<"Valid options are:" << endl 
+         << "\t" << parser.synopsis () << endl
+         << endl << "Where:" << endl
+         << parser.description() << endl;
     exit(0);
   }
   

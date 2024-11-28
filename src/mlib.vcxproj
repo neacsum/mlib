@@ -204,7 +204,7 @@
     <ClInclude Include="..\include\mlib\stopwatch.h" />
     <ClInclude Include="..\include\mlib\syncbase.h" />
     <ClInclude Include="..\include\mlib\syncque.h" />
-    <ClInclude Include="..\include\mlib\tcpserv.h" />
+    <ClInclude Include="..\include\mlib\tcpserver.h" />
     <ClInclude Include="..\include\mlib\thread.h" />
     <ClInclude Include="..\include\mlib\trace.h" />
     <ClInclude Include="..\include\mlib\tvops.h" />

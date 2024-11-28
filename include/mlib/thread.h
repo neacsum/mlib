@@ -14,41 +14,78 @@ namespace mlib {
 class thread : public syncbase
 {
 public:
-  /// Thread state
+
+  /// Execution state of a thread
   enum class state
   {
-    ready,
-    starting,
-    running,
-    ending,
-    finished
+    ready,        ///< not started
+    starting,     ///< in the process of starting up
+    running,      ///< is running
+    ending,       ///< in the process of finishing
+    finished      ///< execution finished
   };
+
+  /// Make a thread with the given function body
   thread (std::function<unsigned int ()> func);
+
   virtual ~thread ();
 
+  /// Begin execution of a newly created thread
   virtual void start ();
+
+  /// Another name for start () function
   void fork ();
+
+  /// Another name for wait () function
   void join ();
+
+  /// Wait for thread to finish execution
   DWORD wait (DWORD time_limit = INFINITE);
+
+  /// Wait for thread to finish or an APC, or IO completion routine to occur
   DWORD wait_alertable (DWORD time_limit = INFINITE);
+
+  /// Wait for thread to finish or a message to be queued
   DWORD wait_msg (DWORD time_limit = INFINITE, DWORD mask = QS_ALLINPUT);
+
+  /// Rethrow an exception usually in the context of another thread
   void rethrow_exception () const;
 
+  /// Return thread's ID
   DWORD id () const;
+
+  /// Return thread's exit code
   UINT result () const;
+
+  /// Return _true_ if %thread is running
   bool is_running () const;
+
+  /// Return thread's execution status
   state get_state () const;
-  int priority ();
+
+  /// Return thread's priority
+  int priority () const;
+
+  /// Set thread's priority
   void priority (int pri);
+
   using syncbase::name;
+
+  /// Set thread's name
   virtual void name (const std::string& nam);
 
 protected:
+  /// Protected constructor for use of thread-derived objects
   thread (const std::string& name = std::string (), DWORD stack_size = 0,
           PSECURITY_DESCRIPTOR sd = NULL, bool inherit = false);
 
+  /// Initialization function called before run
   virtual bool init ();
+
+  /// Finalization function called after run
   virtual void term ();
+
+  /// Default run function
   virtual void run ();
 
   unsigned int exitcode; ///< exit code
@@ -84,63 +121,54 @@ public:
 
 // inlines
 
-/// Another name for start () function
 inline void thread::fork ()
 {
   start ();
 }
 
-/// Another name for wait () function
 inline void thread::join ()
 {
   wait (INFINITE);
 }
 
-/// Return thread's ID
 inline DWORD thread::id () const
 {
   return id_;
 };
 
-/// Return thread's exit code
 inline UINT thread::result () const
 {
   return exitcode;
 }
 
-/// Return _true_ if %thread is running
 inline bool thread::is_running () const
 {
   return stat == state::running;
 }
 
-/// Return thread status
 inline thread::state thread::get_state () const
 {
   return stat;
 }
 
-/// Return priority of a thread
-inline int thread::priority ()
+inline int thread::priority () const
 {
   return GetThreadPriority (handle ());
 }
 
-/// Set priority of a thread
 inline void thread::priority (int pri)
 {
   SetThreadPriority (handle (), pri);
 }
 
-/// Initialization function called before run
 inline bool thread::init ()
 {
   return true;
 }
 
-/// Finalization function called after run
 inline void thread::term ()
-{}
+{
+}
 
 inline void thread::rethrow_exception () const
 {

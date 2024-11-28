@@ -1,7 +1,10 @@
+/*
+  Copyright (c) Mircea Neacsu (2014-2024) Licensed under MIT License.
+  This is part of MLIB project. See LICENSE file for full license terms.
+*/
+
 /*!
   \file options.h Command line parser class
-
-  (c) Mircea Neacsu 2017-2022
 
   Can parse a command line based on options descriptions like these:
 ```C
@@ -30,25 +33,63 @@ namespace mlib {
 class OptParser
 {
 public:
-  OptParser ();
+  explicit OptParser ();
+
+  /// Initializes parser and sets the list of valid options.
   OptParser (std::vector<const char*>& list);
+
+  /// Initializes parser and sets the list of valid options.
   OptParser (std::initializer_list<const char*> list);
+
+  /// Initializes parser and sets the list of options descriptors.
   OptParser (const char** list);
 
+  /// Set list of valid options
   void set_options (std::vector<const char*>& list);
+
+  /// Add a new option descriptor to the list of options.
   void add_option (const char* descr);
 
+  /// Parse a command line
   int parse (int argc, const char* const* argv, int* stop = 0);
+
+  ///@{
+  /// Return next option in command line
   bool next (std::string& opt, std::string& optarg, char sep = '|');
+
+  /// Return next option in command line
   bool next (std::string& opt, std::vector<std::string>& optarg);
+  ///@}
+
+  ///@{
+  /// Return a specific option from the command line
   int getopt (const std::string& option, std::string& optarg, char sep = '|') const;
+
+  /// Return a specific option from the command line
   int getopt (const std::string& option, std::vector<std::string>& optarg) const;
+
+  /// Return a specific option from the command line
   int getopt (char option, std::string& optarg, char sep = '|') const;
+
+  /// Return a specific option from the command line
   int getopt (char option, std::vector<std::string>& optarg) const;
+  ///@}
+
+  ///@{
+  /// Check if command line has an option
   bool hasopt (const std::string& option) const;
+
+  /// Check if command line has an option
   bool hasopt (char option) const;
+  ///@}
+  
+  /// Return a nicely formatted syntax string containing all the options
   const std::string synopsis () const;
+
+  /// Return options description
   const std::string description (size_t indent_size = 2) const;
+
+  /// Return program name
   const std::string& appname () const;
 
 private:
@@ -73,8 +114,6 @@ private:
 };
 
 /*!
-  Return program name
-
   This is the content of `argv[0]` without any path or extension.
 */
 inline const std::string& OptParser::appname () const
@@ -82,9 +121,7 @@ inline const std::string& OptParser::appname () const
   return app;
 }
 
-///@{
 /*!
-  Check if command line has an option
   \param  option  long or short form of the option
 */
 inline bool OptParser::hasopt (const std::string& option) const
@@ -100,12 +137,8 @@ inline bool OptParser::hasopt (char option) const
 {
   return find_option (option) != cmd.end ();
 }
-///@}
 
-///@{
 /*!
-  Return a specific option from the command
-
   \param  option  the requested option
   \param  optarg  option argument(s)
 
@@ -123,6 +156,12 @@ inline int OptParser::getopt (const std::string& option, std::vector<std::string
   return p->count;
 }
 
+/*!
+  \param  option  the requested option
+  \param  optarg  option argument(s)
+
+  \return  number of occurrences on command line
+*/
 inline int OptParser::getopt (char option, std::vector<std::string>& optarg) const
 {
   optarg.clear ();
@@ -133,6 +172,5 @@ inline int OptParser::getopt (char option, std::vector<std::string>& optarg) con
   optarg = p->arg;
   return p->count;
 }
-///@}
 
 } // namespace mlib

@@ -1,17 +1,24 @@
-﻿/*!
-  \file convert.cpp Conversion functions
-
-  (c) Mircea Neacsu 2017
+﻿/*
+  Copyright (c) Mircea Neacsu (2014-2024) Licensed under MIT License.
+  This is part of MLIB project. See LICENSE file for full license terms.
 */
+
+///  \file convert.cpp Conversion functions
+
 #include <mlib/mlib.h>
 #pragma hdrstop
 #include <utf8/utf8.h>
 
-constexpr double epsilon = 1e-10;
+/*!
+   \defgroup convert Angle and Unit Conversion
+   Functions and constants for angle and unit conversions
 
+   These are conversion functions between different angle representations as
+   well as to and from customary latitude/longitude string representations.
+*/
 namespace mlib {
 
-double inline pow10 (int x)
+static double inline pow10 (int x)
 {
   return ipow (10., x);
 }
@@ -38,17 +45,28 @@ double deg_reduce (double value)
 }
 
 /*!
-  Conversion from degrees to ASCII string. Format is controlled by flags
-  settings and precision.
+  \param degrees value to convert in decimal degrees
+  \param format formatting flags
+  \param latitude true if value is a latitude value
+  \param precision number of decimal places for fractional part
+
+  Format is controlled by flags settings and precision. The resulting string
+  can have one of the following formats:
+   - `DD°MM'SS.sss"H` if output format has deg_fmt::sec bit set
+   - `DD°MM.mmmm'H` if output format has LL_MIN bit set
+   - `DD.dddd°H` if neither of these bits is set
+
+   In the above formats, `H` is the hemisphere which can be one of `N` or `S`
+   if \p latitude parameter is \b true. Otherwise it is one of `E` or `W`.
 */
-std::string degtoa (double degrees, int flags, int precision)
+std::string degtoa (double degrees, deg_fmt format, bool latitude, int precision)
 {
   std::string str;
   char sign;
   int deg_width, width;
 
   width = precision + 3;
-  if (flags & LL_LAT)
+  if (latitude)
   {
     sign = (char)((degrees >= 0.) ? 'N' : 'S');
     deg_width = 2;
@@ -60,14 +78,14 @@ std::string degtoa (double degrees, int flags, int precision)
   }
 
   degrees = fabs (degrees);
-  if (flags & LL_SEC)
+  if (format == deg_fmt::seconds)
   {
     double dd, mm;
     degrees = modf (modf (degrees + .5 * pow10 (-precision - 1) / 3600., &dd) * 60., &mm) * 60.;
     strprintf (str, u8"%0*.0lf°%02.0lf'%0*.*lf\"%c", deg_width, dd, mm, width, precision, degrees,
                sign);
   }
-  else if (flags & LL_MIN)
+  else if (format == deg_fmt::minutes)
   {
     double dd;
     degrees = modf (degrees + .5 * pow10 (-precision - 1) / 60., &dd) * 60.;
@@ -85,13 +103,15 @@ std::string degtoa (double degrees, int flags, int precision)
 }
 
 /*!
-  Conversion from string to decimal degrees.
-    Some valid strings are:
-    - 130°45'25.34566W
-    - 130D45'25.34566E
-    - 65D45M25.34567S
-    - 130.56789W
-    - 85°30.45678N
+  \param str input string
+  \return angle value in degrees
+
+  Some valid strings are:
+  - 130°45'25.34566W
+  - 130D45'25.34566E
+  - 65D45M25.34567S
+  - 130.56789W
+  - 85°30.45678N
 */
 double atodeg (const std::string& str)
 {

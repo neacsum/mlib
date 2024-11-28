@@ -23,8 +23,8 @@ SUITE (Convert)
 
   TEST (atodeg)
   {
-    CHECK_EQUAL (DMS (12, 34, 56)/D2R, atodeg ("12D34M56"));
-    CHECK_EQUAL (-DMS (12, 34, 56)/D2R, atodeg ("12D34M56S"));
+    CHECK_EQUAL (DMS2deg (12'34'56), atodeg ("12D34M56"));
+    CHECK_EQUAL (-DMS2deg (12'34'56), atodeg ("12D34M56S"));
 
     CHECK_EQUAL (DMS (12, 34, 56.78)/D2R, atodeg ("12D34M56.78"));
     CHECK_EQUAL (-DMS (12, 34, 56.78)/D2R, atodeg ("12D34M56.78S"));
@@ -36,8 +36,8 @@ SUITE (Convert)
     CHECK_EQUAL (0, atodeg (""));
 
     //degrees minutes
-    CHECK_EQUAL (DM (12, 34.56)/D2R, atodeg ("12D34.56M"));
-    CHECK_EQUAL (-DM (12, 34.56) / D2R, atodeg ("-12D34.56M"));
+    CHECK_CLOSE (DMD2deg (12'34.56), atodeg ("12D34.56M"), 1e-7);
+    CHECK_CLOSE (-DMD2deg (12'34.56), atodeg ("-12D34.56M"), 1e-7);
 
     //decimal degrees
     CHECK_CLOSE (12.3456, atodeg ("12.3456"), 1e-4);
@@ -47,11 +47,11 @@ SUITE (Convert)
 
   TEST (degtoa)
   {
-    CHECK_EQUAL (u8"12°34'56.00\"N", degtoa (DMS (12, 34, 56) / D2R, LL_SEC | LL_LAT, 2));
-    CHECK_EQUAL (u8"12°34'56.00\"S", degtoa (-DMS (12, 34, 56) / D2R, LL_SEC | LL_LAT, 2));
-    CHECK_EQUAL (u8"012°34.50'E", degtoa (DMS (12, 34, 30) / D2R, LL_MIN, 2));
-    CHECK_EQUAL (u8"012°34.50'W", degtoa (-DMS (12, 34, 30) / D2R, LL_MIN, 2));
-    CHECK_EQUAL (u8"012.3457°E", degtoa (12.345678, 0, 4));
-    CHECK_EQUAL (u8"12.3457°N", degtoa (12.345678, LL_LAT, 4));
+    CHECK_EQUAL (u8"12°34'56.00\"N", degtoa (DMS (12, 34, 56) / D2R, deg_fmt::seconds, true, 2));
+    CHECK_EQUAL (u8"12°34'56.00\"S", degtoa (-DMS (12, 34, 56) / D2R, deg_fmt::seconds, true, 2));
+    CHECK_EQUAL (u8"012°34.50'E", degtoa (DMS (12, 34, 30) / D2R, deg_fmt::minutes, false, 2));
+    CHECK_EQUAL (u8"012°34.50'W", degtoa (-DMS (12, 34, 30) / D2R, deg_fmt::minutes, false, 2));
+    CHECK_EQUAL (u8"012.3457°E", degtoa (12.345678, deg_fmt::degrees, false, 4));
+    CHECK_EQUAL (u8"12.3457°N", degtoa (12.345678, deg_fmt::degrees, true, 4));
   }
 }

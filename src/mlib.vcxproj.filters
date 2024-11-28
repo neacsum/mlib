@@ -72,9 +72,6 @@
     <ClInclude Include="..\include\mlib\syncbase.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\mlib\tcpserv.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\mlib\thread.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -154,6 +151,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\include\mlib\safe_winsock.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\mlib\tcpserver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

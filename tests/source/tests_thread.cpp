@@ -46,6 +46,22 @@ SUITE (threads)
     CHECK_THROW (th.wait (), std::out_of_range);
   }
 
+  TEST (thread_exception2)
+  {
+    auto bad_func = [] () -> unsigned int {
+      Sleep (50);
+      char t = std::string ().at (1); // this generates an std::out_of_range
+      return 0;
+    };
+
+    mlib::thread th1 (bad_func), th2 (bad_func);
+    th1.start ();
+    th2.start ();
+
+    CHECK_THROW (wait_all ({&th1, &th2}), std::out_of_range);
+  }
+
+
   TEST (thread_states)
   {
     f_run.reset ();

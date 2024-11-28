@@ -18,7 +18,7 @@ static char enctab[64] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
                           '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '/'};
 
 static char dectab[256];
-bool dectab_initialized = false;
+static bool dectab_initialized = false;
 
 /*!
   Decode a Base64 string

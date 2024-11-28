@@ -36,10 +36,16 @@ public:
   int operator== (const syncbase& rhs) const;
 
   virtual void wait ();
+
+  /// Wait a number of milliseconds for the object to become signaled.
   virtual DWORD wait (DWORD limit_msec);
+
+  /// Wait a number of milliseconds for the object to become signaled.
   virtual DWORD wait (std::chrono::milliseconds limit);
 
   virtual DWORD wait_alertable (DWORD limit_msec = INFINITE);
+
+  /// Wait for object to become signaled or a message to be queued
   virtual DWORD wait_msg (DWORD limit_msec = INFINITE, DWORD mask = QS_ALLINPUT);
   operator bool ();
   virtual bool is_signaled ();
@@ -84,7 +90,6 @@ inline void syncbase::wait ()
 }
 
 /*!
-   Wait a number of milliseconds for the object to become signaled.
    \param limit_msec maximum wait time in milliseconds
    \return `WAIT_OBJECT0` if object becomes signaled
    \return `WAIT_TIMEOUT` if timeout has expired
@@ -96,7 +101,6 @@ inline DWORD syncbase::wait (DWORD limit_msec)
 }
 
 /*!
-   Wait a number of milliseconds for the object to become signaled.
    \param limit maximum wait time
    \return `WAIT_OBJECT0` if object becomes signaled
    \return `WAIT_TIMEOUT` if timeout has expired
@@ -117,7 +121,19 @@ inline DWORD syncbase::wait_alertable (DWORD limit_msec)
   return WaitForSingleObjectEx (hl->handle_, limit_msec, TRUE);
 }
 
-/// Wait for object to become signaled or a message to be queued
+/*!
+
+  \param limit_msec   time-out interval, in milliseconds
+  \param mask         input message types
+
+  \return `WAIT_OBJECT_0`     thread finished
+  \return `WAIT_TIMEOUT`      time-out interval expired
+  \return `WAIT_OBJECT_0+1`   Input message received.
+
+  The \p mask parameter can be any combination of flags described for the
+  [GetQueueStatus](https://learn.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-getqueuestatus)
+  function.
+*/
 inline DWORD syncbase::wait_msg (DWORD limit_msec, DWORD mask)
 {
   return MsgWaitForMultipleObjects (1, &hl->handle_, FALSE, limit_msec, mask);

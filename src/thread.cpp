@@ -22,27 +22,25 @@ namespace mlib {
   \class thread
   \ingroup syncro
 
-  There objects can be created by providing a function that will be run in a
-  separate thread or by deriving an new object that reimplements the
+  Thread objects can be created by providing a function that will be run in a
+  separate execution thread or by deriving an new object that reimplements the
   thread::run() function. Either way, thread objects are created in a
   "suspended animation" state. To start them use the thread::start() function.
 
   When combining objects and multi-threading it is useful to define what
   member functions are \e foreign (i.e. can be called by another execution
-  %thread) and what functions are \e owned (i.e. can be called only by the same
-  execution %thread. If possible, "owned" functions should be made private or
-  protected. The object's constructors and destructor are inherently \e foreign
-  while the run function is inherently \e owned.
+  thread) and what functions are \e owned (i.e. can be called only by the same
+  execution thread). As a general rule, "owned" functions should be made private
+  or protected. The object's constructors and destructor are inherently \e foreign
+  while the run() function is inherently \e owned.
 
   Exceptions thrown while executing a thread that are not caught by user
-  handlers are caught by a try...catch block that encompasses the thread::run()
+  handlers are caught by a `try...catch` block that encompasses the thread::run()
   function and re-thrown by the thread::wait() function (considered a _foreign_
   function).
 */
 
 /*!
-  Protected constructor for use of thread-derived objects
-
   \param name       thread name (mostly for debugging purposes)
   \param stack_size thread stack size or 0 for default size
   \param sd         pointer to a security descriptor or NULL
@@ -63,8 +61,6 @@ thread::thread (const std::string& name, DWORD stack_size, PSECURITY_DESCRIPTOR 
 }
 
 /*!
-  Make a thread from a function.
-
   Uses a polymorphic function wrapper that can be a lambda expression, a bind
   expression or any other type of function object as a run function of the
   newly created thread. When the thread is started (using the start() function),
@@ -152,7 +148,9 @@ UINT _stdcall thread::entryProc (thread* th)
   return th->exitcode;
 }
 
-///  Default run function. Calls user supplied function if there is one
+/*!
+  Calls user supplied function if there is one
+*/
 void thread::run ()
 {
   if (thfunc)
@@ -167,7 +165,6 @@ void thread::name (const std::string& nam)
   syncbase::name (nam);
 }
 
-///  Begin execution of a newly created thread
 void thread::start ()
 {
   assert (handle ());
@@ -181,49 +178,46 @@ void thread::start ()
 }
 
 /*!
-  Wait for thread to finish execution
-
   \param time_limit time-out interval, in milliseconds
   \return `WAIT_OBJECT_0` thread finished
   \return `WAIT_TIMEOUT` time-out interval expired
 
-  If an exception occurred during thread execution, it is re-thrown now.
+  If thread has finished and an exception occurred during thread execution,
+  it is re-thrown now.
 */
 DWORD
 thread::wait (DWORD time_limit)
 {
   DWORD ret = syncbase::wait (time_limit);
-  if (ret == WAIT_OBJECT_0)
-    rethrow_exception ();
+  if (ret == WAIT_OBJECT_0 && pex)
+    std::rethrow_exception (pex);
   return ret;
 }
 
 /*!
-  Wait for thread to finish or an APC or IO completion routine to occur
-
   \param time_limit time-out interval, in milliseconds
   \return `WAIT_OBJECT_0` thread finished
   \return `WAIT_TIMEOUT` time-out interval expired
   \return `WAIT_IO_COMPLETION` wait ended by one or more APC-es queued.
 
-  If an exception occurred during thread execution, it is re-thrown now.
+  If thread has finished and an exception occurred during thread execution,
+  it is re-thrown now.
 */
 DWORD
 thread::wait_alertable (DWORD time_limit)
 {
   DWORD ret = syncbase::wait_alertable (time_limit);
-  if (ret == WAIT_OBJECT_0)
-    rethrow_exception ();
+  if (ret == WAIT_OBJECT_0 && pex)
+    std::rethrow_exception (pex);
   return ret;
 }
 
 /*!
-  Wait for thread to finish or a message to be queued
-
-  \param time_limit time-out interval, in milliseconds
-  \return `WAIT_OBJECT_0` thread finished
-  \return `WAIT_TIMEOUT` time-out interval expired
-  \return `WAIT_OBJECT_0+1` Input message received.
+  \param time_limit   time-out interval, in milliseconds
+  \param mask         input message types
+  \return `WAIT_OBJECT_0`     thread finished
+  \return `WAIT_TIMEOUT`      time-out interval expired
+  \return `WAIT_OBJECT_0+1`   Input message received.
 
   If an exception occurred during thread execution, it is re-thrown now.
 */
@@ -231,8 +225,8 @@ DWORD
 thread::wait_msg (DWORD time_limit, DWORD mask)
 {
   DWORD ret = syncbase::wait_msg (time_limit, mask);
-  if (ret == WAIT_OBJECT_0)
-    rethrow_exception ();
+  if (ret == WAIT_OBJECT_0 && pex)
+    std::rethrow_exception (pex);
   return ret;
 }
 

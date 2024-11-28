@@ -1,7 +1,6 @@
 /*
-  MLIB Library
-  (c) Mircea Neacsu 2002-2023. Licensed under MIT License.
-  See README file for full license terms.
+  Copyright (c) Mircea Neacsu (2014-2024) Licensed under MIT License.
+  This is part of MLIB project. See LICENSE file for full license terms.
 */
 
 /// \file inaddr.cpp Implementation of inaddr class.
@@ -19,8 +18,12 @@ namespace mlib {
 sock_initializer init;
 
 /*!
-  \class inaddr wrapper class for sockaddr structure.
+  \class inaddr
   \ingroup sockets
+
+  This is a wrapper for sockaddr structure, providing functions that go
+  between host and network order. All parameters and returned values are in
+  _host_ order. 
 */
 
 /*!

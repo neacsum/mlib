@@ -27,7 +27,7 @@
   SOFTWARE.
 */
 
-#include <mlib/tcpserv.h>
+#include <mlib/tcpserver.h>
 #include <conio.h>
 
 using namespace std;

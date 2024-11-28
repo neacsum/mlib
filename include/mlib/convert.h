@@ -1,10 +1,13 @@
-﻿#pragma once
+﻿/*
+  Copyright (c) Mircea Neacsu (2014-2024) Licensed under MIT License.
+  This is part of MLIB project. See LICENSE file for full license terms.
+*/
+
+#pragma once
 /*!
   \file convert.h Conversion functions and frequently used constants
-
-
-  \addtogroup other Other Functions
-@{
+  \addtogroup convert Angle and Unit Conversion
+  @{
 */
 
 #ifndef _USE_MATH_DEFINES
@@ -23,7 +26,8 @@
 #define USFOOT2M (1200. / 3937.)           ///< US Survey foot to meters conversion factor
 #define MAS      (M_PI / (180 * 3600000.)) ///< milli-arcsecond
 
-/// Degrees literal operator converts a value to radians
+/// Degrees literal operator converts a value in degrees to radians
+/// @{
 constexpr double operator"" _deg (long double deg)
 {
   return deg * D2R;
@@ -33,8 +37,11 @@ constexpr double operator"" _deg (unsigned long long deg)
 {
   return deg * D2R;
 }
+/// @}
 
-/// Milli-arcseconds literal operator converts a value to radians
+/// Milli-arcseconds literal operator converts a value in thousandth of
+/// arc-seconds to radians
+/// @{
 constexpr double operator"" _mas (long double mas)
 {
   return mas * MAS;
@@ -44,8 +51,10 @@ constexpr double operator"" _mas (unsigned long long mas)
 {
   return mas * MAS;
 }
+/// @}
 
-/// US survey foot literal operator  converts a value to meters
+/// US survey foot literal operator  converts a value in US survey feet to meters
+/// @{
 constexpr double operator"" _ftus (long double ftus)
 {
   return ftus * USFOOT2M;
@@ -55,12 +64,20 @@ constexpr double operator"" _ftus (unsigned long long ftus)
 {
   return ftus * USFOOT2M;
 }
+/// @}
 
-/// Nautical miles literal operator  converts a value to meters
+/// Nautical miles literal operator  converts a value in nautical miles to meters
+/// @{
 constexpr double operator"" _nmi (long double nmi)
 {
   return nmi * NM2M;
 }
+
+constexpr double operator"" _nmi (unsigned long long nmi)
+{
+  return nmi * NM2M;
+}
+/// @}
 
 /// Convert decimal degrees to radians
 constexpr double DEG (double dd)
@@ -80,8 +97,8 @@ constexpr double DMS (double dd, double mm, double ss)
   return (dd + mm / 60. + ss / 3600.) * D2R;
 }
 
-/// Conversion to decimal degrees from DDMM.mmm
-constexpr double DMD2deg (double value)
+/// Conversion to decimal degrees from DDMMSS.ssss
+constexpr double DMS2deg (double value)
 {
   int sign = (value >= 0) ? 1 : -1;
   if (value < 0)
@@ -93,8 +110,8 @@ constexpr double DMD2deg (double value)
   return sign * (deg + min / 60. + value / 3600.);
 }
 
-/// Conversion to decimal degrees from DDMMSS.ssss
-constexpr double DMS2deg (double value)
+/// Conversion to decimal degrees from DDMM.mmm
+constexpr double DMD2deg (double value)
 {
   int sign = (value >= 0) ? 1 : -1;
   if (value < 0)
@@ -139,14 +156,19 @@ namespace mlib {
 /// Reduces a degrees value to [0,360) interval
 double deg_reduce (double value);
 
-// formatting flags for degtoa function
-#define LL_MIN 0x01 ///< Degrees, minutes format (DD°MM.mmmm')
-#define LL_SEC 0x02 ///< Degrees, minutes, seconds format (DD°MM'SS.sss")
-#define LL_LAT 0x04 ///< Latitude angle
+/// Formatting options for degtoa() function
+enum deg_fmt
+{
+  degrees = 0, ///< Decimal degrees (DD.dddd°)
+  minutes = 1, ///< Degrees, minutes format (DD°MM.mmmm')
+  seconds = 2 ///< Degrees, minutes, seconds format (DD°MM'SS.sss")
+};
 
-std::string degtoa (double degrees, int flags, int precision);
+/// Conversion from degrees to a string.
+std::string degtoa (double degrees, deg_fmt format, bool latitude, int precision);
 
+/// Conversion from string to decimal degrees
 double atodeg (const std::string& str);
-///@}
+/// @}
 
 } // namespace mlib

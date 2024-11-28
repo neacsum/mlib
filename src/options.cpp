@@ -1,3 +1,8 @@
+/*
+  Copyright (c) Mircea Neacsu (2014-2024) Licensed under MIT License.
+  This is part of MLIB project. See LICENSE file for full license terms.
+*/
+
 /*!
   \file options.cpp Implementation of command line parsing class.
 
@@ -9,15 +14,15 @@
   and GNU Standard for Command line Interface at
   http://www.gnu.org/prep/standards/html_node/Command_002dLine-Interfaces.html
 
-  It accepts either short options composed of a dash ('-') followed by a letter,
-  or long options composed of '--' followed by the option name. An option can have
+  It accepts either short options composed of a dash (`-`) followed by a letter,
+  or long options composed of `--` followed by the option name. An option can have
   arguments that are either required or optional. If an option can have multiple
   arguments, all program arguments following the option are considered option
-  arguments until the next option argument (argument preceded by '-' or '--')
-  or until the last argument. The first '--' argument stops options' processing.
+  arguments until the next option argument (argument preceded by `-` or `--`)
+  or until the last argument. The first `--` argument stops options' processing.
   All remaining arguments are considered non-option arguments (operands).
 
-  It is possible to specify several short options after one '-', as long as all
+  It is possible to specify several short options after one `-`, as long as all
   (except possibly the last) do not have required or optional arguments.
 
   An option can be repeated. In this case, if the option has arguments, they are
@@ -94,7 +99,6 @@ OptParser::OptParser ()
 {}
 
 /*!
-  Initializes parser and sets the list of valid options.
   \param  list array of option descriptor strings
 
   \see OptParser::add_option for syntax of a descriptor string
@@ -106,7 +110,6 @@ OptParser::OptParser (std::vector<const char*>& list)
 }
 
 /*!
-  Initializes parser and sets the list of valid options.
   \param  list array of option descriptor strings
 
   \see OptParser::add_option for syntax of a descriptor string
@@ -119,7 +122,6 @@ OptParser::OptParser (std::initializer_list<const char*> list)
 }
 
 /*!
-  Initializes parser and sets the list of options descriptors.
   \param  list array of pointers to option descriptor strings
 
   \note The list must be terminated with a null pointer.
@@ -132,7 +134,6 @@ OptParser::OptParser (const char** list)
 }
 
 /*!
-  Set list of valid options
   \param list  - array of option descriptor strings
 
   Each valid option is described by a string in the list array.
@@ -146,7 +147,6 @@ void OptParser::set_options (std::vector<const char*>& list)
 }
 
 /*!
-  Add a new option descriptor to the list of options.
   \param descr option descriptor string
 
   The descriptor string is has the following syntax:
@@ -168,12 +168,13 @@ void OptParser::set_options (std::vector<const char*>& list)
   The `<opt_description>` is the option description and is used to generate the description string.
   The `<opt_description>` part is preceded by a TAB (`\t`) character
 
-  Example:
+  __Example:__
+  
   ` "l?list list_arg \t list something" `
 
-  In this example the option syntax part is `l?list`, the argument description
-  is `list_arg` and the option description is `list something`. The option
-  can appear on the command line as:
+  The option syntax part is `l?list`, the argument description is `list_arg`
+  and the option description is `list something`. The option can appear on the
+  command line as:
 ```
   -l stuff
 ```
@@ -227,7 +228,6 @@ void OptParser::add_option (const char* descr)
 }
 
 /*!
-  Parse a command line
   \param argc   number of arguments
   \param argv   array of arguments
   \param stop   pointer to an integer that receives the index of the first non-option
@@ -376,8 +376,6 @@ done:
 }
 
 /*!
-  Return next option in the command
-
   \param  opt   option
   \param  optarg  option argument(s)
   \param  sep     separator character to insert between arguments if option has multiple arguments
@@ -409,8 +407,6 @@ bool OptParser::next (std::string& opt, std::string& optarg, char sep)
 }
 
 /*!
-  Return next option in the command
-
   \param  opt   option
   \param  optarg  option argument(s)
 
@@ -438,10 +434,7 @@ bool OptParser::next (std::string& opt, std::vector<std::string>& optarg)
   return true;
 }
 
-///@{
 /*!
-  Return a specific option from the command
-
   \param  option  the requested option
   \param  optarg  option argument(s)
   \param  sep     separator character to insert between arguments if option has multiple arguments
@@ -474,17 +467,12 @@ int OptParser::getopt (char option, std::string& optarg, char sep) const
   format_arg (optarg, *op, sep);
   return op->count;
 }
-///@}
 
-/*!
-  Generate a nicely formatted syntax string.
-*/
 const string OptParser::synopsis () const
 {
   string result, term;
   auto op = optlist.begin ();
 
-  result = app;
   for (auto& op : optlist)
   {
     result += ' ';
@@ -502,25 +490,28 @@ const string OptParser::synopsis () const
     }
 
     if (op.flag == '|')
+    {
+      result += ' ';
       continue;
+    }
 
     switch (op.flag)
     {
     case '?':
       result += " [";
-      term = "]";
+      term = "] ";
       break;
     case ':':
       result += " <";
-      term = ">";
+      term = "> ";
       break;
     case '*':
       result += " [";
-      term = " ...]";
+      term = " ...] ";
       break;
     case '+':
       result += " <";
-      term = ">...";
+      term = ">... ";
       break;
     }
     string param = op.arg_descr;
@@ -540,7 +531,6 @@ const string OptParser::synopsis () const
 }
 
 /*!
-  Generate options description
   \param indent_size number of spaces to indent each option description line
 
   Each option and its synopsis is shown on a separate line indented by

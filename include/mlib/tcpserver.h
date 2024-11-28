@@ -1,8 +1,10 @@
-/*!
-  \file tcpserv.h Definition of tcpserv class
-
-  (c) Mircea Neacsu 2003
+/*
+  Copyright (c) Mircea Neacsu (2014-2024) Licensed under MIT License.
+  This is part of MLIB project. See LICENSE file for full license terms.
 */
+
+///  \file tcpserver.h Definition of tcpserver class
+
 #pragma once
 
 #include "wsockstream.h"
@@ -22,20 +24,17 @@ public:
   tcpserver (unsigned short port, const std::string& name = std::string (),
              unsigned int max_conn = 0);
   ~tcpserver ();
-  sock& socket ()
-  {
-    return srv_sock;
-  }
+
+  /// Provides access to server listening socket
+  sock& socket ();
+
   void foreach (conn_iter_func f, void* param);
-  thread* get_connection_thread (const sock& connection);
-  void close_connection (const sock& connection);
+  thread* get_connection_thread (const sock& conn_sock);
+  void close_connection (const sock& conn_sock);
   void terminate ();
 
   /// Return number of active connections
-  size_t numconn () const
-  {
-    return contab.size ();
-  };
+  size_t numconn () const;
 
   /// Return max interval to wait for an incoming connection (in milliseconds)
   unsigned int timeout () const;
@@ -43,13 +42,11 @@ public:
   /// Set maximum timeout interval (in milliseconds)
   void timeout (DWORD msec);
 
+  /// Set maximum number of connections accepted
   void maxconn (unsigned int new_max);
 
   /// Return maximum number of connections accepted
-  unsigned int maxconn () const
-  {
-    return limit;
-  };
+  unsigned int maxconn () const;
 
   void set_connfunc (std::function<int (const sock&)> f);
 
@@ -58,9 +55,9 @@ protected:
   void run () override;
 
   virtual bool idle_action ();
-  virtual void initconn (sock& socket, thread* thread);
-  virtual void termconn (sock& socket, thread* thread);
-  virtual thread* make_thread (sock& connection);
+  virtual void initconn (sock& conn_sock, thread* thread);
+  virtual void termconn (sock& conn_sock, thread* thread);
+  virtual thread* make_thread (sock& conn_sock);
 
 private:
   sock srv_sock; // listening socket
@@ -82,13 +79,28 @@ private:
   std::function<int (const sock& s)> connfunc;
 };
 
+/*==================== INLINE FUNCTIONS ===========================*/
+
+inline
+sock& tcpserver::socket ()
+{
+  return srv_sock;
+}
+
+inline
+size_t tcpserver::numconn () const
+{
+  return contab.size ();
+}
+
 /*!
   \return timeout value in milliseconds
 
   If timeout interval is 0 or `INFINITE` the server waits indefinitely for
   incoming connections.
 */
-inline unsigned int mlib::tcpserver::timeout () const
+inline
+unsigned int tcpserver::timeout () const
 {
   return (idle == INFINITE) ? 0 : idle;
 }
@@ -105,6 +117,13 @@ inline void tcpserver::timeout (DWORD msec)
   if (is_running ())
     evt.signal ();
 }
+
+inline
+unsigned int tcpserver::maxconn () const
+{
+  return limit;
+}
+
 
 /*!
   Called periodically from run loop.

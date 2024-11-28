@@ -50,7 +50,8 @@ public:
     sharedcache   = SQLITE_OPEN_SHAREDCACHE, ///< database connection is eligible to use shared cache mode
     privatecache  = SQLITE_OPEN_PRIVATECACHE, ///< database connection does not participate in shared cache mode
     memory        = SQLITE_OPEN_MEMORY | SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE,  ///< database opened in memory
-    nofollow      = SQLITE_OPEN_NOFOLLOW ///< filename cannot be a symlink
+    nofollow      = SQLITE_OPEN_NOFOLLOW, ///< filename cannot be a symbolic link
+    ext_result    = SQLITE_OPEN_EXRESCODE ///< enables extended result codes
   };
 
   /// Default constructor

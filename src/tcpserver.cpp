@@ -1,17 +1,13 @@
-/*!
-  \file tcpserv.cpp Implementation of tcpserver class
-
-  (c) Mircea Neacsu 2003-2024
-
-
+/*
+  Copyright (c) Mircea Neacsu (2014-2024) Licensed under MIT License.
+  This is part of MLIB project. See LICENSE file for full license terms.
 */
+
+///  \file tcpserver.cpp Implementation of mlib::tcpserver class
 
 #include <mlib/mlib.h>
 #pragma hdrstop
 #include <algorithm>
-
-/// Allocation increment for connections table
-#define ALLOC_INCR 5
 
 namespace mlib {
 
@@ -30,10 +26,10 @@ namespace mlib {
   execute periodically.
 
   Being a thread itself, the tcpserver object has to be started by calling
-  the start() function.
-
-  You can set the listening port either when the object is constructed or before
-  starting the server by calling the `bind()` function on the underlining socket.
+  the start() function. The listening port must be set before the server thread
+  is started. It can be set either when the object is constructed or by 
+  calling the `bind()` function on the listening socket.
+  
   The following two examples are equivalent:
 
   Example 1:
@@ -54,10 +50,19 @@ namespace mlib {
 
     srv.start ();
   \endcode
+
+
+  When a new connection is received (`listen()` function returns a new socket)
+  the server calls make_thread() to create a new thread servicing the
+  connection. It then starts this new thread by calling initconn().
 */
 
 /*!
   Opens the socket and initializes the connections table.
+
+  \param port listening port number
+  \param name server name used for debug messages
+  \param max_conn maximum number of accepted connections
 
   If port address is 0, the listening address is the local loop-back interface.
   Otherwise, the listening address defaults to 'all interfaces' (`INADDR_ANY`).
@@ -129,7 +134,7 @@ void tcpserver::run ()
 
     if (srv_sock.is_readready (0))
     {
-      /// - check if can accept more connections
+      /// - check if server can accept more connections
       if (limit && (contab.size () >= limit))
       {
         sock s;
@@ -153,9 +158,9 @@ void tcpserver::run ()
 
       TRACE7 ("tcpserver::run - request from %s:%d", peer.ntoa (), peer.port ());
 
-      /// - invoke make_thread to get a servicing thread
+      /// - invoke make_thread() to get a servicing thread
       auto th = make_thread (accepted);
-      /// - invoke initconn function
+      /// - invoke initconn() function
       initconn (accepted, th);
       contab.emplace_back (conndata{accepted, th, false});
 
@@ -191,14 +196,20 @@ void tcpserver::run ()
 }
 
 /*!
-  Delete connection from connections table
+  Closes a connection
+
+  \param conn_sock socket associated with connection to be closed
+
+  The connection is also removed from the connections table. In fact, the
+  connection is only marked as condemned and the run loop will remove it next
+  time it is run.
 */
-void tcpserver::close_connection (const sock& s)
+void tcpserver::close_connection (const sock& conn_sock)
 {
-  if (s.is_open ())
+  if (conn_sock.is_open ())
   {
     auto p =
-      std::find_if (contab.begin (), contab.end (), [&s] (auto& c) { return c.socket == s; });
+      std::find_if (contab.begin (), contab.end (), [&conn_sock] (auto& c) { return c.socket == conn_sock; });
     if (p != contab.end ())
     {
 #ifdef MLIB_TRACE
@@ -216,14 +227,17 @@ void tcpserver::close_connection (const sock& s)
 /*!
   Initializes a connection.
 
-  If the connection has associated a servicing thread
-  (returned by make_thread), this thread is started now.
+  \param conn_sock connection socket
+  \param th thread that services the new connection
+
+  If the connection has associated a servicing thread (\p th is not NULL),
+  this thread is started now.
 */
-void tcpserver::initconn (sock& socket, thread* th)
+void tcpserver::initconn (sock& conn_sock, thread* th)
 {
 #ifdef MLIB_TRACE
   inaddr other;
-  socket.peer (other);
+  conn_sock.peer (other);
   TRACE8 ("TCP server %s - Accepted connection with %s:%d", thread::name ().c_str (), other.ntoa (),
           other.port ());
 #endif
@@ -232,7 +246,7 @@ void tcpserver::initconn (sock& socket, thread* th)
 }
 
 /*!
-  Set function or lambda expression that becomes the body of the thread
+  Set function object that becomes the body of the thread
   serving a new connection.
 */
 void tcpserver::set_connfunc (std::function<int (const sock& conn)> f)
@@ -243,20 +257,20 @@ void tcpserver::set_connfunc (std::function<int (const sock& conn)> f)
 /*!
   Return a servicing thread for each connection.
 
-  If user has set a connection function (using set_connfunc() function), make_thread
-  returns a thread whose body is the connection function.
+  \param conn_sock socket associated with the new connection
 
-  If the connection doesn't need a servicing thread (single-threaded TCP server)
-  return NULL.
+  If user has set a connection function (using set_connfunc() function), 
+  the function returns a thread whose body is the connection function.
+  Otherwise, it returns NULL and the server becomes a single-threaded server.
 
-  The returned thread should not be started. It will be started from the initconn
-  function.
+  \note The returned thread should not be started. It will be started from the
+  initconn() function.
 */
-thread* tcpserver::make_thread (sock& connection)
+thread* tcpserver::make_thread (sock& conn_sock)
 {
   if (connfunc)
   {
-    sock client (connection);
+    sock client (conn_sock);
     auto f = [=] () -> int {
       int ret = connfunc (client);
       close_connection (client);
@@ -270,10 +284,13 @@ thread* tcpserver::make_thread (sock& connection)
 /*!
   Finalizes a connection.
 
+  \param conn_sock socket associated with the connection
+  \param th connection servicing thread
+
   Wait for the servicing thread to terminate (if there is one) than close
   the socket
 */
-void tcpserver::termconn (sock& socket, thread* th)
+void tcpserver::termconn (sock& conn_sock, thread* th)
 {
   TRACE9 ("tcpserver::termconn");
   if (th)
@@ -281,24 +298,24 @@ void tcpserver::termconn (sock& socket, thread* th)
     th->wait (10);
     delete th;
   }
-  if (socket.is_open ())
+  if (conn_sock.is_open ())
   {
     try
     {
 #ifdef MLIB_TRACE
       inaddr other;
-      socket.peer (other);
+      conn_sock.peer (other);
       TRACE8 ("TCP server %s - Closed connection with %s:%d", thread::name ().c_str (),
               other.ntoa (), other.port ());
 #endif
-      socket.linger (true, 1);
-      socket.shutdown (sock::shut_readwrite);
+      conn_sock.linger (true, 1);
+      conn_sock.shutdown (sock::shut_readwrite);
 
       // read and discard any pending data
       char buf[256];
-      while (socket.is_readready (0) && socket.recv (buf, sizeof (buf)) != EOF)
+      while (conn_sock.is_readready (0) && conn_sock.recv (buf, sizeof (buf)) != EOF)
         ;
-      socket.close ();
+      conn_sock.close ();
     }
     catch (erc& x)
     {
@@ -310,12 +327,16 @@ void tcpserver::termconn (sock& socket, thread* th)
 
 /*!
   Return the thread servicing a connection
+
+  \param conn_sock socket associated with the connection
+  \return pointer to connection servicing thread or NULL of there is no
+          associated thread
 */
-thread* tcpserver::get_connection_thread (const sock& connection)
+thread* tcpserver::get_connection_thread (const sock& conn_sock)
 {
   lock l (contab_lock);
-  auto p = std::find_if (contab.begin (), contab.end (), [&connection] (auto& c) {
-    return !c.condemned && c.socket == connection;
+  auto p = std::find_if (contab.begin (), contab.end (), [&conn_sock] (auto& c) {
+    return !c.condemned && c.socket == conn_sock;
   });
 
   return (p != contab.end ()) ? p->thread : nullptr;
@@ -344,6 +365,9 @@ void tcpserver::terminate ()
 
 /*!
   Invoke an iteration function for each active connection
+
+  \param f function to call
+  \param param arbitrary value passed as second parameter to iteration function
 */
 void tcpserver::foreach (conn_iter_func f, void* param)
 {
