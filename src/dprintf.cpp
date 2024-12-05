@@ -12,6 +12,16 @@
 #include <mutex>
 #include <sstream>
 #include <cstring>
+#include <mlib/critsect.h>
+
+// using std::mutex seems to crash in release version of MSVC runtime.
+// TODO Investigate if it's indeed a runtime bug.
+#ifndef _WIN32
+static std::mutex dpr_lock;
+#else
+static mlib::criticalsection dpr_lock;
+#endif
+
 
 /*!
   printf style function writes messages using OutputDebugString.
@@ -26,14 +36,12 @@
 
 bool dprintf (const char* fmt, ...)
 {
-  static std::mutex dpr_lock;
-
   char buffer[MAX_DPRINTF_CHARS];
   size_t sz;
   int r;
   va_list params;
   va_start (params, fmt);
-#ifdef _WINDOWS_
+#ifdef _WIN32
   sprintf_s (buffer, "[%x] ", GetCurrentThreadId ());
 #else
   std::stringstream s;
@@ -47,18 +55,16 @@ bool dprintf (const char* fmt, ...)
     return false; // for some reason we cannot print
   if ((size_t)r > sz - 1)
     buffer[MAX_DPRINTF_CHARS - 2] = 0; // print was truncated
-#ifdef _WINDOWS_
+#ifdef _WIN32
   strcat_s (buffer, "\n");
   wchar_t* out;
+  mlib::lock l (dpr_lock);
 
   int wsz = MultiByteToWideChar (CP_UTF8, 0, buffer, -1, 0, 0);
   if (wsz && (out = (wchar_t*)malloc (wsz * sizeof (wchar_t))))
   {
     MultiByteToWideChar (CP_UTF8, 0, buffer, -1, out, wsz);
-    {
-      std::lock_guard<std::mutex> l (dpr_lock);
-      OutputDebugString (out);
-    }
+    OutputDebugString (out);
     free (out);
     return true;
   }

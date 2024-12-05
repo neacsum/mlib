@@ -10,57 +10,44 @@
   @{
 */
 
-#ifndef _USE_MATH_DEFINES
-#define _USE_MATH_DEFINES
 #include <math.h>
-#endif
+#include <numbers>
 #include <string>
 
+#ifndef M_PI
+#define M_PI std::numbers::pi
+#endif
+
 // Useful constants
-#define D2R      0.01745329251994          ///< Degrees to radians conversion factor
-#define A_WGS84  6378137.000               ///< Semimajor axis of WGS84 ellipsoid
-#define F_WGS84  0.003352810664747         ///< Flattening of WGS84 ellipsoid
-#define F1_WGS84 298.257223563             ///< Inverse of flattening for WGS84 ellipsoid
+
+/// Degrees to radians conversion factor
+constexpr double D2R = M_PI / 180.;
+
+/// Semimajor axis of WGS84 ellipsoid
+constexpr double A_WGS84 = 6378137.000;
+
+/// Flattening of WGS84 ellipsoid
+constexpr double F_WGS84 = 0.003352810664747;
+
+/// Inverse of flattening for WGS84 ellipsoid
+constexpr double F1_WGS84 = 298.257223563;
+
 #define NM2M     1852.                     ///< Nautical mile to meters conversion factor
 #define MPS2KNOT (3600. / NM2M)            ///< Meters/sec to knots conversion factor
 #define USFOOT2M (1200. / 3937.)           ///< US Survey foot to meters conversion factor
-#define MAS      (M_PI / (180 * 3600000.)) ///< milli-arcsecond
 
-/// Degrees literal operator converts a value in degrees to radians
-/// @{
-constexpr double operator"" _deg (long double deg)
-{
-  return deg * D2R;
-}
+/// milli-arcsecond
+constexpr double MAS = M_PI / (180 * 3600000.);
 
-constexpr double operator"" _deg (unsigned long long deg)
-{
-  return deg * D2R;
-}
-/// @}
-
-/// Milli-arcseconds literal operator converts a value in thousandth of
-/// arc-seconds to radians
-/// @{
-constexpr double operator"" _mas (long double mas)
-{
-  return mas * MAS;
-}
-
-constexpr double operator"" _mas (unsigned long long mas)
-{
-  return mas * MAS;
-}
-/// @}
 
 /// US survey foot literal operator  converts a value in US survey feet to meters
 /// @{
-constexpr double operator"" _ftus (long double ftus)
+constexpr double operator"" _ftUS (long double ftus)
 {
   return ftus * USFOOT2M;
 }
 
-constexpr double operator"" _ftus (unsigned long long ftus)
+constexpr double operator"" _ftUS (unsigned long long ftus)
 {
   return ftus * USFOOT2M;
 }
@@ -79,11 +66,29 @@ constexpr double operator"" _nmi (unsigned long long nmi)
 }
 /// @}
 
+// ================== Degrees conversion functions ==========================
+
+// Decimal degrees---------------------------------------------------------
+
 /// Convert decimal degrees to radians
 constexpr double DEG (double dd)
 {
   return dd * D2R;
 }
+
+/// Convert decimal degrees to radians
+constexpr double D2rad (double dd)
+{
+  return dd * D2R;
+}
+
+/// Convert radians to decimal degrees
+constexpr double rad2D (double r)
+{
+  return r / D2R;
+}
+
+// Degrees, minutes --------------------------------------------------------
 
 /// Convert degrees, minutes to radians
 constexpr double DM (double dd, double mm)
@@ -91,66 +96,118 @@ constexpr double DM (double dd, double mm)
   return (dd + mm / 60.) * D2R;
 }
 
+/// Convert degrees, minutes (DDMM.mmm) to decimal degrees
+constexpr double DM2deg (double ddmm)
+{
+  int sign = (ddmm >= 0) ? 1 : -1;
+  if (ddmm < 0)
+    ddmm = -ddmm;
+  int deg = (int)(ddmm / 100.);
+  ddmm -= (double)deg * 100.;
+  return sign * (deg + ddmm / 60.);
+}
+
+/// Convert decimal degrees to degrees, minutes (DDMM.mmm)
+constexpr double deg2DM (double dd)
+{
+  int deg = (int)dd;
+  return (dd - deg) * 60. + deg * 100.;
+}
+
+/// Convert from radians to degrees, minutes (DDMM.mmm)
+constexpr double rad2DM (double rad)
+{
+  return deg2DM (rad / D2R);
+}
+
+/// Convert degrees, minutes (DDMM.mmm) to radians
+constexpr double DM2rad (double val)
+{
+  return DM2deg (val) * D2R;
+}
+
+// Degrees, minutes, seconds ------------------------------------------------
+
 /// Convert degrees, minutes seconds to radians
 constexpr double DMS (double dd, double mm, double ss)
 {
   return (dd + mm / 60. + ss / 3600.) * D2R;
 }
 
-/// Conversion to decimal degrees from DDMMSS.ssss
-constexpr double DMS2deg (double value)
+/// Convert degrees, minutes, seconds (DDMMSS.sss) to decimal degrees
+constexpr double DMS2deg (double dms)
 {
-  int sign = (value >= 0) ? 1 : -1;
-  if (value < 0)
-    value = -value;
-  int deg = (int)(value / 10000.);
-  value -= (double)deg * 10000;
-  int min = (int)(value / 100.);
-  value -= (double)min * 100.;
-  return sign * (deg + min / 60. + value / 3600.);
+  int sign = (dms >= 0) ? 1 : -1;
+  if (dms < 0)
+    dms = -dms;
+  int deg = (int)(dms / 10000.);
+  dms -= (double)deg * 10000;
+  int min = (int)(dms / 100.);
+  dms -= (double)min * 100.;
+  return sign * (deg + min / 60. + dms / 3600.);
 }
 
-/// Conversion to decimal degrees from DDMM.mmm
-constexpr double DMD2deg (double value)
+/// Convert degrees, minutes, seconds (DDMMSS.sss) to radians
+constexpr double DMS2rad (double dms)
 {
-  int sign = (value >= 0) ? 1 : -1;
-  if (value < 0)
-    value = -value;
-  int deg = (int)(value / 100.);
-  value -= (double)deg * 100.;
-  return sign * (deg + value / 60.);
+  return DMS2deg (dms) * D2R;
 }
 
-/// Conversion from decimal degrees to degrees, minutes (DDMM.mmm)
-constexpr double deg2DMD (double value)
+// =================== Angle units literal operators =========================
+
+/// Degrees literal operator converts a value in degrees to radians
+/// @{
+constexpr double operator"" _deg (long double deg)
 {
-  int deg = (int)value;
-  return (value - deg) * 60. + deg * 100.;
+  return deg * D2R;
 }
 
-/// Conversion from degrees to radians
-constexpr double D2rad (double val)
+constexpr double operator"" _deg (unsigned long long deg)
 {
-  return val * D2R;
+  return deg * D2R;
+}
+/// @}
+
+/// Degrees-minutes literal operator converts a value to radians
+///@{
+constexpr double operator ""_dm (long double val)
+{
+  return DM2rad (val);
 }
 
-/// Conversion from degrees, minutes (DDMM.mmm) to radians
-constexpr double DMD2rad (double val)
+constexpr double operator ""_dm (unsigned long long val)
 {
-  return DMD2deg (val) * D2R;
+  return DM2rad ((double)val);
+}
+///@}
+
+/// Degrees-minutes-seconds literal operator converts a value to radians
+///@{
+constexpr double operator ""_dms (long double val)
+{
+  return DMS2rad (val);
 }
 
-/// Conversion from degrees, minutes, seconds (DDMMSS.sss) to radians
-constexpr double DMS2rad (double val)
+constexpr double operator ""_dms (unsigned long long val)
 {
-  return DMS2deg (val) * D2R;
+  return DMS2rad ((double)val);
+}
+///@}
+
+/// Milli-arcseconds literal operator converts a value in thousandth of
+/// arc-seconds to radians
+/// @{
+constexpr double operator"" _mas (long double mas)
+{
+  return mas * MAS;
 }
 
-/// Conversion from radians to degrees, minutes (DDMM.mmm)
-constexpr double rad2DMD (double val)
+constexpr double operator"" _mas (unsigned long long mas)
 {
-  return deg2DMD (val / D2R);
+  return mas * MAS;
 }
+/// @}
+
 
 namespace mlib {
 /// Reduces a degrees value to [0,360) interval

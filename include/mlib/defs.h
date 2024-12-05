@@ -21,7 +21,7 @@
 */
 
 // If _TRACE has a numeric value, that becomes the trace level
-#if !defined(MLIB_TRACE_LEVEL) && defined(_TRACE) && ((_TRACE) + 0 > 0)
+#if !defined(MLIB_TRACE_LEVEL) && defined(_TRACE) && (_TRACE + 0 > 0)
 #define MLIB_TRACE_LEVEL _TRACE
 #endif
 

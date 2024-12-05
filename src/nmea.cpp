@@ -287,12 +287,12 @@ int gga (const char* buf, double* lat, double* lon, double* time, double* height
   NEXT_VALIDTOKEN (tok, 0);
   IFPAR (time, atof (tok));
   NEXT_TOKEN (tok, 0);
-  IFPAR (lat, DMD2rad (atof (tok)));
+  IFPAR (lat, DM2rad (atof (tok)));
   NEXT_TOKEN (tok, 0);
   if (lat && *tok && *tok == 'S')
     *lat *= -1.;
   NEXT_TOKEN (tok, 0);
-  IFPAR (lon, DMD2rad (atof (tok)));
+  IFPAR (lon, DM2rad (atof (tok)));
   NEXT_TOKEN (tok, 0);
   if (lon && *tok && *tok == 'W')
     *lon *= -1.;
@@ -344,12 +344,12 @@ int ggk (const char* buf, double* lat, double* lon, double* time, double* height
   IFPAR (time, atof (tok));
   NEXT_TOKEN (tok, 0); // date
   NEXT_TOKEN (tok, 0);
-  IFPAR (lat, DMD2rad (atof (tok)));
+  IFPAR (lat, DM2rad (atof (tok)));
   NEXT_TOKEN (tok, 0);
   if (lat && *tok && *tok == 'S')
     *lat *= -1.;
   NEXT_TOKEN (tok, 0);
-  IFPAR (lon, DMD2rad (atof (tok)));
+  IFPAR (lon, DM2rad (atof (tok)));
   NEXT_TOKEN (tok, 0);
   if (lon && *tok && *tok == 'W')
     *lon *= -1.;
@@ -390,12 +390,12 @@ int gll (const char* buf, double* lat, double* lon, double* time, int* mode)
     return 0;
 
   NEXT_TOKEN (tok, 0);
-  IFPAR (lat, DMD2rad (atof (tok)));
+  IFPAR (lat, DM2rad (atof (tok)));
   NEXT_TOKEN (tok, 0);
   if (lat && *tok && *tok == 'S')
     *lat *= -1.;
   NEXT_TOKEN (tok, 0);
-  IFPAR (lon, DMD2rad (atof (tok)));
+  IFPAR (lon, DM2rad (atof (tok)));
   NEXT_TOKEN (tok, 0);
   if (lon && *tok && *tok == 'W')
     *lon *= -1.;
@@ -437,12 +437,12 @@ int gns (const char* buf, double* time, double* lat, double* lon, int* mode, int
   NEXT_VALIDTOKEN (tok, 0);
   IFPAR (time, atof (tok));
   NEXT_TOKEN (tok, 0);
-  IFPAR (lat, DMD2rad (atof (tok)));
+  IFPAR (lat, DM2rad (atof (tok)));
   NEXT_TOKEN (tok, 0);
   if (lat && *tok && *tok == 'S')
     *lat *= -1.;
   NEXT_TOKEN (tok, 0);
-  IFPAR (lon, DMD2rad (atof (tok)));
+  IFPAR (lon, DM2rad (atof (tok)));
   NEXT_TOKEN (tok, 0);
   if (lon && *tok && *tok == 'W')
     *lon *= -1.;
@@ -623,12 +623,12 @@ int gxp (const char* buf, double* lat, double* lon, double* time, int* wp)
   NEXT_VALIDTOKEN (tok, 0);
   IFPAR (time, atof (tok));
   NEXT_TOKEN (tok, 0);
-  IFPAR (lat, DMD2rad (atof (tok)));
+  IFPAR (lat, DM2rad (atof (tok)));
   NEXT_TOKEN (tok, 0);
   if (lat && *tok && *tok == 'S')
     *lat *= -1.;
   NEXT_TOKEN (tok, 0);
-  IFPAR (lon, DMD2rad (atof (tok)));
+  IFPAR (lon, DM2rad (atof (tok)));
   NEXT_TOKEN (tok, 0);
   if (lon && *tok && *tok == 'W')
     *lon *= -1.;
@@ -935,12 +935,12 @@ int ptnlggk (const char* buf, double* lat, double* lon, double* time, double* he
   IFPAR (time, atof (tok));
   NEXT_TOKEN (tok, 0); // date
   NEXT_TOKEN (tok, 0);
-  IFPAR (lat, DMD2rad (atof (tok)));
+  IFPAR (lat, DM2rad (atof (tok)));
   NEXT_TOKEN (tok, 0);
   if (lat && *tok && *tok == 'S')
     *lat *= -1.;
   NEXT_TOKEN (tok, 0);
-  IFPAR (lon, DMD2rad (atof (tok)));
+  IFPAR (lon, DM2rad (atof (tok)));
   NEXT_TOKEN (tok, 0);
   if (lon && *tok && *tok == 'W')
     *lon *= -1.;
@@ -1014,12 +1014,12 @@ int rmc (const char* buf, double* lat, double* lon, double* time, double* speed,
   if (*tok && *tok != 'A' && *tok != 'V')
     return 0;
   NEXT_TOKEN (tok, 0);
-  IFPAR (lat, DMD2rad (atof (tok)));
+  IFPAR (lat, DM2rad (atof (tok)));
   NEXT_TOKEN (tok, 0);
   if (lat && *tok && *tok == 'S')
     *lat *= -1.;
   NEXT_TOKEN (tok, 0);
-  IFPAR (lon, DMD2rad (atof (tok)));
+  IFPAR (lon, DM2rad (atof (tok)));
   NEXT_TOKEN (tok, 0);
   if (lon && *tok && *tok == 'W')
     *lon *= -1.;
