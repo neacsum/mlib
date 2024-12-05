@@ -168,6 +168,19 @@ constexpr double operator"" _deg (unsigned long long deg)
 }
 /// @}
 
+/// Minutes literal operator converts a value in arc-minutes to radians
+/// @{
+constexpr double operator"" _arcmin (long double min)
+{
+  return min/60. * D2R;
+}
+
+constexpr double operator"" _arcmin (unsigned long long min)
+{
+  return min/60. * D2R;
+}
+/// @}
+
 /// Degrees-minutes literal operator converts a value to radians
 ///@{
 constexpr double operator ""_dm (long double val)
@@ -193,6 +206,19 @@ constexpr double operator ""_dms (unsigned long long val)
   return DMS2rad ((double)val);
 }
 ///@}
+
+/// Seconds literal operator converts a value in arc-seconds to radians
+/// @{
+constexpr double operator"" _arcsec (long double sec)
+{
+  return sec/3600. * D2R;
+}
+
+constexpr double operator"" _arcsec (unsigned long long sec)
+{
+  return sec/3600. * D2R;
+}
+/// @}
 
 /// Milli-arcseconds literal operator converts a value in thousandth of
 /// arc-seconds to radians

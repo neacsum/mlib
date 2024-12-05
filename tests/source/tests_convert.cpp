@@ -17,8 +17,11 @@ SUITE (Convert)
   TEST (oplit)
   {
     CHECK_EQUAL (DEG (12.5), 12.5_deg);
-    CHECK_EQUAL (1852, 1._nmi);
-    CHECK_EQUAL (1200., 3937._ftus);
+    CHECK_EQUAL (1852, 1_nmi);
+    CHECK_EQUAL (1200., 3937_ftUS);
+    CHECK_CLOSE (1_deg, 60_arcmin, 1e-10);
+    CHECK_CLOSE (1_deg, 3600_arcsec, 1e-10);
+    CHECK_CLOSE (1_arcsec, 1000_mas, 1e-10);
   }
 
   TEST (atodeg)
@@ -36,8 +39,8 @@ SUITE (Convert)
     CHECK_EQUAL (0, atodeg (""));
 
     //degrees minutes
-    CHECK_CLOSE (DMD2deg (12'34.56), atodeg ("12D34.56M"), 1e-7);
-    CHECK_CLOSE (-DMD2deg (12'34.56), atodeg ("-12D34.56M"), 1e-7);
+    CHECK_CLOSE (DM2deg (12'34.56), atodeg ("12D34.56M"), 1e-7);
+    CHECK_CLOSE (-DM2deg (12'34.56), atodeg ("-12D34.56M"), 1e-7);
 
     //decimal degrees
     CHECK_CLOSE (12.3456, atodeg ("12.3456"), 1e-4);
