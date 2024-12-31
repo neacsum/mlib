@@ -21,7 +21,7 @@ jobs:
         uses: engineerd/configurator@v0.0.10
         with:
           name: doxygen.exe
-          url: https://github.com/doxygen/doxygen/releases/download/Release_1_9_8/doxygen-1.9.8.windows.x64.bin.zip
+          url: https://github.com/doxygen/doxygen/releases/download/Release_1_13_0/doxygen-1.13.0.windows.x64.bin.zip
           pathInArchive: doxygen.exe
 
       - name: Generate Doxygen documentation
