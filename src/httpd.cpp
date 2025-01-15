@@ -851,7 +851,7 @@ bool http_connection::parse_url ()
   To have any effect, this function should be called before calling the
   response() (or serve_...) function as all headers are sent at that time.
 */
-void http_connection::add_ohdr (const char* hdr, const char* value)
+void http_connection::add_ohdr (const std::string& hdr, const std::string& value)
 {
   oheaders[hdr] = value;
 }
@@ -862,11 +862,8 @@ void http_connection::add_ohdr (const char* hdr, const char* value)
   \param  uri   redirected uri
   \param  code  redirect code
 */
-void http_connection::redirect (const char* uri, unsigned int code)
+void http_connection::redirect (const std::string& uri, unsigned int code)
 {
-  if (!uri || !strlen (uri))
-    uri = "/";
-
   add_ohdr ("Location", uri);
   respond (code);
   if (code == 303 && strcmpi ("HEAD", get_method ()))
@@ -1404,22 +1401,25 @@ bool httpd::find_alias (const char* uri, char* path)
 /*!
   Add or modify a user variable
   \param name     variable name (the name used in SSI construct)
-  \param fmt      sprintf format string
   \param addr     address of content
+  \
+  \param fmt      sprintf format string
   \param multiplier for numeric variables, resulting value is multiplied by this factor
 
-  User variables are accessible through SSi constructs like:
+  User variables are accessible through SSI constructs like:
   \verbatim
     <!--#echo var="name" -->
   \endverbatim
 
   When the page is served the SSI construct is replaced by the current value of
   the named variable, eventually multiplied by \a multiplier factor and formatted
-  as text using the \a fmt string.
+  as text using the \a fmt string. If format string is NULL, a format appropriate
+  for the variable type is used
 */
-void httpd::add_var (const char* name, const char* fmt, void* addr, double multiplier)
+void httpd::add_var (const std::string& name, vtype t, const void* addr,
+                     const char* fmt, double multiplier)
 {
-  struct var_info vi = {fmt, addr, multiplier};
+  struct var_info vi = {fmt ? fmt : string (), t, addr, multiplier};
   lock l (varlock);
   variables[name] = vi;
 }
@@ -1428,42 +1428,58 @@ void httpd::add_var (const char* name, const char* fmt, void* addr, double multi
   Return the current string representation of a variable.
   \param name variable name
 */
-string httpd::get_var (const char* name)
+const string httpd::get_var (const char* name)
 {
   lock l (varlock);
-  if (variables.find (name) != variables.end ())
+  auto vptr = variables.find (name);
+  if (vptr != variables.end ())
   {
-    struct var_info vi = variables[name];
     char buf[256];
-    int vt = fmt2type (vi.fmt.c_str ());
-
-    switch (vt)
+    const auto& vi = vptr->second;
+    bool nofmt = vi.fmt.empty ();
+    const char* fmt = vi.fmt.c_str ();
+    switch (vi.type)
     {
-    case 0:
-      sprintf (buf, vi.fmt.c_str (), vi.addr);
+    case VT_CHAR:
+      snprintf (buf, sizeof(buf), nofmt ? "%s" : fmt, (const char*)vi.addr);
       break;
-    case 1:
-      sprintf (buf, vi.fmt.c_str (), *(int*)vi.addr);
+    case VT_SHORT:
+      snprintf (buf, sizeof (buf), nofmt ? "%hd" : fmt, *(const short*)vi.addr);
       break;
-    case 2:
-      sprintf (buf, vi.fmt.c_str (), *(long*)vi.addr);
+    case VT_USHORT:
+      snprintf (buf, sizeof (buf), nofmt ? "%hu" : fmt, *(const unsigned short*)vi.addr);
       break;
-    case 3:
-      sprintf (buf, vi.fmt.c_str (),
-               (vi.multiplier == 0.) ? *(float*)vi.addr
-                                     : (*(float*)vi.addr * (float)vi.multiplier));
+    case VT_INT:
+      snprintf (buf, sizeof (buf), nofmt ? "%d" : fmt, *(const int*)vi.addr);
       break;
-    case 4:
-      sprintf (buf, vi.fmt.c_str (),
-               (vi.multiplier == 0.) ? *(double*)vi.addr : (*(double*)vi.addr * vi.multiplier));
+    case VT_UINT:
+      snprintf (buf, sizeof (buf), nofmt ? "%u" : fmt, *(const unsigned int*)vi.addr);
       break;
-    default:
+    case VT_LONG:
+      snprintf (buf, sizeof (buf), nofmt ? "%ld" : fmt, *(const long*)vi.addr);
+      break;
+    case VT_ULONG:
+      snprintf (buf, sizeof (buf), nofmt ? "%lu" : fmt, *(const unsigned long*)vi.addr);
+      break;
+    case VT_FLOAT:
+      snprintf (buf, sizeof (buf), nofmt ? "%f" : fmt,
+                *(const float*)vi.addr * (float)vi.multiplier);
+      break;
+    case VT_DOUBLE:
+      snprintf (buf, sizeof (buf), nofmt ? "%lf" : fmt, 
+                *(const double*)vi.addr * vi.multiplier);
+      break;
+    case VT_STRING:
+      return *(const std::string*)vi.addr;
+      break;
+
+    default: //should never happen
       buf[0] = 0;
     }
-    return string (buf);
+    return buf;
   }
   else
-    return string ("none");
+    return "none";
 }
 
 /*!

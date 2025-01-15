@@ -50,7 +50,7 @@ public:
   const char* get_uri () const;
   const char* get_method () const;
   const char* get_all_ihdr () const;
-  void add_ohdr (const char* hdr, const char* value);
+  void add_ohdr (const std::string& hdr, const std::string& value);
   const char* get_ihdr (const char* hdr) const;
   const char* get_ohdr (const char* hdr) const;
   const char* get_query () const;
@@ -63,7 +63,7 @@ public:
 
   sockstream& out ();
   void respond (unsigned int code, const char* reason = 0);
-  void redirect (const char* uri, unsigned int code = 303);
+  void redirect (const std::string& uri, unsigned int code = 303);
   void serve404 (const char* text = 0);
   int serve_file (const std::string& full_path);
   int serve_shtml (const std::string& full_path);
@@ -128,8 +128,19 @@ public:
   bool add_user (const char* realm, const char* username, const char* pwd);
   bool remove_user (const char* realm, const char* username);
   void add_realm (const char* realm, const char* uri);
-  void add_var (const char* name, const char* fmt, void* addr, double multiplier = 1.);
-  std::string get_var (const char* name);
+  void add_var (const char* name, const char* addr, const char *fmt = nullptr);
+  void add_var (const char* name, const short* addr, const char* fmt = nullptr);
+  void add_var (const char* name, const unsigned short* addr, const char *fmt = nullptr);
+  void add_var (const char* name, const int* addr, const char* fmt = nullptr);
+  void add_var (const char* name, const unsigned int* addr, const char* fmt = nullptr);
+  void add_var (const char* name, const long* addr, const char* fmt = nullptr);
+  void add_var (const char* name, const unsigned long* addr, const char* fmt = nullptr);
+  void add_var (const char* name, const float* addr,
+                const char* fmt = nullptr, double multiplier = 1.);
+  void add_var (const char* name, const double* addr, const char* fmt = nullptr,
+                double multiplier = 1.);
+  void add_var (const char* name, const std::string* addr);
+  const std::string get_var (const char* name);
   void aquire_varlock ();
   void release_varlock ();
   bool try_varlock ();
@@ -157,10 +168,14 @@ public:
   friend class http_connection;
 
 protected:
+  enum vtype {VT_CHAR, VT_SHORT, VT_USHORT, VT_INT, VT_UINT, VT_LONG, VT_ULONG,
+    VT_FLOAT, VT_DOUBLE, VT_STRING};
   int invoke_handler (const char* uri, http_connection& client);
   bool find_alias (const char* uri, char* path);
   const char* guess_mimetype (const char* file, bool& shtml);
   http_connection* make_thread (sock& connection);
+  void add_var (const std::string& name, vtype t, const void* addr, 
+     const char* fmt = nullptr, double multiplier = 1.);
 
 private:
   str_pairs out_headers;          //!< response headers
@@ -182,7 +197,8 @@ private:
   struct var_info
   {
     std::string fmt;
-    void* addr;
+    vtype type;
+    const void* addr;
     double multiplier;
   };
   std::map<std::string, var_info> variables;
@@ -283,6 +299,59 @@ inline httpd::handle_info::handle_info (uri_handler h_, void* info_)
   , nfo (info_)
   , in_use{std::make_shared<criticalsection> ()}
 {}
+
+inline
+void httpd::add_var (const char* name, const char* fmt, const char* addr)
+{
+  add_var (name, VT_CHAR, addr, fmt);
+}
+
+inline void httpd::add_var (const char* name, const short* addr, const char* fmt)
+{
+  add_var (name, VT_SHORT, addr, fmt);
+}
+
+inline void httpd::add_var (const char* name, const unsigned short* addr, const char* fmt)
+{
+  add_var (name, VT_USHORT, addr, fmt);
+}
+
+inline void httpd::add_var (const char* name, const int* addr, const char* fmt)
+{
+  add_var (name, VT_INT, addr, fmt);
+}
+
+inline void httpd::add_var (const char* name, const unsigned int* addr, const char* fmt)
+{
+  add_var (name, VT_UINT, addr, fmt);
+}
+
+inline void httpd::add_var (const char* name, const long* addr, const char* fmt)
+{
+  add_var (name, VT_LONG, addr, fmt);
+}
+
+inline void httpd::add_var (const char* name, const unsigned long* addr, const char* fmt)
+{
+  add_var (name, VT_ULONG, addr, fmt);
+}
+
+inline void httpd::add_var (const char* name, const float* addr, const char* fmt, double multiplier)
+{
+  add_var (name, VT_FLOAT, addr, fmt, multiplier);
+}
+
+inline void httpd::add_var (const char* name, const double* addr, const char* fmt,
+                            double multiplier)
+{
+  add_var (name, VT_DOUBLE, addr, fmt, multiplier);
+}
+
+inline
+void httpd::add_var (const char* name, const std::string* addr)
+{
+  add_var (name, VT_STRING, addr);
+}
 
 void parse_urlparams (const char* par_str, str_pairs& params);
 

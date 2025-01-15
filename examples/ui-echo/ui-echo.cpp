@@ -40,6 +40,8 @@ using namespace std;
 
 #pragma comment (lib, "utf8.lib")
 
+#define HOME_PAGE "index.shtml"
+
 const char* page1 = R"(<html>
 <head>
   <title>Echo UI</title>
@@ -61,6 +63,9 @@ xhr.send ();
     <input type="submit" value="OK" />
   </form>
   Type 'quit' to exit.
+<p>
+SSI counter: <!--#echo var="counter" --><br/>
+SSI string: <!--#echo var="text" -->
 </body>
 </html>
 )";
@@ -68,16 +73,20 @@ xhr.send ();
 //variable updated by HTML user interface
 string field {"Hello world!"};
 
+int counter = 0;
+
 int main()
 {
   // save HTML page to a file
-  ofstream idx ("index.html");
+  ofstream idx (HOME_PAGE);
   idx << page1;
   idx.close ();
 
   // create HTTP server and set it serve pages from current directory
   httpd ui_server;
   ui_server.docroot (".");
+  ui_server.add_var ("counter", &counter);
+  ui_server.add_var ("text", &field);
 
   // create user interface and link it to server
   JSONBridge ui ("uivars");
@@ -86,8 +95,9 @@ int main()
 
   // when receiving a POST message, echo the field, then reload page
   ui.set_action ([](JSONBridge& ui) {
+    ++counter;
     cout << "Web page says: " << field << endl;
-    ui.client ()->redirect ("/");
+    ui.client ()->redirect (string("/") + HOME_PAGE);
     });
 
   // Start HTTP server
@@ -102,7 +112,7 @@ int main()
   // Direct a browser to HTML page
   inaddr addr;
   ui_server.socket ().name (addr);
-  utf8::ShellExecute ("http://localhost:" + to_string(addr.port()));
+  utf8::ShellExecute ("http://localhost:" + to_string (addr.port ()) + '/' + HOME_PAGE);
 
   // wait until user types "QUIT"
   while (_stricmp (field.c_str(), "quit"))
@@ -110,7 +120,7 @@ int main()
 
   // stop server and clean up
   ui_server.terminate ();
-  remove ("index.html");
+  remove (HOME_PAGE);
 
   return 0;
 }
