@@ -11,7 +11,7 @@
 #include <list>
 #include <typeindex>
 
-namespace mlib {
+namespace mlib::http {
 
 // Errors
 #define ERR_JSON_NOTFOUND -10 ///< Entry not found
@@ -90,10 +90,10 @@ public:
 
     template <typename T>
     std::enable_if_t<std::is_same_v<T, std::string> || std::is_same_v<T, short>
-                     || std::is_same_v<T, unsigned short> || std::is_same_v<T, int>
-                     || std::is_same_v<T, unsigned int> || std::is_same_v<T, long>
-                     || std::is_same_v<T, unsigned long> || std::is_same_v<T, float>
-                     || std::is_same_v<T, double> || std::is_same_v<T, bool>>
+                      || std::is_same_v<T, unsigned short> || std::is_same_v<T, int>
+                      || std::is_same_v<T, unsigned int> || std::is_same_v<T, long>
+                      || std::is_same_v<T, unsigned long> || std::is_same_v<T, float>
+                      || std::is_same_v<T, double> || std::is_same_v<T, bool>>
     add_var (T& var, const std::string& name)
     {
       constexpr jb_type t = std::is_same_v<T, short>            ? JT_SHORT
@@ -110,7 +110,7 @@ public:
                             : std::is_same_v<T, char*>          ? JT_PSTR
                             : std::is_same_v<T, const char*>    ? JT_PSTR
                                                                 : JT_UNKNOWN;
-      static_assert (t != JT_UNKNOWN, "Invalid array type");
+      static_assert (t != JT_UNKNOWN, "Invalid variable type");
       children.emplace_back (name, &var, t, sizeof (T));
     }
 
@@ -133,12 +133,12 @@ public:
   JSONBridge (const char* path);
   ~JSONBridge ();
 
-  void attach_to (httpd& server);
+  void attach_to (server& server);
   void lock ();
   void unlock ();
   const std::string& path () const;
   void set_action (post_action pfn);
-  http_connection* client ();
+  connection* client ();
 
   bool parse_urlencoded () const;
   bool parse_jsonencoded () const;
@@ -172,10 +172,10 @@ public:
   /// add variable of one of basic types
   template <typename T>
   std::enable_if_t<std::is_same_v<T, std::string> || std::is_same_v<T, short>
-                   || std::is_same_v<T, unsigned short> || std::is_same_v<T, int>
-                   || std::is_same_v<T, unsigned int> || std::is_same_v<T, long>
-                   || std::is_same_v<T, unsigned long> || std::is_same_v<T, float>
-                   || std::is_same_v<T, double> || std::is_same_v<T, bool>>
+                    || std::is_same_v<T, unsigned short> || std::is_same_v<T, int>
+                    || std::is_same_v<T, unsigned int> || std::is_same_v<T, long>
+                    || std::is_same_v<T, unsigned long> || std::is_same_v<T, float>
+                    || std::is_same_v<T, double> || std::is_same_v<T, bool>>
   add_var (T& var, const std::string& name)
   {
     constexpr jb_type t = std::is_same_v<T, short>            ? JT_SHORT
@@ -192,7 +192,7 @@ public:
                           : std::is_same_v<T, char*>          ? JT_PSTR
                           : std::is_same_v<T, const char*>    ? JT_PSTR
                                                               : JT_UNKNOWN;
-    static_assert (t != JT_UNKNOWN, "Invalid array type");
+    static_assert (t != JT_UNKNOWN, "Invalid variable type");
     dict_.emplace_back (name, &var, t, sizeof (T));
   }
 
@@ -212,12 +212,12 @@ private:
   erc deserialize_node (const json::node& n, dict_cptr v, size_t index = 0) const;
   std::string path_;
   dictionary dict_;
-  http_connection* client_;
+  connection* client_;
   criticalsection in_use;
   post_action action;
   std::map<std::string, post_fun> post_handlers;
 
-  static int callback (const char* uri, http_connection& client, JSONBridge* ctx);
+  static int callback (connection& client, JSONBridge* ctx);
   static bool deep_search (const std::string& var, const dictionary& dict, dict_cptr& found);
 };
 
@@ -242,7 +242,7 @@ inline const std::string& JSONBridge::path () const
 }
 
 /// Return currently connected client (if any)
-inline http_connection* JSONBridge::client ()
+inline connection* JSONBridge::client ()
 {
   return client_;
 };
@@ -263,4 +263,4 @@ inline void JSONBridge::add_postfun (const std::string& name, post_fun pfn)
   post_handlers[name] = pfn;
 }
 
-} // end namespace mlib
+} // end namespace mlib::http

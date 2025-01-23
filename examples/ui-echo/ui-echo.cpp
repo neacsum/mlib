@@ -26,16 +26,17 @@
   single text input field. When user presses the "OK" button the application
   receives the updated text and displays it on the console window.
 
-  It shows how to create a JSON bridge and attach it to a HTTP server.
+  It shows how to use the SII mechanism of the HTTP server.
 */
 
 #include <iostream>
 #include <fstream>
 
-#include <mlib/jbridge.h>
+#include <mlib/httpd.h>
 #include <utf8/utf8.h>
 
 using namespace mlib;
+
 using namespace std;
 
 #pragma comment (lib, "utf8.lib")
@@ -46,26 +47,19 @@ const char* page1 = R"(<html>
 <head>
   <title>Echo UI</title>
   <script>
-let xhr = new XMLHttpRequest();
-xhr.open("GET", "/uivars?field");
-xhr.onload = function() {
-  if (xhr.status == 200)
-    document.getElementById('field').value = JSON.parse(xhr.response);
-  else
-    alert(`Error ${xhr.status}: ${xhr.statusText}`);
-};
-xhr.send (); 
+    function load() {
+      document.getElementById('field').value = "<!--#echo var="text" -->"
+    }
   </script>
 </head>
-<body>
+<body onload="load() ">
   <form method="post" action="/uivars">
-    Text: <input name="field" id="field" size="80"/>
+    Text: <input name="text" id="field" size="80"/>
     <input type="submit" value="OK" />
   </form>
   Type 'quit' to exit.
 <p>
-SSI counter: <!--#echo var="counter" --><br/>
-SSI string: <!--#echo var="text" -->
+Update counter: <!--#echo var="counter" --><br/>
 </body>
 </html>
 )";
@@ -74,30 +68,33 @@ SSI string: <!--#echo var="text" -->
 string field {"Hello world!"};
 
 int counter = 0;
+mlib::manual_event ok_clicked;
 
 int main()
 {
+  auto f = std::filesystem::temp_directory_path ().append (HOME_PAGE);
   // save HTML page to a file
-  ofstream idx (HOME_PAGE);
+  ofstream idx (f.string());
   idx << page1;
   idx.close ();
 
-  // create HTTP server and set it serve pages from current directory
-  httpd ui_server;
-  ui_server.docroot (".");
+  // create HTTP server
+  http::server ui_server;
+
   ui_server.add_var ("counter", &counter);
   ui_server.add_var ("text", &field);
 
-  // create user interface and link it to server
-  JSONBridge ui ("uivars");
-  ui.attach_to (ui_server);
-  ui.add_var (field, "field");
 
   // when receiving a POST message, echo the field, then reload page
-  ui.set_action ([](JSONBridge& ui) {
-    ++counter;
-    cout << "Web page says: " << field << endl;
-    ui.client ()->redirect (string("/") + HOME_PAGE);
+  ui_server.add_post_handler ("/uivars",
+    [] (http::connection& cl, void*) -> int {
+      ++counter;
+      if (cl.has_bparam ("text"))
+        field = cl.get_bparam ("text");
+      cout << "Web page says: " << field << endl;
+      cl.redirect (string("/") + HOME_PAGE);
+      ok_clicked.signal ();
+      return 0;
     });
 
   // Start HTTP server
@@ -112,15 +109,16 @@ int main()
   // Direct a browser to HTML page
   inaddr addr;
   ui_server.socket ().name (addr);
+
   utf8::ShellExecute ("http://localhost:" + to_string (addr.port ()) + '/' + HOME_PAGE);
 
   // wait until user types "QUIT"
   while (_stricmp (field.c_str(), "quit"))
-    Sleep (100);
+    ok_clicked.wait();
 
   // stop server and clean up
   ui_server.terminate ();
-  remove (HOME_PAGE);
+  remove (f);
 
   return 0;
 }

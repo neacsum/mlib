@@ -76,21 +76,20 @@ const char *psarr[]
 
 double pi = atan(1)*4.;
 
-httpd       ui_server;      //HTTP server for user interface
-unsigned short server_port;
+http::server        ui_server;      //HTTP server for user interface
+unsigned short      server_port;
 
-int submit_sarr (const std::string& uri, JSONBridge& ui);
-int exit_server (const std::string& uri, JSONBridge& ui);
+int submit_sarr (const std::string& uri, http::JSONBridge& ui);
 
 
 /*
-  Declare a JSON bridge to "var" location.
+  Declare a JSON bridge to "/var" location.
 
   That means every GET request to "http://server/var?xxx" will trigger a search
   for the variable xxx and the content of that variable will be formatted as a
   JSON string and sent back to the client.
 */
-JSONBridge  user_interface ("var");
+http::JSONBridge  user_interface ("/var");
 
 //Assets for HTTP server
 
@@ -215,6 +214,13 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE, LPSTR /*lpCmdLine*/, int /*n
 
   //Configure UI server
   ui_server.docroot (docroot.c_str());
+  ui_server.add_post_handler ("/exit", [] (http::connection& client, void*) -> int 
+    {
+      PostMessage (mainWnd, WM_COMMAND, ID_SAMPLE_EXIT, 0);
+      dprintf ("Shutting down UI-sample server");
+      client.add_ohdr ("Connection", "Close");
+      return 0;
+    });
 
   // Populate UI variables
   auto& sample = user_interface.add_object ("sample");
@@ -236,13 +242,12 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE, LPSTR /*lpCmdLine*/, int /*n
   user_interface.add_var (pi, "varpi");
 
   user_interface.add_postfun ("submit_sarr", submit_sarr);
-  user_interface.add_postfun ("exit_server", exit_server);
 
   //Attach the "JSON bridge" to server
   user_interface.attach_to (ui_server);
 
   //Set action after receiving user data
-  user_interface.set_action ([](JSONBridge& ui) {
+  user_interface.set_action ([](http::JSONBridge& ui) {
     ui.client ()->redirect ("/");
     });
   //Start the server
@@ -365,7 +370,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE, LPSTR /*lpCmdLine*/, int /*n
   It calls the parse_urlencoded function to retrieve the latest values
   and then shows a message box with the new values of the sarr array.
 */
-int submit_sarr (const std::string& uri, JSONBridge& ui)
+int submit_sarr (const std::string& uri, http::JSONBridge& ui)
 {
   bool ok = ui.parse_urlencoded ();
   string mbox_msg = 
@@ -385,10 +390,13 @@ int submit_sarr (const std::string& uri, JSONBridge& ui)
   return 0;
 }
 
-int exit_server (const std::string& uri, JSONBridge& ui)
+/*
+  Response to "POST /exit" request
+*/
+int exit_server (http::connection& client, void*)
 {
   PostMessage (mainWnd, WM_COMMAND, ID_SAMPLE_EXIT, 0);
-  ui.client ()->add_ohdr ("Connection", "Close");
+  client.add_ohdr ("Connection", "Close");
   return 0;
 }
 
