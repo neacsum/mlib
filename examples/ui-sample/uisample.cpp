@@ -248,9 +248,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE, LPSTR /*lpCmdLine*/, int /*n
   //Start the server
   ui_server.start ();
 
-  inaddr server_addr;
-  ui_server.socket ().name (server_addr);
-  server_port = server_addr.port ();
+  server_port = ui_server.socket ().name ()->port ();
 
 
   //Register main window class

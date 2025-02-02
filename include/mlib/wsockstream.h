@@ -88,8 +88,8 @@ public:
   erc          listen (int num = SOMAXCONN) const;
   erc          accept (sock& client, inaddr* sa = nullptr) const;
   erc          accept (sock& client, int wp_sec, inaddr* sa = nullptr) const;
-  erc          name (inaddr& addr) const;
-  erc          peer (inaddr& addr) const;
+  checked<inaddr>  name () const;
+  checked<inaddr>  peer () const;
 
   int          getopt (int op, void* buf, int len, int level = SOL_SOCKET) const;
   erc          setopt (int op, void* buf, int len, int level = SOL_SOCKET) const;

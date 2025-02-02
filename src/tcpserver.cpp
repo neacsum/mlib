@@ -96,11 +96,14 @@ bool tcpserver::init ()
 {
   try
   {
+    //if not opened, open it now
     if (!srv_sock.is_open ())
       srv_sock.open (SOCK_STREAM);
-    inaddr me;
-    if (srv_sock.name (me) != erc::success)
+
+    //if not bound, bind it now
+    if (srv_sock.name () != erc::success)
       srv_sock.bind (addr);
+
     srv_sock.setevent (evt.handle (), FD_ACCEPT);
     srv_sock.listen ();
     TRACE2 ("TCP server %s started", thread::name ().c_str ());
@@ -208,16 +211,12 @@ void tcpserver::close_connection (const sock& conn_sock)
 {
   if (conn_sock.is_open ())
   {
-    auto p =
-      std::find_if (contab.begin (), contab.end (), [&conn_sock] (auto& c) { return c.socket == conn_sock; });
+    auto p = std::find_if (contab.begin (), contab.end (),
+                           [&conn_sock] (auto& c) { return c.socket == conn_sock; });
     if (p != contab.end ())
     {
-#ifdef MLIB_TRACE
-      inaddr other;
-      p->socket.peer (other);
-      TRACE9 ("tcpserver::close_connection closing connection to %s:%d", other.ntoa (),
-              other.port ());
-#endif
+      TRACE9 ("tcpserver::close_connection closing connection to %s",
+              to_string (*p->socket.peer ()).c_str ());
       p->condemned = true;
     }
   }
@@ -235,12 +234,8 @@ void tcpserver::close_connection (const sock& conn_sock)
 */
 void tcpserver::initconn (sock& conn_sock, thread* th)
 {
-#ifdef MLIB_TRACE
-  inaddr other;
-  conn_sock.peer (other);
-  TRACE8 ("TCP server %s - Accepted connection with %s:%d", thread::name ().c_str (), other.ntoa (),
-          other.port ());
-#endif
+  TRACE8 ("TCP server %s - Accepted connection with %s", thread::name ().c_str (),
+          to_string (*conn_sock.peer ()).c_str ());
   if (th)
     th->start ();
 }
@@ -302,12 +297,8 @@ void tcpserver::termconn (sock& conn_sock, thread* th)
   {
     try
     {
-#ifdef MLIB_TRACE
-      inaddr other;
-      conn_sock.peer (other);
       TRACE8 ("TCP server %s - Closed connection with %s:%d", thread::name ().c_str (),
-              other.ntoa (), other.port ());
-#endif
+              to_string (*conn_sock.peer ()).c_str ());
       conn_sock.linger (true, 1);
       conn_sock.shutdown (sock::shut_readwrite);
 

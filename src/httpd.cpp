@@ -125,11 +125,7 @@ http_connection::http_connection (sock& socket, httpd& server)
 void http_connection::run ()
 {
   ws->recvtimeout (HTTPD_TIMEOUT);
-#if defined(MLIB_TRACE)
-  inaddr addr;
-  ws->peer (addr);
-  TRACE8 ("http_connection::run - Connection from %s", addr.hostname ().c_str ());
-#endif
+  TRACE8 ("http_connection::run - Connection from %s", ws->peer ()->hostname ().c_str ());
   try
   {
     while (1)
@@ -158,11 +154,7 @@ void http_connection::run ()
 
         if (!ws.good ())
         {
-#if defined(MLIB_TRACE)
-          inaddr addr;
-          ws->peer (addr);
-          TRACE2 ("http_connection::run - timeout peer %s", addr.hostname ().c_str ());
-#endif
+          TRACE2 ("http_connection::run - timeout peer %s", ws->peer()->hostname ().c_str ());
           respond (408);
           return;
         }
@@ -187,12 +179,8 @@ void http_connection::run ()
 
       if (req_len == HTTPD_MAX_HEADER)
       {
-#if defined(MLIB_TRACE)
-        inaddr addr;
-        ws->peer (addr);
         TRACE2 ("http_connection::run - Request too long (%d) peer %s", req_len,
-                addr.hostname ().c_str ());
-#endif
+                ws->peer ()->hostname ().c_str ());
         respond (413);
         return;
       }
@@ -249,11 +237,7 @@ void http_connection::run ()
 
 void http_connection::term ()
 {
-#if defined(MLIB_TRACE)
-  inaddr addr;
-  ws->peer (addr);
-  TRACE8 ("http_connection::term - Closed connection to %s", addr.hostname ().c_str ());
-#endif
+  TRACE8 ("http_connection::term - Closed connection to %s", ws->peer ()->hostname ().c_str ());
   parent.close_connection (*ws.rdbuf ());
   thread::term ();
 }

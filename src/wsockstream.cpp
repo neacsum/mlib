@@ -229,34 +229,30 @@ erc sock::close ()
   name function provides the only way to determine the local association
   that has been set by the system.
 */
-erc sock::name (inaddr& addr) const
+checked<inaddr> sock::name () const
 {
+  inaddr local;
   if (!sl || sl->handle == INVALID_SOCKET)
-    return erc (WSAENOTSOCK, Errors());
+    return {local, erc (WSAENOTSOCK, Errors ())};
 
-  sockaddr sa;
-  int len = sizeof (sa);
-  if (getsockname (sl->handle, &sa, &len) == SOCKET_ERROR)
-    return last_error ();
-  addr = sa;
-  return erc::success;
+  int len = sizeof (sockaddr);
+  getsockname (sl->handle, local, &len);
+  return {local, last_error ()};
 }
 
 /*!
   Retrieves the name of the peer to which the socket is connected.
   The socket must be connected.
 */
-erc sock::peer (inaddr& addr) const
+checked<inaddr> sock::peer () const
 {
+  inaddr remote;
   if (!sl || sl->handle == INVALID_SOCKET)
-    return erc (WSAENOTSOCK, Errors());
+    return {remote, erc (WSAENOTSOCK, Errors ())};
 
-  sockaddr sa;
-  int len = sizeof (sa);
-  if (getpeername (sl->handle, &sa, &len) == SOCKET_ERROR)
-    return last_error ();
-  addr = sa;
-  return erc::success;
+  int len = sizeof (sockaddr);
+  getpeername (sl->handle, remote, &len);
+  return {remote, last_error ()};
 }
 
 /*!
@@ -276,8 +272,8 @@ erc sock::bind (const inaddr& sa) const
   Associates a local address with the socket.
 
   Winsock assigns a unique port to the socket. The application can use
-  name() after calling bind to learn the address and the port that has been
-  assigned to it.
+  name() function to learn the address and the port that has been assigned
+  to it.
 */
 erc sock::bind () const
 {

@@ -118,9 +118,15 @@ inline bool inaddr::operator!= (const inaddr& other) const
 
 } // namespace mlib
 
+/// Convert an address to a string in format '`<hostname\>:\<port\>`
+inline std::string to_string (const mlib::inaddr& addr)
+{
+  return std::string (addr.ntoa ()) + ':' + std::to_string(addr.port ());
+}
 /// Serialize an address as '\<hostname\>:\<port\>'
 inline std::ostream& operator<< (std::ostream& strm, const mlib::inaddr& addr)
 {
-  strm << addr.ntoa () << ':' << addr.port ();
+  strm << to_string(addr);
   return strm;
 }
+

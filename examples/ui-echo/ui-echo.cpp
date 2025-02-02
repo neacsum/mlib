@@ -100,9 +100,7 @@ int main()
   }
 
   // Direct a browser to HTML page
-  inaddr addr;
-  ui_server.socket ().name (addr);
-  utf8::ShellExecute ("http://localhost:" + to_string(addr.port()));
+  utf8::ShellExecute ("http://" + to_string(*ui_server.socket ().name ()));
 
   // wait until user types "QUIT"
   while (_stricmp (field.c_str(), "quit"))

@@ -14,14 +14,6 @@
 #include <cstring>
 #include <mlib/critsect.h>
 
-// using std::mutex seems to crash in release version of MSVC runtime.
-// TODO Investigate if it's indeed a runtime bug.
-#ifndef _WIN32
-static std::mutex dpr_lock;
-#else
-static mlib::criticalsection dpr_lock;
-#endif
-
 
 /*!
   printf style function writes messages using OutputDebugString.
@@ -36,6 +28,12 @@ static mlib::criticalsection dpr_lock;
 
 bool dprintf (const char* fmt, ...)
 {
+#ifndef _WIN32
+  static std::mutex dpr_lock;
+#else
+  static mlib::criticalsection dpr_lock;
+#endif
+
   char buffer[MAX_DPRINTF_CHARS];
   size_t sz;
   int r;

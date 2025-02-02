@@ -49,15 +49,13 @@ int main (int argc, char** argv)
     [](sock conn)->int {
       sockstream strm (conn);
       std::string line;
-      inaddr other;
-      conn.peer (other);
-      cout << "Connection from " << other << " socket " << conn.handle() << endl;
+      cout << "Connection from " << *conn.peer () << " socket " << conn.handle() << endl;
 
       //echo each line
       while (getline (strm, line))
         strm << line << endl;
 
-      cout << "Terminated connection to " << other << " socket " << conn.handle () << endl;
+      cout << "Terminated connection to " << *conn.peer () << " socket " << conn.handle () << endl;
       return 0;
     }
   );
@@ -71,9 +69,7 @@ int main (int argc, char** argv)
     srv.terminate ();
     return 1;
   }
-  inaddr me;
-  srv.socket ().name (me);
-  cout << "Echo server waiting for connections on " << me << endl;
+  cout << "Echo server waiting for connections on " << srv.socket ().name () << endl;
   cout << "Timeout is " << srv.timeout () << " seconds." << endl;
   cout << "Press any key to exit..." << endl;
 

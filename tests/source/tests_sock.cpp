@@ -103,9 +103,7 @@ TEST (sock_send_string)
   s.bind (inaddr ("localhost", 0));
   s.listen ();
 
-  inaddr addr;
-  s.name (addr);
-  c1.connect (addr);
+  c1.connect (*s.name());
   s.accept (c2);
   c1.send ("TEST"s);
 
@@ -149,9 +147,7 @@ TEST (accept_ok)
   s.bind (inaddr ("localhost", 0));
   s.listen ();
 
-  inaddr addr;
-  s.name (addr);
-  c1.connect (addr);
+  c1.connect (*s.name());
 
   CHECK_EQUAL (erc::success, s.accept (c2));
   CHECK (c2.is_open ());
@@ -163,11 +159,9 @@ TEST (accept_ok2)
   s.bind (inaddr ("localhost", 0));
   s.listen ();
 
-  inaddr addr;
-  s.name (addr);
-  c1.connect (addr);
+  c1.connect (*s.name());
 
-  CHECK_EQUAL (erc::success, s.accept (c2, 0, &addr));
+  CHECK_EQUAL (erc::success, s.accept (c2, 0));
   CHECK (c2.is_open ());
 }
 
@@ -299,8 +293,8 @@ TEST (dgram_send_string)
   s2.bind ({"127.0.0.2", 1234});
 
   char buf[80];
-  inaddr actual_sender, expected_sender;
-  s1.name(expected_sender);
+  inaddr actual_sender;
+  inaddr expected_sender = *s1.name ();
 
   s1.sendto (inaddr("127.0.0.2", 1234), "TEST"s);
   auto l = s2.recvfrom (actual_sender, buf, sizeof (buf));
@@ -376,9 +370,7 @@ TEST (stream_send_receive)
   auto f = [&] () -> int {
     sock s(SOCK_STREAM);
     s.bind (inaddr("127.0.0.1",0));
-    inaddr me;
-    s.name (me);
-    port = me.port ();
+    port = s.name ()->port();
     s.listen ();
     inaddr who;
 

@@ -15,10 +15,7 @@ TEST (Binding)
   httpd srv;
   srv.socket ().bind (inaddr (INADDR_LOOPBACK, 12345));
 
-  inaddr self;
-  srv.socket ().name (self);
-
-  int port = self.port ();
+  int port = srv.socket ().name ()->port ();
   CHECK_EQUAL (12345, port);
 
   ofstream idx ("index.html");
@@ -27,8 +24,6 @@ TEST (Binding)
   srv.docroot (".");
   srv.start ();
   auto client = thread ([&] () -> int {
-    inaddr srv_addr;
-    srv.socket ().name (srv_addr);
     sockstream ws (inaddr (INADDR_LOOPBACK, port));
     ws << "GET / HTTP/1.1" << endl << endl << flush;
     ws->shutdown (sock::shut_write);
@@ -109,9 +104,7 @@ HttpServerFixture::HttpServerFixture ()
   srv.docroot (".");
   srv.start ();
   cfunc = [&] () -> int {
-    inaddr srv_addr;
-    srv.socket ().name (srv_addr);
-    sockstream ws (inaddr ("127.0.0.1", srv_addr.port ()));
+    sockstream ws (inaddr ("127.0.0.1", srv.socket ().name ()->port ()));
     ws << "GET " << uri << " HTTP/1.1" << endl;
     cout << "GET " << uri.c_str () << endl;
     ws << request.c_str () << endl << flush;
