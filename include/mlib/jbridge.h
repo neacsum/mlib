@@ -1,8 +1,9 @@
-/*!
-  \file jbridge.h Definition of JSONBridge class
-
-  (c) Mircea Neacsu 2017. All rights reserved.
+/*
+  Copyright (c) Mircea Neacsu (2014-2025) Licensed under MIT License.
+  This is part of MLIB project. See LICENSE file for full license terms.
 */
+
+///   \file jbridge.h Definition of JSONBridge class
 #pragma once
 
 #include "httpd.h"
@@ -14,12 +15,13 @@
 namespace mlib::http {
 
 // Errors
-#define ERR_JSON_NOTFOUND -10 ///< Entry not found
-#define ERR_JSON_DICSTRUC -11 ///< Bad dictionary structure
+#define HTTP_JSON_NOTFOUND -10 ///< Entry not found
+#define HTTP_JSON_DICSTRUC -11 ///< Bad dictionary structure
 
 class JSONBridge;
-typedef void (*post_action) (JSONBridge&);
-typedef int (*post_fun) (const std::string& uri, JSONBridge& ui);
+
+/// User defined variable handler function
+typedef std::function<int (JSONBridge& bridge, void* var)> var_handler;
 
 /// JSON objects support
 class JSONBridge
@@ -45,16 +47,16 @@ public:
     JT_POSTFUN, ///< POST function call
   };
 
+  /// JSON data dictionary entry
   class entry;
   typedef std::list<entry> dictionary;
   typedef dictionary::iterator dict_ptr;
   typedef dictionary::const_iterator dict_cptr;
 
-  /// JSON data dictionary entry
   class entry
   {
   public:
-    entry (const std::string& n, void* a, jb_type t, size_t s, size_t c = 1)
+    entry (const std::string& n, void* a, jb_type t, size_t s, size_t c)
       : name (n)
       , addr (a)
       , type (t)
@@ -83,17 +85,17 @@ public:
                                                                 : JT_UNKNOWN;
       static_assert (t != JT_UNKNOWN, "Invalid array type");
       if (t == JT_CSTR && sz == 1)
-        children.emplace_back (name, var, t, C); // char var[C]
+        children.emplace_back (name, var, t, C, 1); // char var[C]
       else
         children.emplace_back (name, var, t, sz, C);
     }
 
     template <typename T>
     std::enable_if_t<std::is_same_v<T, std::string> || std::is_same_v<T, short>
-                      || std::is_same_v<T, unsigned short> || std::is_same_v<T, int>
-                      || std::is_same_v<T, unsigned int> || std::is_same_v<T, long>
-                      || std::is_same_v<T, unsigned long> || std::is_same_v<T, float>
-                      || std::is_same_v<T, double> || std::is_same_v<T, bool>>
+                     || std::is_same_v<T, unsigned short> || std::is_same_v<T, int>
+                     || std::is_same_v<T, unsigned int> || std::is_same_v<T, long>
+                     || std::is_same_v<T, unsigned long> || std::is_same_v<T, float>
+                     || std::is_same_v<T, double> || std::is_same_v<T, bool>>
     add_var (T& var, const std::string& name)
     {
       constexpr jb_type t = std::is_same_v<T, short>            ? JT_SHORT
@@ -111,7 +113,7 @@ public:
                             : std::is_same_v<T, const char*>    ? JT_PSTR
                                                                 : JT_UNKNOWN;
       static_assert (t != JT_UNKNOWN, "Invalid variable type");
-      children.emplace_back (name, &var, t, sizeof (T));
+      children.emplace_back (name, &var, t, sizeof (T), 1);
     }
 
     entry& add_object (const std::string& name)
@@ -137,8 +139,9 @@ public:
   void lock ();
   void unlock ();
   const std::string& path () const;
-  void set_action (post_action pfn);
-  connection* client ();
+  void redirect_to (const std::string& uri);
+  void set_post_action (uri_handler pfn);
+  connection& client ();
 
   bool parse_urlencoded () const;
   bool parse_jsonencoded () const;
@@ -193,19 +196,21 @@ public:
                           : std::is_same_v<T, const char*>    ? JT_PSTR
                                                               : JT_UNKNOWN;
     static_assert (t != JT_UNKNOWN, "Invalid variable type");
-    dict_.emplace_back (name, &var, t, sizeof (T));
+    dict_.emplace_back (name, &var, t, sizeof (T), 1);
   }
 
   entry& add_object (const std::string& name);
-  void add_postfun (const std::string& name, post_fun pfn);
+  void add_postfun (const std::string& name, uri_handler pfn);
 
 protected:
+
   erc jsonify (json::node& n, dict_cptr entry);
   void not_found (const char* varname);
   bool find (const std::string& name, dict_cptr& found, size_t* idx = 0) const;
   bool deep_find (const std::string& name, dict_cptr& found, size_t* idx = 0) const;
 
 private:
+  void process_request ();
   erc json_begin (json::node& obj);
   erc json_end (json::node& obj);
   erc serialize_node (json::node& n, dict_cptr v, size_t index = 0);
@@ -214,42 +219,58 @@ private:
   dictionary dict_;
   connection* client_;
   criticalsection in_use;
-  post_action action;
-  std::map<std::string, post_fun> post_handlers;
+  uri_handler post_action;
+  std::string redirect_uri;
+  std::map<std::string, uri_handler> post_handlers;
 
-  static int callback (connection& client, JSONBridge* ctx);
+  static int callback (connection& client, void* ctx);
   static bool deep_search (const std::string& var, const dictionary& dict, dict_cptr& found);
 };
 
 /*==================== INLINE FUNCTIONS ===========================*/
 
-/// Enter the critical section associated with this context
+/// Enter the critical section associated with this bridge
 inline void JSONBridge::lock ()
 {
   in_use.enter ();
 }
 
-/// Leave the critical section associated with this context
+/// Leave the critical section associated with this bridge
 inline void JSONBridge::unlock ()
 {
   in_use.leave ();
 }
 
-/// Return the context path
+/// Return the root path where bridge is attached
 inline const std::string& JSONBridge::path () const
 {
   return path_;
 }
 
-/// Return currently connected client (if any)
-inline connection* JSONBridge::client ()
+/// Set default redirection target for POST requests
+inline void JSONBridge::redirect_to (const std::string& uri)
 {
-  return client_;
+  redirect_uri = uri;
+}
+
+/// Return currently connected client (if any)
+inline connection& JSONBridge::client ()
+{
+  if (client_)
+    return *client_;
+  else
+    throw std::logic_error ("Missing client connection");
 };
 
-inline void JSONBridge::set_action (post_action pfn)
+/*!
+  Set the function invoked after successful processing of a POST request.
+
+  This function is invoked before redirecting the client to the `redirect_uri`.
+  If the function does not return HTTP_OK, the client is not redirected.
+*/
+inline void JSONBridge::set_post_action (uri_handler pfn)
 {
-  action = pfn;
+  post_action = pfn;
 }
 
 inline JSONBridge::entry& JSONBridge::add_object (const std::string& name)
@@ -258,9 +279,18 @@ inline JSONBridge::entry& JSONBridge::add_object (const std::string& name)
   return *(--dict_.end ());
 }
 
-inline void JSONBridge::add_postfun (const std::string& name, post_fun pfn)
+/*!
+  Add a handler function invoked in response to a POST request with an additional
+  parameter.
+  \param qparam   additional query parameter
+  \param pfn      handler function
+
+  If the handler function does not return HTTP_OK, the `post_action` function
+  is not invoked and client is not redirected to `redirect_uri'
+*/
+inline void JSONBridge::add_postfun (const std::string& qparam, uri_handler pfn)
 {
-  post_handlers[name] = pfn;
+  post_handlers[qparam] = pfn;
 }
 
 } // end namespace mlib::http

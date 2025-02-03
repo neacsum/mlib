@@ -64,19 +64,14 @@ Update counter: <!--#echo var="counter" --><br/>
 </html>
 )";
 
-//variable updated by HTML user interface
-string field {"Hello world!"};
-
-int counter = 0;
-mlib::manual_event ok_clicked;
 
 int main()
 {
-  auto f = std::filesystem::temp_directory_path ().append (HOME_PAGE);
-  // save HTML page to a file
-  ofstream idx (f.string());
-  idx << page1;
-  idx.close ();
+  // variable updated by HTML user interface
+  string field{"Hello world!"};
+
+  int counter = 0;
+  mlib::manual_event ok_clicked;
 
   // create HTTP server
   http::server ui_server;
@@ -84,17 +79,25 @@ int main()
   ui_server.add_var ("counter", &counter);
   ui_server.add_var ("text", &field);
 
+  auto fname = ui_server.docroot() / HOME_PAGE;
+  // save HTML page to a file
+  ofstream idx (fname.string ());
+  idx << page1;
+  idx.close ();
+
 
   // when receiving a POST message, echo the field, then reload page
   ui_server.add_post_handler ("/uivars",
-    [] (http::connection& cl, void*) -> int {
-      ++counter;
+    [&] (http::connection& cl, void*) -> int {
+      /* The server does not update any variable in response to a POST request. 
+      User has to retrieve any variable from the request body.*/
       if (cl.has_bparam ("text"))
         field = cl.get_bparam ("text");
       cout << "Web page says: " << field << endl;
-      cl.redirect (string("/") + HOME_PAGE);
+      ++counter;
+      cl.redirect (string ("/") + HOME_PAGE);
       ok_clicked.signal ();
-      return 0;
+      return 1;
     });
 
   // Start HTTP server
@@ -118,7 +121,7 @@ int main()
 
   // stop server and clean up
   ui_server.terminate ();
-  remove (f);
+  std::filesystem::remove (fname);
 
   return 0;
 }

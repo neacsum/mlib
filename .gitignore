@@ -6,8 +6,8 @@
 *.obj
 *.bak
 *.user
-/build
 *.ipch
 .vs/
+/build
 /lib
 /docs

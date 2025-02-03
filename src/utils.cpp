@@ -18,7 +18,9 @@ bool parse_urlparams (const std::string& str, mlib::http::str_pairs& params)
       return false;
 
     std::string key(beg, kend);
-    std::string val(kend + 1, end);
+    if (!url_decode (key))
+      return false;
+    std::string val (kend + 1, end);
     if (!url_decode (val))
       return false;
     params[key] = val;
@@ -32,8 +34,7 @@ bool parse_urlparams (const std::string& str, mlib::http::str_pairs& params)
 }
 
 /*!
-  Decoding of URL-encoded data.
-  We can do it in place because resulting string is shorter or equal than input.
+  Decodes URL-encoded data.
 
   \return `true` if successful, `false` otherwise
 */
@@ -74,56 +75,3 @@ bool url_decode (std::string& s)
   return true;
 }
 
-int hexdigit (char* bin, char c)
-{
-  c = toupper (c);
-  if (c >= '0' && c <= '9')
-    *bin = c - '0';
-  else if (c >= 'A' && c <= 'F')
-    *bin = c - 'A' + 10;
-  else
-    return 0;
-
-  return 1;
-}
-
-int hexbyte (char* bin, const char* str)
-{
-  char d1, d2;
-
-  // first digit
-  if (!hexdigit (&d1, *str++) || !hexdigit (&d2, *str++))
-    return 0;
-  *bin = (d1 << 4) | d2;
-  return 1;
-}
-
-/*!
-  In place decoding of URL-encoded data.
-  We can do it in place because resulting string is shorter or equal than input.
-
-  \return 1 if successful, 0 otherwise
-*/
-int url_decode (char* buf)
-{
-  char *in, *out;
-
-  in = out = buf;
-
-  while (*in)
-  {
-    if (*in == '%')
-    {
-      if (!hexbyte (out++, ++in))
-        return 0;
-      in++;
-    }
-    else if (*in == '+')
-      *out++ = ' ';
-    else
-      *out++ = *in;
-    in++;
-  }
-  *out = 0;
-  return 1;
-}

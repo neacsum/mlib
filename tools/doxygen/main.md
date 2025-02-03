@@ -6,7 +6,7 @@ with the hope that other people might find it useful or interesting.
 
 The MIT License (MIT)
  
-Copyright (c) 1999-2020 Mircea Neacsu
+Copyright (c) 1999-2025 Mircea Neacsu
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -47,8 +47,8 @@ SOFTWARE.
 - \ref mlib::sockbuf
 - \ref mlib::generic_sockstream "generic_sockstream" and derived classes
 - \ref mlib::tcpserver "TCP server"
-- \ref mlib::httpd "HTTP server"
-- \ref mlib::JSONBridge "JSONBridge" - JSON interface to HTTP server
+- \ref mlib::http::server "HTTP server"
+- \ref mlib::http::JSONBridge "JSONBridge" - JSON interface to HTTP server
 - \ref mlib::firewall "Windows firewall" configuration
 
 ### Error Logging and Handling ###

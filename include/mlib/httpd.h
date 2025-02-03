@@ -1,9 +1,10 @@
-#pragma once
-/*!
-  \file httpd.h Implementation of http::server and http::connection classes
-
-  (c) Mircea Neacsu 2007-2025. All rights reserved.
+/*
+  Copyright (c) Mircea Neacsu (2014-2025) Licensed under MIT License.
+  This is part of MLIB project. See LICENSE file for full license terms.
 */
+
+///  \file httpd.h Implementation of http::server and http::connection classes
+#pragma once
 
 #include "tcpserver.h"
 #include <string>
@@ -17,10 +18,10 @@
 
 /// \name Error codes
 ///\{
-#define HTTPD_OK        0  ///< Success
-#define HTTPD_ERR_WRITE -1 ///< Socket write failure
-#define HTTPD_ERR_FOPEN -2 ///< File open failure
-#define HTTPD_ERR_FREAD -3 ///< File read failure
+#define HTTP_OK        0  ///< Success
+#define HTTP_ERR_WRITE -1 ///< Socket write failure
+#define HTTP_ERR_FOPEN -2 ///< File open failure
+#define HTTP_ERR_FREAD -3 ///< File read failure
 ///\}
 
 namespace mlib::http {
@@ -41,37 +42,62 @@ struct ci_less : public std::function<bool (std::string, std::string)>
 typedef std::map<std::string, std::string, ci_less> str_pairs;
 
 /// User defined URL handler function
-typedef int (*uri_handler) (connection& client, void* info);
+typedef std::function<int (connection& client, void* info)> uri_handler;
 
 /// Representation of a HTTP client connection request
 class connection : public thread
 {
-public:
   friend class server;
 
-  const std::string& get_uri () const;
+public:
+
+  /// Return request target of this connection
+  const std::string& get_path () const;
+
+  /// Return HTTP method (GET, POST, etc.) of the request
   const std::string& get_method () const;
+
+  /// Return request query string (everything after '?' and before '#')
   const std::string& get_query () const;
+
+  /// Return request body
   const std::string& get_body () const;
 
   void add_ohdr (const std::string& hdr, const std::string& value);
+
+  /// Check if request has a header
   bool has_ihdr (const std::string& hdr) const;
+
+  /// Return the value of a request header
   const std::string& get_ihdr (const std::string& hdr) const;
+
+  /// Check if response has a header
   bool has_ohdr (const std::string& hdr) const;
+
+  /// Return the value of a response header
   const std::string& get_ohdr (const std::string& hdr) const;
+
+  /// Check if query has a parameter
   bool has_qparam (const std::string& key);
+
+  /// Return the value of a query parameter
   const std::string& get_qparam (const std::string& key);
+
+  /// Return true if request contains the given parameter in the request body
   bool has_bparam (const std::string& key);
+
+  /// Return the value of a body parameter
   const std::string& get_bparam (const std::string& key);
 
+  /// Return size of request body
   int get_content_length () const;
   sockstream& out ();
   
-  void respond (unsigned int code, const char* reason = 0);
+  void respond (unsigned int code, const std::string& reason = std::string());
   void redirect (const std::string& uri, unsigned int code = 303);
   void serve404 (const char* text = 0);
-  int serve_file (const std::filesystem::path& fname);
-  int serve_shtml (const std::filesystem::path& fname);
+  int serve_file (const std::filesystem::path& file);
+  int serve_shtml (const std::filesystem::path& file);
   int serve_buffer (const BYTE* buffer, size_t sz);
   int serve_buffer (const std::string& str);
 
@@ -80,6 +106,8 @@ public:
 
 protected:
   connection (sock& socket, server& server);
+
+  /// The thread run loop
   void run () override;
   void term () override;
 
@@ -88,19 +116,19 @@ protected:
 
 private:
   bool parse_request (const std::string& req);
-  bool parse_headers ();
+  bool parse_headers (const std::string& hdrs);
   bool parse_body ();
   void parse_query ();
   void process_valid_request ();
   void process_ssi (const char* request);
   int do_auth ();
   void serve401 (const char* realm);
+  bool should_close ();
 
-  std::string uri;           ///< location
-  std::string query;         ///< query string
-  std::string method;        ///< query method (GET, POST, etc.)
+  std::string path_;         ///< location
+  std::string query_;        ///< query string
+  std::string method_;       ///< query method (GET, POST, etc.)
   std::string http_version;  ///< HTTP version string
-  std::string headers;       ///< all headers
   std::string body;          ///< request body
   int content_len;           ///< content length or -1 if not known
   std::string part_boundary; ///< multi-part boundary
@@ -117,6 +145,7 @@ private:
     std::string pwd;
   };
   std::multimap<std::string, user> auth; // authenticated users
+
 };
 
 /// Small multi-threaded HTTP server
@@ -128,6 +157,8 @@ public:
 
   void add_ohdr (const std::string& hdr, const std::string& value);
   void remove_ohdr (const std::string& hdr);
+
+  ///  Add or modify an URI handler function
   void add_handler (const std::string& uri, uri_handler func, void* info = 0);
   void add_post_handler (const std::string& uri, uri_handler func, void* info = 0);
   bool add_user (const char* realm, const char* username, const char* pwd);
@@ -257,28 +288,60 @@ private:
 
 /*==================== INLINE FUNCTIONS ===========================*/
 
-/// Return URI of this connection
+/*!
+  Returns the `<target path>` component of the request line.
+
+  The general structure of a HTTP request line is:
+  ```
+    <request> :=  <method> ' ' <target> ' ' <protocol version>
+    <target> := <target path>['?' <query> ['#' <fragment>]]
+  ```
+  
+  Only `origin-form` (see [RFC9112](https://www.rfc-editor.org/rfc/rfc9112#name-origin-form))
+  is accepted.
+*/
 inline
-const std::string& connection::get_uri () const
+const std::string& connection::get_path () const
 {
-  return uri;
+  return path_;
 };
 
-/// Return HTTP method (GET, POST, etc.)
-inline
-const std::string& connection::get_method () const
+/*!
+  Returns the `<method>` component of the request line.
+
+  The general structure of a HTTP request line is:
+  ```
+    <request> :=  <method> ' ' <target> ' ' <protocol version>
+    <target> := <target path>['?' <query> ['#' <fragment>]]
+  ```
+*/
+inline const std::string& connection::get_method () const
 {
-  return method;
+  return method_;
 };
 
-/// Return URI query string (everything after '?' and before '#')
-inline
-const std::string& connection::get_query () const
+/*!
+  Returns the `query` component from the request line.
+  
+  The general structure of a HTTP request line is:
+  ```
+    <request> :=  <method> ' ' <target> ' ' <protocol version>
+    <target> := <target path>['?' <query> ['#' <fragment>]]
+  ```
+
+  \note The returned string is not decoded.
+
+  \return query component of the request line or empty string if request line
+    doesn't include a query.
+*/
+inline const std::string& connection::get_query () const
 {
-  return query;
+  return query_;
 };
 
-/// Return request body
+/*!
+  \return request body or empty string if request doesn't have a body
+*/
 inline
 const std::string& connection::get_body () const
 {
@@ -292,7 +355,7 @@ const std::string& connection::get_body () const
   \param  value header value
 
   To have any effect, this function should be called before calling the
-  response() (or serve_...) function as all headers are sent at that time.
+  respond() (or serve_...) function as all headers are sent at that time.
 */
 inline
 void connection::add_ohdr (const std::string& hdr, const std::string& value)
@@ -300,7 +363,7 @@ void connection::add_ohdr (const std::string& hdr, const std::string& value)
   oheaders[hdr] = value;
 }
 
-/// Returns `true` if request has the header
+/// Return `true` if request has the header
 inline
 bool connection::has_ihdr (const std::string& hdr) const
 {
@@ -308,12 +371,10 @@ bool connection::has_ihdr (const std::string& hdr) const
 }
 
 /*!
-  Returns the value of a request header.
-
   \param  hdr   header name
   \return header value
 
-  Throws an exception of type `std::out_of_range` if request doesn't have that
+  Throws an exception of type `std::out_of_range` if request doesn't have the
   header
 */
 inline
@@ -322,6 +383,10 @@ const std::string& connection::get_ihdr (const std::string& hdr) const
   return iheaders.at(hdr);
 }
 
+/*!
+  Return `true' if either the server or the connection has added the header
+  to the request response
+*/
 inline 
 bool connection::has_ohdr (const std::string& hdr) const
 {
@@ -331,8 +396,7 @@ bool connection::has_ohdr (const std::string& hdr) const
 }
 
 /*!
-  Returns the value of a response header. The header can belong either to server
-  or to connection.
+  The header can belong either to server or to connection.
 
   \param  hdr  header name
   \return header field value
@@ -351,7 +415,11 @@ const std::string& connection::get_ohdr (const std::string& hdr) const
   return oheaders.at (hdr);
 }
 
-/// Return `true` if the query contains the given parameter
+/*!
+  Return `true` if the query contains the given parameter.
+
+  Query parameters and their values are URL-decoded before being processed.
+*/
 inline
 bool connection::has_qparam (const std::string& key)
 {
@@ -361,7 +429,6 @@ bool connection::has_qparam (const std::string& key)
 }
 
 /*!
-  Return the value of a query parameter
 
   \param key query parameter
   \return parameter value
@@ -369,8 +436,7 @@ bool connection::has_qparam (const std::string& key)
   Throws an exception of type `std::out_of_range` if the query doesn't have
   the parameter.
 
-  Even though query parameters and their values are URL encoded, the returned
-  value is decoded.
+  Query parameters and their values are URL-decoded before being processed.
 */
 inline
 const std::string& connection::get_qparam (const std::string& key)
@@ -380,7 +446,11 @@ const std::string& connection::get_qparam (const std::string& key)
   return qparams.at (key);
 }
 
-/// Return true if the body contains the given parameter
+/*!
+  Return `true` if request body contains the parameter.
+
+  Request body is URL-decoded before being processed.
+*/
 inline
 bool connection::has_bparam (const std::string& key)
 {
@@ -390,7 +460,7 @@ bool connection::has_bparam (const std::string& key)
 }
 
 /*!
-  Return the value of a form parameter
+  Only requests with content in URL-encoded format can be parsed.
 
   \param key form parameter
   \return parameter value
@@ -408,7 +478,10 @@ const std::string& connection::get_bparam (const std::string& key)
   return bparams.at (key);
 }
 
-/// Return size of request body
+/*!
+  If the request is a POST or PUT request without a "Content-Length" header,
+  the request is rejected with a response code 400
+*/
 inline
 int connection::get_content_length () const
 {

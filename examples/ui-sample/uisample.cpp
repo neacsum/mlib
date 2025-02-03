@@ -79,7 +79,7 @@ double pi = atan(1)*4.;
 http::server        ui_server;      //HTTP server for user interface
 unsigned short      server_port;
 
-int submit_sarr (const std::string& uri, http::JSONBridge& ui);
+int submit_sarr (http::connection& client, void* var);
 
 
 /*
@@ -247,8 +247,9 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE, LPSTR /*lpCmdLine*/, int /*n
   user_interface.attach_to (ui_server);
 
   //Set action after receiving user data
-  user_interface.set_action ([](http::JSONBridge& ui) {
-    ui.client ()->redirect ("/");
+  user_interface.set_post_action ( [](http::connection& cl, void* )->int {
+    cl.redirect ("/");
+    return HTTP_OK;
     });
   //Start the server
   ui_server.start ();
@@ -370,9 +371,8 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE, LPSTR /*lpCmdLine*/, int /*n
   It calls the parse_urlencoded function to retrieve the latest values
   and then shows a message box with the new values of the sarr array.
 */
-int submit_sarr (const std::string& uri, http::JSONBridge& ui)
+int submit_sarr (http::connection& client, void* ui)
 {
-  bool ok = ui.parse_urlencoded ();
   string mbox_msg = 
     "sarr[0] " + string (sarr[0]) + "\n"
     "sarr[1] " + string (sarr[1]) + "\n"
@@ -386,8 +386,7 @@ int submit_sarr (const std::string& uri, http::JSONBridge& ui)
   This is just a quick and dirty handler.*/
   utf8::MessageBox (mainWnd, mbox_msg, "UI Sample App", MB_OK | MB_SYSTEMMODAL);
 
-  ui.client ()->add_ohdr ("Connection", "Close");
-  return 0;
+  return HTTP_OK;
 }
 
 /*

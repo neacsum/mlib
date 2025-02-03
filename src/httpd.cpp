@@ -1,8 +1,9 @@
-/*!
-  \file httpd.cpp Implementation of httpd and http::connection classes
-
-  (c) Mircea Neacsu 2007-2025. All rights reserved.
+/*
+  Copyright (c) Mircea Neacsu (2014-2025) Licensed under MIT License.
+  This is part of MLIB project. See LICENSE file for full license terms.
 */
+
+///  \file httpd.cpp Implementation of http::server and http::connection classes
 #include <mlib/mlib.h>
 #pragma hdrstop
 
@@ -59,37 +60,34 @@ static size_t match (const std::string& str1, const std::string& str2);
 
 //-----------------------------------------------------------------------------
 /*!
-  \class http::connection
+  \class mlib::http::connection
   \ingroup  sockets
 
-  This is the thread created by the http::server object in response to a new
-  connection request.
+  This is the thread created by the mlib::http::server object in response to a
+  new connection request.
 
-  After construction, the thread is started automatically by the server and it
-  begins listening to its connection socket and process HTTP requests. When the
-  HTTP client closes the connection the thread is stopped and destructed.
+  The thread is started automatically by the server. It listens on the 
+  connection socket and process HTTP requests. When the HTTP client closes the
+  connection the thread stops and the object is destructed by the server.
 
   Users can create derived classes but the parent server must also be a class
   derived from http::server with an overridden http::server::make_thread function.
 
-  The request processing cycle starts with the receiving a client request,
-  validating, processing it and sending back the reply. The processing part
-  implies either calling a user handler function, if one was registered for the
-  URI, or serving a file.
+  For details of request processing, see the run() function.
 
   Most of the public functions are designed for the benefit of user handler
-  functions. The handler function is called before sending any reply to
-  the HTTP client.
+  functions. The handler function, if one has been registered, is called before
+  sending any reply to the HTTP client.
 */
 
 /*!
-  Protected constructor used by http::server class to create a new connection
-  thread
+  Protected constructor used by mlib::http::server class to create a new
+  connection thread
 
   \param  socket  connecting socket
   \param  server  parent server object
 
-  As it has only a protected constructor it is not possible for users of this
+  As it has only a protected constructor, it is not possible for users of this
   class to directly create this object. Derived classes should maintain this
   convention.
 */
@@ -104,9 +102,15 @@ connection::connection (sock& socket, server& server)
 {}
 
 /*!
-  Thread run loop.
+  The loop has the following steps:
 
-  The loop collects the client request, parses, validates and processes it.
+  1. Wait for a client request line and validate it.
+  2. Get request headers; validate and parse them.
+  3. For POST and PUT requests, get the request body.
+  4. Invoke the handler function if one has been defined.
+  5. Otherwise, see if it is a request for an existing file and return it.
+
+
 */
 void connection::run ()
 {
@@ -120,7 +124,7 @@ void connection::run ()
   {
     while (1)
     {
-      std::string request;
+      std::string input;
       content_len = -1;
       iheaders.clear ();
       oheaders.clear ();
@@ -129,23 +133,23 @@ void connection::run ()
       body.clear ();
       query_parsed = body_parsed = response_sent = false;
 
-      // Accumulate HTTP request
-      bool eol_seen = false;
-      while (request.size () < HTTPD_MAX_HEADER)
+      // Accumulate HTTP request line
+      while (input.size () < HTTPD_MAX_HEADER)
       {
         // wait for chars.
         char ch = ws.get ();
 
         if (ws.eof ())
+        {
+          TRACE2 ("http::connection::run - client closed");
           return; // client closed
+        }
 
         if (!ws.good ())
         {
-#if defined(MLIB_TRACE)
           inaddr addr;
           ws->peer (addr);
           TRACE2 ("http::connection::run - timeout peer %s", addr.hostname ().c_str ());
-#endif
           respond (408);
           return;
         }
@@ -153,29 +157,70 @@ void connection::run ()
         if (ch == '\r')
           continue;
 
-        request.push_back (ch);
+        input.push_back (ch);
+        if (ch == '\n')
+          break;
+      }
+      if (input.size () == HTTPD_MAX_HEADER)
+      {
+        ws->peer (addr);
+        TRACE2 ("http::connection::run - Request too long (%d) peer %s", input.size (),
+                addr.hostname ().c_str ());
+        respond (414);
+        return;
+      }
+      if (!parse_request (input))
+      {
+        respond (400);
+        return; // invalid request line
+      }
+
+      //Accumulate headers
+      bool eol_seen = false;
+      input.clear ();
+      while (input.size () < HTTPD_MAX_HEADER)
+      {
+        // wait for chars.
+        char ch = ws.get ();
+
+        if (ws.eof ())
+        {
+          TRACE2 ("http::connection::run - client closed");
+          return; // client closed
+        }
+
+        if (!ws.good ())
+        {
+          inaddr addr;
+          ws->peer (addr);
+          TRACE2 ("http::connection::run - timeout peer %s", addr.hostname ().c_str ());
+          respond (408);
+          return;
+        }
+
+        if (ch == '\r')
+          continue;
+
         if (ch == '\n')
         {
           if (eol_seen)
-            break; //end of headers
-          else
-            eol_seen = true;
+            break; // end of headers
+          eol_seen = true;
         }
         else
           eol_seen = false;
+        input.push_back (ch);
       }
 
-      if (request.size () == HTTPD_MAX_HEADER)
+      if (input.size () == HTTPD_MAX_HEADER)
       {
-#if defined(MLIB_TRACE)
         ws->peer (addr);
-        TRACE2 ("http::connection::run - Request too long (%d) peer %s", request.size (),
+        TRACE2 ("http::connection::run - Headers too long (%d) peer %s", input.size (),
                 addr.hostname ().c_str ());
-#endif
         respond (413);
         return;
       }
-      if (!parse_request (request) || !parse_headers ())
+      if (!parse_headers (input))
       {
         respond (400);
         return;
@@ -192,13 +237,8 @@ void connection::run ()
         ws->recvtimeout (kaval);
       }
 
-      if (method == "POST" || method == "PUT")
+      if (method_ == "POST" || method_ == "PUT")
       {
-        if (!has_ihdr ("Content-Length"))
-        {
-          respond (400); // must have "Content-Length" header
-          return;
-        }
         // read request body
         string cl = get_ihdr ("Content-Length");
         try
@@ -227,9 +267,7 @@ void connection::run ()
       process_valid_request ();
 
       // should close connection?
-      if (!has_ohdr ("Content-Length") // could not generate content length (shtml pages)
-       || (has_ihdr("Connection") && get_ihdr ("Connection") == "Close")  // client wants to close
-       || (has_ohdr ("Connection") && (get_ohdr ("Connection") == "Close"))) // server wants to close
+      if (should_close ())
         return;
       ws.flush ();
     }
@@ -248,6 +286,35 @@ void connection::run ()
   // all cleanup is done by term function
 }
 
+// Return true if client connection should be closed
+bool connection::should_close ()
+{
+  if (has_ihdr ("Connection") && get_ihdr ("Connection") == "Close")
+  {
+    TRACE8 ("should_close - client wants to close");
+    return true; // client wants to close
+  }
+  if (has_ohdr ("Connection") && get_ohdr ("Connection") == "Close")
+  {
+    TRACE8 ("should_close - server wants to close");
+    return true; // server wants to close
+  }
+  if (method_ == "GET" && !has_ohdr ("Content-Length"))
+  {
+    TRACE8 ("should_close - no content length");
+    return true; // don't have content length in response to GET (shtml file)
+  }
+
+  if (http_version == "HTTP/1.0"
+   && (!has_ihdr ("Connection") || get_ihdr ("Connection") != "Keep-Alive"))
+  {
+    TRACE8 ("should_close - protocol HTTP 1.0");
+    return true;
+  }
+
+  return false;
+}
+
 void connection::term ()
 {
 #if defined(MLIB_TRACE)
@@ -261,7 +328,7 @@ void connection::term ()
 }
 
 /*
-  Check if uri is covered by a server realm and if user has credentials for
+  Check if path_ is covered by a server realm and if user has credentials for
   said realm.
 
   \return
@@ -273,7 +340,7 @@ void connection::term ()
 int connection::do_auth ()
 {
   string realm;
-  if (!parent.is_protected (uri, realm))
+  if (!parent.is_protected (path_, realm))
     return 1;
 
   if (!has_ihdr("Authorization"))
@@ -336,20 +403,20 @@ void connection::serve401 (const char* realm)
 void connection::process_valid_request ()
 {
   // check if there is a handler registered for this URI
-  if (parent.invoke_handler (*this))
+  if (parent.invoke_handler (*this) == HTTP_OK)
   {
     TRACE9 ("handler done");
     return;
   }
 
-  if (method == "GET" || method == "HEAD")
+  if (method_ == "GET" || method_ == "HEAD")
   {
     // try to see if we can serve a file
     std::filesystem::path fullpath;
-    if (!parent.find_alias (uri, fullpath))
+    if (!parent.find_alias (path_, fullpath))
     {
       fullpath = parent.docroot ();
-      fullpath.concat (uri);
+      fullpath.concat (path_);
     }
     if (!fullpath.has_filename ())
       fullpath += parent.default_uri ();
@@ -374,7 +441,7 @@ void connection::process_valid_request ()
       serve404 ();
     }
   }
-  else if (method == "POST" || method == "PUT")
+  else if (method_ == "POST" || method_ == "PUT")
   {
     if (!parent.invoke_post_handler (*this))
       respond (204);
@@ -404,9 +471,9 @@ void connection::serve404 (const char* text)
 }
 
 
-bool connection::parse_headers ()
+bool connection::parse_headers (const std::string& hdrs)
 {
-  auto ptr = headers.begin();
+  auto ptr = hdrs.begin();
   string key, val;
   int fsm_state = 0;
   iheaders.clear ();
@@ -415,7 +482,7 @@ bool connection::parse_headers ()
     switch (fsm_state)
     {
     case 0: //initial header name character
-      if (ptr == headers.end ())
+      if (ptr == hdrs.end ())
         break; // 
       if (strchr (": \t\n", *ptr) != 0)
         fsm_state = -1;
@@ -472,13 +539,16 @@ bool connection::parse_headers ()
       ++ptr;
       break;
     }
-  } while (ptr != headers.end () && fsm_state >= 0);
+  } while (ptr != hdrs.end () && fsm_state >= 0);
   
   if (fsm_state != 0)
     return false;
 
+  //check for required headers
   if (http_version == "HTTP/1.1" && !has_ihdr ("Host"))
     return false;
+  if (!has_ihdr ("Content-Length") && (method_ == "POST" || method_ == "PUT"))
+    return false; // must have "Content-Length" header
 
   return true;
 }
@@ -486,7 +556,7 @@ bool connection::parse_headers ()
 bool connection::parse_body ()
 {
   // check if we have what to parse
-  if (body.empty() || !has_ihdr ("Content-Type") || body_parsed)
+  if (body.empty () || body_parsed  || !has_ihdr ("Content-Type"))
     return body_parsed;
 
   if (get_ihdr ("Content-Type") == "application/x-www-form-urlencoded")
@@ -504,7 +574,7 @@ void connection::parse_query ()
 {
   if (query_parsed)
     return; // don't repeat parsing
-  parse_urlparams (query, qparams);
+  parse_urlparams (query_, qparams);
   query_parsed = true;
 }
 
@@ -512,7 +582,7 @@ void connection::parse_query ()
 /*!
   Send the content of a file, processing any SSI directives.
 
-  \param  fname file name
+  \param  file file name
 
   \return 0 if successful or one of the following values:
   \retval -1 socket write failure
@@ -521,16 +591,20 @@ void connection::parse_query ()
   As we don't know the size of the response, the file is sent without a
   "Content-Length" header.
 */
-int connection::serve_shtml (const std::filesystem::path& fname)
+int connection::serve_shtml (const std::filesystem::path& file)
 {
-  FILE* fn = utf8::fopen (fname.string (), "rS");
-  if (fn == NULL)
-    return -2;
-
+  auto fname = file.u8string ();
+  FILE* fin = utf8::fopen (fname, "rbS");
+  if (!fin)
+  {
+    TRACE2 ("File %s - open error", fname.c_str());
+    return HTTP_ERR_FOPEN;
+  }
   respond (200);
+
   if (get_method () == "HEAD")
   {
-    fclose (fn);
+    fclose (fin);
     return 0; // don't send body in response to a HEAD request
   }
   int parser_state = 0;
@@ -539,10 +613,10 @@ int connection::serve_shtml (const std::filesystem::path& fname)
   int ssi_seq = 0;
   static char ssi_intro[] = "<!--#";
   static char ssi_end[] = "-->";
-  while (!feof (fn))
+  while (!feof (fin))
   {
-    char c = fgetc (fn);
-    if (feof (fn))
+    char c = fgetc (fin);
+    if (feof (fin))
       break;
     if (!ws.good ())
       return -1;
@@ -622,7 +696,7 @@ int connection::serve_shtml (const std::filesystem::path& fname)
       break;
     }
   }
-  fclose (fn);
+  fclose (fin);
   return 0;
 }
 
@@ -659,13 +733,13 @@ void connection::process_ssi (const char* req)
   \param  sz buffer length
 
   \return 0 if successful or one of the following codes:
-  \retval HTTPD_ERR_WRITE  - socket write failure
+  \retval HTTP_ERR_WRITE  - socket write failure
 
   The buffer is preceded by "Content-Length" header.
 */
 int connection::serve_buffer (const BYTE* src_buff, size_t sz)
 {
-  int ret = HTTPD_OK;
+  int ret = HTTP_OK;
 
   // find file size
   unsigned int len;
@@ -684,7 +758,7 @@ int connection::serve_buffer (const BYTE* src_buff, size_t sz)
     if (!ws.good ())
     {
       TRACE2 ("socket write failure");
-      ret = HTTPD_ERR_WRITE;
+      ret = HTTP_ERR_WRITE;
       break;
     }
     cnt += out;
@@ -700,7 +774,7 @@ int connection::serve_buffer (const BYTE* src_buff, size_t sz)
   \param  str string to send
 
   \return 0 if successful or one of the following codes:
-  \retval HTTPD_ERR_WRITE  - socket write failure
+  \retval HTTP_ERR_WRITE  - socket write failure
 
   The string is preceded by "Content-Length" header.
 */
@@ -712,33 +786,32 @@ int connection::serve_buffer (const std::string& str)
 /*!
   Send the content of a file.
 
-  \param  fname file name
+  \param  file file name
 
   \return 0 if successful or one of the following codes:
-  \retval HTTPD_ERR_WRITE  - socket write failure
-  \retval HTTPD_ERR_FOPEN  - file open failure
-  \retval HTTPD_ERR_FREAD  - file read failure
+  \retval HTTP_ERR_WRITE  - socket write failure
+  \retval HTTP_ERR_FOPEN  - file open failure
+  \retval HTTP_ERR_FREAD  - file read failure
 
   The file is preceded by "Content-Length" header.
 */
-int connection::serve_file (const std::filesystem::path& fname)
+int connection::serve_file (const std::filesystem::path& file)
 {
-  int ret = HTTPD_OK;
-  FILE* fin = utf8::fopen (fname.u8string (), "rbS");
+  int ret = HTTP_OK;
+  auto fname = file.u8string ();
+  FILE* fin = utf8::fopen (fname, "rbS");
   if (!fin)
   {
-    TRACE2 ("File %s - open error", fname.u8string ());
-    return HTTPD_ERR_FOPEN;
+    TRACE2 ("File %s - open error", fname.c_str());
+    return HTTP_ERR_FOPEN;
   }
   // find file size
   unsigned int len;
   fseek (fin, 0, SEEK_END);
   len = ftell (fin);
   fseek (fin, 0, SEEK_SET);
-  TRACE8 ("http::connection::serve_file - File %s size %d", fname.u8string (), len);
-  char flen[30];
-  sprintf (flen, "%d", len);
-  add_ohdr ("Content-Length", flen);
+  TRACE8 ("http::connection::serve_file - File %s size %d", fname.c_str (), len);
+  add_ohdr ("Content-Length", to_string(len));
   respond (200);
   if (get_method() != "HEAD")
   {
@@ -749,14 +822,14 @@ int connection::serve_file (const std::filesystem::path& fname)
       cnt = (int)fread (buf, 1, sizeof (buf), fin);
       if (!cnt && ferror (fin))
       {
-        TRACE2 ("File %s - file read error %d", fname.u8string (), ferror (fin));
-        ret = HTTPD_ERR_FREAD;
+        TRACE2 ("File %s - file read error %d", fname.c_str (), ferror (fin));
+        ret = HTTP_ERR_FREAD;
       }
       ws.write (buf, cnt);
       if (!ws.good ())
       {
-        TRACE2 ("File %s - socket write failure", fname.u8string ());
-        ret = HTTPD_ERR_WRITE;
+        TRACE2 ("File %s - socket write failure", fname.c_str());
+        ret = HTTP_ERR_WRITE;
         break;
       }
     }
@@ -776,25 +849,26 @@ bool connection::parse_request (const std::string& req)
     preq++;
   if (*preq != ' ')
     return false;
-  method = string (req.begin (), preq);
-  str_upper (method);
+  method_ = string (req.begin (), preq);
+  str_upper (method_);
 
   // SP
   while (*++preq == ' ')
     ;
 
-  // Request-URI
+  // Request-target
   auto pbeg = preq;
   while (preq != req.end() && *preq != ' ' && *preq != '\n')
     ++preq;
   if (*preq != ' ')
     return false;
   
-  // URI must be in origin-form: absolute-path ["?" query] ["#" fragment] 
+  // Request target must be in origin-form: absolute-path ["?" query] ["#" fragment] 
   if (*pbeg != '/')
     return false; 
 
-  uri = string (pbeg, preq);
+  path_ = string (pbeg, preq);
+  url_decode (path_); // path normalization (RFC9110 sect 4.2.3)
 
   // SP
   while (*++preq == ' ')
@@ -808,18 +882,22 @@ bool connection::parse_request (const std::string& req)
     return false;
   http_version = string (pbeg, preq);
 
-  // headers start on next line
-  headers = string(preq+1, req.end()-1);
-
   // separate query part
-  auto qbeg= uri.find ('?');
+  auto qbeg= path_.find ('?');
   if (qbeg != string::npos)
   {
-    query = uri.substr (qbeg + 1);
-    auto qend = query.find ('#');
+    query_ = path_.substr (qbeg + 1);
+    auto qend = query_.find ('#');
     if (qend != string::npos)
-      query.erase (qend);
-    uri.erase (qbeg);
+      query_.erase (qend);
+    path_.erase (qbeg);
+  }
+  else
+  {
+    //query is missing but maybe there is a fragment
+    auto pend = path_.find ('#');
+    if (pend != string::npos)
+      path_.erase (pend);
   }
 
   return true;
@@ -827,18 +905,18 @@ bool connection::parse_request (const std::string& req)
 
 
 /*!
-  Generate a HTTP redirect response to a new uri.
+  Generate a HTTP redirect response to a new resource.
 
-  \param  uri   redirected uri
+  \param  uri   path for new resource
   \param  code  redirect code
 */
 void connection::redirect (const std::string& uri, unsigned int code)
 {
   add_ohdr ("Location", uri);
   respond (code);
-  if (code == 303 && get_method () == "HEAD")
+  if (code == 303 && get_method () != "HEAD")
   {
-    /* RFC7231 (https://tools.ietf.org/html/rfc7231#section-6.4.4) says:
+    /* RFC9110 (https://www.rfc-editor.org/rfc/rfc9110#name-303-see-other)says:
      Except for responses to a HEAD request, the representation of a 303
      response ought to contain a short hypertext note with a hyperlink to
      the same URI reference provided in the Location header field
@@ -853,7 +931,7 @@ void connection::redirect (const std::string& uri, unsigned int code)
   Send the beginning of HTTP response.
 
   \param  code HTTP response code
-  \param  reason reason-phrase. If NULL a standard reason-phrase is used.
+  \param  reason reason-phrase. If empty a standard reason-phrase is used.
 
   First time the function sends the status line and headers of the HTTP response:
   \verbatim
@@ -866,65 +944,47 @@ void connection::redirect (const std::string& uri, unsigned int code)
 
   In subsequent calls it sends only connection headers (to support multi-part responses)
 */
-void connection::respond (unsigned int code, const char* reason)
+void connection::respond (unsigned int code, const std::string& reason)
 {
   static struct
   {
     int code;
     const char* text;
-  } respcodes[] = {{100, "Continue"},
-                   {101, "Switching Protocols"},
-                   {200, "OK"},
-                   {201, "Created"},
-                   {202, "Accepted"},
-                   {203, "Non-Authoritative Information"},
-                   {204, "No Content"},
-                   {205, "Reset Content"},
-                   {206, "Partial Content"},
-                   {300, "Multiple Choices"},
-                   {301, "Moved Permanently"},
-                   {302, "Found"},
-                   {303, "See Other"},
-                   {304, "Not Modified"},
-                   {305, "Use Proxy"},
-                   {307, "Temporary Redirect"},
-                   {400, "Bad Request"},
-                   {401, "Unauthorized"},
-                   {403, "Forbidden"},
-                   {404, "Not Found"},
-                   {405, "Method Not Allowed"},
-                   {406, "Not Acceptable"},
-                   {407, "Proxy Authentication Required"},
-                   {408, "Request Time-out"},
-                   {409, "Conflict"},
-                   {410, "Gone"},
-                   {411, "Length Required"},
-                   {412, "Precondition Failed"},
-                   {413, "Request Entity Too Large"},
-                   {414, "Request-URI Too Large"},
-                   {415, "Unsupported Media Type"},
-                   {416, "Requested range not satisfiable"},
-                   {417, "Expectation Failed"},
-                   {500, "Internal Server Error"},
-                   {501, "Not Implemented"},
-                   {502, "Bad Gateway"},
-                   {503, "Service Unavailable"},
-                   {504, "Gateway Time-out"},
-                   {505, "HTTP Version not supported"},
-                   {0, 0}};
+  } respcodes[] = {
+    {100, "Continue"},          {101, "Switching Protocols"},
+    {200, "OK"},                {201, "Created"},
+    {202, "Accepted"},          {203, "Non-Authoritative Information"},
+    {204, "No Content"},        {205, "Reset Content"},
+    {206, "Partial Content"},   {300, "Multiple Choices"},
+    {301, "Moved Permanently"}, {302, "Found"},
+    {303, "See Other"},         {304, "Not Modified"},
+    {305, "Use Proxy"},         {307, "Temporary Redirect"},
+    {400, "Bad Request"},       {401, "Unauthorized"},
+    {403, "Forbidden"},         {404, "Not Found"},
+    {405, "Method Not Allowed"},{406, "Not Acceptable"},
+    {407, "Proxy Authentication Required"}, {408, "Request Time-out"},
+    {409, "Conflict"},          {410, "Gone"},
+    {411, "Length Required"},   {412, "Precondition Failed"},
+    {413, "Request Entity Too Large"}, {414, "Request-URI Too Large"},
+    {415, "Unsupported Media Type"}, {416, "Requested range not satisfiable"},
+    {417, "Expectation Failed"},{500, "Internal Server Error"},
+    {501, "Not Implemented"},   {502, "Bad Gateway"},
+    {503, "Service Unavailable"},{504, "Gateway Time-out"},
+    {505, "HTTP Version not supported"}, {0, 0}};
 
-  str_pairs::iterator idx;
-  if (code != 200)
-    TRACE ("response %d\n", code);
-  
   if (response_sent)
     return; // already sent response
 
+  if (code != 200)
+    TRACE ("response %d - %s\n", code, reason.c_str());
+
+  str_pairs::iterator idx;
   int ic = 0;
+
   while (respcodes[ic].code && respcodes[ic].code != code)
     ic++;
   ws << "HTTP/1.1 " << code;
-  if (reason)
+  if (!reason.empty())
     ws << " " << reason;
   else if (respcodes[ic].code)
     ws << " " << respcodes[ic].text;
@@ -992,16 +1052,24 @@ void connection::respond_next (bool last)
   \class server
   \ingroup sockets
 
-  This class is derived from tcpserver class and implements a basic HTTP server.
+  This class is derived from mlib::tcpserver class and implements a basic HTTP
+  server.
+  
   After construction, the main server thread has to be started by calling start()
   function. When started, the server binds to the listening socket and creates
-  new http::connection objects for each incoming client. All the protocol is then
-  handled by the http::connection (or derived) class.
+  new \ref mlib::http::connection "http::connection" objects for each incoming
+  client. All the protocol is then handled by the connection  (or derived) 
+  object.
 
-  A HTTP server can be integrated to an application by adding specific url handlers
-  and user variables. URL handlers are registered by calling the add_handler()
-  function.
-
+  A HTTP server can be integrated to an application by adding specific handlers
+  and user variables. Handlers are user functions called in response to client
+  requests. There are two types of handlers:
+  - _global handlers_ registered using the add_handler() function. These are
+  called by the client connection thread immediately after validating a client
+  request.
+  - _post handlers_ registered using the add_post_handler() function. These are
+  called only for POST or PUT requests.
+  
   User variables can be added by calling the add_var() function. The content of
   those variables is then returned in response to SSI echo directives.
 */
@@ -1048,11 +1116,11 @@ void server::name (const char* nam)
 }
 
 /*!
-  Create an new http::connection object in response to a new client connection
-  request.
+  Create an new mlib::http::connection object in response to a new client
+  connection request.
 
   Derived classes can override this function to return objects derived from
-  http::connection class.
+  mlib::http::connection class.
 */
 connection* server::make_thread (sock& connection)
 {
@@ -1086,7 +1154,6 @@ void server::remove_ohdr (const std::string& hdr)
 }
 
 /*!
-  Add or modify an URI handler function.
   \param uri    URI address
   \param func   handler function
   \param info   handler specific information
@@ -1095,7 +1162,22 @@ void server::remove_ohdr (const std::string& hdr)
   client connection will invoke the user-defined handler function passing the
   connection object and the handler specific information.
 
-  Note that these handlers are invoked irrespective of the HTTP method (GET, 
+  Example:
+\code{.cpp}
+  int say_hello (http::connection& client, void *)
+  {
+    client.serve_buffer ("Hello world!");
+    return HTTP_OK;
+  }
+  //...
+  http::server my_server(8080);
+
+  my_server.add_handler ("/greeting", say_hello, nullptr);
+\endcode
+  In response to a request to http://localhost:8080/greeting, the server will
+  display the greeting message.
+  
+  \note These handlers are invoked irrespective of the HTTP method (GET, 
   POST, DELETE, etc.).
 */
 void server::add_handler (const std::string& uri, uri_handler func, void* info)
@@ -1106,7 +1188,7 @@ void server::add_handler (const std::string& uri, uri_handler func, void* info)
 
 /*!
   Add or modify an POST handler function.
-  \param uri    URI address
+  \param tgt_path    URI address
   \param func   handler function
   \param info   handler specific information
 
@@ -1143,10 +1225,10 @@ void server::delete_mime_type (const std::string& ext)
 }
 
 /*!
-  Add a new access realm. Realms are assigned to specific uri paths and their
+  Add a new access realm. Realms are assigned to specific tgt_path paths and their
   access can be restricted to specified users.
   \param realm    protection realm
-  \param uri      starting path
+  \param tgt_path      starting path
 */
 void server::add_realm (const char* realm, const char* uri)
 {
@@ -1214,7 +1296,7 @@ bool server::remove_user (const char* realm, const char* username)
 
 /*!
   Find the realm with longest matching path that covers an URI
-  \param uri    URI to check
+  \param tgt_path    URI to check
   \param realm  matching realm
   \return       true if URI is covered by a realm
 
@@ -1268,7 +1350,7 @@ bool server::authenticate (const std::string& realm, const std::string& user, co
 int server::invoke_handler (connection& client)
 {
   int ret = 0;
-  auto idx = handlers.find (client.get_uri());
+  auto idx = handlers.find (client.get_path());
   if (idx != handlers.end ())
   {
     lock l (*idx->second.in_use);
@@ -1292,7 +1374,7 @@ int server::invoke_handler (connection& client)
 int server::invoke_post_handler (connection& client)
 {
   int ret = 0;
-  auto idx = post_handlers.find (client.get_uri ());
+  auto idx = post_handlers.find (client.get_path ());
   if (idx != post_handlers.end ())
   {
     lock l (*idx->second.in_use);
@@ -1306,7 +1388,7 @@ int server::invoke_post_handler (connection& client)
 
 /*!
   Maps a local file path to an URI resource path.
-  \param  uri     URI resource path
+  \param  tgt_path     URI resource path
   \param  path    mapped local file path
 
   The mapping is always relative to server's root folder (`docroot`).

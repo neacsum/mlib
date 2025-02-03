@@ -2,25 +2,18 @@
 <head>
   <title>Echo UI</title>
   <script>
-let xhr = new XMLHttpRequest();
-xhr.open("GET", "/uivars?field");
-xhr.onload = function() {
-  if (xhr.status == 200)
-    document.getElementById('field').value = JSON.parse(xhr.response);
-  else
-    alert(`Error ${xhr.status}: ${xhr.statusText}`);
-};
-xhr.send (); 
+    function load() {
+      document.getElementById('field').value = "<!--#echo var="text" -->"
+    }
   </script>
 </head>
-<body>
+<body onload="load() ">
   <form method="post" action="/uivars">
-    Text: <input name="field" id="field" size="80"/>
+    Text: <input name="text" id="field" size="80"/>
     <input type="submit" value="OK" />
   </form>
   Type 'quit' to exit.
 <p>
-SSI counter: <!--#echo var="counter" --><br/>
-SSI string: <!--#echo var="text" -->
+Update counter: <!--#echo var="counter" --><br/>
 </body>
 </html>

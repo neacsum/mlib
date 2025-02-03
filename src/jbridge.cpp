@@ -1,10 +1,12 @@
-/*!
-  \file   jbridge.cpp Implementation of JSONBridge class
-
-  (c) Mircea Neacsu 2017
+/*
+  Copyright (c) Mircea Neacsu (2014-2025) Licensed under MIT License.
+  This is part of MLIB project. See LICENSE file for full license terms.
 */
+
+///  \file   jbridge.cpp Implementation of JSONBridge class
 #include <mlib/mlib.h>
 #pragma hdrstop
+
 #include <memory.h>
 #include <string.h>
 #include <sstream>
@@ -17,9 +19,6 @@ using namespace std;
 
 namespace mlib::http {
 
-#define MAX_JSONRESPONSE 8192
-
-static bool url_decode (std::string& s);
 
 static std::tuple<std::string, size_t> index_split (const std::string name);
 
@@ -53,7 +52,7 @@ static std::tuple<std::string, size_t> index_split (const std::string name);
 JSONBridge::JSONBridge (const char* path)
   : path_ (path)
   , client_ (nullptr)
-  , action (nullptr)
+  , post_action (nullptr)
 {
   assert (path[0] == '/');
 }
@@ -64,21 +63,21 @@ JSONBridge::~JSONBridge ()
 /// Attach JSONBridge object to a HTTP server
 void JSONBridge::attach_to (server& server)
 {
-  server.add_handler (path_.c_str (), (uri_handler)JSONBridge::callback, this);
+  server.add_handler (path_.c_str (), JSONBridge::callback, this);
 }
 
 ///
 erc JSONBridge::json_begin (json::node& root)
 {
-  TRACE9 ("JSONBridge::json_begin - %s", client ()->get_query ());
+  TRACE9 ("JSONBridge::json_begin - %s", client ().get_query ());
   mlib::lock l (in_use);
   size_t idx;
   dict_cptr pvar;
 
-  if (!find (client ()->get_query (), pvar, &idx))
+  if (!find (client ().get_query (), pvar, &idx))
   {
-    TRACE2 ("JSONBridge::json_begin - Cannot find %s", client ()->get_query ().c_str());
-    return erc (ERR_JSON_NOTFOUND);
+    TRACE2 ("JSONBridge::json_begin - Cannot find %s", client ().get_query ().c_str());
+    return erc (HTTP_JSON_NOTFOUND);
   }
   return jsonify (root, pvar);
 }
@@ -91,11 +90,11 @@ erc JSONBridge::json_end (json::node& obj)
     // serialize in a buffer to find content length
     stringstream ss;
     ss << fixed << obj;
-    client ()->add_ohdr ("Cache-Control", "no-cache, no-store");
-    client ()->add_ohdr ("Content-Type", "application/json");
-    client ()->add_ohdr ("Content-Length", to_string(ss.str ().size ()));
-    client()->respond (200);
-    client ()->out () << ss.str () << endl;
+    client ().add_ohdr ("Cache-Control", "no-cache, no-store");
+    client ().add_ohdr ("Content-Type", "application/json");
+    client ().add_ohdr ("Content-Length", to_string(ss.str ().size ()));
+    client().respond (200);
+    client ().out () << ss.str () << endl;
   }
   catch (erc& x)
   {
@@ -178,7 +177,7 @@ erc JSONBridge::serialize_node (json::node& n, dict_cptr v, size_t index)
 
   default:
     TRACE ("Unexpected entry type %d", v->type);
-    return erc (ERR_JSON_DICSTRUC, json::Errors ());
+    return erc (HTTP_JSON_DICSTRUC, json::Errors ());
   }
   return erc::success;
 }
@@ -247,11 +246,11 @@ erc JSONBridge::deserialize_node (const json::node& n, dict_cptr v, size_t index
 void JSONBridge::not_found (const char* varname)
 {
   string tmp = "Unknown variable "s + varname;
-  client ()->add_ohdr ("Content-Type", "text/plain");
-  client ()->add_ohdr ("Content-Length", to_string(tmp.size ()));
-  client ()->respond (410, tmp.c_str ());
+  client ().add_ohdr ("Content-Type", "text/plain");
+  client ().add_ohdr ("Content-Length", to_string(tmp.size ()));
+  client ().respond (410, tmp.c_str ());
 
-  client ()->out () << tmp << endl;
+  client ().out () << tmp;
 }
 
 /*!
@@ -475,52 +474,73 @@ bool JSONBridge::parse_jsonencoded () const
   return false; // only objects and some arrays can be parsed
 }
 
-int JSONBridge::callback (connection& client, JSONBridge* ctx)
+void JSONBridge::process_request ()
 {
+  try
+  {
+    if (client ().get_method () == "GET")
+    {
+      json::node root;
+      erc ret;
+      if ((ret = json_begin (root)) == erc::success)
+        json_end (root);
+      else if (ret == HTTP_JSON_NOTFOUND)
+        not_found (client ().get_query ().c_str ());
+      else
+        client ().serve404 ();
+    }
+    else if (client ().get_method () == "POST")
+    {
+      if (!client ().has_ihdr ("Content-Type"))
+      {
+        client ().respond (403);
+        return;
+      }
+      std::string content = client ().get_ihdr ("Content-Type");
+      str_lower (content);
+
+      bool ok = (content == "application/x-www-form-urlencoded") ? parse_urlencoded ()
+              : (content == "application/json")                  ? parse_jsonencoded ()
+                                                                 : false; 
+
+      if (!ok)
+      {
+        client ().respond (400);
+        return;
+      }
+
+      if (!client ().get_query ().empty ())
+      {
+        const auto& h = post_handlers.find (client ().get_query ());
+        if (h != post_handlers.end ())
+          ok = (h->second(client(), this) == HTTP_OK);
+      }
+      if (ok && post_action)
+        ok = (post_action (client(), this) == HTTP_OK);
+
+      if (ok && !redirect_uri.empty())
+        client ().redirect (redirect_uri);
+    }
+  }
+  catch (erc& x)
+  {
+    TRACE ("JSONBridge::process_request erc %d", (int)x);
+    client ().respond (500); //server error
+  }
+}
+
+int JSONBridge::callback (connection& client, void* par)
+{
+  JSONBridge* bridge = (JSONBridge*)par;
   auto& req = client.get_method ();
   auto& query = client.get_query ();
   TRACE9 ("ui_callback req=%s query=%s", req.c_str (), query.c_str());
-  ctx->client_ = &client;
-  ctx->lock ();
-  if (req == "GET")
-  {
-    json::node root;
-    erc ret;
-    if ((ret = ctx->json_begin (root)) == erc::success)
-      ctx->json_end (root);
-    else if (ret == ERR_JSON_NOTFOUND)
-      ctx->not_found (query.c_str());
-    else
-      client.serve404 ();
-  }
-  else if (req == "POST")
-  {
-    bool ok = false;
-    std::string content = client.get_ihdr ("Content-Type");
-    str_lower (content);
 
-    if (!client.get_query ().empty())
-    {
-      auto ph = ctx->post_handlers.find (client.get_query ());
-      if (ph != ctx->post_handlers.end ())
-      {
-        (ph->second) (client.get_uri (), *ctx);
-        ok = true;
-      }
-    }
-    if (!ok)
-    {
-      if (content.find ("application/x-www-form-urlencoded") != string::npos)
-        ok = ctx->parse_urlencoded ();
-      if (content.find ("application/json", 0) != string::npos)
-        ok = ctx->parse_jsonencoded ();
-    }
-
-    if (ok && ctx->action)
-      ctx->action (*ctx);
-  }
-  ctx->client_ = nullptr;
-  ctx->unlock ();
+  bridge->lock ();
+  bridge->client_ = &client;
+  bridge->process_request ();
+  bridge->client_ = nullptr;
+  bridge->unlock ();
   return 1;
 }
 
