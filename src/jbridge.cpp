@@ -1,24 +1,24 @@
-/*!
-  \file   jbridge.cpp Implementation of JSONBridge class
-
-  (c) Mircea Neacsu 2017
+/*
+  Copyright (c) Mircea Neacsu (2014-2025) Licensed under MIT License.
+  This is part of MLIB project. See LICENSE file for full license terms.
 */
+
+///  \file   jbridge.cpp Implementation of JSONBridge class
 #include <mlib/mlib.h>
 #pragma hdrstop
+
 #include <memory.h>
 #include <string.h>
 #include <sstream>
+#include <cassert>
 
-#include <algorithm>
+#include <utils.h>
 #include <utf8/utf8.h>
 
 using namespace std;
 
-namespace mlib {
+namespace mlib::http {
 
-#define MAX_JSONRESPONSE 8192
-
-static bool url_decode (std::string& s);
 
 static std::tuple<std::string, size_t> index_split (const std::string name);
 
@@ -28,14 +28,13 @@ static std::tuple<std::string, size_t> index_split (const std::string name);
 
   JSONBridge class provides an easy access mechanism to program variables for
   HTTP server. A JSONBridge object is attached to a HTTP server using the
-  attach_to() function. Behind the scene, this function registers a handler function
+  attach_to() function. Behind the scene, this function registers a handler
   for the path associated with the JSONBridge.
 
-  Assume the HTTP server `hs` answers requests sent to `http://localhost:8080` and
-  the JSONBridge object was created
-  as:
+  Assume the HTTP server `hs` answers requests sent to `http://localhost:8080`
+  and the JSONBridge object was created as:
   \code
-    JSONBridge jb("var");
+    JSONBridge jb("/var");
   \endcode
 
   Then:
@@ -44,39 +43,41 @@ static std::tuple<std::string, size_t> index_split (const std::string name);
   \endcode
   will register a handler for requests to `http://localhost:8080/var`
 
-  If this handler is invoked with a GET request for http://localhost:8080/var?data
-  it will search in the JSON dictionary a variable called 'data' and return it's
-  content as a JSON object.
+  When this handler is invoked with a GET request for 
+  http://localhost:8080/var?data, it will search in the JSON dictionary a
+  variable called 'data' and return its content as a JSON object.
 */
 
 /// Creates a JSONBridge object for the given path
 JSONBridge::JSONBridge (const char* path)
   : path_ (path)
   , client_ (nullptr)
-  , action (nullptr)
-{}
+  , post_action (nullptr)
+{
+  assert (path[0] == '/');
+}
 
 JSONBridge::~JSONBridge ()
 {}
 
 /// Attach JSONBridge object to a HTTP server
-void JSONBridge::attach_to (httpd& server)
+void JSONBridge::attach_to (server& server)
 {
-  server.add_handler (path_.c_str (), (uri_handler)JSONBridge::callback, this);
+  server.add_handler (path_.c_str (), JSONBridge::callback, this);
 }
 
 ///
 erc JSONBridge::json_begin (json::node& root)
 {
-  TRACE9 ("JSONBridge::json_begin - %s", client ()->get_query ());
+  TRACE9 ("JSONBridge::json_begin - %s", client ().get_query ());
   mlib::lock l (in_use);
   size_t idx;
   dict_cptr pvar;
 
-  if (!find (client ()->get_query (), pvar, &idx))
+  if (!find (client ().get_query (), pvar, &idx))
   {
-    TRACE2 ("JSONBridge::json_begin - Cannot find %s", client ()->get_query ());
-    return erc (ERR_JSON_NOTFOUND);
+    TRACE2 ("JSONBridge::json_begin - Cannot find %s", client ().get_query ().c_str());
+    return erc (HTTP_JSON_NOTFOUND);
   }
   return jsonify (root, pvar);
 }
@@ -89,17 +90,11 @@ erc JSONBridge::json_end (json::node& obj)
     // serialize in a buffer to find content length
     stringstream ss;
     ss << fixed << obj;
-
-    client ()->out () << "HTTP/1.1 200 OK\r\n"
-                         "Cache-Control: no-cache, no-store\r\n"
-                         "Content-Type: application/json\r\n"
-                         //"Access-Control-Allow-Origin: *\r\n"
-                         "Connection: Keep-Alive\r\n"
-                         "Content-Length: "
-                      << ss.str ().size ()
-                      << "\r\n"
-                         "\r\n"
-                      << ss.str () << endl;
+    client ().add_ohdr ("Cache-Control", "no-cache, no-store");
+    client ().add_ohdr ("Content-Type", "application/json");
+    client ().add_ohdr ("Content-Length", to_string(ss.str ().size ()));
+    client().respond (200);
+    client ().out () << ss.str () << endl;
   }
   catch (erc& x)
   {
@@ -182,7 +177,7 @@ erc JSONBridge::serialize_node (json::node& n, dict_cptr v, size_t index)
 
   default:
     TRACE ("Unexpected entry type %d", v->type);
-    return erc (ERR_JSON_DICSTRUC, json::Errors());
+    return erc (HTTP_JSON_DICSTRUC, json::Errors ());
   }
   return erc::success;
 }
@@ -250,13 +245,12 @@ erc JSONBridge::deserialize_node (const json::node& n, dict_cptr v, size_t index
 
 void JSONBridge::not_found (const char* varname)
 {
-  string tmp = "HTTP/1.1 415 Unknown variable %s\r\n";
-  tmp += varname;
+  string tmp = "Unknown variable "s + varname;
+  client ().add_ohdr ("Content-Type", "text/plain");
+  client ().add_ohdr ("Content-Length", to_string(tmp.size ()));
+  client ().respond (410, tmp.c_str ());
 
-  client ()->out () << "HTTP/1.1 415 Unknown variable " << varname << "\r\n"
-                    << "Content-Type: text/plain\r\n"
-                    << "Content-Length: " << tmp.size () << "\r\n\r\n"
-                    << tmp << endl;
+  client ().out () << tmp;
 }
 
 /*!
@@ -396,7 +390,7 @@ bool JSONBridge::parse_urlencoded () const
       *(double*)pv = stod (value);
       break;
     case JT_BOOL:
-      utf8::tolower (value);
+      str_lower (value);
       *(bool*)pv = (value == "true" || value == "1" || value == "on");
       break;
 
@@ -480,98 +474,74 @@ bool JSONBridge::parse_jsonencoded () const
   return false; // only objects and some arrays can be parsed
 }
 
-int JSONBridge::callback (const char* uri, http_connection& client, JSONBridge* ctx)
+void JSONBridge::process_request ()
 {
-  const char* req = client.get_method ();
-  const char* query = client.get_query ();
-  TRACE9 ("ui_callback req=%s query=%s", req, query);
-  ctx->client_ = &client;
-  ctx->lock ();
-  if (!_strcmpi (req, "GET"))
+  try
   {
-    json::node root;
-    erc ret;
-    if ((ret = ctx->json_begin (root)) == erc::success)
-      ctx->json_end (root);
-    else if (ret == ERR_JSON_NOTFOUND)
-      ctx->not_found (query);
-    else
-      client.serve404 ();
-  }
-  else if (!_strcmpi (req, "POST"))
-  {
-    bool ok = false;
-    std::string content = client.get_ihdr ("Content-Type");
-    // make lower case
-    std::transform (content.begin (), content.end (), content.begin (),
-                    [] (char c) -> char { return tolower (c); });
-
-    if (strlen (client.get_query ()))
+    if (client ().get_method () == "GET")
     {
-      auto ph = ctx->post_handlers.find (client.get_query ());
-      if (ph != ctx->post_handlers.end ())
+      json::node root;
+      erc ret;
+      if ((ret = json_begin (root)) == erc::success)
+        json_end (root);
+      else if (ret == HTTP_JSON_NOTFOUND)
+        not_found (client ().get_query ().c_str ());
+      else
+        client ().serve404 ();
+    }
+    else if (client ().get_method () == "POST")
+    {
+      if (!client ().has_ihdr ("Content-Type"))
       {
-        (ph->second) (uri, *ctx);
-        ok = true;
+        client ().respond (403);
+        return;
       }
-    }
-    if (!ok)
-    {
-      if (content.find ("application/x-www-form-urlencoded") != string::npos)
-        ok = ctx->parse_urlencoded ();
-      if (content.find ("application/json", 0) != string::npos)
-        ok = ctx->parse_jsonencoded ();
-    }
+      std::string content = client ().get_ihdr ("Content-Type");
+      str_lower (content);
 
-    if (ok && ctx->action)
-      ctx->action (*ctx);
+      bool ok = (content == "application/x-www-form-urlencoded") ? parse_urlencoded ()
+              : (content == "application/json")                  ? parse_jsonencoded ()
+                                                                 : false; 
+
+      if (!ok)
+      {
+        client ().respond (400);
+        return;
+      }
+
+      if (!client ().get_query ().empty ())
+      {
+        const auto& h = post_handlers.find (client ().get_query ());
+        if (h != post_handlers.end ())
+          ok = (h->second(client(), this) == HTTP_OK);
+      }
+      if (ok && post_action)
+        ok = (post_action (client(), this) == HTTP_OK);
+
+      if (ok && !redirect_uri.empty())
+        client ().redirect (redirect_uri);
+    }
   }
-  ctx->client_ = nullptr;
-  ctx->unlock ();
-  return 1;
+  catch (erc& x)
+  {
+    TRACE ("JSONBridge::process_request erc %d", (int)x);
+    client ().respond (500); //server error
+  }
 }
 
-/*!
-  Decoding of URL-encoded data.
-  We can do it in place because resulting string is shorter or equal than input.
-
-  \return `true` if successful, `false` otherwise
-*/
-bool url_decode (std::string& s)
+int JSONBridge::callback (connection& client, void* par)
 {
-  size_t in = 0, out = 0;
+  JSONBridge* bridge = (JSONBridge*)par;
+  auto& req = client.get_method ();
+  auto& query = client.get_query ();
+  TRACE9 ("ui_callback req=%s query=%s", req.c_str (), query.c_str());
 
-  auto hexdigit = [] (char* bin, char c) -> bool {
-    if (c >= '0' && c <= '9')
-      *bin = c - '0';
-    else if (c >= 'A' && c <= 'F')
-      *bin = c - 'A' + 10;
-    else if (c >= 'a' && c <= 'f')
-      *bin = c - 'a' + 10;
-    else
-      return false;
-
-    return true;
-  };
-
-  while (in < s.size ())
-  {
-    if (s[in] == '%')
-    {
-      in++;
-      char d1, d2; // hex digits
-      if (!hexdigit (&d1, s[in++]) || !hexdigit (&d2, s[in]))
-        return false;
-      s[out++] = (d1 << 4) | d2;
-    }
-    else if (s[in] == '+')
-      s[out++] = ' ';
-    else
-      s[out++] = s[in];
-    in++;
-  }
-  s.erase (out);
-  return true;
+  bridge->lock ();
+  bridge->client_ = &client;
+  bridge->process_request ();
+  bridge->client_ = nullptr;
+  bridge->unlock ();
+  return 1;
 }
 
 //  If input string is of the format <var>_<number>, splits it in components
@@ -593,4 +563,4 @@ std::tuple<std::string, size_t> index_split (const std::string name)
   return {var, idx};
 }
 
-} // namespace mlib
+} // end namespace mlib::http

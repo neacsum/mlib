@@ -85,13 +85,12 @@
     });
 
     //request for a non-existent entry
-    $.getJSON("/var?no_such_variable", function (r) { }).fail(function () { console.log("Expected 415 reply") })
+    $.getJSON("/var?no_such_variable", function (r) { }).fail(function () { console.log("Expected 410 reply") })
   }
 
   $(document).ready(get_data());
 
-  function exit_server() {
-    $.post({ url: "/var?exit_server", data: " " });
+  function exit_program() {
     alert("Thanks for trying the user interface server");
     window.close();
   }
@@ -289,7 +288,9 @@
     <div class="clear"></div>
     <hr />
     <div class="grid_2, push_2">
-      <input type="button" onclick="exit_server()" value="EXIT PROGRAM" />
+      <form method="post" id="exit_form" action="/exit" onsubmit="setTimeout(exit_program, 100)">
+          <button>EXIT PROGRAM</button>
+      </form>
     </div>
   </div>
 

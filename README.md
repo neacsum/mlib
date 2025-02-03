@@ -3,7 +3,7 @@ This is a collection of bits and pieces crafted over the years. It is released
 with the hope that other people might find it useful or interesting.
 
 Here you will find stuff as diverse as:
-- socket streams that allow you work with C++ io streams over TCP or UDP sockets
+- socket streams that allow you work with C++ I/O streams over TCP or UDP sockets
 - a very competent JSON parser/generator
 - an embedded HTTP server
 - tools for creating a user interface using HTML
@@ -24,7 +24,7 @@ Example programs:
 - yacb (Yet Another Circular Buffer) - Circular buffer sample
 
 ## Building ##
-mlib requires the [UTF-8 Library](https://github.com/neacsum/utf8). in addition The test program requires the [UTPP Library](https://github.com/neacsum/utpp).
+mlib requires the [UTF-8 Library](https://github.com/neacsum/utf8). In addition, the test program requires the [UTPP Library](https://github.com/neacsum/utpp).
 
 The preferred method is to use the [CPM - C/C++ Package Manager](https://github.com/neacsum/cpm/). Download the [CPM executable](https://github.com/neacsum/cpm/releases/latest/download/cpm.exe) and, from the root of the development tree, issue the `cpm` command:
 ```

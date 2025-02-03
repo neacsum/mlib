@@ -156,6 +156,9 @@
     <ClInclude Include="..\include\mlib\tcpserver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="base64.cpp">
@@ -267,6 +270,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="asset.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="utils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -297,7 +297,7 @@ void tcpserver::termconn (sock& conn_sock, thread* th)
   {
     try
     {
-      TRACE8 ("TCP server %s - Closed connection with %s:%d", thread::name ().c_str (),
+      TRACE8 ("TCP server %s - Closed connection with %s", thread::name ().c_str (),
               to_string (*conn_sock.peer ()).c_str ());
       conn_sock.linger (true, 1);
       conn_sock.shutdown (sock::shut_readwrite);
