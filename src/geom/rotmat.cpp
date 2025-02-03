@@ -1,8 +1,10 @@
-/*!
-  \file rotmat.cpp Implementation of a rotation calculator class
-
-  (c) Mircea Neacsu 2017. All rights reserved.
+/*
+  Copyright (c) Mircea Neacsu (2014-2025) Licensed under MIT License.
+  This is part of MLIB project. See LICENSE file for full license terms.
 */
+
+///  \file rotmat.cpp Implementation of a rotation calculator class
+
 #include <mlib/mlib.h>
 #pragma hdrstop
 #include <math.h>

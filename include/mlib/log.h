@@ -1,12 +1,14 @@
+/*
+  Copyright (c) Mircea Neacsu (2014-2025) Licensed under MIT License.
+  This is part of MLIB project. See LICENSE file for full license terms.
+*/
+
 #pragma once
 /*!
   \file log.h syslog related functions.
 
-  (c) Mircea Neacsu 2008
-
   The header file is a shameless copy of the original BSD syslog.h file,
   however implementations are new.
-
 */
 #if __has_include("defs.h")
 #include "defs.h"

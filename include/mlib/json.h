@@ -593,6 +593,7 @@ inline node& node::at (size_t index)
   return const_cast<node&> (static_cast<const node&> (*this).at (index));
 }
 
+/// \cond not_documented
 struct omanip
 {
   omanip (void (*fn)(std::ios_base&, int), int val) : pfun(fn), arg(val) {}
@@ -624,8 +625,12 @@ inline std::ostream& tabs (std::ostream& os)
   return os;
 };
 std::ostream& noindent (std::ostream& os);
+/// \endcond
 
+/// Insertion operator serializes a JSON node to an output stream
 std::ostream& operator<< (std::ostream& os, const node& n);
+
+/// Extraction operator retrieves a JSON node from an input stream
 std::istream& operator>> (std::istream& is, node& n);
 
 /// Assign array value to a node

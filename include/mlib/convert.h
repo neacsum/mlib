@@ -1,5 +1,5 @@
 ﻿/*
-  Copyright (c) Mircea Neacsu (2014-2024) Licensed under MIT License.
+  Copyright (c) Mircea Neacsu (2014-2025) Licensed under MIT License.
   This is part of MLIB project. See LICENSE file for full license terms.
 */
 
@@ -252,6 +252,20 @@ std::string degtoa (double degrees, deg_fmt format, bool latitude, int precision
 
 /// Conversion from string to decimal degrees
 double atodeg (const std::string& str);
-/// @}
 
+/*!
+   A handy template to get sin and cos in a single function call
+
+   Using structured bindings (C++17), it can be called like:
+\code{.cpp}
+  auto [s, c] = sincos (M_PI/4.);
+\endcode
+*/
+template <typename T>
+std::pair<T, T> sincos (T val)
+{
+  return {std::sin (val), std::cos (val)};
+}
 } // namespace mlib
+
+/// @}

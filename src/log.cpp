@@ -1,7 +1,10 @@
-/*!
-  \file log.cpp Implementation of syslog functions.
-
+/*
+  Copyright (c) Mircea Neacsu (2014-2025) Licensed under MIT License.
+  This is part of MLIB project. See LICENSE file for full license terms.
 */
+
+///  \file log.cpp Implementation of syslog functions.
+
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 
 #include <mlib/mlib.h>
@@ -43,6 +46,7 @@ int log_defaultmask = DEFAULT_PRIMASK;
 char log_servhostname[_MAX_PATH] = {DEFAULT_SERVERNAME};
 char log_fname[_MAX_PATH];
 
+/// \cond not_documented
 // logger data
 struct LOG
 {
@@ -56,6 +60,7 @@ struct LOG
   char* ident;
   char str_pid[10];
 };
+/// \endcond
 
 static LOG* proclog = 0; // default process log
 

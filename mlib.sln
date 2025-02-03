@@ -49,6 +49,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "opt-sample", "examples\opt-
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "error_codes", "examples\error_codes\error_codes.vcxproj", "{6F661B2D-BB25-4DF1-AB86-13F0A82241BC}"
+	ProjectSection(ProjectDependencies) = postProject
+		{F9E11AA9-FAB8-40D8-96D9-F92C5725762B} = {F9E11AA9-FAB8-40D8-96D9-F92C5725762B}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "http_handler1", "examples\http_handler1\http_handler1.vcxproj", "{322C1126-59F8-4868-950A-7E133339EE19}"
 	ProjectSection(ProjectDependencies) = postProject

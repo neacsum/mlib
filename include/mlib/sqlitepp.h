@@ -333,6 +333,7 @@ inline Query::operator std::string () const
   return sql ();
 }
 
+/// Bitwise OR operator permits combining database open flags
 inline Database::openflags operator| (const Database::openflags& f1, const Database::openflags& f2)
 {
   return static_cast<Database::openflags> (static_cast<int> (f1) | static_cast<int> (f2));

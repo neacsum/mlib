@@ -69,6 +69,7 @@ SOFTWARE.
 - \ref mlib::Database "Database"
 
 ### Other things ###
+- \ref convert - Angle and unit conversion functions
 - \ref mlib::bitstream "bitstream" - Reading and writing of bit fields
 - \ref mlib::ipow() "ipow" - Integer powers through multiplication
 - \ref mlib::poly() "poly" - Polynomial evaluation using Horner's scheme

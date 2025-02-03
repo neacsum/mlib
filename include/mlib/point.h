@@ -10,8 +10,7 @@
 #include "defs.h"
 #endif
 
-#define _USE_MATH_DEFINES
-#include <math.h>
+#include <mlib/convert.h>
 
 #include <ostream>
 
@@ -26,6 +25,7 @@ namespace mlib {
   azimuth from north, as well as basic operators (comparison, I/O).
 */
 
+/// Provides default tolerance value for Point class
 template <typename T>
 struct point_traits
 {
@@ -35,6 +35,7 @@ struct point_traits
   };
 };
 
+/// Provide tolerance for integer points
 template <>
 struct point_traits<int>
 {
@@ -55,7 +56,10 @@ public:
   Point (T a, T b);
   Point ();
 
+  /// Return azimuth from North of line this-P2
   double azimuth (const Point<T>& P2) const;
+
+  /// Return inside angle P1-this-P2.
   double angle (const Point<T>& P1, const Point<T>& P2) const;
 
   Point<T> operator+ (const Point<T>& p) const
@@ -168,8 +172,7 @@ Point<T>::Point ()
 {}
 
 /*!
-  Return azimuth from North of line this-P2
-
+  Azimuth is measured in a clockwise direction
   0<= azimuth < 2*M_PI
 */
 template <class T>
@@ -206,8 +209,6 @@ double Point<T>::distance (const Point<T>& P2) const
 }
 
 /*!
-  Return inside angle P1-this-P2.
-
   0 <= angle < M_PI
   degenerated angles (p1 == this or p2 == this) are 0
 */
@@ -222,14 +223,14 @@ double Point<T>::angle (const Point<T>& P1, const Point<T>& P2) const
   return (cang <= -1) ? M_PI : (cang >= 1) ? 0. : acos (cang);
 }
 
-/// Return true if this is left of the line (a,b)
+/// Return `true` if this is left of the line (a,b)
 template <class T>
 bool Point<T>::leftof (const Point<T>& a, const Point<T>& b) const
 {
   return (a.x - x) * (b.y - y) - (a.y - y) * (b.x - x) > point_traits<T>::tolerance ();
 }
 
-/// Return true if points a, this, b are collinear
+/// Return `true` if points a, this, b are collinear
 template <class T>
 bool Point<T>::collinear (const Point& a, const Point& b) const
 {
@@ -239,8 +240,8 @@ bool Point<T>::collinear (const Point& a, const Point& b) const
 template <class T>
 void Point<T>::rotate (double angle)
 {
-  double c, s;
-  double x1 = x * (c = cos (angle)) - y * (s = sin (angle));
+  auto [s, c] = sincos (angle);
+  double x1 = x * c - y * s;
   double y1 = x * s + y * c;
   x = x1;
   y = y1;

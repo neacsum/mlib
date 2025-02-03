@@ -1,20 +1,8 @@
-/*!
-  \file trace.h Definition of trace debugging macros.
-
-  (c) Mircea Neacsu 1999-2002. All rights reserved.
-
-  TRACE
-  Usage: TRACE (fmt, arg1, arg2, ....);
-
-  If _TRACE symbol is defined the macro produces a
-  printf-like string to the debug output.
-  Otherwise TRACE has no effect.
-
-  There are also 9 additional macros TRACEx (where x is 1 to 9) that behave
-  like TRACE if _TRACE_LEVEL is greater than x. The intended usage is
-  to have very detailed trace information if _TRACE_LEVEL is high with
-  diminishing amounts of information as _TRACE_LEVEL is lowered.
+/*
+  Copyright (c) Mircea Neacsu (2014-2025) Licensed under MIT License.
+  This is part of MLIB project. See LICENSE file for full license terms.
 */
+
 #pragma once
 
 #if __has_include("defs.h")
@@ -34,6 +22,25 @@
 #undef TRACE8
 #undef TRACE9
 
+/*!
+  \file TRACE.H definition of TRACE macro
+
+  Usage: 
+```
+  TRACE (fmt, arg1, arg2, ....);
+```
+  If `_TRACE` symbol is defined, the macro produces a printf-like string on the
+  debug output.
+
+  Otherwise `TRACE` has no effect and is optimized out of existence.
+
+  There are 9 additional macros, `TRACEx` (where x is 1 to 9) that behave
+  like `TRACE` if `_TRACE_LEVEL` is greater than x. The intended usage is
+  to have very detailed trace information if `_TRACE_LEVEL` is high with
+  diminishing amounts of information as `_TRACE_LEVEL` is lowered.
+*/
+
+/// \cond not_documented
 // MLIB_SYSLOG_TRACE forces MLIB_TRACE
 #if MLIB_SYSLOG_TRACE && !defined(MLIB_TRACE)
 #define MLIB_TRACE MLIB_SYSLOG_TRACE
@@ -79,3 +86,4 @@
 #else
 #define TRACE 1 ? 0 : dprintf
 #endif
+/// \endcond

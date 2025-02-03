@@ -13,8 +13,9 @@
    \defgroup convert Angle and Unit Conversion
    Functions and constants for angle and unit conversions
 
-   These are conversion functions between different angle representations as
-   well as to and from customary latitude/longitude string representations.
+   These are conversion functions between different angle representations.
+   It contains also functions for conversion to and from customary 
+   latitude/longitude string representations of angles.
 */
 namespace mlib {
 
@@ -52,12 +53,14 @@ double deg_reduce (double value)
 
   Format is controlled by flags settings and precision. The resulting string
   can have one of the following formats:
-   - `DD°MM'SS.sss"H` if output format has deg_fmt::sec bit set
-   - `DD°MM.mmmm'H` if output format has LL_MIN bit set
-   - `DD.dddd°H` if neither of these bits is set
+   - `DD°MM'SS.sss"H` if format is set to deg_fmt::seconds
+   - `DD°MM.mmmm'H` if output format is set to deg_fmt::minutes
+   - `DD.dddd°H` if output format is set to deg_fmt::degrees
 
    In the above formats, `H` is the hemisphere which can be one of `N` or `S`
    if \p latitude parameter is \b true. Otherwise it is one of `E` or `W`.
+
+   \ingroup convert
 */
 std::string degtoa (double degrees, deg_fmt format, bool latitude, int precision)
 {
@@ -106,12 +109,14 @@ std::string degtoa (double degrees, deg_fmt format, bool latitude, int precision
   \param str input string
   \return angle value in degrees
 
-  Some valid strings are:
+  Some sample valid strings are:
   - 130°45'25.34566W
   - 130D45'25.34566E
   - 65D45M25.34567S
   - 130.56789W
   - 85°30.45678N
+
+  \ingroup convert
 */
 double atodeg (const std::string& str)
 {

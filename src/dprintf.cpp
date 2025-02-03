@@ -1,8 +1,10 @@
-/*!
-  \file dprintf.cpp Implementation of dprintf() function
-
-  (c) Mircea Neacsu 1999-2020. All rights reserved.
+/*
+  Copyright (c) Mircea Neacsu (2014-2025) Licensed under MIT License.
+  This is part of MLIB project. See LICENSE file for full license terms.
 */
+
+
+///  \file dprintf.cpp Implementation of dprintf() function
 
 #include <mlib/mlib.h>
 #pragma hdrstop
@@ -15,9 +17,13 @@
 #include <mlib/critsect.h>
 
 
-/*!
-  printf style function writes messages using OutputDebugString.
-  Message length is limited to MAX_DPRINTF_CHARS characters.
+/*!  
+  A printf-style function, writes debug messages.
+
+  On Windows platform, the function  uses the `OutputDebugString` API call to
+  generate the output. On other platforms, output is sent to `stderr`.
+
+  Message length is limited to `MAX_DPRINTF_CHARS` characters.
 
   \param fmt print format
   \return true if successful, false otherwise
@@ -25,7 +31,6 @@
   \note Function is thread-safe. Calls from different threads are serialized by
   a critical section object.
 */
-
 bool dprintf (const char* fmt, ...)
 {
 #ifndef _WIN32
