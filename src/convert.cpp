@@ -24,15 +24,21 @@ static double inline pow10 (int x)
   return ipow (10., x);
 }
 
-// safe replacement for sprintf to a string
+/// safe replacement for sprintf to a string
 inline size_t strprintf (std::string& str, const char* fmt, ...)
 {
   va_list args;
   va_start (args, fmt);
   auto sz = vsnprintf (nullptr, 0, fmt, args);
-  str.resize (sz + 1); // leave space for terminating null
+  if (sz < 0)
+  {
+    str.clear ();
+    return sz; //something went wrong
+  }
+  if (str.size () < sz+1)
+    str.resize (sz + 1); // leave space for terminating null
   va_start (args, fmt);
-  sz = vsnprintf (const_cast<char*> (str.data ()), sz + 1, fmt, args);
+  sz = vsnprintf (str.data (), sz + 1, fmt, args);
   str.resize (sz);
   return sz;
 }
