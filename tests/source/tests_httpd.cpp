@@ -10,6 +10,52 @@ using namespace std;
 
 SUITE (HttpServer)
 {
+TEST (uri_handler)
+{
+  http::server srv;
+  srv.socket ().bind (inaddr (INADDR_LOOPBACK, 12345));
+  srv.add_handler ("/?A", [] (http::connection& cl, void*) -> int { 
+    cl.serve_buffer ("Hello world!");
+    return HTTP_OK;
+   });
+  srv.start ();
+  int status_code;
+  string uri;
+  auto fn = [&] () -> int {
+    sockstream ws (inaddr ("127.0.0.1", srv.socket ().name ()->port ()));
+    ws << "GET " << uri << " HTTP/1.1" << endl;
+    ws << "Host: " << to_string (*srv.socket ().name ()) << endl;
+    ws << "Connection: Close" << endl;
+    ws << endl << flush;
+    char text[1024];
+    ws.getline (text, sizeof (text));
+    cout << "Response:" << endl;
+    cout << text << endl;
+    strtok (text, " ");
+    status_code = atoi (strtok (NULL, " "));
+    while (!ws.eof ())
+    {
+      ws.getline (text, sizeof (text));
+      cout << text << endl;
+    }
+
+    return 1;
+  };
+
+  thread cl1 (fn);
+  uri = "/%3fA";
+  cl1.start ();
+  cl1.wait ();
+  CHECK_EQUAL (200, status_code);
+
+  thread cl2 (fn);
+  uri = "/%3fB";
+  cl2.start ();
+  cl2.wait ();
+  CHECK_EQUAL (404, status_code);
+
+  srv.terminate ();
+}
 
 TEST (url_decode_ok)
 {

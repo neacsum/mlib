@@ -541,7 +541,7 @@ int JSONBridge::callback (connection& client, void* par)
   bridge->process_request ();
   bridge->client_ = nullptr;
   bridge->unlock ();
-  return 1;
+  return HTTP_OK;
 }
 
 //  If input string is of the format <var>_<number>, splits it in components

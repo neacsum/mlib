@@ -25,7 +25,7 @@ static double inline pow10 (int x)
 }
 
 /// safe replacement for sprintf to a string
-inline size_t strprintf (std::string& str, const char* fmt, ...)
+size_t strprintf (std::string& str, const char* fmt, ...)
 {
   va_list args;
   va_start (args, fmt);
