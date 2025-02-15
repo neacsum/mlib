@@ -25,7 +25,7 @@ static double inline pow10 (int x)
 }
 
 /// safe replacement for sprintf to a string
-inline size_t strprintf (std::string& str, const char* fmt, ...)
+size_t strprintf (std::string& str, const char* fmt, ...)
 {
   va_list args;
   va_start (args, fmt);
@@ -35,10 +35,11 @@ inline size_t strprintf (std::string& str, const char* fmt, ...)
     str.clear ();
     return sz; //something went wrong
   }
-  if (str.size () < sz+1)
-    str.resize (sz + 1); // leave space for terminating null
+  size_t alloc = (size_t)sz + 1;
+  if (str.size () < alloc)
+    str.resize (alloc); // leave space for terminating null
   va_start (args, fmt);
-  sz = vsnprintf (str.data (), sz + 1, fmt, args);
+  sz = vsnprintf (str.data (), alloc, fmt, args);
   str.resize (sz);
   return sz;
 }

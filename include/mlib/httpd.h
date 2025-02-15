@@ -42,7 +42,7 @@ struct ci_less : public std::function<bool (std::string, std::string)>
 /// Keys are case insensitive.
 typedef std::map<std::string, std::string, ci_less> str_pairs;
 
-/// User defined URL handler function
+  /// User defined URL handler function
 typedef std::function<int (connection& client, void* info)> uri_handler;
 
 /// Representation of a HTTP client connection request
@@ -71,6 +71,9 @@ public:
 
   /// Return the value of a request header
   const std::string& get_ihdr (const std::string& hdr) const;
+
+  /// Return all request headers
+  const str_pairs& get_request_headers () const;
 
   /// Check if response has a header
   bool has_ohdr (const std::string& hdr) const;
@@ -101,9 +104,6 @@ public:
   int serve_shtml (const std::filesystem::path& file);
   int serve_buffer (const BYTE* buffer, size_t sz);
   int serve_buffer (const std::string& str);
-
-  void respond_part (const char* part_type, const char* bound);
-  void respond_next (bool last);
 
 protected:
   connection (sock& socket, server& server);
@@ -496,6 +496,13 @@ sockstream& connection::out ()
   return ws;
 }
 
+inline
+const str_pairs& connection::get_request_headers () const
+{
+  return iheaders;
+}
+
+
 //------------------------ http::server inline functions ----------------------
 /// Return current file origin
 inline
@@ -534,5 +541,20 @@ server::handle_info::handle_info (uri_handler h_, void* info_)
   , nfo (info_)
   , in_use{std::make_shared<criticalsection> ()}
 {}
+
+/*!
+   Stream out a headers map as a sequence of lines
+```
+   <key>: <value><CR><LF>
+```
+*/
+inline std::ostream& operator<< (std::ostream& os, const str_pairs& hdrs)
+{
+  for (auto& hdr : hdrs)
+  {
+    os << hdr.first << ": " << hdr.second << "\r\n";
+  }
+  return os;
+}
 
 } // namespace mlib::http

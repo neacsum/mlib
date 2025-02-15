@@ -828,45 +828,44 @@ int connection::serve_file (const std::filesystem::path& file)
 bool connection::parse_request (const std::string& req)
 {
   // Request-Line   = Method SP Request-URI SP HTTP-Version CRLF
-  auto preq = req.begin();
+  auto crt = req.begin();
 
   // method
-  while (preq != req.end() && *preq != ' ' && *preq != '\n')
-    preq++;
-  if (*preq != ' ')
+  while (crt != req.end() && *crt != ' ' && *crt != '\n')
+    crt++;
+  if (*crt != ' ')
     return false;
-  method_ = string (req.begin (), preq);
+  method_ = string (req.begin (), crt);
   str_upper (method_);
 
   // SP
-  while (*++preq == ' ')
+  while (*++crt == ' ')
     ;
 
   // Request-target
-  auto pbeg = preq;
-  while (preq != req.end() && *preq != ' ' && *preq != '\n')
-    ++preq;
-  if (*preq != ' ')
+  auto pbeg = crt;
+  while (crt != req.end() && *crt != ' ' && *crt != '\n')
+    ++crt;
+  if (*crt != ' ')
     return false;
   
   // Request target must be in origin-form: absolute-path ["?" query] ["#" fragment] 
   if (*pbeg != '/')
     return false; 
 
-  path_ = string (pbeg, preq);
-  url_decode (path_); // path normalization (RFC9110 sect 4.2.3)
+  path_ = string (pbeg, crt);
 
   // SP
-  while (*++preq == ' ')
+  while (*++crt == ' ')
     ;
 
   // HTTP-Version
-  pbeg = preq;
-  while (preq != req.end () && *preq != '\n')
-    ++preq;
-  if (*preq != '\n')
+  pbeg = crt;
+  while (crt != req.end () && *crt != '\n')
+    ++crt;
+  if (*crt != '\n')
     return false;
-  http_version = string (pbeg, preq);
+  http_version = string (pbeg, crt);
 
   // separate query part
   auto qbeg= path_.find ('?');
@@ -877,6 +876,7 @@ bool connection::parse_request (const std::string& req)
     if (qend != string::npos)
       query_.erase (qend);
     path_.erase (qbeg);
+    url_decode (query_); // normalization of query component
   }
   else
   {
@@ -885,6 +885,7 @@ bool connection::parse_request (const std::string& req)
     if (pend != string::npos)
       path_.erase (pend);
   }
+  url_decode (path_); // path normalization (RFC9110 sect 4.2.3)
 
   return true;
 }
@@ -978,59 +979,12 @@ void connection::respond (unsigned int code, const std::string& reason)
 
   // output server headers
   lock l (parent.hdr_lock);
-  idx = parent.out_headers.begin ();
-  while (idx != parent.out_headers.end ())
-  {
-    ws << idx->first << ": " << idx->second << "\r\n";
-    idx++;
-  }
-  response_sent = true;
+  ws << parent.out_headers;
   // followed by our headers
   TRACE9 ("Sending connection headers");
-  idx = oheaders.begin ();
-  while (idx != oheaders.end ())
-  {
-    ws << idx->first << ": " << idx->second << "\r\n";
-    idx++;
-  }
-  ws << "\r\n";
-}
-
-
-/*!
-  Send first part of a multi-part response.
-  \param part_type value of the 'Content-Type' header
-  \param bound part boundary string
-*/
-void connection::respond_part (const char* part_type, const char* bound)
-{
-  part_boundary = bound;
-  string mpart (part_type);
-  mpart += ";boundary=";
-  mpart += part_boundary;
-  add_ohdr ("Content-Type", mpart.c_str ());
-  respond (200);
-  ws << "--" << part_boundary << "\r\n";
-  ws.flush ();
-}
-
-/*!
-  Send subsequent parts of a multi-part response.
-  \param last _true_ if this is the last part of the mulit-part response
-
-  This function should be called only after a call to respond_part() function.
-*/
-void connection::respond_next (bool last)
-{
-  if (part_boundary.empty ())
-    return; // misuse
-  ws << "\r\n--" << part_boundary;
-  if (last)
-  {
-    ws << "--";
-    part_boundary.clear ();
-  }
-  ws << "\r\n";
+  ws << oheaders;
+  ws << "\r\n"; 
+  response_sent = true;
 }
 
 //-----------------------------------------------------------------------------
