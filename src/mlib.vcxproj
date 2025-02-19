@@ -179,6 +179,7 @@
     <ClInclude Include="..\include\mlib\errorcode.h" />
     <ClInclude Include="..\include\mlib\event.h" />
     <ClInclude Include="..\include\mlib\firewall.h" />
+    <ClInclude Include="..\include\mlib\hex.h" />
     <ClInclude Include="..\include\mlib\httpd.h" />
     <ClInclude Include="..\include\mlib\inaddr.h" />
     <ClInclude Include="..\include\mlib\ipow.h" />
@@ -226,6 +227,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="dprintf.cpp" />
+    <ClCompile Include="hex.cpp" />
     <ClCompile Include="json.cpp" />
     <ClCompile Include="rdir.cpp" />
     <ClCompile Include="event.cpp" />
