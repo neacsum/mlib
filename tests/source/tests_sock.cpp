@@ -281,8 +281,8 @@ TEST (dgram_send_receive)
   th1.start ();
   th2.start ();
   go.signal ();
-  wait_all ({&th1, &th2});
-
+  auto ret = wait_all ({&th1, &th2}, 2000);
+  CHECK (ret < WAIT_OBJECT_0 + 2);
   CHECK_EQUAL ("TEST", buf);
 }
 
@@ -398,7 +398,9 @@ TEST (stream_send_receive)
 
   try
   {
-    wait_all ({&th1, &th2});
+    auto ret = wait_all ({&th1, &th2}, 4000);
+    std::cout << "wait_all return=" << ret << std::endl;
+    CHECK (ret < WAIT_OBJECT_0 + 2);
   }
   catch (erc& x)
   {
