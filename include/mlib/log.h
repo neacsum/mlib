@@ -89,7 +89,7 @@ extern "C"
   void closelog (void);
 
   /// Open connection to logger.
-  void openlog (const char* ident, int option, int facility);
+  void openlog (const char* ident, int option = 0, int facility = LOG_USER);
 
   /// Set the log mask level.
   int setlogmask (int mask);
