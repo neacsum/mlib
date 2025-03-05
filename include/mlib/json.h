@@ -27,7 +27,7 @@ constexpr int max_string_length = 8192;
 // Formatting flags
 #define JSON_FMT_INDENT     0x01 //!< Indent JSON string when writing
 #define JSON_FMT_QUOTESLASH 0x02 //!< Quote all solidus ('/') characters
-
+#define JSON_FMT_UTF8       0x04 //!< Do not encode UTF8 characters
 // JSON error codes
 #define ERR_JSON_INVTYPE  -1 //!< invalid node type
 #define ERR_JSON_TOOMANY  -2 //!< too many descendants
@@ -624,7 +624,13 @@ inline std::ostream& tabs (std::ostream& os)
   indenter (os, 0);
   return os;
 };
+
 std::ostream& noindent (std::ostream& os);
+
+std::ostream& utf8 (std::ostream& os);
+
+std::ostream& noutf8 (std::ostream& os);
+
 /// \endcond
 
 /// Insertion operator serializes a JSON node to an output stream
