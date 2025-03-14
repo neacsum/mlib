@@ -51,7 +51,10 @@ public:
   void add_option (const char* descr);
 
   /// Parse a command line
-  int parse (int argc, const char* const* argv, int* stop = 0);
+  int parse (int argc, const char* const* argv, int* stop = nullptr);
+
+  /// Parse a vector of string arguments
+  int parse (const std::vector<std::string>& args, int* stop = nullptr);
 
   ///@{
   /// Return next option in command line
