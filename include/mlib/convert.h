@@ -13,6 +13,7 @@
 #include <math.h>
 #include <numbers>
 #include <string>
+#include <cmath>
 
 #ifndef M_PI
 #define M_PI std::numbers::pi
