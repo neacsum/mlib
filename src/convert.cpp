@@ -33,7 +33,7 @@ size_t strprintf (std::string& str, const char* fmt, ...)
   if (sz < 0)
   {
     str.clear ();
-    return sz; //something went wrong
+    return sz; // something went wrong
   }
   size_t alloc = (size_t)sz + 1;
   if (str.size () < alloc)

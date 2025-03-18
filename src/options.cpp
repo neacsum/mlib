@@ -241,18 +241,38 @@ void OptParser::add_option (const char* descr)
 */
 int OptParser::parse (int argc, const char* const* argv, int* stop)
 {
+  vector<string> args;
+  for (int i = 0; i < argc; ++i)
+    args.push_back (argv[i]);
+
+  return parse (args, stop);
+}
+
+/*!
+  \param args   vector of strings
+  \param stop   pointer to an integer that receives the index of the first non-option
+                argument if function is successful, or the index of the invalid
+                option in case of failure
+
+  \return   0   success
+  \return   1   unknown option found
+  \return   2   required argument is missing
+  \return   3   invalid multiple options string
+
+*/
+int OptParser::parse (const std::vector<std::string>& args, int* stop)
+{
   int ret = 0;
-  string d, p, e; // unused
   const char* ptr;
 
-  app = std::filesystem::path (argv[0]).stem ().string ();
+  app = std::filesystem::path (args[0]).stem ().string ();
 
   cmd.clear ();
 
-  int i = 1;
-  while (i < argc)
+  size_t i = 1;
+  while (i < args.size())
   {
-    ptr = argv[i];
+    ptr = args[i].c_str();
     if (*ptr++ != '-')
       break; // end of options
     auto op = optlist.begin ();
@@ -269,8 +289,8 @@ int OptParser::parse (int argc, const char* const* argv, int* stop)
         i++;
         break;
       }
-      op = find_if (op, optlist.end (), 
-            [&ptr] (auto& o) { return !strcmp (ptr, o.olong.c_str ()); });
+      op =
+        find_if (op, optlist.end (), [&ptr] (auto& o) { return !strcmp (ptr, o.olong.c_str ()); });
       option.olong = ptr;
       if (op != optlist.end ())
         option.oshort = op->oshort;
@@ -283,8 +303,7 @@ int OptParser::parse (int argc, const char* const* argv, int* stop)
     else
     {
       // short option(s)
-      op = find_if (op, optlist.end (), 
-            [&ptr] (auto& o) { return o.oshort == *ptr; });
+      op = find_if (op, optlist.end (), [&ptr] (auto& o) { return o.oshort == *ptr; });
       if (op == optlist.end ())
       {
         ret = 1; // unknown option
@@ -301,8 +320,8 @@ int OptParser::parse (int argc, const char* const* argv, int* stop)
           goto done;
         }
         cmd.push_back (option);
-        op = find_if (optlist.begin (), optlist.end (), 
-              [&ptr] (auto& o) { return o.oshort == *ptr; });
+        op =
+          find_if (optlist.begin (), optlist.end (), [&ptr] (auto& o) { return o.oshort == *ptr; });
         if (op == optlist.end ())
         {
           ret = 1; // unknown option
@@ -317,13 +336,13 @@ int OptParser::parse (int argc, const char* const* argv, int* stop)
     switch (op->flag)
     {
     case '?': // optional arg
-      if (i < argc && *argv[i] != '-')
-        option.arg.push_back (argv[i++]);
+      if (i < args.size () && args[i][0] != '-')
+        option.arg.push_back (args[i++]);
       break;
 
     case ':': // required arg
-      if (i < argc && *argv[i] != '-')
-        option.arg.push_back (argv[i++]);
+      if (i < args.size () && args[i][0] != '-')
+        option.arg.push_back (args[i++]);
       else
       {
         ret = 2; // required arg missing
@@ -333,11 +352,11 @@ int OptParser::parse (int argc, const char* const* argv, int* stop)
       break;
 
     case '+': // one or more
-      if (i < argc && *argv[i] != '-')
+      if (i < args.size () && args[i][0] != '-')
       {
-        option.arg.push_back (argv[i++]);
-        while (i < argc && *argv[i] != '-')
-          option.arg.push_back (argv[i++]);
+        option.arg.push_back (args[i++]);
+        while (i < args.size () && args[i][0] != '-')
+          option.arg.push_back (args[i++]);
       }
       else
       {
@@ -348,8 +367,8 @@ int OptParser::parse (int argc, const char* const* argv, int* stop)
       break;
 
     case '*': // zero or more
-      while (i < argc && *argv[i] != '-')
-        option.arg.push_back (argv[i++]);
+      while (i < args.size () && args[i][0] != '-')
+        option.arg.push_back (args[i++]);
       break;
 
     case '|': // no argument
@@ -371,7 +390,7 @@ int OptParser::parse (int argc, const char* const* argv, int* stop)
 
 done:
   if (stop)
-    *stop = i;
+    *stop = (int)i;
   return ret;
 }
 

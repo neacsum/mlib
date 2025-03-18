@@ -452,6 +452,36 @@ TEST (SampleOptionsCode)
             << "Where:" << std::endl
             << optparser.description () << std::endl;
 }
+
+TEST (Sample_args_as_vector)
+{
+  OptParser optparser (
+    {"a? optional_arg \t -a can have an argument example: -a 1 or -a xyz",
+     "b: required_arg \t -b must be followed by an argument example: -b mmm",
+     "c+ one_or_more_args \t -c can be followed by one or more arguments example: -c 12 ab cd",
+     "d* 0_or_more_args \t -d can have zero or more arguments", "e|\t-e doesn't have any arguments",
+     "f?longorshort optional \t -f can be also written as --longorshort",
+     ":longopt required \t --longopt must have an argument"});
+
+  // sample command line
+  const std::vector <std::string> args {"c:\\path\\to\\file\\program.exe", "-a", "1", "-e", "--longopt", "par"};
+
+  optparser.parse (args);
+  string lo;
+  if (optparser.getopt ("longopt", lo))
+  {
+    // lo should be "par"
+    CHECK_EQUAL ("par", lo);
+  }
+
+  if (optparser.hasopt ('e'))
+  {
+    // option -e is present
+  }
+  else
+    CHECK ("Missing option");
+}
+
 }
 
 

@@ -88,6 +88,20 @@ TEST (quoted_string_outside_bmp)
   CHECK_EQUAL (in, out);
 }
 
+TEST (utf8_outside_bmp)
+{
+  string in{u8"{\"G clef\":\"𝄞\"}"};
+  json::node n;
+  n.read (in);
+  string out;
+  n.write (out);
+  string check{R"({"G clef":"\ud834\udd1e"})"};
+  CHECK_EQUAL (check, out);
+
+  n.write (out, JSON_FMT_UTF8);
+  CHECK_EQUAL (in, out);
+}
+
 TEST (copy_constructor)
 {
   string in = R"({
@@ -705,6 +719,65 @@ TEST (Code_project)
   new_node.read(R"({"t":"x", "l" : [0.0, 0.0, 0.0, 0.0] })");
   cityInfo[i] = new_node ;
   CHECK_EQUAL (5, data["city_data"].size ());
+}
+
+TEST (rfc8259)
+{
+  //some examples from RFC8259
+  string in{R"(
+{
+        "Image": {
+            "Width":  800,
+            "Height": 600,
+            "Title":  "View from 15th Floor",
+            "Thumbnail": {
+                "Url":    "http://www.example.com/image/481989943",
+                "Height": 125,
+                "Width":  100
+            },
+            "Animated" : false,
+            "IDs": [116, 943, 234, 38793]
+          }
+      }
+)"};
+  json::node data;
+  data.read (in);
+  CHECK_EQUAL (800, data["Image"]["Width"].to_num());
+
+  in = R"([
+        {
+           "precision": "zip",
+           "Latitude":  37.7668,
+           "Longitude": -122.3959,
+           "Address":   "",
+           "City":      "SAN FRANCISCO",
+           "State":     "CA",
+           "Zip":       "94107",
+           "Country":   "US"
+        },
+        {
+           "precision": "zip",
+           "Latitude":  37.371991,
+           "Longitude": -122.026020,
+           "Address":   "",
+           "City":      "SUNNYVALE",
+           "State":     "CA",
+           "Zip":       "94085",
+           "Country":   "US"
+        }
+      ])";
+  data.read (in);
+  CHECK_EQUAL (json::type::array, data.kind ());
+  CHECK_EQUAL ("SAN FRANCISCO", data[0]["City"].to_str ());
+
+  data = "Hello world!";
+  CHECK_EQUAL ("Hello world!", data.to_str ());
+
+  data = 42;
+  CHECK_EQUAL (42, data.to_num ());
+
+  data = true;
+  CHECK_EQUAL (true, data.to_bool ());
 }
 
 }  //end suite

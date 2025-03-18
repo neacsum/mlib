@@ -57,6 +57,7 @@ public:
   HANDLE       handle () const;
   bool         operator== (const sock& other) const;
   bool         operator!= (const sock& other) const;
+  operator     SOCKET () const;
 
   virtual erc  open (int type, int domain = AF_INET, int proto = 0);
   virtual erc  close ();
@@ -281,6 +282,12 @@ inline sock::sock ()
 inline HANDLE sock::handle () const
 {
   return sl ? (HANDLE)sl->handle : INVALID_HANDLE_VALUE;
+}
+
+/// Conversion operator 
+inline sock::operator SOCKET () const
+{
+  return sl ? sl->handle : INVALID_SOCKET;
 }
 
 /// Check if socket is opened

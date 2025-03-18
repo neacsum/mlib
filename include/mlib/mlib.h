@@ -18,6 +18,7 @@
 #include "crc32.h"
 #include "dprintf.h"
 #include "errorcode.h"
+#include "hex.h"
 #include "ipow.h"
 #include "json.h"
 #include "md5.h"

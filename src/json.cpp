@@ -453,42 +453,45 @@ static erc parse_num (istream& is, double& num)
 static erc parse_string (istream& is, std::string& s)
 {
   s.clear ();
-  wstring ws;
   int len = 0;
+  int high_surrogate = 0;
   while (++len < max_string_length)
   {
     int c = is.get ();
-    if (c == L'"')
-    {
-      s = utf8::narrow (ws);
+    if (high_surrogate && c != '\\')
+      return erc (ERR_JSON_INPUT, Errors ()); // non terminated surrogate sequence
+
+    if (c == '"')
       return erc::success;
-    }
     else if (c < 0x20 || c == char_traits<char>::eof ())
       return erc (ERR_JSON_INPUT, Errors());
     else if (c == '\\')
     {
       c = is.get ();
+      if (high_surrogate && c != 'u')
+        return erc (ERR_JSON_INPUT, Errors ()); // non terminated surrogate sequence
+
       switch (c)
       {
       case '"':
       case '\\':
       case '/':
-        ws.push_back (c);
+        s.push_back (c);
         break;
       case 'b':
-        ws.push_back (L'\b');
+        s.push_back ('\b');
         break;
       case 'f':
-        ws.push_back (L'\f');
+        s.push_back ('\f');
         break;
       case 'n':
-        ws.push_back (L'\n');
+        s.push_back ('\n');
         break;
       case 'r':
-        ws.push_back (L'\r');
+        s.push_back ('\r');
         break;
       case 't':
-        ws.push_back (L'\t');
+        s.push_back ('\t');
         break;
       case 'u':
         c = 0;
@@ -504,7 +507,25 @@ static erc parse_string (istream& is, std::string& s)
           else
             return erc (ERR_JSON_INPUT, Errors());
         }
-        ws.push_back (c);
+        if (0xd800 <= c && c <= 0xdbff)
+        {
+          if (!high_surrogate)
+            high_surrogate = c;
+          else
+            return erc (ERR_JSON_INPUT, Errors ()); //two consecutive high surrogates
+        }
+        else if (0xdc00 <= c && c <= 0xdfff)
+        {
+          if (!high_surrogate)
+            return erc (ERR_JSON_INPUT, Errors ()); // low surrogate without high
+          c = 0x10000 + ((high_surrogate - 0xd800) << 10) + (c - 0xdc00);
+          high_surrogate = 0;
+          s += utf8::narrow ((char32_t)c);
+        }
+        else if (high_surrogate)
+          return erc (ERR_JSON_INPUT, Errors ()); // high surrogate without low
+        else
+          s += utf8::narrow((char32_t)c);
         break;
 
       default:
@@ -513,7 +534,7 @@ static erc parse_string (istream& is, std::string& s)
       }
     }
     else
-      ws.push_back (c);
+      s.push_back (c);
   }
   return erc (ERR_JSON_SIZE, Errors());
 }
@@ -644,7 +665,7 @@ erc node::read (const std::string& s)
 }
 
 // Quotes all characters that need to be quotes in a string
-static void quote (ostream& os, const std::string& s, bool quote_slash)
+static void quote (ostream& os, const std::string& s, int flags)
 {
   std::u32string r = utf8::runes (s);
   for (auto chr : r)
@@ -673,7 +694,7 @@ static void quote (ostream& os, const std::string& s, bool quote_slash)
       os << "\\\"";
       break;
     case '/':
-      if (quote_slash)
+      if (flags & JSON_FMT_QUOTESLASH)
         os << "\\/";
       else
         os << '/';
@@ -682,9 +703,11 @@ static void quote (ostream& os, const std::string& s, bool quote_slash)
     default:
       if (chr >= ' ' && chr <= 0x7f)
         os << (char)chr;
-      else if (chr < ' ' && chr < 0xffff)
+      else if (flags & JSON_FMT_UTF8)
+        os << utf8::narrow (chr);
+      else if (chr < 0xffff)
       {
-        // controls & basic multilingual plane
+        // basic multilingual plane
         char buf[8];
         sprintf (buf, "\\u%04x", (unsigned int)chr);
         os << buf;
@@ -692,7 +715,7 @@ static void quote (ostream& os, const std::string& s, bool quote_slash)
       else
       {
         // supplemental multilingual planes
-        wstring ws = utf8::widen (utf8::narrow (&chr, 1));
+        wstring ws = utf8::widen (chr);
         char buf[16];
         sprintf (buf, "\\u%04x\\u%04x", ws[0], ws[1]);
         os << buf;
@@ -739,7 +762,7 @@ erc node::write (std::ostream& os, int flags, int spaces, int level) const
     for (auto ptr = obj.begin (); ptr != obj.end ();)
     {
       os << '"';
-      quote (os, ptr->first, (flags & JSON_FMT_QUOTESLASH) != 0);
+      quote (os, ptr->first, flags);
       os << "\":";
       ptr->second->write (os, flags, spaces, level);
       ++ptr;
@@ -777,7 +800,7 @@ erc node::write (std::ostream& os, int flags, int spaces, int level) const
 
   case type::string:
     os << '"';
-    quote (os, str, (flags & JSON_FMT_QUOTESLASH) != 0);
+    quote (os, str, flags);
     os << '"';
     break;
 
@@ -882,7 +905,19 @@ std::ostream& noindent (std::ostream& os)
   return os;
 }
 
-/// Write a JSON object to a stream
+std::ostream& utf8 (std::ostream& os)
+{
+  os.iword (ostream_flags) |= (JSON_FMT_UTF8 << 8);
+  return os;
+}
+
+std::ostream& noutf8 (std::ostream& os)
+{
+  os.iword (ostream_flags) &= ~(JSON_FMT_UTF8 << 8);
+  return os;
+}
+
+  /// Write a JSON object to a stream
 std::ostream& operator<< (std::ostream& os, const node& n)
 {
   long fmt = os.iword (json::ostream_flags);

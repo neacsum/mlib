@@ -41,18 +41,25 @@ TEST (uri_handler)
 
     return 1;
   };
+  try
+  {
+    thread cl1 (fn);
+    uri = "/%3fA";
+    cl1.start ();
+    cl1.wait ();
+    CHECK_EQUAL (200, status_code);
 
-  thread cl1 (fn);
-  uri = "/%3fA";
-  cl1.start ();
-  cl1.wait ();
-  CHECK_EQUAL (200, status_code);
-
-  thread cl2 (fn);
-  uri = "/%3fB";
-  cl2.start ();
-  cl2.wait ();
-  CHECK_EQUAL (404, status_code);
+    thread cl2 (fn);
+    uri = "/%3fB";
+    cl2.start ();
+    cl2.wait ();
+    CHECK_EQUAL (404, status_code);
+  }
+  catch (erc& x)
+  {
+    cout << "erc=" << (int)x << " at " << x.facility ().name () << endl;
+    CHECK_EX (!x, "erc=%d at %s", (int)x, x.facility ().name().c_str());
+  }
 
   srv.terminate ();
 }
