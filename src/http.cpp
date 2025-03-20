@@ -420,6 +420,12 @@ void connection::serve401 (const char* realm)
 */
 void connection::process_valid_request ()
 {
+  if (method_ == "OPTIONS")
+  {
+    serve_options ();
+    return;
+  }
+  
   // check if there is a handler registered for this URI
   if (parent.invoke_handler (*this) == HTTP_OK)
   {
@@ -431,15 +437,7 @@ void connection::process_valid_request ()
   {
     // try to see if we can serve a file
     std::filesystem::path fullpath;
-    if (!parent.find_alias (path_, fullpath))
-    {
-      fullpath = parent.docroot ();
-      fullpath.concat (path_);
-    }
-    if (!fullpath.has_filename ())
-      fullpath += parent.default_uri ();
-
-    if (std::filesystem::exists (fullpath) && std::filesystem::is_regular_file (fullpath))
+    if (parent.locate_resource (path_, fullpath))
     {
       bool shtml = false;
       int ret;
@@ -468,6 +466,34 @@ void connection::process_valid_request ()
     respond (400);
 }
 
+// Response to OPTIONS request
+void connection::serve_options ()
+{
+  std::filesystem::path fullpath;
+  if (path_ == "*")
+  {
+    add_ohdr ("Allow", "OPTIONS, GET, HEAD, POST, PUT");
+    respond (204);
+  }
+  else if (parent.post_handlers.find (path_) != parent.post_handlers.end ())
+  {
+    add_ohdr ("Allow", "OPTIONS, PUT, POST");
+    respond (204);
+  }
+  else if (parent.locate_resource (path_, fullpath))
+  {
+    add_ohdr ("Allow", "OPTIONS, GET, HEAD");
+    respond (204);
+  }
+  else if (parent.locate_handler (path_, nullptr))
+  {
+    add_ohdr ("Allow", "OPTIONS, GET, HEAD, POST, PUT");
+    respond (204);
+  }
+  else
+    serve404 ();
+}
+
 /*!
   Sends a 404 (page not found) response
 */
@@ -477,12 +503,10 @@ void connection::serve404 (const char* text)
                               "<body><h1>Oops! 404 - File not found</h1>"
                               "<p>The page you requested was not found.</body></html>";
 
-  char len[10];
   if (!text)
     text = std404;
 
-  sprintf (len, "%d", (int)strlen (text));
-  add_ohdr ("Content-Length", len);
+  add_ohdr ("Content-Length", to_string (strlen(text)));
   add_ohdr ("Content-Type", "text/html");
   respond (404);
   ws << text;
@@ -887,8 +911,10 @@ bool connection::parse_request (const std::string& req)
   if (*crt != ' ')
     return false;
   
-  // Request target must be in origin-form: absolute-path ["?" query] ["#" fragment] 
-  if (*pbeg != '/')
+  // Request target must be in origin-form: absolute-path ["?" query] ["#" fragment]
+  // or the request must be "OPTIONS *"
+  if (*pbeg != '/' 
+   && !(method_ == "OPTIONS" && *pbeg == '*' && (crt - pbeg == 1)))
     return false; 
 
   path_ = string (pbeg, crt);
@@ -1016,7 +1042,7 @@ void connection::respond (unsigned int code, const std::string& reason)
   ws << "\r\n";
 
   //If content type is not set, default to plain text 
-  if (!has_ohdr ("Content-Type"))
+  if (code != 204 && !has_ohdr ("Content-Type"))
     add_ohdr ("Content-Type", "text/plain");
 
   if (!has_ohdr ("Date"))
@@ -1328,7 +1354,35 @@ bool server::authenticate (const std::string& realm, const std::string& user, co
   return false;
 }
 
-/*!
+bool server::locate_handler (const std::string& res, handle_info** ptr)
+{
+  auto h = handlers.end ();
+  size_t len = 0;
+  auto crt = handlers.begin ();
+
+  while (crt != handlers.end ())
+  {
+    size_t n = match (res, crt->first);
+
+    if ((n == crt->first.size ())                // matches whole handler URI
+        && (n == res.length () || res[n] == '/') // complete URI or path segment
+        && (n > len))                            // longer than previous match
+    {
+      len = n;
+      h = crt;
+    }
+    crt++;
+  }
+  if (h != handlers.end ())
+  {
+    if (ptr)
+      *ptr = &h->second;
+    return true;
+  }
+
+  return false;
+}
+  /*!
   Invoke a user defined URI handler 
   \param  client connection thread
 
@@ -1340,28 +1394,12 @@ int server::invoke_handler (connection& client)
 {
   auto uri = client.get_path ();
   int ret = HTTP_NO_HANDLER;
-  auto h = handlers.end();
-  size_t len = 0;
-  auto crt = handlers.begin ();
-
-  while (crt != handlers.end ())
+  handle_info* hinfo;
+  if (locate_handler (client.path_, &hinfo))
   {
-    size_t n = match (uri, crt->first);
-
-    if ( (n == crt->first.size ())             //matches whole handler URI
-      && (n == uri.length () || uri[n] == '/') // complete URI or path segment
-      && (n > len))                            // longer than previous match
-    {
-      len = n;
-      h = crt;
-    }
-    crt++;
-  }
-  if (h != handlers.end())
-  {
-    lock l (*h->second.in_use);
-    TRACE9 ("Invoking handler for %s", h->first.c_str ());
-    ret = h->second.h (client, h->second.nfo);
+    lock l (*hinfo->in_use);
+    TRACE9 ("Invoking handler for %s", client.get_path ().c_str ());
+    ret = hinfo->h (client, hinfo->nfo);
     TRACE9 ("Handler done (%d)", ret);
   }
   
@@ -1446,6 +1484,27 @@ bool server::find_alias (const std::string& res, std::filesystem::path& path)
     return true;
   }
   return false;
+}
+
+/*!
+  Try to map a resource to a local file.
+  \param res resource to map
+  \param path local file system path
+
+  \return `true` if a local file exists and is a regular file
+  \return `false` otherwise
+*/
+bool server::locate_resource (const std::string& res, std::filesystem::path& path)
+{
+  if (!find_alias (res, path))
+  {
+    path = docroot ();
+    path.concat (res);
+  }
+  if (!path.has_filename ())
+    path += default_uri ();
+
+  return (std::filesystem::exists (path) && std::filesystem::is_regular_file (path));
 }
 
 /*!

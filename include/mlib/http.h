@@ -132,6 +132,7 @@ private:
   void serve401 (const char* realm);
   bool should_close ();
   void request_init ();
+  void serve_options ();
 
 
   std::string path_;         ///< location
@@ -245,16 +246,18 @@ protected:
     VT_DOUBLE   ///< double*
   };
   int invoke_handler (connection& client);
+
   int invoke_post_handler (connection& client);
 
   bool find_alias (const std::string& res, std::filesystem::path& path);
+  virtual bool locate_resource (const std::string& res, std::filesystem::path& path);
+
   const std::string& guess_mimetype (const std::filesystem::path& fn, bool& shtml);
   connection* make_thread (sock& connection);
   void add_var (const std::string& name, vtype t, const void* addr, const char* fmt = nullptr,
                 double multiplier = 1.);
 
 private:
-
   str_pairs out_headers;          //!< response headers
   mlib::criticalsection hdr_lock; ///<! headers access lock
   str_pairs realms;               //!< access control realms
@@ -267,6 +270,9 @@ private:
     void* nfo;
     std::shared_ptr<mlib::criticalsection> in_use;
   };
+
+  bool locate_handler (const std::string& res, handle_info** ptr);
+
   std::map<std::string, handle_info> handlers;
   std::map<std::string, handle_info> post_handlers;
 
