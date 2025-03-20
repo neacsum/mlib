@@ -51,7 +51,7 @@
     <ClInclude Include="..\include\mlib\event.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\mlib\httpd.h">
+    <ClInclude Include="..\include\mlib\http.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\include\mlib\inaddr.h">
@@ -182,7 +182,7 @@
     <ClCompile Include="firewall.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="httpd.cpp">
+    <ClCompile Include="http.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="inaddr.cpp">

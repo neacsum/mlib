@@ -6,7 +6,7 @@
 ///   \file jbridge.h Definition of JSONBridge class
 #pragma once
 
-#include "httpd.h"
+#include "http.h"
 #include "json.h"
 
 #include <list>

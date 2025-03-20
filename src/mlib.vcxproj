@@ -180,7 +180,7 @@
     <ClInclude Include="..\include\mlib\event.h" />
     <ClInclude Include="..\include\mlib\firewall.h" />
     <ClInclude Include="..\include\mlib\hex.h" />
-    <ClInclude Include="..\include\mlib\httpd.h" />
+    <ClInclude Include="..\include\mlib\http.h" />
     <ClInclude Include="..\include\mlib\inaddr.h" />
     <ClInclude Include="..\include\mlib\ipow.h" />
     <ClInclude Include="..\include\mlib\jbridge.h" />
@@ -240,7 +240,7 @@
     </ClCompile>
     <ClCompile Include="geom\chull.cpp" />
     <ClCompile Include="geom\rotmat.cpp" />
-    <ClCompile Include="httpd.cpp" />
+    <ClCompile Include="http.cpp" />
     <ClCompile Include="inaddr.cpp" />
     <ClCompile Include="jbridge.cpp" />
     <ClCompile Include="log.cpp" />

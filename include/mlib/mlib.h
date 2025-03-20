@@ -38,7 +38,7 @@
 #include "basename.h"
 #include "chull.h"
 #include "firewall.h"
-#include "httpd.h"
+#include "http.h"
 #include "jbridge.h"
 #include "log.h"
 #include "mutex.h"
