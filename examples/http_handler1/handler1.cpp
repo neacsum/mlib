@@ -8,10 +8,29 @@ int say_hello (http::connection& client, void*)
   return HTTP_OK;
 }
 
+const char* page1 = R"(<html>
+<head>
+  <title>Handler 1</title>
+</head>
+<body>
+  This is the <b>index.html</b> page.
+  <p>You can also go to <a href="/hi">Hello World</a> page.</p>
+</body>
+</html>
+)";
+
 int main (int argc, char** argv)
 {
-  http::server my_server (8080);
-  my_server.add_handler ("/", say_hello, nullptr);
+  http::server my_server;
+
+  auto fname = my_server.docroot () / "index.html";
+  // save HTML page to a file
+  std::ofstream idx (fname.string ());
+  idx << page1;
+  idx.close ();
+
+  my_server.socket ().bind (inaddr (INADDR_LOOPBACK, 8080));
+  my_server.add_handler ("/hi", say_hello, nullptr);
   my_server.start ();
 
   std::cout << "Server is running. Connect to http://localhost:8080" << std::endl
@@ -19,5 +38,6 @@ int main (int argc, char** argv)
 
   char x;
   std::cin.get(x);
+  std::filesystem::remove (fname);
   return 0;
 }

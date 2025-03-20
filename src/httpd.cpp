@@ -15,10 +15,7 @@ using namespace mlib;
 
 // Defaults
 #define HTTP_DEFAULT_URI "index.html"      //!< Default URL
-#define HTTPD_SERVER_NAME "MLIB_HTTP 2.0"   //!< Default server name
-
-/// Timeout interval while waiting for a client response
-#define HTTPD_TIMEOUT 30
+#define HTTP_SERVER_NAME "MLIB_HTTP 2.0"   //!< Default server name
 
 /// Max length of a form parameter
 #define MAX_PAR 1024
@@ -90,6 +87,7 @@ static size_t match (const std::string& str1, const std::string& str2);
   As it has only a protected constructor, it is not possible for users of this
   class to directly create this object. Derived classes should maintain this
   convention.
+
 */
 connection::connection (sock& socket, server& server)
   : thread ("http::connection")
@@ -99,7 +97,8 @@ connection::connection (sock& socket, server& server)
   , content_len (-1)
   , query_parsed (false)
   , body_parsed (false)
-{}
+{
+}
 
 /*!
   The loop has the following steps:
@@ -114,23 +113,17 @@ connection::connection (sock& socket, server& server)
 */
 void connection::run ()
 {
-  ws->recvtimeout (HTTPD_TIMEOUT);
+  ws->recvtimeout (HTTP_TIMEOUT);
   TRACE8 ("http_connection::run - Connection from %s", ws->peer ()->hostname ().c_str ());
   try
   {
     while (1)
     {
       std::string input;
-      content_len = -1;
-      iheaders.clear ();
-      oheaders.clear ();
-      qparams.clear ();
-      bparams.clear ();
-      body.clear ();
-      query_parsed = body_parsed = response_sent = false;
+      request_init ();
 
       // Accumulate HTTP request line
-      while (input.size () < HTTPD_MAX_HEADER)
+      while (input.size () < HTTP_MAX_HEADER)
       {
         // wait for chars.
         char ch = ws.get ();
@@ -155,7 +148,7 @@ void connection::run ()
         if (ch == '\n')
           break;
       }
-      if (input.size () == HTTPD_MAX_HEADER)
+      if (input.size () == HTTP_MAX_HEADER)
       {
         TRACE2 ("http::connection::run - Request too long (%d) peer %s", input.size (),
                 ws->peer()->hostname ().c_str ());
@@ -171,7 +164,7 @@ void connection::run ()
       //Accumulate headers
       bool eol_seen = false;
       input.clear ();
-      while (input.size () < HTTPD_MAX_HEADER)
+      while (input.size () < HTTP_MAX_HEADER)
       {
         // wait for chars.
         char ch = ws.get ();
@@ -204,7 +197,7 @@ void connection::run ()
         input.push_back (ch);
       }
 
-      if (input.size () == HTTPD_MAX_HEADER)
+      if (input.size () == HTTP_MAX_HEADER)
       {
         TRACE2 ("http_connection::run - Request too long peer %s",
                 ws->peer ()->hostname ().c_str ());
@@ -221,13 +214,36 @@ void connection::run ()
       if (auth_stat <= 0)
         return; // bad auth - response sent by do_auth
 
-      // set timeout to whatever client wants
-      if (has_ihdr ("Keep-Alive"))
+      //Prepare output headers
+      if (!has_ihdr ("Connection"))
       {
-        int kaval = min (stoi (get_ihdr ("Keep-Alive")), 600);
-        ws->recvtimeout (kaval);
+        // Default "Connection" setting
+        if (http_version.empty () || http_version == "HTTP/1.0")
+          add_ohdr ("Connection", "Close");
+        else
+          add_ohdr ("Connection", "keep-alive");
       }
+      else
+        add_ohdr ("Connection", get_ihdr ("Connection"));
 
+      if (get_ohdr ("Connection") == "keep-alive")
+      {
+        /* set timeout to whatever client wants but not more than what the
+           server accepts */
+        unsigned int ka_srv = parent.keep_alive ();
+        unsigned int ka_cli = UINT_MAX;
+        if (has_ihdr ("Keep-Alive"))
+        {
+          auto ka_str = get_ihdr ("Keep-Alive");
+          auto t = ka_str.find ("timeout=");
+
+          if (t != string::npos)
+            ka_cli = stoi (ka_str.substr (t));
+        }
+        ka_cli = min (ka_srv, ka_cli);
+        ws->recvtimeout (ka_cli);
+        add_ohdr ("Keep-Alive", "timeout="s + to_string (ka_cli));
+      }
       if (method_ == "POST" || method_ == "PUT")
       {
         // read request body
@@ -303,6 +319,22 @@ bool connection::should_close ()
   }
 
   return false;
+}
+
+// initialization before getting a new client request
+void connection::request_init ()
+{
+  content_len = -1;
+  iheaders.clear ();
+  qparams.clear ();
+  bparams.clear ();
+  body.clear ();
+
+  // Response headers are initialized with server's response headers.
+  lock l (parent.hdr_lock);
+  oheaders = parent.out_headers;
+
+  query_parsed = body_parsed = response_sent = false;
 }
 
 void connection::term ()
@@ -785,6 +817,7 @@ int connection::serve_file (const std::filesystem::path& file)
 {
   int ret = HTTP_OK;
   auto fname = file.u8string ();
+  char buf[1024];
   FILE* fin = utf8::fopen (fname, "rbS");
   if (!fin)
   {
@@ -798,10 +831,15 @@ int connection::serve_file (const std::filesystem::path& file)
   fseek (fin, 0, SEEK_SET);
   TRACE8 ("http::connection::serve_file - File %s size %d", fname.c_str (), len);
   add_ohdr ("Content-Length", to_string(len));
+  auto file_time = std::filesystem::last_write_time (file);
+  auto tp = std::chrono::clock_cast<std::chrono::system_clock> (file_time);
+  std::time_t cftime = std::chrono::system_clock::to_time_t (tp);
+  auto tm = std::gmtime (&cftime);
+  std::strftime (buf, sizeof (buf), "%a, %d %b %Y %H:%M:%S GMT", tm);
+  add_ohdr ("Last-Modified", buf);
   respond (200);
   if (get_method() != "HEAD")
   {
-    char buf[1024];
     int cnt = 1;
     while (cnt)
     {
@@ -977,10 +1015,18 @@ void connection::respond (unsigned int code, const std::string& reason)
     ws << " " << respcodes[ic].text;
   ws << "\r\n";
 
-  // output server headers
-  lock l (parent.hdr_lock);
-  ws << parent.out_headers;
-  // followed by our headers
+  //If content type is not set, default to plain text 
+  if (!has_ohdr ("Content-Type"))
+    add_ohdr ("Content-Type", "text/plain");
+
+  if (!has_ohdr ("Date"))
+  {
+    char buf[80];
+    time_t cftime = chrono::system_clock::to_time_t (chrono::system_clock::now());
+    auto tm = gmtime (&cftime);
+    strftime (buf, sizeof (buf), "%a, %d %b %Y %H:%M:%S GMT", tm);
+    add_ohdr ("Date", buf);
+  }
   TRACE9 ("Sending connection headers");
   ws << oheaders;
   ws << "\r\n"; 
@@ -1028,31 +1074,34 @@ void connection::respond (unsigned int code, const std::string& reason)
   - server name is HTTP_SERVER_NAME
 */
 server::server (unsigned short port, unsigned int maxconn)
-  : tcpserver (port, HTTPD_SERVER_NAME, maxconn)
+  : tcpserver (port, HTTP_SERVER_NAME, maxconn)
   , root (std::filesystem::current_path())
   , defuri (HTTP_DEFAULT_URI)
+  , timeout (HTTP_TIMEOUT)
 {
+  name (HTTP_SERVER_NAME);
 }
 
 /*!
   Destructor
 */
 server::~server ()
-{}
+{
+}
 
 /*!
   Change server name.
-  \param nam new server name string
+  \param name_ new server name string
 
   This string is returned in the "Server" HTTP header.
 */
-void server::name (const char* nam)
+void server::name (const std::string& name_)
 {
-  if (nam)
-    add_ohdr ("Server", nam);
+  if (!name_.empty())
+    add_ohdr ("Server", name_);
   else
     remove_ohdr ("Server");
-  thread::name (nam);
+  thread::name (name_);
 }
 
 /*!
@@ -1280,28 +1329,43 @@ bool server::authenticate (const std::string& realm, const std::string& user, co
 }
 
 /*!
-  Invoke a user defined URI handler
+  Invoke a user defined URI handler 
   \param  client connection thread
 
-  \return the result of calling the user handler or 0 if there is no handler
-          set for the URI.
+  \return the result of calling the user handler or HTTP_NO_HANDLER if there
+    is no handler set for the URI.
 
 */
 int server::invoke_handler (connection& client)
 {
-  auto idx = handlers.find (client.get_path());
-  if (idx != handlers.end ())
-  {
-    int ret;
-    lock l (*idx->second.in_use);
-    TRACE9 ("Invoking handler for %s", idx->first.c_str ());
-    ret = idx->second.h (client, idx->second.nfo);
-    TRACE9 ("Handler done (%d)", ret);
-    return ret;
-  }
-  else
-    return HTTP_NO_HANDLER;
+  auto uri = client.get_path ();
+  int ret = HTTP_NO_HANDLER;
+  auto h = handlers.end();
+  size_t len = 0;
+  auto crt = handlers.begin ();
 
+  while (crt != handlers.end ())
+  {
+    size_t n = match (uri, crt->first);
+
+    if ( (n == crt->first.size ())             //matches whole handler URI
+      && (n == uri.length () || uri[n] == '/') // complete URI or path segment
+      && (n > len))                            // longer than previous match
+    {
+      len = n;
+      h = crt;
+    }
+    crt++;
+  }
+  if (h != handlers.end())
+  {
+    lock l (*h->second.in_use);
+    TRACE9 ("Invoking handler for %s", h->first.c_str ());
+    ret = h->second.h (client, h->second.nfo);
+    TRACE9 ("Handler done (%d)", ret);
+  }
+  
+  return ret;
 }
 
 
@@ -1468,13 +1532,6 @@ const string server::get_var (const std::string& name)
     return "none";
 }
 
-/*!
-  Set server root path
-*/
-void server::docroot (const std::string& path)
-{
-  root = std::filesystem::absolute(path);
-}
 /*!
   Guess MIME type of a file and if SSI replacement should be enabled based on
   file extension.

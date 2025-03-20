@@ -14,7 +14,10 @@
 #include <filesystem>
 
 /// Maximum size of HTTP header
-#define HTTPD_MAX_HEADER 8192
+#define HTTP_MAX_HEADER 8192
+
+/// Default timeout interval while waiting for a client request
+#define HTTP_TIMEOUT 30
 
 /// \name Error codes
 ///\{
@@ -75,6 +78,9 @@ public:
   /// Return all request headers
   const str_pairs& get_request_headers () const;
 
+  /// Return all response headers
+  const str_pairs& get_response_headers () const;
+
   /// Check if response has a header
   bool has_ohdr (const std::string& hdr) const;
 
@@ -125,6 +131,8 @@ private:
   int do_auth ();
   void serve401 (const char* realm);
   bool should_close ();
+  void request_init ();
+
 
   std::string path_;         ///< location
   std::string query_;        ///< query string
@@ -200,19 +208,16 @@ public:
   void release_varlock ();
   bool try_varlock ();
 
-  void name (const char* nam);
-  void docroot (const std::string& path);
+  void name (const std::string& name_);
+  void docroot (const std::filesystem::path& path);
   const std::filesystem::path& docroot () const;
   void add_alias (const std::string& uri, const std::string& path);
 
-  void default_uri (const std::string& name)
-  {
-    defuri = name;
-  };
-  const std::string& default_uri ()
-  {
-    return defuri;
-  };
+  void default_uri (const std::string& name);
+  const std::string& default_uri () const;
+
+  void keep_alive (unsigned int seconds);
+  unsigned int keep_alive () const;
 
   static void add_mime_type (const std::string& ext, const std::string& type, bool shtml = false);
   static void delete_mime_type (const std::string& ext);
@@ -249,6 +254,7 @@ protected:
                 double multiplier = 1.);
 
 private:
+
   str_pairs out_headers;          //!< response headers
   mlib::criticalsection hdr_lock; ///<! headers access lock
   str_pairs realms;               //!< access control realms
@@ -285,6 +291,7 @@ private:
 
   std::filesystem::path root;
   std::string defuri;
+  unsigned int timeout;
 };
 
 /*==================== INLINE FUNCTIONS ===========================*/
@@ -316,7 +323,8 @@ const std::string& connection::get_path () const
     <target> := <target path>['?' <query> ['#' <fragment>]]
   ```
 */
-inline const std::string& connection::get_method () const
+inline
+const std::string& connection::get_method () const
 {
   return method_;
 };
@@ -335,7 +343,8 @@ inline const std::string& connection::get_method () const
   \return query component of the request line or empty string if request line
     doesn't include a query.
 */
-inline const std::string& connection::get_query () const
+inline
+const std::string& connection::get_query () const
 {
   return query_;
 };
@@ -356,7 +365,7 @@ const std::string& connection::get_body () const
   \param  value header value
 
   To have any effect, this function should be called before calling the
-  respond() (or serve_...) function as all headers are sent at that time.
+  respond() (or serve_...) function as response headers are sent at that time.
 */
 inline
 void connection::add_ohdr (const std::string& hdr, const std::string& value)
@@ -385,34 +394,24 @@ const std::string& connection::get_ihdr (const std::string& hdr) const
 }
 
 /*!
-  Return `true' if either the server or the connection has added the header
-  to the request response
+  Return `true' if connection has the response header
 */
 inline 
 bool connection::has_ohdr (const std::string& hdr) const
 {
-  lock l (parent.hdr_lock);
-  return parent.out_headers.find (hdr) != parent.out_headers.end()
-    || (oheaders.find(hdr) != oheaders.end());
+  return oheaders.find(hdr) != oheaders.end();
 }
 
 /*!
-  The header can belong either to server or to connection.
-
   \param  hdr  header name
   \return header field value
 
-  Throws an exception of type `std::out_of_range` if the response doesn't have
-  that header.
+  Throws an exception of type `std::out_of_range` if response header doesn't 
+  exist.
 */
 inline
 const std::string& connection::get_ohdr (const std::string& hdr) const
 {
-  lock l (parent.hdr_lock);
-  auto idx = parent.out_headers.find (hdr);
-  if (idx != parent.out_headers.end ())
-    return idx->second;
-
   return oheaders.at (hdr);
 }
 
@@ -502,14 +501,28 @@ const str_pairs& connection::get_request_headers () const
   return iheaders;
 }
 
+inline const str_pairs& connection::get_response_headers () const
+{
+  return oheaders;
+}
+
 
 //------------------------ http::server inline functions ----------------------
-/// Return current file origin
+
+/// Return current root path as absolute path
 inline
 const std::filesystem::path& server::docroot () const
 {
   return root;
 }
+
+/// Set server root path
+inline
+void server::docroot (const std::filesystem::path& path)
+{
+  root = std::filesystem::absolute (path);
+}
+
 
 /// Acquire lock on server's variables
 inline
@@ -533,6 +546,34 @@ inline
 bool server::try_varlock ()
 {
   return varlock.try_enter ();
+}
+
+/// Set default file name (initially `index.html`)
+inline
+void server::default_uri (const std::string& name)
+{
+  defuri = name;
+}
+
+/// Return default file name (initially `index.html`)
+inline
+const std::string& server::default_uri () const
+{
+  return defuri;
+}
+
+/// Set timeout value for keep-alive connections
+inline 
+void server::keep_alive (unsigned int seconds)
+{
+  timeout = seconds;
+}
+
+/// Return timeout value for keep-alive connections
+inline
+unsigned int server::keep_alive () const
+{
+  return timeout;
 }
 
 inline
