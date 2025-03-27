@@ -1,6 +1,9 @@
 #include <mlib/mlib.h>
+#include <filesystem>
+#include <fstream>
 
 using namespace mlib;
+using namespace std;
 
 int say_hello (http::connection& client, void*)
 {
@@ -8,7 +11,7 @@ int say_hello (http::connection& client, void*)
   return HTTP_OK;
 }
 
-const char* page1 = R"(<html>
+const char* index_shtml = R"(<html>
 <head>
   <title>Handler 1</title>
 </head>
@@ -25,8 +28,8 @@ int main (int argc, char** argv)
 
   auto fname = my_server.docroot () / "index.html";
   // save HTML page to a file
-  std::ofstream idx (fname.string ());
-  idx << page1;
+  ofstream idx (fname);
+  idx << index_shtml;
   idx.close ();
 
   my_server.socket ().bind (inaddr (INADDR_LOOPBACK, 8080));

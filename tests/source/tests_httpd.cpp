@@ -8,6 +8,19 @@ using namespace mlib;
 
 using namespace std;
 
+namespace mlib::http {
+struct UnitTest_connection : public connection
+{
+  UnitTest_connection (sock& s, server& srv)
+    : connection (s, srv) {};
+
+public:
+  connection::method_;
+  connection::path_;
+  connection::iheaders;
+  connection::do_auth;
+};
+
 SUITE (HttpServer)
 {
 TEST (uri_handler)
@@ -368,17 +381,17 @@ TEST (Binding)
 TEST (Auth)
 {
   http::server srv;
-  srv.add_realm ("Control", "/ctl");
+  srv.add_secured_path ("Control", "/ctl");
   srv.add_user ("Control", "admin", "admin");
   srv.add_user ("Control", "Alice", "password");
 
-  bool ok = srv.authenticate ("Control", "admin", "admin");
+  bool ok = srv.verify_authorization ("Control", "admin", "admin");
   CHECK (ok);
 
-  ok = srv.authenticate ("Control", "Alice", "password");
+  ok = srv.verify_authorization ("Control", "Alice", "password");
   CHECK (ok);
 
-  ok = srv.authenticate ("Control", "Eve", "nopass");
+  ok = srv.verify_authorization ("Control", "Eve", "nopass");
   CHECK (!ok);
 }
 
@@ -386,10 +399,12 @@ TEST (AuthMatch)
 {
   http::server srv;
   string realm;
-  srv.add_realm ("Control", "/ctl");
-  srv.add_realm ("Control1", "/ctl/inner");
+  srv.add_secured_path ("All", "/");
+  srv.add_secured_path ("Control", "/ctl");
+  srv.add_secured_path ("Control1", "/ctl/inner");
   bool ok = srv.is_protected ("/status/map.html", realm);
-  CHECK (!ok);
+  CHECK (ok);
+  CHECK_EQUAL ("All", realm);
   ok = srv.is_protected ("/ctl/change.cgi", realm);
   CHECK (ok);
   CHECK_EQUAL ("Control", realm);
@@ -399,6 +414,9 @@ TEST (AuthMatch)
   ok = srv.is_protected ("/ctl/inner/deep/stuff.html", realm);
   CHECK (ok);
   CHECK_EQUAL ("Control1", realm);
+}
+
+
 }
 
 class HttpServerFixture
@@ -482,7 +500,7 @@ TEST_FIXTURE (HttpServerFixture, Answer404)
 
 TEST_FIXTURE (HttpServerFixture, Answer401)
 {
-  srv.add_realm ("Control", "/");
+  srv.add_secured_path ("Control", "/");
 
   mlib::thread client (cfunc);
   client.start ();
@@ -492,7 +510,7 @@ TEST_FIXTURE (HttpServerFixture, Answer401)
 
 TEST_FIXTURE (HttpServerFixture, AuthOk)
 {
-  srv.add_realm ("Control", "/");
+  srv.add_secured_path ("Control", "/");
   srv.add_user ("Control", "Alice", "password");
   request = "Authorization: Basic QWxpY2U6cGFzc3dvcmQ=\r\n";
 
@@ -504,7 +522,7 @@ TEST_FIXTURE (HttpServerFixture, AuthOk)
 
 TEST_FIXTURE (HttpServerFixture, HttpBadPassword)
 {
-  srv.add_realm ("Control", "/");
+  srv.add_secured_path ("Control", "/");
   srv.add_user ("Control", "Alice", "password");
   request = "Authorization: Basic QWxpY2U6d3Jvbmc=\r\n"; // wrong password
 

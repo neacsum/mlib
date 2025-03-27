@@ -26,7 +26,7 @@
   single text input field. When user presses the "OK" button the application
   receives the updated text and displays it on the console window.
 
-  It shows how to use the SII mechanism of the HTTP server.
+  It shows how to use the SSI mechanism of the HTTP server.
 */
 
 #include <iostream>
@@ -43,7 +43,7 @@ using namespace std;
 
 #define HOME_PAGE "index.shtml"
 
-const char* page1 = R"(<html>
+const char* index_shtml = R"(<html>
 <head>
   <title>Echo UI</title>
   <script>
@@ -82,7 +82,7 @@ int main()
   auto fname = ui_server.docroot() / HOME_PAGE;
   // save HTML page to a file
   ofstream idx (fname.string ());
-  idx << page1;
+  idx << index_shtml;
   idx.close ();
 
 

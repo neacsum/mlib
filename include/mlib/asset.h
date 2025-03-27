@@ -42,6 +42,7 @@ public:
   /// Delete asset file from disk.
   bool remove ();
 
+  /// Relative asset name
   std::filesystem::path name;
 
 private:

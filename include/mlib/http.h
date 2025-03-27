@@ -3,7 +3,7 @@
   This file is part of MLIB project. See LICENSE file for full license terms.
 */
 
-///  \file http.h Definition of http::server and http::connection classes
+///  \file http.h Definition of mlib::http::server and mlib::http::connection classes
 #pragma once
 
 #include "tcpserver.h"
@@ -26,6 +26,7 @@
 #define HTTP_ERR_FOPEN  -2    ///< File open failure
 #define HTTP_ERR_FREAD  -3    ///< File read failure
 #define HTTP_NO_HANDLER -4    ///< No handler found
+#define HTTP_CONTINUE   1     ///< Continue serving page
 ///\}
 
 namespace mlib::http {
@@ -99,8 +100,12 @@ public:
   /// Return the value of a body parameter
   const std::string& get_bparam (const std::string& key);
 
+  /// Return authenticated user name
+  const std::string& get_auth_user ();
+
   /// Return size of request body
   int get_content_length () const;
+
   sockstream& out ();
   
   void respond (unsigned int code, const std::string& reason = std::string());
@@ -116,9 +121,14 @@ protected:
 
   /// The thread run loop
   void run () override;
+
+  /// Cleanup function invoked when connection thread terminates
   void term () override;
 
+  /// HTTP server that created this connection
   server& parent;
+
+  /// socket stream used for send/receive operations
   sockstream ws;
 
 private:
@@ -128,8 +138,8 @@ private:
   void parse_query ();
   void process_valid_request ();
   void process_ssi (const char* request);
-  int do_auth ();
-  void serve401 (const char* realm);
+  bool do_auth ();
+  void serve401 (const std::string& realm);
   bool should_close ();
   void request_init ();
   void serve_options ();
@@ -148,14 +158,10 @@ private:
   str_pairs qparams;
   str_pairs bparams;
   bool query_parsed, body_parsed;
+  std::string auth_user;  ///< authenticated user
+  std::string auth_realm; ///< protection realm
 
-  struct user
-  {
-    std::string name;
-    std::string pwd;
-  };
-  std::multimap<std::string, user> auth; // authenticated users
-
+  friend struct UnitTest_connection;
 };
 
 /// Small multi-threaded HTTP server
@@ -170,11 +176,24 @@ public:
 
   ///  Add or modify an URI handler function
   void add_handler (const std::string& uri, uri_handler func, void* info = 0);
-  void add_post_handler (const std::string& uri, uri_handler func, void* info = 0);
-  bool add_user (const char* realm, const char* username, const char* pwd);
-  bool remove_user (const char* realm, const char* username);
-  void add_realm (const char* realm, const char* uri);
 
+  ///  Add or modify an POST handler function.
+  void add_post_handler (const std::string& uri, uri_handler func, void* info = 0);
+
+  ///  Add a new user to a protection realm.
+  void add_user (const std::string& realm, const std::string& username, const std::string& pwd);
+
+  /// Remove an allowed user from an protection realm
+  void remove_user (const std::string& realm, const std::string& username);
+
+  /// Add an URI to a protection realm
+  void add_secured_path (const std::string& realm, const std::string& uri);
+
+  /// Add a variable to the dictionary of SSI variables
+  ///   \tparam T variable's type (non-floating point)
+  ///   \param name variable's SSI name
+  ///   \param addr pointer to variable
+  ///   \param fmt sprintf formatting specifier
   template <typename T>
   void add_var (const std::string& name, const T* addr, const char* fmt = nullptr)
   {
@@ -192,6 +211,12 @@ public:
     add_var (name, t, addr, fmt);
   }
 
+  /// Add a variable to the dictionary of SSI variables
+  ///   \tparam T variable's type (floating point)
+  ///   \param name variable's SSI name
+  ///   \param addr pointer to variable
+  ///   \param fmt sprintf formatting specifier
+  ///   \param multiplier scaling factor
   template <typename T>
   std::enable_if_t<std::is_floating_point_v<T>> add_var (const std::string& name, const T* addr,
                                                           const char* fmt = nullptr,
@@ -224,10 +249,8 @@ public:
   static void delete_mime_type (const std::string& ext);
 
   bool is_protected (const std::string& uri, std::string& realm);
-  bool authenticate (const std::string& realm, const std::string& user, const std::string& pwd);
-
-  friend class connection;
-
+  virtual bool verify_authorization (const std::string& realm, const std::string& user,
+                                     const std::string& password);
 protected:
   /// SSI variables type
   enum vtype
@@ -256,11 +279,10 @@ protected:
   connection* make_thread (sock& connection);
   void add_var (const std::string& name, vtype t, const void* addr, const char* fmt = nullptr,
                 double multiplier = 1.);
-
 private:
+
   str_pairs out_headers;          //!< response headers
   mlib::criticalsection hdr_lock; ///<! headers access lock
-  str_pairs realms;               //!< access control realms
 
   struct handle_info
   {
@@ -278,6 +300,7 @@ private:
 
   std::map<std::string, std::string> aliases;
 
+  /// Descriptor for a SSI variable
   struct var_info
   {
     std::string fmt;
@@ -285,19 +308,34 @@ private:
     const void* addr;
     double multiplier;
   };
+
+  /// SSI variables
   std::map<std::string, var_info> variables;
   mlib::criticalsection varlock;
 
-  struct user
+  /// User authentication info
+  struct user_inf
   {
     std::string name;
     std::string pwd;
   };
-  std::multimap<std::string, user> credentials;
+
+  /// Protection realm descriptor
+  struct realm_descr
+  {
+    std::vector<std::string> paths; ///< protected URIs under a realm
+    std::vector<user_inf> credentials;  ///< Users allowed access to realm
+  };
+
+  /// Protection realms
+  std::map<std::string, realm_descr> realms; 
+  mlib::criticalsection realmlock;
 
   std::filesystem::path root;
   std::string defuri;
   unsigned int timeout;
+
+  friend class connection;
 };
 
 /*==================== INLINE FUNCTIONS ===========================*/
@@ -484,6 +522,11 @@ const std::string& connection::get_bparam (const std::string& key)
   return bparams.at (key);
 }
 
+inline const std::string& connection::get_auth_user ()
+{
+  return auth_user;
+}
+
 /*!
   If the request is a POST or PUT request without a "Content-Length" header,
   the request is rejected with a response code 400
@@ -494,7 +537,7 @@ int connection::get_content_length () const
   return content_len;
 }
 
-/// Return socket object associated with this connection
+/// Return socket stream object associated with this connection
 inline
 sockstream& connection::out ()
 {

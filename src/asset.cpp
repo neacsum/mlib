@@ -63,10 +63,8 @@ bool asset::write (const std::filesystem::path& path)
     return false; // sanity checks
 
   fullpath = filesystem::absolute (path / name);
-
-  auto dirs = fullpath.parent_path ();
   error_code ec;
-  filesystem::create_directories (dirs, ec);
+  filesystem::create_directories (fullpath.parent_path (), ec);
   if (ec)
     return false; // could not create path
 

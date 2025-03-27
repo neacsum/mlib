@@ -3,7 +3,7 @@
   This file is part of MLIB project. See LICENSE file for full license terms.
 */
 
-///  \file http.cpp Implementation of http::server and http::connection classes
+///  \file http.cpp Implementation of mlib::http::server and mlib::http::connection classes
 #include <mlib/mlib.h>
 #pragma hdrstop
 
@@ -26,13 +26,14 @@ using namespace mlib;
 
 namespace mlib::http {
 
-/// Table of known mime types
+/// Info for known MIME types
 struct smime
 {
-  std::string type;
-  bool shtml;
+  std::string type;   //!< value of `Content-Type` header 
+  bool shtml;         //!< `true` if using SSI mechanism
 };
 
+/// Table of known file extensions and associated MIME types
 std::map<std::string, smime> static knowntypes {
   {"htm",   {"text/html", false}}, //also default mime type
   {"html",  {"text/html", false}},
@@ -54,8 +55,10 @@ std::map<std::string, smime> static knowntypes {
 };
 
 static size_t match (const std::string& str1, const std::string& str2);
+static string generate_nonce (size_t length);
+static bool tokenize (const std::string& str, str_pairs& tokens);
 
-//-----------------------------------------------------------------------------
+  //-----------------------------------------------------------------------------
 /*!
   \class mlib::http::connection
   \ingroup  sockets
@@ -210,9 +213,8 @@ void connection::run ()
         return;
       }
 
-      int auth_stat = do_auth ();
-      if (auth_stat <= 0)
-        return; // bad auth - response sent by do_auth
+      if (!do_auth ())
+        return; // bad or missing auth - response sent by do_auth
 
       //Prepare output headers
       if (!has_ihdr ("Connection"))
@@ -295,12 +297,13 @@ void connection::run ()
 // Return true if client connection should be closed
 bool connection::should_close ()
 {
-  if (has_ihdr ("Connection") && get_ihdr ("Connection") == "close")
+  ci_less different;
+  if (has_ihdr ("Connection") && !different(get_ihdr ("Connection"), "close"))
   {
     TRACE8 ("should_close - client wants to close");
     return true; // client wants to close
   }
-  if (has_ohdr ("Connection") && get_ohdr ("Connection") == "close")
+  if (has_ohdr ("Connection") && !different(get_ohdr ("Connection"), "close"))
   {
     TRACE8 ("should_close - server wants to close");
     return true; // server wants to close
@@ -312,7 +315,7 @@ bool connection::should_close ()
   }
 
   if (http_version == "HTTP/1.0"
-   && (!has_ihdr ("Connection") || get_ihdr ("Connection") != "keep-alive"))
+   && (!has_ihdr ("Connection") || different(get_ihdr ("Connection"), "keep-alive")))
   {
     TRACE8 ("should_close - protocol HTTP 1.0");
     return true;
@@ -335,81 +338,85 @@ void connection::request_init ()
   oheaders = parent.out_headers;
 
   query_parsed = body_parsed = response_sent = false;
+
 }
 
 void connection::term ()
 {
-  TRACE8 ("http_connection::term - Closed connection to %s", ws->peer ()->hostname ().c_str ());
+  TRACE ("http_connection::term - Closed connection to %s", ws->peer ()->hostname ().c_str ());
   ws.flush ();
   parent.close_connection (*ws.rdbuf ());
   thread::term ();
 }
 
 /*
-  Check if path_ is covered by a server realm and if user has credentials for
-  said realm.
+  Check if path_ is covered by a protection realm and if user has credentials
+  for that realm.
 
-  \return
-    0   = Missing authorization (401)
-   -1   = Bad authorization (501)
-    1   = all good
+  The function sends the required response if authorization fails.
 
+  \return `true` if access is permitted, `false' otherwise
 */
-int connection::do_auth ()
+bool connection::do_auth ()
 {
   string realm;
   if (!parent.is_protected (path_, realm))
-    return 1;
+    return true;
 
   if (!has_ihdr("Authorization"))
   {
-    serve401 (realm.c_str ());
-    return 0;
+    serve401 (realm);
+    return false;
   }
 
-  auto& auth = get_ihdr ("Authorization");
-  if (auth.substr(0,6) != "Basic ")
+  auto& authorization = get_ihdr ("Authorization");
+  if (match (authorization, "Basic") != 5)
   {
     // Other auth methods
-    TRACE8 ("Authorization: %s", auth.c_str());
+    TRACE8 ("connection::do_auth: Unknown %s", authorization.c_str ());
     respond (501); // not implemented
-    return -1;
+    return false;
+  }
+  size_t i = 5;
+  while (i < authorization.size () && isspace (authorization[i]))
+    i++;
+  if (i == authorization.size ())
+  {
+    respond (400); // malformed "Authorization" header
+    return false;
   }
 
-  char buf[256];
-  size_t outsz = base64dec (auth.substr (6).c_str (), buf);
-  buf[outsz] = 0;
-  char* pwd = strchr (buf, ':');
-  if (pwd)
-    *pwd++ = 0;
-  else
-    pwd = buf;
-  if (!parent.authenticate (realm.c_str (), buf, pwd))
+  auto decoded = base64dec (authorization.substr (i));
+  i = decoded.find (':');
+  if (i == string::npos)
   {
-    // invalid credential
-    TRACE2 ("http::connection: Invalid credentials user %s", buf);
-    serve401 (realm.c_str ());
-    return 0;
+    respond (400); // malformed credentials
+    return false;
   }
-  TRACE8 ("http::connection: Authenticated user %s for realm %s", buf, realm.c_str ());
-  return 1;
+
+  string user = decoded.substr (0, i);
+  string pwd = decoded.substr (i + 1);
+
+  if (!parent.verify_authorization (realm, user, pwd))
+  {
+    serve401 (realm);
+    return false;
+  }
+  auth_user = user;
+  auth_realm = realm;
+  return true;
 }
 
-void connection::serve401 (const char* realm)
+
+void connection::serve401 (const std::string& realm)
 {
-  static const char* std401 =
+  static const std::string std401 =
     "<HTML><HEAD><TITLE>401 Unauthorized</TITLE></HEAD>"
     "<BODY><H4>401 Unauthorized!</H4>Authorization required.</BODY></HTML>";
-  char len[10];
-  char challenge[256];
-  strcpy (challenge, "Basic realm=\"");
-  strcat (challenge, realm);
-  strcat (challenge, "\"");
 
-  add_ohdr ("WWW-Authenticate", challenge);
 
-  sprintf (len, "%d", (int)strlen (std401));
-  add_ohdr ("Content-Length", len);
+  add_ohdr ("WWW-Authenticate", "Basic realm=\"" + realm + "\"");
+  add_ohdr ("Content-Length", to_string (std401.size()));
   add_ohdr ("Content-Type", "text/html");
   respond (401);
   ws << std401;
@@ -918,6 +925,8 @@ bool connection::parse_request (const std::string& req)
     return false; 
 
   path_ = string (pbeg, crt);
+  if (*path_.rbegin () == '/')
+    path_ += parent.default_uri ();
 
   // SP
   while (*++crt == ' ')
@@ -1053,6 +1062,9 @@ void connection::respond (unsigned int code, const std::string& reason)
     strftime (buf, sizeof (buf), "%a, %d %b %Y %H:%M:%S GMT", tm);
     add_ohdr ("Date", buf);
   }
+  if (code >= 300 && !has_ohdr ("Connection"))
+    add_ohdr ("Connection", "close");
+
   TRACE9 ("Sending connection headers");
   ws << oheaders;
   ws << "\r\n"; 
@@ -1197,13 +1209,13 @@ void server::remove_ohdr (const std::string& hdr)
 */
 void server::add_handler (const std::string& uri, uri_handler func, void* info)
 {
+  string uri_abs = uri[0] == '/' ? uri : "/"s + uri;
   handle_info hi {func, info};
-  handlers.emplace (uri, hi);
+  handlers.emplace (uri_abs, hi);
 }
 
 /*!
-  Add or modify an POST handler function.
-  \param tgt_path    URI address
+  \param uri    URI address
   \param func   handler function
   \param info   handler specific information
 
@@ -1212,8 +1224,9 @@ void server::add_handler (const std::string& uri, uri_handler func, void* info)
 */
 void server::add_post_handler (const std::string& uri, uri_handler func, void* info)
 {
-  handle_info hi {func, info};
-  post_handlers.emplace (uri, hi);
+  string uri_abs = uri[0] == '/' ? uri : "/"s + uri;
+  handle_info hi{func, info};
+  post_handlers.emplace (uri_abs, hi);
 }
 
 /*!
@@ -1240,116 +1253,107 @@ void server::delete_mime_type (const std::string& ext)
 }
 
 /*!
-  Add a new access realm. Realms are assigned to specific tgt_path paths and their
-  access can be restricted to specified users.
   \param realm    protection realm
-  \param tgt_path      starting path
+  \param uri      URI path
 */
-void server::add_realm (const char* realm, const char* uri)
+void server::add_secured_path (const std::string& realm, const std::string& uri)
 {
-  string s_uri = (*uri == '/') ? uri : string ("/") + uri;
-  realms[realm] = s_uri;
+  //make sure path is absolute
+  string abs_uri = (uri[0] == '/') ? uri : "/"s + uri;
+  mlib::lock l(realmlock);
+  auto& descr = realms[realm];
+  descr.paths.push_back (abs_uri);
 }
 
 /*!
-  Add a new user to a relm or modifies password for an existing user.
   \param realm access realm
   \param username user name
   \param pwd user password
-  \return _true_ if successful or _false_ if realm doesn't exist
+
+  If user already exists, it just modifies the access credentials
 */
-bool server::add_user (const char* realm, const char* username, const char* pwd)
+void server::add_user (const std::string& realm, const std::string& username, const std::string& pwd)
 {
-  if (realms.find (realm) == realms.end ())
-    return false; // no such realm
-  user inf;
-  inf.name = username;
-  inf.pwd = pwd;
-  multimap<string, user>::iterator it = credentials.find (realm);
-  if (it == credentials.end ())
+  mlib::lock l (realmlock);
+  auto& auth = realms[realm].credentials;
+  bool user_found = false;
+  for (auto& entry : auth)
   {
-    pair<string, user> p (realm, inf);
-    credentials.insert (p);
-  }
-  else
-  {
-    while (it != credentials.end () && it->first == realm)
+    if (entry.name == username)
     {
-      if (it->second.name == username)
-      {
-        it->second.pwd = pwd; // change password
-        return true;
-      }
-      it++;
+      entry.pwd = pwd;
+      user_found = true;
+      break;
     }
-    pair<string, user> p (realm, inf);
-    credentials.insert (p);
   }
-
-  return true;
+  if (!user_found)
+    auth.emplace_back (username, pwd);
 }
 
-bool server::remove_user (const char* realm, const char* username)
+void server::remove_user (const std::string& realm, const std::string& username)
 {
-  if (realms.find (realm) == realms.end ())
-    return false; // no such realm
-
-  multimap<string, user>::iterator it = credentials.find (realm);
-
-  while (it != credentials.end () && it->first == realm)
+  mlib::lock l (realmlock);
+  auto& auth = realms[realm].credentials;
+  for (auto entry_ptr = auth.begin (); entry_ptr != auth.end (); ++entry_ptr)
   {
-    if (it->second.name == username)
+    if (entry_ptr->name == username)
     {
-      credentials.erase (it); // remove user
-      return true;
+      auth.erase (entry_ptr);
+      break;
     }
-    it++;
   }
-
-  return true;
 }
 
-/*!
-  Find the realm with longest matching path that covers an URI
-  \param tgt_path    URI to check
-  \param realm  matching realm
+  /*!
+  Find if URI is covered by a protection realm
+  \param uri    URI to check
   \return       true if URI is covered by a realm
 
 */
 bool server::is_protected (const std::string& uri, std::string& realm)
 {
-  size_t len = 0;
-  auto it = realms.begin ();
-  while (it != realms.end ())
-  {
-    size_t n = match (uri, it->second.c_str ());
+  size_t best_len = 0;
+  auto best_match = realms.end ();
 
-    if ((n == uri.length () || uri[n] == '/') // complete path segment
-     && n == it->second.length () //matching whole realm path
-     && n > len)                  //longest matching path
+  // make sure path is absolute
+  string abs_uri = (uri[0] == '/') ? uri : "/"s + uri;
+
+  mlib::lock l (realmlock);
+  for (auto realm_ptr = realms.begin (); realm_ptr != realms.end (); ++realm_ptr)
+  {
+    for (auto& p : realm_ptr->second.paths)
     {
-      len = n;
-      realm = it->first;
+      size_t n = match (abs_uri, p);
+      if ((n == p.length ())                       // matching whole protected path
+          && (p.length() == 1 || n == abs_uri.length () || uri[n] == '/') // complete path segment
+          && n > best_len)                         // longest matching path
+      {
+        best_len = n;
+        best_match = realm_ptr;
+      }
     }
-    it++;
   }
-  return (len > 0);
+  if (best_len)
+  {
+    realm = best_match->first;
+    return true;
+  }
+  return false;
 }
 
-/*!
-  Verify user credentials for a realm.
-  \return     true if user is authorized for the realm
-*/
-bool server::authenticate (const std::string& realm, const std::string& user, const std::string& pwd)
+bool server::verify_authorization (const std::string& realm, const std::string& user,
+                                  const std::string& password)
 {
-  auto it = credentials.find (realm);
-  if (it == credentials.end ())
-    return false; // no such realm
-  while (it != credentials.end () && it->first == realm)
+  mlib::lock l (realmlock);
+  auto& users = realms[realm].credentials;
+  for (auto& u : users)
   {
-    if (it->second.name == user && it->second.pwd == pwd)
+    if (u.name == user && u.pwd == password)
+    {
+      TRACE8 ("server::basic_auth: Authenticated user %s for realm %s", user.c_str (),
+              realm.c_str ());
       return true;
-    it++;
+    }
   }
   return false;
 }
@@ -1395,10 +1399,10 @@ int server::invoke_handler (connection& client)
   auto uri = client.get_path ();
   int ret = HTTP_NO_HANDLER;
   handle_info* hinfo;
-  if (locate_handler (client.path_, &hinfo))
+  if (locate_handler (uri, &hinfo))
   {
     lock l (*hinfo->in_use);
-    TRACE9 ("Invoking handler for %s", client.get_path ().c_str ());
+    TRACE9 ("Invoking handler for %s", uri.c_str ());
     ret = hinfo->h (client, hinfo->nfo);
     TRACE9 ("Handler done (%d)", ret);
   }
@@ -1432,7 +1436,7 @@ int server::invoke_post_handler (connection& client)
 
 /*!
   Maps a local file path to an URI resource path.
-  \param  tgt_path     URI resource path
+  \param  uri     URI resource path
   \param  path    mapped local file path
 
   The mapping is always relative to server's root folder (`docroot`).
@@ -1458,7 +1462,7 @@ void server::add_alias (const std::string& uri, const std::string& path)
   Note that mapping is only lexical. The function does not check if the resource
   exists.
 
-  Remapping is "greedy". If the alias table contains mappings for "doc" and
+  Remapping is "greedy". If the alias table contains two mappings for "doc" and
   "doc/new", a resource like "/doc/new/manual.html" will use the mapping for
   "/doc/new"
 */
@@ -1509,20 +1513,20 @@ bool server::locate_resource (const std::string& res, std::filesystem::path& pat
 
 /*!
   Add or modify a user variable
-  \param name     variable name (the name used in SSI construct)
+  \param name     name of variable (the name used in SSI construct)
+  \param t        type of variable
   \param addr     address of content
-  \
   \param fmt      sprintf format string
   \param multiplier for numeric variables, resulting value is multiplied by this factor
 
   User variables are accessible through SSI constructs like:
-  \verbatim
+  ```html
     <!--#echo var="name" -->
-  \endverbatim
+  ```
 
   When the page is served the SSI construct is replaced by the current value of
-  the named variable, eventually multiplied by \a multiplier factor and formatted
-  as text using the \a fmt string. If format string is NULL, a format appropriate
+  the named variable, eventually multiplied by `multiplier` factor and formatted
+  as text using the `fmt` string. If format string is NULL, a format appropriate
   for the variable type is used
 */
 void server::add_var (const std::string& name, vtype t, const void* addr,
@@ -1615,7 +1619,6 @@ const std::string& server::guess_mimetype (const std::filesystem::path& fn, bool
   return knowntypes[0].type;
 }
 
-
 /*!
   Return number of matching characters at beginning of str1 and str2.
   Comparison is case insensitive.
@@ -1628,6 +1631,156 @@ size_t match (const std::string& str1, const std::string& str2)
     n++;
   return n;
 }
+
+#if 0
+// Not currently used. Might be used when/if implementing digest authentication
+
+/*!
+  Generate a nonce string for digest authentication
+*/
+string generate_nonce (size_t length)
+{
+  static const char charset[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  const size_t charset_size = sizeof (charset) - 1;
+  string nonce;
+  srand ((unsigned int)time (nullptr));
+
+  for (size_t i = 0; i < length; i++)
+    nonce.push_back (charset[rand () % charset_size]);
+
+  return nonce;
+}
+
+/*!
+  Tokenizer for credential strings.
+  Conforms to RFC 7235
+
+  Syntax is:
+  <auth-param-list> = <auth-param> | <auth-param> OWS ","  OWS <auth-paramlist>
+  <auth-param> = <token> BWS "=" BWS ( <token> | <quoted-string> )
+  <token> = 1*( ALPHA | DIGIT | "-" | "." | "_" | "~" | "+" | "/" )
+*/
+bool tokenize (const std::string& str, str_pairs& tokens)
+{
+  //using same charset for "token" and "token68". Not standard conforming but it's ok.
+  static const char charset68[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~+/";
+  
+  size_t i = 0;
+  int state = 0;
+  string key, value;
+  bool go_on = true;
+  while (go_on && i < str.length ())
+  {
+    switch (state)
+    {
+    case 0: //waiting for key
+      if (isblank (str[i]))
+        i++;
+      else
+      {
+        key.clear ();
+        value.clear ();
+        state = 1;
+      }
+      break;
+
+    case 1: //first key char
+      if (strchr (charset68, str[i]) != nullptr)
+        key.push_back (str[i++]);
+      else
+        go_on = false; // illegal first key char
+      state = 2;
+      break;
+
+    case 2: //accumulating key
+      if (str[i] == '=')
+      {
+        i++;
+        state = 3;
+      }
+      else if (strchr (charset68, str[i]) != nullptr)
+        key.push_back (str[i++]);
+      else if (isblank (str[i]))
+      {
+        i++; // bad white space (BWS)
+        state = 21;
+      }
+      else
+        return false; //illegal char in key
+      break;
+
+    case 21: //bad white space after key
+      if (str[i] == '=')
+      {
+        i++;
+        state = 3;
+      }
+      else if (!isblank (str[i++]))
+        go_on = false; 
+      break;
+
+    case 3: //first value char
+      if (str[i] == '"')
+      {
+        i++;
+        state = 4;
+      }
+      else if (strchr (charset68, str[i]) != nullptr)
+      {
+        value.push_back (str[i++]);
+        state = 5;
+      }
+      else if (isblank (str[i]))
+      {
+        i++;
+        state = 31; //BWS
+      }
+      else
+        go_on = false; //illegal first value char
+      break;
+
+    case 31:    //bad white space after '=' sign
+      if (isblank (str[i]))
+        i++;
+      else
+        state = 3;
+      break;
+
+    case 4: //accumulate quoted string
+      if (str[i] == '"')
+      {
+        tokens.emplace (key, value);
+        i++;
+        state = 6;
+      }
+      else
+        value.push_back (str[i++]);
+      break;
+
+    case 5: //accumulate token
+      if (strchr (charset68, str[i]) != nullptr)
+        value.push_back (str[i++]);
+      else if (isblank (str[i]) || str[i] == ',')
+      {
+        tokens.emplace (key, value);
+        state = 6;
+      }
+      break;
+
+    case 6: //waiting for comma delimiter
+      if (str[i] == ',')
+      {
+        i++;
+        state = 0;
+      }
+      else if (!isblank (str[i++]))
+        go_on = false; 
+      break;
+    }
+  }
+  return (state == 6);
+}
+#endif
 
 } // namespace mlib::http
 

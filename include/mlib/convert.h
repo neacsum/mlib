@@ -1,6 +1,6 @@
 ﻿/*
   Copyright (c) Mircea Neacsu (2014-2025) Licensed under MIT License.
-  This is part of MLIB project. See LICENSE file for full license terms.
+  This file is part of MLIB project. See LICENSE file for full license terms.
 */
 
 #pragma once
@@ -16,6 +16,7 @@
 #include <cmath>
 
 #ifndef M_PI
+/// Older name for `std::numbers::pi`
 #define M_PI std::numbers::pi
 #endif
 
