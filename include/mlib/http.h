@@ -1,9 +1,9 @@
 /*
   Copyright (c) Mircea Neacsu (2014-2025) Licensed under MIT License.
-  This is part of MLIB project. See LICENSE file for full license terms.
+  This file is part of MLIB project. See LICENSE file for full license terms.
 */
 
-///  \file httpd.h Implementation of http::server and http::connection classes
+///  \file http.h Definition of http::server and http::connection classes
 #pragma once
 
 #include "tcpserver.h"

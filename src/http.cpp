@@ -1,9 +1,9 @@
 /*
   Copyright (c) Mircea Neacsu (2014-2025) Licensed under MIT License.
-  This is part of MLIB project. See LICENSE file for full license terms.
+  This file is part of MLIB project. See LICENSE file for full license terms.
 */
 
-///  \file httpd.cpp Implementation of http::server and http::connection classes
+///  \file http.cpp Implementation of http::server and http::connection classes
 #include <mlib/mlib.h>
 #pragma hdrstop
 
@@ -219,7 +219,7 @@ void connection::run ()
       {
         // Default "Connection" setting
         if (http_version.empty () || http_version == "HTTP/1.0")
-          add_ohdr ("Connection", "Close");
+          add_ohdr ("Connection", "close");
         else
           add_ohdr ("Connection", "keep-alive");
       }
@@ -295,12 +295,12 @@ void connection::run ()
 // Return true if client connection should be closed
 bool connection::should_close ()
 {
-  if (has_ihdr ("Connection") && get_ihdr ("Connection") == "Close")
+  if (has_ihdr ("Connection") && get_ihdr ("Connection") == "close")
   {
     TRACE8 ("should_close - client wants to close");
     return true; // client wants to close
   }
-  if (has_ohdr ("Connection") && get_ohdr ("Connection") == "Close")
+  if (has_ohdr ("Connection") && get_ohdr ("Connection") == "close")
   {
     TRACE8 ("should_close - server wants to close");
     return true; // server wants to close
@@ -312,7 +312,7 @@ bool connection::should_close ()
   }
 
   if (http_version == "HTTP/1.0"
-   && (!has_ihdr ("Connection") || get_ihdr ("Connection") != "Keep-Alive"))
+   && (!has_ihdr ("Connection") || get_ihdr ("Connection") != "keep-alive"))
   {
     TRACE8 ("should_close - protocol HTTP 1.0");
     return true;
@@ -1213,7 +1213,7 @@ void server::add_handler (const std::string& uri, uri_handler func, void* info)
 void server::add_post_handler (const std::string& uri, uri_handler func, void* info)
 {
   handle_info hi {func, info};
-  handlers.emplace (uri, hi);
+  post_handlers.emplace (uri, hi);
 }
 
 /*!

@@ -48,7 +48,6 @@ using namespace mlib;
 
 //globals
 HINSTANCE           hInst;
-string              docroot;
 NOTIFYICONDATA      nid;
 HWND                mainWnd;
 
@@ -137,6 +136,7 @@ LRESULT WINAPI WndProc (HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
       utf8::ShellExecute ("http://localhost:" + to_string (server_port) + "/about.html");
       break;
     case ID_SAMPLE_EXIT:
+      Sleep (100);
       DestroyWindow (hWnd);
       break;
     default:
@@ -205,21 +205,20 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE, LPSTR /*lpCmdLine*/, int /*n
   hInst = hInstance;
 
   /*Find a temp folder for all HTML assets (the docroot)*/
-  docroot = utf8::GetTempPath() + "uisample";
-  utf8::mkdir (docroot);
+  auto docroot = filesystem::temp_directory_path () / "uisample";
 
   /*Expand all assets in temp folder*/
   for (auto& a : assets)
     a.write (docroot);
 
   //Configure UI server
-  ui_server.docroot (docroot.c_str());
+  ui_server.docroot (docroot);
   ui_server.add_post_handler ("/exit", [] (http::connection& client, void*) -> int 
     {
       PostMessage (mainWnd, WM_COMMAND, ID_SAMPLE_EXIT, 0);
       dprintf ("Shutting down UI-sample server");
-      client.add_ohdr ("Connection", "Close");
-      return 0;
+      client.add_ohdr ("Connection", "close");
+      return HTTP_OK;
     });
 
   // Populate UI variables
@@ -346,7 +345,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE, LPSTR /*lpCmdLine*/, int /*n
   for (auto& a : assets)
     a.remove ();
 
-  utf8::rmdir (docroot);
+  filesystem::remove_all (docroot);
   return (int)msg.wParam;
 }
 
@@ -385,15 +384,5 @@ int submit_sarr (http::connection& client, void* ui)
   utf8::MessageBox (mainWnd, mbox_msg, "UI Sample App", MB_OK | MB_SYSTEMMODAL);
 
   return HTTP_OK;
-}
-
-/*
-  Response to "POST /exit" request
-*/
-int exit_server (http::connection& client, void*)
-{
-  PostMessage (mainWnd, WM_COMMAND, ID_SAMPLE_EXIT, 0);
-  client.add_ohdr ("Connection", "Close");
-  return 0;
 }
 
