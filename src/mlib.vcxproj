@@ -229,6 +229,7 @@
     <ClCompile Include="dprintf.cpp" />
     <ClCompile Include="hex.cpp" />
     <ClCompile Include="json.cpp" />
+    <ClCompile Include="md5.cpp" />
     <ClCompile Include="rdir.cpp" />
     <ClCompile Include="event.cpp" />
     <ClCompile Include="firewall.cpp" />
@@ -244,12 +245,6 @@
     <ClCompile Include="inaddr.cpp" />
     <ClCompile Include="jbridge.cpp" />
     <ClCompile Include="log.cpp" />
-    <ClCompile Include="md5.c">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
     <ClCompile Include="mutex.cpp" />
     <ClCompile Include="nmea.cpp" />
     <ClCompile Include="options.cpp" />

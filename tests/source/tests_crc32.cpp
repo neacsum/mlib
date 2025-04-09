@@ -22,3 +22,18 @@ TEST (CRC32_Boost)
 
   CHECK_EQUAL (std_crc_32_result, crc);
 }
+
+TEST (MD5_QuickBrownFox)
+{
+  //Test vector from https://www.febooti.com/products/filetweak/members/hash-and-crc/test-vectors/
+
+  const char* fox = "The quick brown fox jumps over the lazy dog";
+  const char* expected = "9e107d9d372bb6826bd81d3542a419d6";
+  mlib::md5 hasher;
+  hasher.append ((const unsigned char *)fox, strlen (fox));
+  unsigned char digest[16];
+  char result[33];
+  hasher.finish (digest);
+  mlib::binhex (result, digest, sizeof (digest));
+  CHECK_EQUAL (expected, result);
+}
