@@ -1,9 +1,10 @@
-/*!
-  \file tvops.h Operations on timeval structure.
-
-  (c) Mircea Neacsu 2002. All rights reserved.
-
+/*
+  Copyright (c) Mircea Neacsu (2014-2025) Licensed under MIT License.
+  This file is part of MLIB project. See LICENSE file for full license terms.
 */
+
+///  \file tvops.h Operations on timeval structure.
+
 #pragma once
 
 #if __has_include("defs.h")
@@ -106,7 +107,8 @@ timeval fromdouble (double d);
 // Inline implementations ----------------------------------------------------
 
 /// Addition operator
-inline timeval operator+ (const timeval& t1, const timeval& t2)
+inline
+timeval operator+ (const timeval& t1, const timeval& t2)
 {
   timeval ans;
   ans.tv_usec = t1.tv_usec + t2.tv_usec;
@@ -116,7 +118,8 @@ inline timeval operator+ (const timeval& t1, const timeval& t2)
 }
 
 /// Subtraction operator
-inline timeval operator- (const timeval& t1, const timeval& t2)
+inline
+timeval operator- (const timeval& t1, const timeval& t2)
 {
   timeval ans;
 
@@ -127,7 +130,8 @@ inline timeval operator- (const timeval& t1, const timeval& t2)
 }
 
 /// Addition assignment operator
-inline timeval& operator+= (timeval& lhs, const timeval& rhs)
+inline
+timeval& operator+= (timeval& lhs, const timeval& rhs)
 {
   lhs.tv_usec += rhs.tv_usec;
   lhs.tv_sec += rhs.tv_sec;
@@ -136,7 +140,8 @@ inline timeval& operator+= (timeval& lhs, const timeval& rhs)
 }
 
 /// Subtraction assignment
-inline timeval& operator-= (timeval& lhs, const timeval& rhs)
+inline
+timeval& operator-= (timeval& lhs, const timeval& rhs)
 {
   lhs.tv_usec -= rhs.tv_usec;
   lhs.tv_sec -= rhs.tv_sec;
@@ -145,19 +150,22 @@ inline timeval& operator-= (timeval& lhs, const timeval& rhs)
 }
 
 /// Conversion to floating-point seconds
-inline double secd (const timeval& tv)
+inline
+double secd (const timeval& tv)
 {
   return tv.tv_sec + (double)tv.tv_usec / 1000000;
 }
 
 /// Conversion to 64-bit microseconds
-inline LONGLONG usec64 (const timeval& tv)
+inline
+LONGLONG usec64 (const timeval& tv)
 {
   return (LONGLONG)tv.tv_sec * 1000000L + (LONGLONG)tv.tv_usec;
 }
 
 /// Conversion from 64-bit microseconds
-inline timeval fromusec (LONGLONG us)
+inline
+timeval fromusec (LONGLONG us)
 {
   timeval tv;
   tv.tv_sec = (int)(us / 1000000L);
@@ -166,7 +174,8 @@ inline timeval fromusec (LONGLONG us)
 }
 
 /// Conversion from floating-point seconds
-inline timeval fromdouble (double d)
+inline
+timeval fromdouble (double d)
 {
   timeval tv;
   tv.tv_sec = (long)d;
@@ -175,7 +184,8 @@ inline timeval fromdouble (double d)
 }
 
 /// Multiplication by an integer
-inline timeval operator* (const timeval& op1, int op2)
+inline
+timeval operator* (const timeval& op1, int op2)
 {
   timeval tv;
 
@@ -186,13 +196,15 @@ inline timeval operator* (const timeval& op1, int op2)
 }
 
 /// Multiplication by an integer
-inline timeval operator* (int op1, const timeval& op2)
+inline
+timeval operator* (int op1, const timeval& op2)
 {
   return op2 * op1;
 }
 
 /// Division by an integer
-inline timeval operator/ (const timeval& op1, int op2)
+inline
+timeval operator/ (const timeval& op1, int op2)
 {
   timeval tv;
   tv.tv_usec = op1.tv_usec / op2;
@@ -201,6 +213,7 @@ inline timeval operator/ (const timeval& op1, int op2)
   return tv;
 }
 
+/// Stream extraction operator
 inline ::std::ostream& operator<< (::std::ostream& os, const timeval& tv)
 {
   os << "{ tv_sec: " << tv.tv_sec << ", tv_usec: " << tv.tv_usec << '}';

@@ -1,8 +1,9 @@
-/*!
-  \file   base64.h Definition of Base64 encoding/decoding functions
-
-  (c) Mircea Neacsu 2017
+/*
+  Copyright (c) Mircea Neacsu (2014-2025) Licensed under MIT License.
+  This file is part of MLIB project. See LICENSE file for full license terms.
 */
+
+///  \file   base64.h Definition of Base64 encoding/decoding functions
 #pragma once
 
 #if __has_include("defs.h")

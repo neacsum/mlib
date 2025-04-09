@@ -1,20 +1,19 @@
-/*!
-  \file tvops.cpp Operations on timeval structure.
-
-  (c) Mircea Neacsu 2002-2024. All rights reserved.
-
+/*
+  Copyright (c) Mircea Neacsu (2014-2025) Licensed under MIT License.
+  This file is part of MLIB project. See LICENSE file for full license terms.
 */
+
 
 #include <mlib/mlib.h>
 #pragma hdrstop
 #include <assert.h>
 
-/// \addtogroup tvops Operations with timeval structures
-/// @{
-
-/// 100ns intervals between 1/1/1601 and 1/1/1970 as reported by SystemTimeToFileTime()
+// 100ns intervals between 1/1/1601 and 1/1/1970 as reported by SystemTimeToFileTime()
 #define FILETIME_1970 0x019db1ded53e8000
 #define ONE_SECOND    ((long)1000000)
+
+/// \defgroup tvops Operations with timeval structures
+
 
 ///  Convert from UTC system time to Unix time scale (UTC form 01/01/70)
 timeval fromsystime (const SYSTEMTIME& st)
@@ -103,4 +102,3 @@ void normalize (timeval& tv)
   assert (tv.tv_usec > -ONE_SECOND && tv.tv_usec < ONE_SECOND);
 }
 
-/// @}

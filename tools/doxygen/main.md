@@ -39,7 +39,7 @@ SOFTWARE.
 - \ref mlib::syncbase "syncbase" - base class for all synchronization objects
 
 ## JSON Parser ##
-- \ref json::node an element of a JSON object
+- \ref mlib::json::node an element of a JSON object
 
 ### Networking ###
 - \ref mlib::inaddr "inaddr"
@@ -48,14 +48,14 @@ SOFTWARE.
 - \ref mlib::generic_sockstream "generic_sockstream" and derived classes
 - \ref mlib::tcpserver "TCP server"
 - \ref mlib::http::server "HTTP server"
-- \ref mlib::http::JSONBridge "JSONBridge" - JSON interface to HTTP server
+- \ref mlib::http::jbridge "JSON Bridge" - JSON interface to HTTP server
 - \ref mlib::firewall "Windows firewall" configuration
 
 ### Error Logging and Handling ###
 - \ref mlib::erc "Error code" objects
 - \ref mlib::errfac "Error facility"
 - \ref syslog() "syslog"
-- \ref dprintf() "dprintf" - output using OutputDebugString
+- \ref mlib::dprintf() "dprintf" - output using `OutputDebugString`
 - \ref trace.h "TRACE macros"
 
 ### Geometry ###

@@ -1,9 +1,8 @@
-/*!
-  \file mutex.cpp mutex class implementation
-
-  (c) Mircea Neacsu 1999
-
+/*
+  Copyright (c) Mircea Neacsu (2014-2025) Licensed under MIT License.
+  This file is part of MLIB project. See LICENSE file for full license terms.
 */
+
 #include <mlib/mlib.h>
 #pragma hdrstop
 #include <assert.h>
@@ -32,9 +31,9 @@ mutex::mutex (const std::string& name)
 }
 
 /*!
-  Check if %mutex is free (signaled).
+  Check if mutex is free (signaled).
 
-  If the %mutex is acquired (i.e. it was free) it is released back immediately.
+  If the mutex is acquired (i.e. it was free) it is released back immediately.
 */
 mutex::operator bool ()
 {

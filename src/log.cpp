@@ -3,10 +3,6 @@
   This is part of MLIB project. See LICENSE file for full license terms.
 */
 
-///  \file log.cpp Implementation of syslog functions.
-
-#define _WINSOCK_DEPRECATED_NO_WARNINGS
-
 #include <mlib/mlib.h>
 #pragma hdrstop
 #include <psapi.h>

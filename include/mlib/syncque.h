@@ -1,8 +1,10 @@
-/*!
-  \file syncque.h Definition of sync_queue and async_queue classes
-
-  (c) Mircea Neacsu 1999-2021. All rights reserved.
+/*
+  Copyright (c) Mircea Neacsu (2014-2025) Licensed under MIT License.
+  This file is part of MLIB project. See LICENSE file for full license terms.
 */
+
+/// \file syncque.h Definition of classes for FIFO queues
+
 #pragma once
 
 #if __has_include("defs.h")
@@ -16,13 +18,14 @@
 
 namespace mlib {
 /*!
-  A template class that implements a "synchronous queue", in effect a mailbox
-  that can store one "message", created by a producer thread, until consumed
-  by a consumer thread.
+  A template class that implements a "synchronous queue".
+  
+  This is, in effect, a mailbox that can store one "message", created by a
+  producer thread, until consumed by a consumer thread.
 
   If the mailbox is full (a message already there), the producer is blocked
-  until previous message is consumed. If the mailbox is empty, a consumer is
-  blocked until a new message arrives.
+  until the previous message is consumed. If the mailbox is empty, the consumer
+  is blocked until a new message arrives.
 
   This is strictly equivalent with an async_queue with size 1 however it doesn't
   have the underlining std::queue structure and avoids all the back and forth
@@ -199,7 +202,7 @@ public:
   }
 
 protected:
-  size_t limit;
+  size_t limit;           ///< maximum queue size
   semaphore prod_sema;    ///< producers' semaphore counts down until queue is full
   semaphore cons_sema;    ///< consumers' semaphore counts down until queue is empty
   criticalsection update; ///< critical section protects queue's integrity

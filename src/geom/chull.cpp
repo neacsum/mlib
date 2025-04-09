@@ -1,6 +1,4 @@
-/*!
-  \file chull.cpp Find convex hull for a set of points
-
+/*
   http://cm.bell-labs.com/who/clarkson/2dch.c
 
   Ken Clarkson wrote this.  Copyright (c) 1996 by AT&T..
@@ -15,14 +13,6 @@
   OF THIS SOFTWARE OR ITS FITNESS FOR ANY PARTICULAR PURPOSE.
 
 */
-
-/*
- * two-dimensional convex hull
- * read points from stdin,
- *      one point per line, as two numbers separated by whitespace
- * on stdout, points on convex hull in order around hull, given
- *      by their numbers in input order
- */
 
 #include <mlib/mlib.h>
 #pragma hdrstop

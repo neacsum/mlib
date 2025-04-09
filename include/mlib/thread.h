@@ -1,8 +1,10 @@
-/*!
-  \file thread.h thread class definition.
-
-  (c) Mircea Neacsu 1999-2017
+/*
+  Copyright (c) Mircea Neacsu (2014-2025) Licensed under MIT License.
+  This file is part of MLIB project. See LICENSE file for full license terms.
 */
+
+///  \file thread.h Definition of mlib::thread class
+
 #pragma once
 
 #include "event.h"
@@ -105,7 +107,7 @@ private:
 };
 
 /*!
-  Currently executing %thread object
+  Currently executing thread object
   \ingroup syncro
 
   Useful for accessing properties like id, handle, priority etc.
@@ -113,10 +115,10 @@ private:
 class current_thread
 {
 public:
-  DWORD id () const;
-  HANDLE handle () const;
-  int priority ();
-  void priority (int pri);
+  DWORD id () const;      ///< Return ID of current thread
+  HANDLE handle () const; ///< Return handle of current thread
+  int priority ();        ///< Return priority of current thread
+  void priority (int pri); ///< set priority of current thread
 };
 
 // inlines

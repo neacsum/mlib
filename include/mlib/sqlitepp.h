@@ -1,8 +1,10 @@
-/*!
-  \file sqlitepp.h C++ wrapper for SQLITE3
-
-  (c) Mircea Neacsu 2017. All rights reserved.
+/*
+  Copyright (c) Mircea Neacsu (2014-2025) Licensed under MIT License.
+  This file is part of MLIB project. See LICENSE file for full license terms.
 */
+
+///   \file sqlitepp.h C++ wrapper for SQLITE3
+
 #pragma once
 
 #if __has_include("defs.h")

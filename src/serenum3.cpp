@@ -1,8 +1,8 @@
-/*!
-  \file serenum2.cpp Implementation of SerEnum_UsingRegistry() function.
-
-  (c) Mircea Neacsu 2017-2024. All rights reserved.
+/*
+  Copyright (c) Mircea Neacsu (2014-2025) Licensed under MIT License.
+  This file is part of MLIB project. See LICENSE file for full license terms.
 */
+
 #include <mlib/mlib.h>
 #pragma hdrstop
 #include <utf8/utf8.h>

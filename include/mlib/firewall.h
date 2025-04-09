@@ -1,3 +1,9 @@
+/*
+  Copyright (c) Mircea Neacsu (2014-2025) Licensed under MIT License.
+  This file is part of MLIB project. See LICENSE file for full license terms.
+*/
+
+/// \file firewall.h Definition of mlib::firewall class
 #pragma once
 
 #if __has_include("defs.h")

@@ -1,6 +1,21 @@
-/*!
-  \file sqlitepp.cpp Implementation of Database and Query classes
+/*
+  Copyright (c) Mircea Neacsu (2014-2025) Licensed under MIT License.
+  This file is part of MLIB project. See LICENSE file for full license terms.
+*/
 
+#include <mlib/mlib.h>
+#pragma hdrstop
+#include <stdio.h>
+#include <assert.h>
+
+using namespace std;
+
+#define STR(X)         #X
+#define STRINGERIZE(X) STR (X)
+
+namespace mlib {
+
+/*!
   \defgroup sqlite SQLite C++ Wrappers
   \brief Object-oriented wrappers for SQLITE3 functions.
 
@@ -17,17 +32,6 @@
   on the command line. Any desired compile-time options can hence be set in the
   `mlib/defs.h` file.
 */
-#include <mlib/mlib.h>
-#pragma hdrstop
-#include <stdio.h>
-#include <assert.h>
-
-using namespace std;
-
-#define STR(X)         #X
-#define STRINGERIZE(X) STR (X)
-
-namespace mlib {
 
 static void set_erc_message (erc& err, sqlite3* db);
 

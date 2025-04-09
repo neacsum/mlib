@@ -1,15 +1,18 @@
+/*
+  Copyright (c) Mircea Neacsu (2014-2025) Licensed under MIT License.
+  This file is part of MLIB project. See LICENSE file for full license terms.
+*/
+
+
+/// \file errorcode.h  Definition of mlib::erc and mlib::errfac classes
 #pragma once
+
 /*!
-  \file errorcode.h  Definition of erc and erfac classes
-
-  Copyright (c) Mircea Neacsu 2000
-  Based on an idea from Marc Guillermont (CUJ 05/2000)
-
   \defgroup errors Error Handling
-  \brief Unified error handling.
+  \brief Unified error handling
 
-  erc objects are a cross between exceptions and return values. A function
-  can return an erc object and the caller can check it just like a regular
+  `erc` objects are a cross between exceptions and return values. A function
+  can return an `erc` object and the caller can check it just like a regular
   return value as in this example:
 
 ```CPP
@@ -25,7 +28,7 @@
   }
 ```
 
-  However with ercs, if the return result is not checked, it might be
+  However with `erc`-s, if the return result is not checked, it might be
   thrown as an exception as in the following example.
 
 ```CPP
@@ -44,9 +47,11 @@
   }
 ```
 
-  This dual behavior is obtained by having erc objects throwing an exception
-  in their destructor if the object is "active". An object is marked as "inactive"
+  This dual behavior is obtained by having `erc` objects throwing an exception
+  in their destructor if the object is _active_. An object is marked as _inactive_
   every time the integer conversion operator is invoked like in the first example.
+
+  Based on an idea from Marc Guillermont (CUJ 05/2000)
 */
 
 #if __has_include("defs.h")
@@ -328,12 +333,12 @@ inline errfac* errfac::default_facility = &deffac;
   \class errfac
   \ingroup errors
 
-  To group handling of erc objects, each erc has associated a _facility_.
-  Instead of throwing an exception directly, the erc calls the
+  To group handling of `erc` objects, each `erc` has associated a _facility_.
+  Instead of throwing an exception directly, the `erc` calls the
   facility's #raise function. In turn, it is this function that decides what
-  should happen erc based on facility's log level and throw level.
+  should happen based on facility's log level and throw level.
 
-  There is also a default facility that is used when the erc doesn't have
+  There is also a default facility that is used when the `erc` doesn't have
   an explicit facility.
 */
 

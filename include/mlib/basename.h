@@ -1,8 +1,10 @@
-/*!
-  \file basename.h Definitions for Unix-like basename() and dirname() functions.
-
-  (c) Mircea Neacsu 2017
+/*
+  Copyright (c) Mircea Neacsu (2014-2025) Licensed under MIT License.
+  This file is part of MLIB project. See LICENSE file for full license terms.
 */
+
+/// \file basename.h Declarations for mlib::basename() and mlib::dirname() functions.
+
 #pragma once
 
 #if __has_include("defs.h")

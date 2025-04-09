@@ -3,7 +3,7 @@
   This is part of MLIB project. See LICENSE file for full license terms.
 */
 
-///   \file jbridge.h Definition of JSONBridge class
+///   \file jbridge.h Definition of mlib::http::jbridge class
 #pragma once
 
 #include "http.h"
@@ -18,13 +18,13 @@ namespace mlib::http {
 #define HTTP_JSON_NOTFOUND -10 ///< Entry not found
 #define HTTP_JSON_DICSTRUC -11 ///< Bad dictionary structure
 
-class JSONBridge;
+class jbridge;
 
 /// User defined variable handler function
-typedef std::function<int (JSONBridge& bridge, void* var)> var_handler;
+typedef std::function<int (jbridge& bridge, void* var)> var_handler;
 
 /// JSON objects support
-class JSONBridge
+class jbridge
 {
 public:
   /// Dictionary entry types
@@ -47,12 +47,17 @@ public:
     JT_POSTFUN, ///< POST function call
   };
 
-  /// JSON data dictionary entry
   class entry;
+
+  /// Data dictionary structure
   typedef std::list<entry> dictionary;
+
+  /// Dictionary iterator @{
   typedef dictionary::iterator dict_ptr;
   typedef dictionary::const_iterator dict_cptr;
+  /// @}
 
+  /// JSON data dictionary entry
   class entry
   {
   public:
@@ -64,6 +69,12 @@ public:
       , sz (s)
     {}
 
+    /*!
+      Add an array to data dictionary
+      \tparam T data type
+      \tparam C number of elements
+      \param name external name
+    */
     template <typename T, size_t C>
     void add_var (T (&var)[C], const std::string& name)
     {
@@ -90,6 +101,12 @@ public:
         children.emplace_back (name, var, t, sz, C);
     }
 
+    /*!
+      Add a variable to data dictionary
+      \tparam T data type
+      \param var variable to add
+      \param name external name
+    */
     template <typename T>
     std::enable_if_t<std::is_same_v<T, std::string> || std::is_same_v<T, short>
                      || std::is_same_v<T, unsigned short> || std::is_same_v<T, int>
@@ -129,11 +146,11 @@ public:
     size_t sz;
     size_t cnt; ///< number of elements
     dictionary children;
-    friend class JSONBridge;
+    friend class jbridge;
   };
 
-  JSONBridge (const char* path);
-  ~JSONBridge ();
+  jbridge (const char* path);
+  ~jbridge ();
 
   void attach_to (server& server);
   void lock ();
@@ -230,31 +247,31 @@ private:
 /*==================== INLINE FUNCTIONS ===========================*/
 
 /// Enter the critical section associated with this bridge
-inline void JSONBridge::lock ()
+inline void jbridge::lock ()
 {
   in_use.enter ();
 }
 
 /// Leave the critical section associated with this bridge
-inline void JSONBridge::unlock ()
+inline void jbridge::unlock ()
 {
   in_use.leave ();
 }
 
 /// Return the root path where bridge is attached
-inline const std::string& JSONBridge::path () const
+inline const std::string& jbridge::path () const
 {
   return path_;
 }
 
 /// Set default redirection target for POST requests
-inline void JSONBridge::redirect_to (const std::string& uri)
+inline void jbridge::redirect_to (const std::string& uri)
 {
   redirect_uri = uri;
 }
 
 /// Return currently connected client (if any)
-inline connection& JSONBridge::client ()
+inline connection& jbridge::client ()
 {
   if (client_)
     return *client_;
@@ -268,12 +285,17 @@ inline connection& JSONBridge::client ()
   This function is invoked before redirecting the client to the `redirect_uri`.
   If the function does not return HTTP_OK, the client is not redirected.
 */
-inline void JSONBridge::set_post_action (uri_handler pfn)
+inline void jbridge::set_post_action (uri_handler pfn)
 {
   post_action = pfn;
 }
 
-inline JSONBridge::entry& JSONBridge::add_object (const std::string& name)
+/*!
+  Add an object to data dictionary
+  \param name object's name
+  \return reference to newly created dictionary entry
+*/
+inline jbridge::entry& jbridge::add_object (const std::string& name)
 {
   dict_.emplace_back (name, nullptr, JT_OBJECT, 0, 1);
   return *(--dict_.end ());
@@ -288,7 +310,7 @@ inline JSONBridge::entry& JSONBridge::add_object (const std::string& name)
   If the handler function does not return HTTP_OK, the `post_action` function
   is not invoked and client is not redirected to `redirect_uri'
 */
-inline void JSONBridge::add_postfun (const std::string& qparam, uri_handler pfn)
+inline void jbridge::add_postfun (const std::string& qparam, uri_handler pfn)
 {
   post_handlers[qparam] = pfn;
 }

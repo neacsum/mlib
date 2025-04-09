@@ -1,11 +1,20 @@
 /*
-  Copyright (c) Mircea Neacsu (2014-2024) Licensed under MIT License.
-  This is part of MLIB project. See LICENSE file for full license terms.
+  Copyright (c) Mircea Neacsu (2014-2025) Licensed under MIT License.
+  This file is part of MLIB project. See LICENSE file for full license terms.
 */
 
-/*!
-  \file options.cpp Implementation of command line parsing class.
+#include <mlib/mlib.h>
+#pragma hdrstop
+#include <ctype.h>
+#include <cstring>
+#include <assert.h>
+#include <filesystem>
 
+using namespace std;
+
+namespace mlib {
+
+/*!
   \class mlib::OptParser
   \brief Command Line Parsing class
 
@@ -82,16 +91,6 @@ and
 
 ```
 */
-#include <mlib/mlib.h>
-#pragma hdrstop
-#include <ctype.h>
-#include <cstring>
-#include <assert.h>
-#include <filesystem>
-
-using namespace std;
-
-namespace mlib {
 
 ///  Initialize parser
 OptParser::OptParser ()

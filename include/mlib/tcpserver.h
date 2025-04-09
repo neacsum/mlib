@@ -3,7 +3,7 @@
   This is part of MLIB project. See LICENSE file for full license terms.
 */
 
-///  \file tcpserver.h Definition of tcpserver class
+///  \file tcpserver.h Definition of mlib::tcpserver class
 
 #pragma once
 

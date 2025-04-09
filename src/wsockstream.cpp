@@ -1,13 +1,8 @@
 /*
-  MLIB Library
-  (c) Mircea Neacsu 2002-2023. Licensed under MIT License.
-  See README file for full license terms.
+  Copyright (c) Mircea Neacsu (2014-2025) Licensed under MIT License.
+  This file is part of MLIB project. See LICENSE file for full license terms.
 */
 
-/// \file wsockstream.cpp Implementation of sock and sock-derived classes
-
-// comment this line if you want debug messages from this module
-#undef _TRACE
 
 #include <mlib/mlib.h>
 #pragma hdrstop
@@ -51,7 +46,7 @@ int sock_initializer_counter = 0;
   \defgroup sockets Networking Objects
 */
 
-/// The initialization object
+// The initialization object
 static sock_initializer init;
 
 /*!
@@ -830,7 +825,7 @@ std::streamsize sockbuf::showmanyc ()
 
 */
 
-/// First instance calls WSAStartup to initialize Winsock library
+// First instance calls WSAStartup to initialize Winsock library
 sock_initializer::sock_initializer ()
 {
   TRACE9 ("sock_initializer::sock_initializer cnt=%d", sock_initializer_counter);
@@ -845,7 +840,7 @@ sock_initializer::sock_initializer ()
   }
 }
 
-/// Last instance calls WSACleanup
+// Last instance calls WSACleanup
 sock_initializer::~sock_initializer ()
 {
   if (--sock_initializer_counter == 0)
@@ -963,9 +958,7 @@ std::string sock_facility::message (const erc& e) const
   return errors[i].str;
 }
 
-/*!
-  Output either the message text or message number if no text.
-*/
+///  Output either the message text or message number if no text.
 void sock_facility::log (const erc& e) const
 {
   auto str = message (e);

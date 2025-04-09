@@ -1,10 +1,10 @@
 /*
-  MLIB Library
-  (c) Mircea Neacsu 2001-2023. Licensed under MIT License.
-  See README file for full license terms.
+  Copyright (c) Mircea Neacsu (2014-2025) Licensed under MIT License.
+  This file is part of MLIB project. See LICENSE file for full license terms.
 */
 
-/// \file wsockstream.h Definition of sock and sockstream classes
+/// \file wsockstream.h Definition of mlib::sock and related classes
+
 #pragma once
 
 #if __has_include("defs.h")

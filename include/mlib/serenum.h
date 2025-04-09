@@ -1,8 +1,10 @@
-/*!
-  \file serenum.h Functions for enumerating serial ports
-
-  (c) Mircea Neacsu 2017. All rights reserved.
+/*
+  Copyright (c) Mircea Neacsu (2014-2025) Licensed under MIT License.
+  This file is part of MLIB project. See LICENSE file for full license terms.
 */
+
+///   \file serenum.h Functions for enumerating serial ports
+
 #pragma once
 
 #include <vector>

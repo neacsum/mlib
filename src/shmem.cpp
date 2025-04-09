@@ -1,9 +1,8 @@
-/*!
-  \file shmem.cpp Implementation of shared memory areas with support for
-  single-writer multiple-readers.
-
-    (c) Mircea Neacsu. 2004-2017
+/*
+  Copyright (c) Mircea Neacsu (2014-2025) Licensed under MIT License.
+  This file is part of MLIB project. See LICENSE file for full license terms.
 */
+
 #include <mlib/mlib.h>
 #pragma hdrstop
 
@@ -134,9 +133,7 @@ bool shmem_base::open (const std::string& nam, size_t sz_)
   return true;
 }
 
-/*!
-  Close a SMA
-*/
+///  Close a SMA
 bool shmem_base::close ()
 {
   assert (!in_rdlock && !in_wrlock);
@@ -192,9 +189,7 @@ bool shmem_base::rdlock ()
   return true;
 }
 
-/*!
-  Release a previously obtained reader lock
-*/
+///  Release a previously obtained reader lock
 void shmem_base::rdunlock ()
 {
   assert (syn);
@@ -262,9 +257,7 @@ bool shmem_base::wrlock ()
   return false;
 }
 
-/*!
-  Release a previously obtained writer lock
-*/
+///  Release a previously obtained writer lock
 void shmem_base::wrunlock ()
 {
   assert (syn);
@@ -280,18 +273,6 @@ void shmem_base::wrunlock ()
   InterlockedDecrement (&syn->wc);
   in_wrlock--;
   TRACE9 ("shmem_base::wrunlock (%d) - done", in_wrlock);
-}
-
-/// Write new data into the SMA
-void shmem_base::put (const void* data)
-{
-  memcpy (dataptr (), data, size ());
-}
-
-/// Retrieve current content of SMA
-void shmem_base::get (void* data)
-{
-  memcpy (data, dataptr (), size ());
 }
 
 /*!

@@ -1,9 +1,9 @@
-/*!
-  \file semaphore.cpp semaphore class implementation
-
-  (c) Mircea Neacsu 1999
-
+/*
+  Copyright (c) Mircea Neacsu (2014-2025) Licensed under MIT License.
+  This file is part of MLIB project. See LICENSE file for full license terms.
 */
+
+
 #include <mlib/mlib.h>
 #pragma hdrstop
 #include <assert.h>
@@ -16,6 +16,7 @@ namespace mlib {
   \class semaphore
   \ingroup syncro
   \brief Wrapper for Windows semaphore objects.
+
   A semaphore is a counter incremented by signal and decremented by wait.
   If counter is negative any waiting thread is blocked until counter becomes
   positive.

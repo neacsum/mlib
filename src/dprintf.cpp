@@ -3,9 +3,6 @@
   This is part of MLIB project. See LICENSE file for full license terms.
 */
 
-
-///  \file dprintf.cpp Implementation of dprintf() function
-
 #include <mlib/mlib.h>
 #pragma hdrstop
 #include <stdio.h>
@@ -14,11 +11,10 @@
 #include <mutex>
 #include <sstream>
 #include <cstring>
-#include <mlib/critsect.h>
 
+namespace mlib {
 
 /*!  
-  A printf-style function, writes debug messages.
 
   On Windows platform, the function  uses the `OutputDebugString` API call to
   generate the output. On other platforms, output is sent to `stderr`.
@@ -79,3 +75,5 @@ bool dprintf (const char* fmt, ...)
   return true;
 #endif
 }
+
+} // namespace mlib

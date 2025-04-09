@@ -3,8 +3,6 @@
   This file is part of MLIB project. See LICENSE file for full license terms.
 */
 
-///  \file asset.cpp Implementation of asset class
-
 #include <mlib/mlib.h>
 #pragma hdrstop
 #include <utf8/utf8.h>

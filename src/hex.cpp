@@ -3,8 +3,6 @@
   This is part of MLIB project. See LICENSE file for full license terms.
 */
 
-/// \file  hex.cpp  Utility functions for strings of hex characters
-
 #include <mlib/mlib.h>
 #pragma hdrstop
 
@@ -38,9 +36,9 @@ void bytehex (char* str, unsigned char bin)
   unsigned char nibble;
 
   nibble = bin >> 4;
-  *str++ = (nibble > 9)? nibble-10+'A' : nibble+'0';
+  *str++ = (nibble > 9)? nibble-10+'a' : nibble+'0';
   nibble = bin & 0x0f;
-  *str++ = (nibble > 9)? nibble-10+'A' : nibble+'0';
+  *str++ = (nibble > 9)? nibble-10+'a' : nibble+'0';
   *str = 0;
 }
 

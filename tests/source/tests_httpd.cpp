@@ -82,7 +82,7 @@ TEST (url_decode_ok)
   string str = "key1=value1&key2=hello%20world%21";
   http::str_pairs pairs;
 
-  auto ret = parse_urlparams (str, pairs);
+  auto ret = internal::parse_urlparams (str, pairs);
   CHECK (ret);
   CHECK_EQUAL (2, pairs.size ());
 }
@@ -92,7 +92,7 @@ TEST (url_decode_bad)
   string str = "key1=value1&key2";
   http::str_pairs pairs;
 
-  auto ret = parse_urlparams (str, pairs);
+  auto ret = internal::parse_urlparams (str, pairs);
   CHECK (!ret);
 }
 

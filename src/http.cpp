@@ -3,7 +3,6 @@
   This file is part of MLIB project. See LICENSE file for full license terms.
 */
 
-///  \file http.cpp Implementation of mlib::http::server and mlib::http::connection classes
 #include <mlib/mlib.h>
 #pragma hdrstop
 
@@ -60,8 +59,9 @@ static bool tokenize (const std::string& str, str_pairs& tokens);
 
   //-----------------------------------------------------------------------------
 /*!
+  \defgroup http Multi-threaded HTTP server
   \class mlib::http::connection
-  \ingroup  sockets
+  \ingroup  http
 
   This is the thread created by the mlib::http::server object in response to a
   new connection request.
@@ -610,7 +610,7 @@ bool connection::parse_body ()
 
   if (get_ihdr ("Content-Type") == "application/x-www-form-urlencoded")
   {
-    parse_urlparams (body, bparams);
+    internal::parse_urlparams (body, bparams);
     body_parsed = true;
     return true;
   }
@@ -623,7 +623,7 @@ void connection::parse_query ()
 {
   if (query_parsed)
     return; // don't repeat parsing
-  parse_urlparams (query_, qparams);
+  internal::parse_urlparams (query_, qparams);
   query_parsed = true;
 }
 
@@ -905,7 +905,7 @@ bool connection::parse_request (const std::string& req)
   if (*crt != ' ')
     return false;
   method_ = string (req.begin (), crt);
-  str_upper (method_);
+  internal::str_upper (method_);
 
   // SP
   while (*++crt == ' ')
@@ -949,7 +949,7 @@ bool connection::parse_request (const std::string& req)
     if (qend != string::npos)
       query_.erase (qend);
     path_.erase (qbeg);
-    url_decode (query_); // normalization of query component
+    internal::url_decode (query_); // normalization of query component
   }
   else
   {
@@ -958,7 +958,7 @@ bool connection::parse_request (const std::string& req)
     if (pend != string::npos)
       path_.erase (pend);
   }
-  url_decode (path_); // path normalization (RFC9110 sect 4.2.3)
+  internal::url_decode (path_); // path normalization (RFC9110 sect 4.2.3)
 
   return true;
 }
@@ -1074,7 +1074,7 @@ void connection::respond (unsigned int code, const std::string& reason)
 //-----------------------------------------------------------------------------
 /*!
   \class server
-  \ingroup sockets
+  \ingroup http
 
   This class is derived from mlib::tcpserver class and implements a basic HTTP
   server.
@@ -1086,7 +1086,7 @@ void connection::respond (unsigned int code, const std::string& reason)
   object.
 
   A HTTP server can be integrated to an application by adding specific handlers
-  and user variables. Handlers are user functions called in response to client
+  and/or user variables. Handlers are user functions called in response to client
   requests. There are two types of handlers:
   - _global handlers_ registered using the add_handler() function. These are
   called by the client connection thread immediately after validating a client

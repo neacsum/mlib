@@ -3,8 +3,6 @@
   This is part of MLIB project. See LICENSE file for full license terms.
 */
 
-///  \file convert.cpp Conversion functions
-
 #include <mlib/mlib.h>
 #pragma hdrstop
 #include <utf8/utf8.h>

@@ -1,9 +1,9 @@
-/*!
-  \file syncbase.cpp Member functions of syncbase class
-
-  (c) Mircea Neacsu 1999-2024
-
+/*
+  Copyright (c) Mircea Neacsu (2014-2025) Licensed under MIT License.
+  This file is part of MLIB project. See LICENSE file for full license terms.
 */
+
+
 #include <mlib/mlib.h>
 #pragma hdrstop
 
@@ -13,7 +13,7 @@ namespace mlib {
   \brief Wrapper classes for Windows synchronization mechanisms.
 
   While, currently, most of these objects have standard conforming replacements
-  (std::mutex, std::semaphore, std::thread, etc.) there are still use cases where
+  (std::mutex, std::semaphore, std::thread, etc.), there are still use cases where
   standard versions lack functionality compared to objects in this library.
 
   One such case is when trying to achieve synchronization between different processes.

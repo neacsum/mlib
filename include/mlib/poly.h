@@ -1,9 +1,10 @@
-#pragma once
-/*!
-  \file   poly.h Polynomial evaluation using Horner's scheme
-
-  (c) Mircea Neacsu 2020
+/*
+  Copyright (c) Mircea Neacsu (2014-2025) Licensed under MIT License.
+  This file is part of MLIB project. See LICENSE file for full license terms.
 */
+
+///  \file poly.h Polynomial evaluation using Horner's scheme
+#pragma once
 
 #if __has_include("defs.h")
 #include "defs.h"

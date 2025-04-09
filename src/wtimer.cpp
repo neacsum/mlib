@@ -1,9 +1,8 @@
-/*!
-  \file wtimer.cpp Implementation of timer class
-
-  (c) Mircea Neacsu 1999
-
+/*
+  Copyright (c) Mircea Neacsu (2014-2025) Licensed under MIT License.
+  This file is part of MLIB project. See LICENSE file for full license terms.
 */
+
 #include <mlib/mlib.h>
 #pragma hdrstop
 #include <assert.h>
@@ -20,7 +19,7 @@ namespace mlib {
   A waitable timer object is set to signaled when the specified due time
   arrives. There are two types of waitable timers that can be created:
   manual and automatic (called synchronization timers in Windows documentation).
-  Automatic timers are reset to their non-signaled state when a %thread
+  Automatic timers are reset to their non-signaled state when a thread
   completes a wait operation on the object (similar to automatic events).
 
   Manual timers remain signaled until restarted.

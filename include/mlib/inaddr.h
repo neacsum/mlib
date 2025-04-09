@@ -1,11 +1,12 @@
-#pragma once
 /*
-  MLIB Library
-  (c) Mircea Neacsu 2002-2023. Licensed under MIT License.
-  See README file for full license terms.
+  Copyright (c) Mircea Neacsu (2014-2025) Licensed under MIT License.
+  This file is part of MLIB project. See LICENSE file for full license terms.
 */
 
-/// \file inaddr.h Definition of inaddr class.
+/// \file inaddr.h Definition of mlib::inaddr class.
+
+#pragma once
+
 
 #if __has_include("defs.h")
 #include "defs.h"
@@ -18,7 +19,7 @@
 
 namespace mlib {
 
-/// sockaddr wrapper
+/// Wrapper for sockaddr structure
 class inaddr
 {
 public:

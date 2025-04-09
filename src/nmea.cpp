@@ -1,7 +1,6 @@
-/*!
-  \file nmea.cpp Implementation of NMEA-0183 parsing functions
-
-  (c) Mircea Neacsu 2019
+/*
+  Copyright (c) Mircea Neacsu (2014-2025) Licensed under MIT License.
+  This file is part of MLIB project. See LICENSE file for full license terms.
 */
 
 #include <mlib/mlib.h>
@@ -9,13 +8,25 @@
 #include <string.h>
 #include <stdlib.h>
 
-namespace mlib {
+namespace mlib::nmea {
+
+// some handy parsing macros
+#define NEXT_TOKEN(A, B)                                                                           \
+  if ((A = ctx.token ()) == NULL)                                                                  \
+  return B
+#define NEXT_VALIDTOKEN(A, B)                                                                      \
+  if ((A = ctx.token ()) == NULL || !strlen (A))                                                   \
+  return B
+#define IFPAR(par, exp)                                                                            \
+  if (par)                                                                                         \
+  *par = (exp)
+
 
 /*! \addtogroup NMEA-0183
  @{
 */
 
-/// parsing context for NMEA-0183 parser
+// parsing context for NMEA-0183 parser
 class parse_context
 {
 public:
@@ -41,7 +52,7 @@ inline parse_context::~parse_context ()
   free (lcl);
 };
 
-/*!
+/*
     Return next token of a NMEA sentence.
 
     Tokens are delimited by ',', \<CR\>, '*' or end of string.
@@ -68,16 +79,6 @@ char* parse_context::token ()
   return ret;
 }
 
-#define NEXT_TOKEN(A, B)                                                                           \
-  if ((A = ctx.token ()) == NULL)                                                                  \
-  return B
-#define NEXT_VALIDTOKEN(A, B)                                                                      \
-  if ((A = ctx.token ()) == NULL || !strlen (A))                                                   \
-  return B
-#define IFPAR(par, exp)                                                                            \
-  if (par)                                                                                         \
-  *par = (exp)
-
 /*!
   Compute the checksum of a NMEA sentence
 
@@ -87,7 +88,7 @@ char* parse_context::token ()
   - true  = if the checksum is correct or inexistent.
 */
 
-bool nmea_checksum (const char* buf)
+bool checksum (const char* buf)
 {
   char cks;
   char hex_cks[2];

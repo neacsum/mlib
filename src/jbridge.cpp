@@ -3,7 +3,6 @@
   This is part of MLIB project. See LICENSE file for full license terms.
 */
 
-///  \file   jbridge.cpp Implementation of JSONBridge class
 #include <mlib/mlib.h>
 #pragma hdrstop
 
@@ -23,18 +22,21 @@ namespace mlib::http {
 static std::tuple<std::string, size_t> index_split (const std::string name);
 
 /*!
-  \class JSONBridge
-  \ingroup sockets
+  \class mlib::http::jbridge
+  \ingroup http
 
-  JSONBridge class provides an easy access mechanism to program variables for
-  HTTP server. A JSONBridge object is attached to a HTTP server using the
+  This class provides JSON serialization/deserialization of variables. It gives
+  an easy access mechanism to program variables for the HTTP server.
+  
+  A `jbridge` object is attached to a HTTP server using the
   attach_to() function. Behind the scene, this function registers a handler
-  for the path associated with the JSONBridge.
+  for the path associated with the `jbridge`.
 
+  ### Sample Usage ###
   Assume the HTTP server `hs` answers requests sent to `http://localhost:8080`
-  and the JSONBridge object was created as:
+  and the `jbridge` object was created as:
   \code
-    JSONBridge jb("/var");
+    jbridge jb("/var");
   \endcode
 
   Then:
@@ -48,8 +50,8 @@ static std::tuple<std::string, size_t> index_split (const std::string name);
   variable called 'data' and return its content as a JSON object.
 */
 
-/// Creates a JSONBridge object for the given path
-JSONBridge::JSONBridge (const char* path)
+/// Creates a jbridge object for the given path
+jbridge::jbridge (const char* path)
   : path_ (path)
   , client_ (nullptr)
   , post_action (nullptr)
@@ -57,33 +59,33 @@ JSONBridge::JSONBridge (const char* path)
   assert (path[0] == '/');
 }
 
-JSONBridge::~JSONBridge ()
+jbridge::~jbridge ()
 {}
 
-/// Attach JSONBridge object to a HTTP server
-void JSONBridge::attach_to (server& server)
+/// Attach jbridge object to a HTTP server
+void jbridge::attach_to (server& server)
 {
-  server.add_handler (path_.c_str (), JSONBridge::callback, this);
+  server.add_handler (path_.c_str (), jbridge::callback, this);
 }
 
 ///
-erc JSONBridge::json_begin (json::node& root)
+erc jbridge::json_begin (json::node& root)
 {
-  TRACE9 ("JSONBridge::json_begin - %s", client ().get_query ());
+  TRACE9 ("jbridge::json_begin - %s", client ().get_query ());
   mlib::lock l (in_use);
   size_t idx;
   dict_cptr pvar;
 
   if (!find (client ().get_query (), pvar, &idx))
   {
-    TRACE2 ("JSONBridge::json_begin - Cannot find %s", client ().get_query ().c_str());
+    TRACE2 ("jbridge::json_begin - Cannot find %s", client ().get_query ().c_str());
     return erc (HTTP_JSON_NOTFOUND);
   }
   return jsonify (root, pvar);
 }
 
 /// Send out the JSON formatted buffer
-erc JSONBridge::json_end (json::node& obj)
+erc jbridge::json_end (json::node& obj)
 {
   try
   {
@@ -105,7 +107,7 @@ erc JSONBridge::json_end (json::node& obj)
 }
 
 /// Serializes a variable to JSON format
-erc JSONBridge::jsonify (json::node& n, dict_cptr v)
+erc jbridge::jsonify (json::node& n, dict_cptr v)
 {
   try
   {
@@ -125,7 +127,7 @@ erc JSONBridge::jsonify (json::node& n, dict_cptr v)
   }
 }
 
-erc JSONBridge::serialize_node (json::node& n, dict_cptr v, size_t index)
+erc jbridge::serialize_node (json::node& n, dict_cptr v, size_t index)
 {
   char* addr;
 
@@ -182,7 +184,7 @@ erc JSONBridge::serialize_node (json::node& n, dict_cptr v, size_t index)
   return erc::success;
 }
 
-erc JSONBridge::deserialize_node (const json::node& n, dict_cptr v, size_t index) const
+erc jbridge::deserialize_node (const json::node& n, dict_cptr v, size_t index) const
 {
   void* pv;
 
@@ -243,7 +245,8 @@ erc JSONBridge::deserialize_node (const json::node& n, dict_cptr v, size_t index
   return erc::success;
 }
 
-void JSONBridge::not_found (const char* varname)
+/// Generate 410 response if a variable was not found in JSON dictionary
+void jbridge::not_found (const char* varname)
 {
   string tmp = "Unknown variable "s + varname;
   client ().add_ohdr ("Content-Type", "text/plain");
@@ -257,7 +260,7 @@ void JSONBridge::not_found (const char* varname)
   Search a variable in JSON dictionary. The variable name can be a construct
   `<name>_<index>` for an indexed variable.
 */
-bool JSONBridge::find (const std::string& name, dict_cptr& found, size_t* pidx) const
+bool jbridge::find (const std::string& name, dict_cptr& found, size_t* pidx) const
 {
   size_t tmpidx;
   string lookup;
@@ -283,7 +286,7 @@ bool JSONBridge::find (const std::string& name, dict_cptr& found, size_t* pidx) 
   return false;
 }
 
-bool JSONBridge::deep_search (const std::string& var, const dictionary& dict, dict_cptr& found)
+bool jbridge::deep_search (const std::string& var, const dictionary& dict, dict_cptr& found)
 {
   auto ptr = dict.cbegin ();
   while (ptr != dict.end ())
@@ -303,7 +306,10 @@ bool JSONBridge::deep_search (const std::string& var, const dictionary& dict, di
   return false;
 }
 
-bool JSONBridge::deep_find (const std::string& name, dict_cptr& found, size_t* pidx) const
+/*!
+  Search for a variable name in JSON dictionary
+*/
+bool jbridge::deep_find (const std::string& name, dict_cptr& found, size_t* pidx) const
 {
   size_t tmpidx;
   string lookup;
@@ -329,13 +335,13 @@ bool JSONBridge::deep_find (const std::string& name, dict_cptr& found, size_t* p
   Parse the URL-encoded body of a POST request assigning new values to all
   variables.
 */
-bool JSONBridge::parse_urlencoded () const
+bool jbridge::parse_urlencoded () const
 {
   size_t idx;
   void* pv;
 
   str_pairs vars;
-  parse_urlparams (client_->get_body (), vars);
+  internal::parse_urlparams (client_->get_body (), vars);
   for (auto var = vars.begin (); var != vars.end (); ++var)
   {
     if (!var->second.length ())
@@ -390,7 +396,7 @@ bool JSONBridge::parse_urlencoded () const
       *(double*)pv = stod (value);
       break;
     case JT_BOOL:
-      str_lower (value);
+      internal::str_lower (value);
       *(bool*)pv = (value == "true" || value == "1" || value == "on");
       break;
 
@@ -401,7 +407,8 @@ bool JSONBridge::parse_urlencoded () const
   return true;
 }
 
-bool JSONBridge::parse_jsonencoded () const
+/// Parse a JSON-encoded body of a POST message
+bool jbridge::parse_jsonencoded () const
 {
   json::node rcvd;
 
@@ -474,7 +481,7 @@ bool JSONBridge::parse_jsonencoded () const
   return false; // only objects and some arrays can be parsed
 }
 
-void JSONBridge::process_request ()
+void jbridge::process_request ()
 {
   try
   {
@@ -497,7 +504,7 @@ void JSONBridge::process_request ()
         return;
       }
       std::string content = client ().get_ihdr ("Content-Type");
-      str_lower (content);
+      internal::str_lower (content);
 
       bool ok = (content == "application/x-www-form-urlencoded") ? parse_urlencoded ()
               : (content == "application/json")                  ? parse_jsonencoded ()
@@ -524,14 +531,14 @@ void JSONBridge::process_request ()
   }
   catch (erc& x)
   {
-    TRACE ("JSONBridge::process_request erc %d", (int)x);
+    TRACE ("jbridge::process_request erc %d", (int)x);
     client ().respond (500); //server error
   }
 }
 
-int JSONBridge::callback (connection& client, void* par)
+int jbridge::callback (connection& client, void* par)
 {
-  JSONBridge* bridge = (JSONBridge*)par;
+  jbridge* bridge = (jbridge*)par;
   auto& req = client.get_method ();
   auto& query = client.get_query ();
   TRACE9 ("ui_callback req=%s query=%s", req.c_str (), query.c_str());

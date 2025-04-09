@@ -3,18 +3,19 @@
   This is part of MLIB project. See LICENSE file for full license terms.
 */
 
-#pragma once
 /*!
   \file log.h syslog related functions.
 
   The header file is a shameless copy of the original BSD syslog.h file,
   however implementations are new.
 */
+
+#pragma once
 #if __has_include("defs.h")
 #include "defs.h"
 #endif
 
-#include <winsock2.h>
+#include "safe_winsock.h"
 
 // facility codes 0 to 24 are defined in syslog.h
 #define LOG_USER (1 << 3) //!< facility for random user-level messages

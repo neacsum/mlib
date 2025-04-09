@@ -1,7 +1,6 @@
-/*!
-  \file firewall.cpp Implementation of firwall object
-
-    (c) Mircea Neacsu 2007-2019
+/*
+  Copyright (c) Mircea Neacsu (2014-2025) Licensed under MIT License.
+  This file is part of MLIB project. See LICENSE file for full license terms.
 */
 
 #include <mlib/mlib.h>

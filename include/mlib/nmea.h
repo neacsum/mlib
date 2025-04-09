@@ -1,17 +1,19 @@
-/*!
-  \file nmea.h Definition of NMEA-0183 parsing functions
-
-  (c) Mircea Neacsu 2017
+/*
+  Copyright (c) Mircea Neacsu (2014-2025) Licensed under MIT License.
+  This file is part of MLIB project. See LICENSE file for full license terms.
 */
+
+///  \file nmea.h Definition of NMEA-0183 parsing functions
+
 #pragma once
 
 #if __has_include("defs.h")
 #include "defs.h"
 #endif
 
-namespace mlib {
+namespace mlib::nmea {
 
-bool nmea_checksum (const char* buf);
+bool checksum (const char* buf);
 
 int dbs (const char* buf, double* depth);
 int dbt (const char* buf, double* depth);
@@ -49,4 +51,4 @@ int vtg (const char* buf, double* speed, double* head);
 int zda (const char* buf, double* time, unsigned short* day, unsigned short* month,
          unsigned short* year);
 
-} // namespace mlib
+} // namespace mlib::nmea

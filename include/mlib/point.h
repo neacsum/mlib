@@ -1,9 +1,10 @@
-/*!
-  \file point.h Definition of Point template class
-
-  (c) Mircea Neacsu 2017
-
+/*
+  Copyright (c) Mircea Neacsu (2014-2025) Licensed under MIT License.
+  This file is part of MLIB project. See LICENSE file for full license terms.
 */
+
+///  \file point.h Definition of mlib::Point template class
+
 #pragma once
 
 #if __has_include("defs.h")
@@ -17,7 +18,7 @@
 namespace mlib {
 
 /*!
-  \class Point
+  \class point
   \ingroup geom
 
   Template class which builds a 2D point from a pair of
@@ -62,22 +63,10 @@ public:
   /// Return inside angle P1-this-P2.
   double angle (const Point<T>& P1, const Point<T>& P2) const;
 
-  Point<T> operator+ (const Point<T>& p) const
-  {
-    return {x + p.x, y + p.y};
-  }
-  Point<T> operator- (const Point<T>& p) const
-  {
-    return {x - p.x, y - p.y};
-  }
-  Point<T> operator* (double scalar) const
-  {
-    return {x * scalar, y * scalar};
-  }
-  Point<T> operator/ (double scalar) const
-  {
-    return {x / scalar, y / scalar};
-  }
+  Point<T> operator+ (const Point<T>& p) const;
+  Point<T> operator- (const Point<T>& p) const;
+  Point<T> operator* (double scalar) const;
+  Point<T> operator/ (double scalar) const;
 
   /// unary minus operator
   Point<T> operator- () const
@@ -157,8 +146,8 @@ typedef Point<double> dpoint;
 
 // Member functions templates --------------------------------------------------
 
-/// Build a Point from a pair of T's
-template <class T>
+/// Build a Point from a pair of values
+template <typename T>
 Point<T>::Point (T a, T b)
   : x (a)
   , y (b)
@@ -171,11 +160,40 @@ Point<T>::Point ()
   , y (0)
 {}
 
+/// Vector addition
+template <typename T>
+Point<T> Point<T>::operator+ (const Point<T>& p) const
+{
+  return {x + p.x, y + p.y};
+}
+
+/// Vector subtraction
+template <typename T>
+Point<T> Point<T>::operator- (const Point<T>& p) const
+{
+  return {x - p.x, y - p.y};
+}
+
+/// Scalar multiplication
+template <typename T>
+Point<T> Point<T>::operator* (double scalar) const
+{
+  return {x * scalar, y * scalar};
+}
+
+/// Scalar division
+template <typename T>
+Point<T> Point<T>::operator/ (double scalar) const
+{
+  return {x / scalar, y / scalar};
+}
+
+
 /*!
   Azimuth is measured in a clockwise direction
   0<= azimuth < 2*M_PI
 */
-template <class T>
+template <typename T>
 double Point<T>::azimuth (const Point<T>& P2) const
 {
   if (P2 == *this)
@@ -188,21 +206,21 @@ double Point<T>::azimuth (const Point<T>& P2) const
 }
 
 /// Return TRUE if p and this are closer than tolerance
-template <class T>
+template <typename T>
 int Point<T>::operator== (const Point<T>& p) const
 {
   return distance (p) < point_traits<T>::tolerance ();
 }
 
 /// Return TRUE if p and this apart by more than tolerance
-template <class T>
+template <typename T>
 int Point<T>::operator!= (const Point<T>& p) const
 {
   return !(p == *this);
 }
 
 /// Return distance between this and P2
-template <class T>
+template <typename T>
 double Point<T>::distance (const Point<T>& P2) const
 {
   return hypot (x - P2.x, y - P2.y);
@@ -212,7 +230,7 @@ double Point<T>::distance (const Point<T>& P2) const
   0 <= angle < M_PI
   degenerated angles (p1 == this or p2 == this) are 0
 */
-template <class T>
+template <typename T>
 double Point<T>::angle (const Point<T>& P1, const Point<T>& P2) const
 {
   if (P1 == *this || P2 == *this)
@@ -224,20 +242,20 @@ double Point<T>::angle (const Point<T>& P1, const Point<T>& P2) const
 }
 
 /// Return `true` if this is left of the line (a,b)
-template <class T>
+template <typename T>
 bool Point<T>::leftof (const Point<T>& a, const Point<T>& b) const
 {
   return (a.x - x) * (b.y - y) - (a.y - y) * (b.x - x) > point_traits<T>::tolerance ();
 }
 
 /// Return `true` if points a, this, b are collinear
-template <class T>
+template <typename T>
 bool Point<T>::collinear (const Point& a, const Point& b) const
 {
   return ::abs ((a.x - x) * (b.y - y) - (a.y - y) * (b.x - x)) <= point_traits<T>::tolerance ();
 }
 
-template <class T>
+template <typename T>
 void Point<T>::rotate (double angle)
 {
   auto [s, c] = sincos (angle);
@@ -246,5 +264,6 @@ void Point<T>::rotate (double angle)
   x = x1;
   y = y1;
 }
+
 
 } // namespace mlib

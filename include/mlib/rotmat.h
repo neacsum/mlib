@@ -1,9 +1,11 @@
-#pragma once
-/*!
-  \file rotmat.h Definition of a rotation calculator class
-
-  (c) Mircea Neacsu 2017. All rights reserved.
+/*
+  Copyright (c) Mircea Neacsu (2014-2025) Licensed under MIT License.
+  This file is part of MLIB project. See LICENSE file for full license terms.
 */
+
+///   \file rotmat.h Definition of mlib::RotMat - a 3D rotation calculator class
+
+#pragma once
 
 #if __has_include("defs.h")
 #include "defs.h"

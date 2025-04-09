@@ -1,9 +1,11 @@
-#pragma once
-/*!
-    \file shmem.h Shared memory object with support for single-writer multiple-readers.
-
-    (c) Mircea Neacsu 2004-2017
+/*
+  Copyright (c) Mircea Neacsu (2014-2025) Licensed under MIT License.
+  This file is part of MLIB project. See LICENSE file for full license terms.
 */
+
+///  \file shmem.h Shared memory object with support for single-writer multiple-readers.
+
+#pragma once
 
 #if __has_include("defs.h")
 #include "defs.h"
@@ -27,40 +29,17 @@ public:
   virtual bool open (const std::string& name, size_t size);
   virtual bool close ();
 
-  bool created () const
-  {
-    return mem_created;
-  };
-  bool is_opened () const
-  {
-    return mem != NULL;
-  };
-  size_t size () const
-  {
-    return sz;
-  };
-  const std::string& name () const
-  {
-    return name_;
-  };
+  bool created () const;
+  bool is_opened () const;
+  size_t size () const;
+
+  const std::string& name () const;
 
   // get/set function for read/write timeout
-  void wtmo (DWORD msec)
-  {
-    wtmo_ = msec;
-  };
-  DWORD wtmo () const
-  {
-    return wtmo_;
-  };
-  void rtmo (DWORD msec)
-  {
-    rtmo_ = msec;
-  };
-  DWORD rtmo () const
-  {
-    return rtmo_;
-  };
+  void wtmo (DWORD msec);
+  DWORD wtmo () const;
+  void rtmo (DWORD msec);
+  DWORD rtmo () const;
 
   // data access function
   virtual bool write (const void* data);
@@ -68,19 +47,19 @@ public:
 
 protected:
   // Lock control
-  bool rdlock ();
-  void rdunlock ();
-  bool wrlock ();
-  void wrunlock ();
+  virtual bool rdlock ();
+  virtual void rdunlock ();
+  virtual bool wrlock ();
+  virtual void wrunlock ();
 
-  // Unprotected data access functions. Use always together with lock control functions
-  virtual void get (void* data);
-  virtual void put (const void* data);
-  void* dataptr () const
-  {
-    return mem;
-  };
-
+  /// \name Naked data access functions
+  /// Use always together with lock control functions
+  /// @{
+  void get (void* data) const;
+  void put (const void* data);
+  const void* dataptr () const;
+  void* dataptr ();
+  /// @}
 private:
 #pragma pack(push, 1)
   /// variables used for access synchronization
@@ -119,10 +98,8 @@ public:
   void operator<< (const S& data);
 
 protected:
-  S* dataptr () const
-  {
-    return (S*)B::dataptr ();
-  };
+  const S* dataptr () const;
+  S* dataptr ();
 
   template <class S, class B>
   friend class lockr;
@@ -197,7 +174,7 @@ public:
 
   const S* operator->()
   {
-    return const_cast<const S*> (mem.dataptr ());
+    return mem.dataptr ();
   };
   operator const S* ()
   {
@@ -249,7 +226,8 @@ public:
     mem.wrunlock ();
   };
 
-  S* operator->()
+  ///@{ Dereferences pointer to shared memory area
+  S* operator -> ()
   {
     return mem.dataptr ();
   };
@@ -257,7 +235,7 @@ public:
   {
     return mem.dataptr ();
   };
-
+  /// @}
 private:
   shmem<S, B>& mem;
 };
@@ -269,5 +247,106 @@ lockw<S, B>::lockw (shmem<S, B>& mem_)
   if (!mem.wrlock ())
     throw std::runtime_error ("wrlock failed");
 };
+
+//---------------------------------------------------------------------------
+
+/// Return `true` if this instance has created the shared memory area or `false`
+/// if shared memory existed already.
+inline 
+bool shmem_base::created () const
+{
+  return mem_created;
+}
+
+/// Return `true` if shared memory is opened
+inline 
+bool shmem_base::is_opened () const
+{
+  return mem != NULL;
+}
+
+/// Return size of shared memory area
+inline 
+size_t shmem_base::size () const
+{
+  return sz;
+}
+
+/// Return the name of the shared memory area
+inline 
+const std::string& shmem_base::name () const
+{
+  return name_;
+}
+
+/// Set timeout value for write operations
+inline 
+void shmem_base::wtmo (DWORD msec)
+{
+  wtmo_ = msec;
+}
+
+/// Return current write timeout value (in milliseconds)
+inline
+DWORD shmem_base::wtmo () const
+{
+  return wtmo_;
+}
+
+/// Set timeout value for read operations
+inline
+void shmem_base::rtmo (DWORD msec)
+{
+  rtmo_ = msec;
+}
+
+/// Return current timeout value for read operations (in milliseconds)
+inline
+DWORD shmem_base::rtmo () const
+{
+  return rtmo_;
+}
+
+/// Write new data into the SMA
+inline
+void shmem_base::put (const void* data)
+{
+  memcpy (dataptr (), data, size ());
+}
+
+/// Retrieve current content of SMA
+inline
+void shmem_base::get (void* data) const
+{
+  memcpy (data, dataptr (), size ());
+}
+
+/// Return a pointer to content of SMA (const variant)
+inline
+const void* shmem_base::dataptr () const
+{
+  return mem;
+}
+
+/// Return a pointer to content of SMA (non-const variant)
+inline
+void* shmem_base::dataptr ()
+{
+  return mem;
+}
+
+/// Return a pointer to content of SMA (const variant)
+template <class S, class B>
+const S* shmem<S, B>::dataptr () const
+{
+  return (const S*)B::dataptr ();
+}
+
+/// Return a pointer to content of SMA (const variant)
+template <class S, class B>
+S* shmem<S, B>::dataptr ()
+{
+  return (S*)B::dataptr ();
+}
 
 } // namespace mlib

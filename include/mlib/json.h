@@ -1,9 +1,11 @@
-#pragma once
-/*!
-  \file json.h Definition of json::node class
-
-  (c) Mircea Neacsu 2022. All rights reserved.
+/*
+  Copyright (c) Mircea Neacsu (2014-2025) Licensed under MIT License.
+  This file is part of MLIB project. See LICENSE file for full license terms.
 */
+
+///   \file json.h Definition of mlib::json::node class
+
+#pragma once
 
 #include <functional>
 #include <map>
@@ -13,7 +15,7 @@
 #include <string>
 #include <vector>
 
-namespace json {
+namespace mlib::json {
 
 /// Maximum number of array elements in a JSON node
 constexpr int max_array_size = 8192;
@@ -85,6 +87,7 @@ public:
   class iterator_type
   {
   public:
+    /// \cond not_documented
     // Following typedefs must exist to allow instantiation of std::iterator_traits
     using difference_type = std::ptrdiff_t;
     using value_type = node;
@@ -95,8 +98,8 @@ public:
     using arr_iter =
       typename std::conditional_t<C_, nodes_array::const_iterator, nodes_array::iterator>;
     using iterator_category = std::bidirectional_iterator_tag;
-
-    // Copy constructor
+    /// \endcond
+    /// Copy constructor
     iterator_type (const iterator_type& other)
       : target (other.target)
     {
@@ -108,7 +111,7 @@ public:
         at_end = other.at_end;
     }
 
-    // Destructor
+    /// Destructor
     ~iterator_type ()
     {
       if (target.t == type::object)

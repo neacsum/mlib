@@ -1,8 +1,10 @@
-/*!
-  \file syncbase.h syncbase class definition.
-
-  (c) Mircea Neacsu 1999
+/*
+  Copyright (c) Mircea Neacsu (2014-2025) Licensed under MIT License.
+  This file is part of MLIB project. See LICENSE file for full license terms.
 */
+
+///  \file syncbase.h Definition of mlib::syncbase class.
+
 #pragma once
 
 #if __has_include("defs.h")
@@ -11,9 +13,6 @@
 
 #include "safe_winsock.h"
 
-#ifndef _INC_WINDOWS
-#include <windows.h>
-#endif
 #include <string>
 #include <atomic>
 #include <vector>

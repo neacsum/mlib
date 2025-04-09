@@ -3,8 +3,6 @@
   This is part of MLIB project. See LICENSE file for full license terms.
 */
 
-///  \file rotmat.cpp Implementation of a rotation calculator class
-
 #include <mlib/mlib.h>
 #pragma hdrstop
 #include <math.h>

@@ -1,9 +1,12 @@
-#pragma once
-/*!
-  \file border.h Small class to represent simple non-intersecting polygons
-
-  (c) Mircea Neacsu 2017
+/*
+  Copyright (c) Mircea Neacsu (2014-2025) Licensed under MIT License.
+  This file is part of MLIB project. See LICENSE file for full license terms.
 */
+
+/// \file border.h Small class to represent simple non-intersecting polygons
+
+#pragma once
+
 #if __has_include("defs.h")
 #include "defs.h"
 #endif

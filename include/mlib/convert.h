@@ -3,12 +3,12 @@
   This file is part of MLIB project. See LICENSE file for full license terms.
 */
 
-#pragma once
 /*!
   \file convert.h Conversion functions and frequently used constants
   \addtogroup convert Angle and Unit Conversion
   @{
 */
+#pragma once
 
 #include <math.h>
 #include <numbers>

@@ -3,21 +3,23 @@
 
 #include <utils.h>
 
+namespace mlib::internal {
+
 /// Parse a URL encoded string of parameters
 bool parse_urlparams (const std::string& str, mlib::http::str_pairs& params)
 {
   std::vector<char> vstr (str.begin (), str.end ());
 
-  auto beg = vstr.begin();
+  auto beg = vstr.begin ();
 
   do
   {
-    auto end = std::find (beg, vstr.end(), '&');
+    auto end = std::find (beg, vstr.end (), '&');
     auto kend = std::find (beg, end, '=');
     if (kend == end)
       return false;
 
-    std::string key(beg, kend);
+    std::string key (beg, kend);
     if (!url_decode (key))
       return false;
     std::string val (kend + 1, end);
@@ -75,3 +77,4 @@ bool url_decode (std::string& s)
   return true;
 }
 
+} // namespace mlib::internal

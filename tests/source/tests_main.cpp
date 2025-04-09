@@ -90,6 +90,8 @@ SUITE (rotations)
 
 }
 
+using mlib::dprintf;
+
 TEST (dprintf_ok)
 {
   const char *greek = u8"ελληνικό αλφάβητο";

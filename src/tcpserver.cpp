@@ -3,8 +3,6 @@
   This is part of MLIB project. See LICENSE file for full license terms.
 */
 
-///  \file tcpserver.cpp Implementation of mlib::tcpserver class
-
 #include <mlib/mlib.h>
 #pragma hdrstop
 #include <algorithm>

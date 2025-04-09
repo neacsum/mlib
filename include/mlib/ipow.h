@@ -1,10 +1,11 @@
 /*
-    Copyright (c) Mircea Neacsu (2019-2024)
-    Part of mlib project licensed under MIT license.
+  Copyright (c) Mircea Neacsu (2014-2025) Licensed under MIT License.
+  This file is part of MLIB project. See LICENSE file for full license terms.
 */
-#pragma once
 
-///  \file   ipow.h Integer exponentiation function template
+///  \file   ipow.h Integer exponentiation function templates
+
+#pragma once
 
 #if __has_include("defs.h")
 #include "defs.h"

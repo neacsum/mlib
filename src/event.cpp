@@ -1,10 +1,7 @@
 /*
-  MLIB Library
-  (c) Mircea Neacsu 2001-2023. Licensed under MIT License.
-  See README file for full license terms.
+  Copyright (c) Mircea Neacsu (2014-2025) Licensed under MIT License.
+  This file is part of MLIB project. See LICENSE file for full license terms.
 */
-
-///  \file event.cpp event class implementation.
 
 #include <mlib/mlib.h>
 #pragma hdrstop

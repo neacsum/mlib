@@ -1,8 +1,9 @@
+/*
+  Copyright (c) Mircea Neacsu (2014-2025) Licensed under MIT License.
+  This file is part of MLIB project. See LICENSE file for full license terms.
+*/
+
 /*!
-  \file serenum1.cpp Implementation of SerEnum_UsingCreateFile() function.
-
-  (c) Mircea Neacsu 2017. All rights reserved.
-
   \defgroup serenum Serial Port Enumeration
   \brief Functions for retrieving available serial ports.
 

@@ -1,7 +1,6 @@
-/*!
-  \file json.cpp Implementation of json::node class
-
-  (c) Mircea Neacsu 2022. All rights reserved.
+/*
+  Copyright (c) Mircea Neacsu (2014-2025) Licensed under MIT License.
+  This file is part of MLIB project. See LICENSE file for full license terms.
 */
 
 #include <mlib/mlib.h>
@@ -13,12 +12,11 @@
 #include <utf8/utf8.h>
 
 using namespace std;
-using namespace mlib;
 
-namespace json {
+namespace mlib::json {
 
-mlib::errfac default_json_errors ("JSON Error");
-mlib::errfac* json_errors = &default_json_errors;
+errfac default_json_errors ("JSON Error");
+errfac* json_errors = &default_json_errors;
 
 errfac& Errors ()
 {

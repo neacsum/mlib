@@ -1,6 +1,6 @@
 /*!
   UISAMPLE.CPP - This program shows how to build a HTML user interface
-  using the HTTP server and the JSONBridge interface.
+  using the HTTP server and the jbridge interface.
 
   The program starts a HTTP server on a dynamically assigned port and opens a
   browser window to that address. Then, it continues living as a small icon in
@@ -88,7 +88,7 @@ int submit_sarr (http::connection& client, void* var);
   for the variable xxx and the content of that variable will be formatted as a
   JSON string and sent back to the client.
 */
-http::JSONBridge  user_interface ("/var");
+http::jbridge  user_interface ("/var");
 
 //Assets for HTTP server
 

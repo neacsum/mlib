@@ -6,6 +6,9 @@
 using namespace mlib;
 using namespace std;
 
+SUITE (SharedMem)
+{
+
 struct S{
   char str[10];
   double fval;
@@ -128,6 +131,77 @@ TEST_FIXTURE (shmem_fixture, TwoThread_shmem)
   CHECK (t1.result ());        //verify rd == wr
 }
 
+TEST_FIXTURE (shmem_fixture, lockr_shmem)
+{
+  mlib::thread t1 ([this] () -> int {
+    shmem<S> smem ("Shared"); // create shared memory
+    CHECK (smem.is_opened ());
+    CHECK (smem.created ());
+
+    memset (&rd, 0, sizeof (S));
+    shwr.wait (); // wait for other thread to populate it
+    lockr<S> rlock(smem);
+    bool ok = true;
+    return (rlock->fval == wr.fval) && (rlock->ival == wr.ival);
+  });
+
+  mlib::thread t2 ([this] () -> int {
+    Sleep (50);
+    shmem<S> smem ("Shared"); // open shared memory
+    CHECK (smem.is_opened ());
+    CHECK (!smem.created ());
+    smem << wr;     // write data
+    shwr.signal (); // signal memory full
+    return 0;
+  });
+
+  // start both threads
+  t1.start ();
+  t2.start ();
+
+  Sleep (100);               // let them finish
+  CHECK (!t1.is_running ()); // verify they have finished
+  CHECK (!t2.is_running ());
+  CHECK (t1.result ()); // verify rd == wr
+}
+
+TEST_FIXTURE (shmem_fixture, lockw_shmem)
+{
+  mlib::thread t1 ([this] () -> int {
+    shmem<S> smem ("Shared"); // create shared memory
+    CHECK (smem.is_opened ());
+    CHECK (smem.created ());
+
+    memset (&rd, 0, sizeof (S));
+    shwr.wait (); // wait for other thread to populate it
+    lockr<S> rlock (smem);
+    bool ok = true;
+    return (rlock->fval == wr.fval) && (rlock->ival == wr.ival) && !strcmp(rlock->str, wr.str);
+  });
+
+  mlib::thread t2 ([this] () -> int {
+    Sleep (50);
+    shmem<S> smem ("Shared"); // open shared memory
+    CHECK (smem.is_opened ());
+    CHECK (!smem.created ());
+    lockw<S> wlock (smem);
+
+    wlock->fval = wr.fval;
+    wlock->ival = wr.ival;
+    strcpy (wlock->str, wr.str);
+    shwr.signal (); // signal memory full
+    return 0;
+  });
+
+  // start both threads
+  t1.start ();
+  t2.start ();
+
+  Sleep (100);               // let them finish
+  CHECK (!t1.is_running ()); // verify they have finished
+  CHECK (!t2.is_running ());
+  CHECK (t1.result ()); // verify rd == wr
+}
 
 TEST_FIXTURE (shmem_fixture, SlowWriter_shmem)
 {
@@ -207,3 +281,4 @@ TEST_FIXTURE (shmem_fixture, SlowReader_shmem)
   CHECK_EQUAL (1, rd.ival);       //check read area was updated only once
 }
 
+} //end suite

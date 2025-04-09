@@ -3,7 +3,7 @@
   This file is part of MLIB project. See LICENSE file for full license terms.
 */
 
-///  \file asset.h Definition of asset class.
+///  \file asset.h Definition of mlib::asset class.
 
 #pragma once
 

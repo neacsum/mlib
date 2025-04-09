@@ -1,8 +1,10 @@
-#pragma once
 /*
   Copyright (c) Mircea Neacsu (2014-2025) Licensed under MIT License.
   This is part of MLIB project. See LICENSE file for full license terms.
 */
+
+/// \file hex.h Hex conversion routines
+#pragma once
 
 namespace mlib {
 

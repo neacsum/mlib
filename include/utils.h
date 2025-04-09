@@ -4,17 +4,19 @@
 #include <string>
 #include <algorithm>
 
+namespace mlib::internal {
+
 inline void str_lower (std::string& s)
 {
-  std::transform (s.begin (), s.end (), s.begin (),
-                  [] (char c) -> char { return tolower (c); });
+  std::transform (s.begin (), s.end (), s.begin (), [] (char c) -> char { return tolower (c); });
 }
 
 inline void str_upper (std::string& s)
 {
-  std::transform (s.begin (), s.end (), s.begin (), 
-    [] (char c) -> char { return toupper (c); });
+  std::transform (s.begin (), s.end (), s.begin (), [] (char c) -> char { return toupper (c); });
 }
 
 bool url_decode (std::string& s);
 bool parse_urlparams (const std::string& par_str, mlib::http::str_pairs& params);
+
+} // namespace mlib::internal

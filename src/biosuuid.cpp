@@ -1,9 +1,8 @@
-/*!
-  \file biosuuid.cpp Definition of biosuuid() function.
-
-  (c) Mircea Neacsu 2011. All rights reserved.
-
+/*
+  Copyright (c) Mircea Neacsu (2014-2025) Licensed under MIT License.
+  This file is part of MLIB project. See LICENSE file for full license terms.
 */
+
 #include <mlib/mlib.h>
 #pragma hdrstop
 #include <sysinfoapi.h>
