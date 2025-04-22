@@ -81,9 +81,9 @@
 #include "log.h"
 #define TRACE syslog_debug
 #else
-#define TRACE dprintf
+#define TRACE mlib::dprintf
 #endif
 #else
-#define TRACE 1 ? 0 : dprintf
+#define TRACE 1 ? 0 : mlib::dprintf
 #endif
 /// \endcond
