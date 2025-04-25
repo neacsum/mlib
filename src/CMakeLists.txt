@@ -8,8 +8,9 @@ target_sources(mlib PRIVATE
   convert.cpp
   crc32.cpp
   dprintf.cpp
+  hex.cpp
   json.cpp
-  md5.c
+  md5.cpp
   nmea.cpp
   options.cpp
   sqlitepp.cpp
@@ -34,7 +35,6 @@ target_sources(mlib PRIVATE
   serenum2.cpp
   serenum3.cpp
   shmem.cpp
-  stopwatch.cpp
   syncbase.cpp
   tcpserver.cpp
   thread.cpp

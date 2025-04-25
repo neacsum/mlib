@@ -29,6 +29,7 @@
 #include "rotmat.h"
 #include "sqlitepp.h"
 #include "statpars.h"
+#include "stopwatch.h"
 #include "trace.h"
 
 // Windows specific stuff
@@ -47,7 +48,6 @@
 #include "semaphore.h"
 #include "serenum.h"
 #include "shmem.h"
-#include "stopwatch.h"
 #include "syncque.h"
 #include "tvops.h"
 #include "wtimer.h"

@@ -285,16 +285,16 @@ href="http://sqlite.org/c3ref/stmt.html">sqlite3</a> statement.
 */
 Query::Query (Database& db, const std::string& sql)
   : stmt (0)
-  , dbase (db)
+  , dbase (db.db)
   , col_mapped (false)
 {
   if (!sql.empty ())
   {
     int rc;
-    if ((rc = sqlite3_prepare_v2 (dbase, sql.c_str (), -1, &stmt, 0)) != SQLITE_OK)
+    if ((rc = sqlite3_prepare_v2 (dbase.get(), sql.c_str (), -1, &stmt, 0)) != SQLITE_OK)
     {
       erc err (rc, Database::Errors ());
-      set_erc_message (err, dbase);
+      set_erc_message (err, dbase.get());
       err.raise ();
     }
   }
@@ -331,7 +331,7 @@ Query& Query::operator= (Query&& rhs)
   col_mapped = rhs.col_mapped;
   index = rhs.index;
   rhs.index.clear ();
-  rhs.dbase = Database ();
+  rhs.dbase.reset ();
 
   return *this;
 }
@@ -370,10 +370,10 @@ Query& Query::sql (const std::string& str)
     erc (SQLITE_MISUSE, Database::Errors ()).raise ();
   if (stmt)
     sqlite3_finalize (stmt);
-  if ((rc = sqlite3_prepare_v2 (dbase, str.c_str (), -1, &stmt, 0)) != SQLITE_OK)
+  if ((rc = sqlite3_prepare_v2 (dbase.get(), str.c_str (), -1, &stmt, 0)) != SQLITE_OK)
   {
     erc err (rc, Database::Errors ());
-    set_erc_message (err, dbase);
+    set_erc_message (err, dbase.get());
     err.raise ();
   }
   col_mapped = false;
@@ -405,7 +405,7 @@ erc Query::step ()
     return erc (rc, Database::Errors () , erc::info);
 
   erc err (rc, Database::Errors ());
-  set_erc_message (err, dbase);
+  set_erc_message (err, dbase.get());
   return err;
 }
 
@@ -422,7 +422,7 @@ erc Query::reset ()
 void Query::clear ()
 {
   sqlite3_finalize (stmt);
-  dbase = Database ();
+  dbase.reset();
   stmt = 0;
 }
 
@@ -995,7 +995,7 @@ erc Query::check_errors (int rc)
   if (rc != SQLITE_OK)
   {
     erc err (rc, Database::Errors ());
-    set_erc_message (err, dbase);
+    set_erc_message (err, dbase.get());
     return err;
   }
   return erc::success;
