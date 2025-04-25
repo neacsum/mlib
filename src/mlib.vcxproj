@@ -255,7 +255,6 @@
     <ClCompile Include="shmem.cpp" />
     <ClCompile Include="sqlitepp.cpp" />
     <ClCompile Include="statpars.cpp" />
-    <ClCompile Include="stopwatch.cpp" />
     <ClCompile Include="syncbase.cpp" />
     <ClCompile Include="tcpserver.cpp" />
     <ClCompile Include="thread.cpp" />

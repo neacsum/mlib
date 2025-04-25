@@ -114,7 +114,7 @@ public:
         update.leave ();
         if (timeout != INFINITE)
         {
-          int t_wait = timeout - (int)t.msecLap ();
+          int t_wait = timeout - (int)t.lap_msec ();
           if (t_wait < 0 || prod_sema.wait (t_wait) == WAIT_TIMEOUT)
             return false;
         }
@@ -149,7 +149,7 @@ public:
       while (std::queue<M, C>::empty ())
       {
         update.leave ();
-        t_wait = timeout - (int)t.msecLap ();
+        t_wait = timeout - (int)t.lap_msec ();
         // give up or wait for a producer
         if (t_wait <= 0 || cons_sema.wait (t_wait) == WAIT_TIMEOUT)
           return false;

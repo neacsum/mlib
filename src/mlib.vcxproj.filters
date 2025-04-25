@@ -218,9 +218,6 @@
     <ClCompile Include="sqlitepp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="stopwatch.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="syncbase.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

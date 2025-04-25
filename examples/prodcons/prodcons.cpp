@@ -134,14 +134,14 @@ void primes_queue (int queue_size)
   //Show producer statistics
   cout << ((queue_size == INFINITE)?"Unlimited" : "Bounded")
     << " async_queue finished producing" << " in " << fixed
-    << setprecision (2) << t_prod.msecEnd ()/1000. << "sec" << endl;
+    << setprecision (2) << t_prod.end_msec ()/1000. << "sec" << endl;
 
   //Wait for consumers to finish
   for (int i = 0; i < NTHREADS; i++)
     consumers[i]->wait ();
   t_cons.stop ();
   cout << "finished consuming" << " in " << fixed
-    << setprecision (2) << t_cons.msecEnd () / 1000. << "sec" << endl;
+    << setprecision (2) << t_cons.end_msec () / 1000. << "sec" << endl;
 
   //Did we find all the primes?
   cout << "Expecting " << checks[CASE].n_primes << " primes, found " 

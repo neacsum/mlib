@@ -11,9 +11,7 @@
 #include "defs.h"
 #endif
 
-#ifndef _INC_WINDOWS
-#include <windows.h>
-#endif
+#include <chrono>
 
 namespace mlib {
 
@@ -24,12 +22,75 @@ public:
   stopwatch ();
   void start ();
   void stop ();
-  double msecLap ();
-  double msecEnd ();
+  std::chrono::steady_clock::duration lap ();
+  std::chrono::steady_clock::duration end ();
+
+  double lap_msec ();
+  double end_msec ();
 
 private:
-  static LARGE_INTEGER freq;
-  LARGE_INTEGER tbeg, tend;
+  typedef std::chrono::steady_clock::time_point tpoint;
+  tpoint tbeg, tend;
 };
+
+inline 
+stopwatch::stopwatch ()
+{
+}
+
+/// Start the stopwatch
+inline
+void stopwatch::start ()
+{
+  tbeg = std::chrono::steady_clock::now ();
+  tend = tpoint{};
+}
+
+/// Stop the stopwatch
+inline
+void stopwatch::stop ()
+{
+  tend = std::chrono::steady_clock::now ();
+}
+
+
+/*!
+  Return elapsed time from start.
+
+  The stopwatch continues to run
+*/
+inline
+std::chrono::steady_clock::duration stopwatch::lap ()
+{
+  return (std::chrono::steady_clock::now () - tbeg);
+}
+
+
+/// Return total duration
+inline 
+std::chrono::steady_clock::duration stopwatch::end ()
+{
+  return (tend - tbeg);
+}
+
+/*!
+  Return number of milliseconds elapsed from start.
+
+  The stopwatch continues to run
+*/
+inline
+double stopwatch::lap_msec ()
+{
+  return std::chrono::duration<double, std::milli> (lap ()).count();
+}
+
+
+/// Return total duration in milliseconds between start and stop
+inline
+double stopwatch::end_msec ()
+{
+  return std::chrono::duration<double, std::milli> (tend - tbeg).count ();
+}
+
 
 } // namespace mlib
