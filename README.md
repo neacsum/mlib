@@ -19,6 +19,7 @@ and many more...
   
 Example programs:
 - echoserv - An echo server
+- echoclient - Client program for echo server
 - ui-sample - Sample HTML user interface
 - prodcons - Sample producer/consumer processes 
 - yacb (Yet Another Circular Buffer) - Circular buffer sample

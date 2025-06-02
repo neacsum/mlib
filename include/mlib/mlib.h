@@ -25,6 +25,7 @@
 #include "nmea.h"
 #include "options.h"
 #include "point.h"
+#include "poly.h"
 #include "ringbuf.h"
 #include "rotmat.h"
 #include "sqlitepp.h"
@@ -43,7 +44,6 @@
 #include "jbridge.h"
 #include "log.h"
 #include "mutex.h"
-#include "poly.h"
 #include "rdir.h"
 #include "semaphore.h"
 #include "serenum.h"
@@ -51,4 +51,9 @@
 #include "syncque.h"
 #include "tvops.h"
 #include "wtimer.h"
+
+#if !defined(NODEFAULTLIB)
+#pragma comment(lib, "mlib.lib")
+#endif
+
 #endif

@@ -21,8 +21,8 @@ typedef void (*conn_iter_func) (sock& conn, void* param);
 class tcpserver : public thread
 {
 public:
-  tcpserver (unsigned short port, const std::string& name = std::string (),
-             unsigned int max_conn = 0);
+  tcpserver (unsigned short port, unsigned int max_conn = 0,
+             const std::string& name = std::string ());
   ~tcpserver ();
 
   /// Provides access to server listening socket

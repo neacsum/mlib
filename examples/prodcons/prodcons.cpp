@@ -34,13 +34,7 @@
   each picks a number from the queue and, if it is prime, places the result
   in an output queue.
 */
-#include <mlib/syncque.h>
-#include <mlib/thread.h>
-#include <mlib/stopwatch.h>
-
-#include <windows.h>
-#include <iostream>
-#include <iomanip>
+#include <mlib/mlib.h>
 
 using namespace std;
 using namespace mlib;

@@ -1,9 +1,5 @@
 #pragma once
 
-#if defined(_MSC_VER) && !defined(NODEFAULTLIB)
-#pragma comment(lib, "mlib.lib")
-#endif
-
 /// log facility claimed by MLIB
 #define MLIB_LOGFAC (25 << 3)
 
@@ -31,15 +27,18 @@
 
 #define SQLITE_ENABLE_COLUMN_METADATA
 
-//Standard types
+#ifndef _MSC_VER
+//Standard type definitions matching
+// https://learn.microsoft.com/en-us/windows/win32/winprog/windows-data-types
 typedef unsigned long DWORD;
 typedef int BOOL;
 typedef unsigned char BYTE;
 typedef unsigned short WORD;
 typedef float FLOAT;
-
 typedef int INT;
 typedef unsigned int UINT;
+#endif
+
 
 #include <stdint.h>
 #include <stddef.h>

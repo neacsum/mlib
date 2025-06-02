@@ -70,7 +70,7 @@
 #define BYTE_ORDER 0
 #endif
 
-#define T_MASK ((md5_word_t)~0)
+#define T_MASK ((UINT)~0)
 #define T1     /* 0xd76aa478 */ (T_MASK ^ 0x28955b87)
 #define T2     /* 0xe8c7b756 */ (T_MASK ^ 0x173848a9)
 #define T3     0x242070db
@@ -138,17 +138,17 @@
 
 namespace mlib {
 
-void md5::process (const md5_byte_t* data /*[64]*/)
+void md5::process (const BYTE* data /*[64]*/)
 {
-  md5_word_t a = abcd[0], b = abcd[1], c = abcd[2], d = abcd[3];
-  md5_word_t t;
+  UINT a = abcd[0], b = abcd[1], c = abcd[2], d = abcd[3];
+  UINT t;
 #if BYTE_ORDER > 0
   /* Define storage only for big-endian CPUs. */
-  md5_word_t X[16];
+  UINT X[16];
 #else
   /* Define storage for little-endian or both types of CPUs. */
-  md5_word_t xbuf[16];
-  const md5_word_t* X;
+  UINT xbuf[16];
+  const UINT* X;
 #endif
 
   {
@@ -160,7 +160,7 @@ void md5::process (const md5_byte_t* data /*[64]*/)
      */
     static const int w = 1;
 
-    if (*((const md5_byte_t*)&w)) /* dynamic little-endian */
+    if (*((const BYTE*)&w)) /* dynamic little-endian */
 #endif
 #if BYTE_ORDER <= 0 /* little-endian */
     {
@@ -168,10 +168,10 @@ void md5::process (const md5_byte_t* data /*[64]*/)
        * On little-endian machines, we can process properly aligned
        * data without copying it.
        */
-      if (!((data - (const md5_byte_t*)0) & 3))
+      if (!((data - (const BYTE*)0) & 3))
       {
         /* data are properly aligned */
-        X = (const md5_word_t*)data;
+        X = (const UINT*)data;
       }
       else
       {
@@ -190,7 +190,7 @@ void md5::process (const md5_byte_t* data /*[64]*/)
        * On big-endian machines, we must arrange the bytes in the
        * right order.
        */
-      const md5_byte_t* xp = data;
+      const BYTE* xp = data;
       int i;
 
 #if BYTE_ORDER == 0
@@ -328,16 +328,16 @@ md5::md5 ()
   abcd[3] = 0x10325476;
 }
 
-void md5::append (const md5_byte_t* data, size_t nbytes)
+void md5::append (const BYTE* data, size_t nbytes)
 {
-  const md5_byte_t* p = data;
+  const BYTE* p = data;
   size_t left = nbytes;
   int offset = (count[0] >> 3) & 63;
-  md5_word_t nbits = (md5_word_t)(nbytes << 3);
+  UINT nbits = (UINT)(nbytes << 3);
 
 
   /* Update the message length. */
-  count[1] += (md5_word_t)nbytes >> 29;
+  count[1] += (UINT)nbytes >> 29;
   count[0] += nbits;
   if (count[0] < nbits)
     count[1]++;
@@ -345,7 +345,7 @@ void md5::append (const md5_byte_t* data, size_t nbytes)
   /* Process an initial partial block. */
   if (offset)
   {
-    int copy = (offset + (md5_word_t)nbytes > 64 ? 64 - offset : (md5_word_t)nbytes);
+    int copy = (offset + (UINT)nbytes > 64 ? 64 - offset : (UINT)nbytes);
 
     memcpy (buf + offset, p, copy);
     if (offset + copy < 64)
@@ -364,24 +364,24 @@ void md5::append (const md5_byte_t* data, size_t nbytes)
     memcpy (buf, p, left);
 }
 
-void md5::finish (md5_byte_t digest[16])
+void md5::finish (BYTE digest[16])
 {
-  static const md5_byte_t pad[64] = {0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  static const BYTE pad[64] = {0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                                      0,    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                                      0,    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                                      0,    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-  md5_byte_t data[8];
+  BYTE data[8];
   int i;
 
   /* Save the length before padding. */
   for (i = 0; i < 8; ++i)
-    data[i] = (md5_byte_t)(count[i >> 2] >> ((i & 3) << 3));
+    data[i] = (BYTE)(count[i >> 2] >> ((i & 3) << 3));
   /* Pad to 56 bytes mod 64. */
   append (pad, ((55 - (count[0] >> 3)) & 63) + 1);
   /* Append the length. */
   append (data, 8);
   for (i = 0; i < 16; ++i)
-    digest[i] = (md5_byte_t)(abcd[i >> 2] >> ((i & 3) << 3));
+    digest[i] = (BYTE)(abcd[i >> 2] >> ((i & 3) << 3));
 }
 
 } // namespace mlib

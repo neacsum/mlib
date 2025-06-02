@@ -59,13 +59,13 @@ namespace mlib {
   Opens the socket and initializes the connections table.
 
   \param port listening port number
-  \param name server name used for debug messages
   \param max_conn maximum number of accepted connections
+  \param name server name used for debug messages
 
   If port address is 0, the listening address is the local loop-back interface.
   Otherwise, the listening address defaults to 'all interfaces' (`INADDR_ANY`).
 */
-tcpserver::tcpserver (unsigned short port, const std::string& name, unsigned int max_conn)
+tcpserver::tcpserver (unsigned short port, unsigned int max_conn, const std::string& name)
   : srv_sock (SOCK_STREAM)
   , addr (port ? INADDR_ANY : INADDR_LOOPBACK, port)
   , thread (name)

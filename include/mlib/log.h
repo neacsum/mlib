@@ -79,7 +79,7 @@
 #define LOGOPT_FILE  0x80 //!< log to disk file
 ///\}
 
-#define LOG_PORT 514 /* port number for logger (same as SYSLOG service) */
+#define LOG_PORT 514  //!< port number for logger (same as SYSLOG service)
 
 #ifdef __cplusplus
 extern "C"

@@ -149,8 +149,8 @@ inline std::ostream& operator<< (std::ostream& strm, const sock& s)
   return strm;
 }
 
-// default buffer size
 #if !defined(SOCKBUF_BUFSIZ)
+/// Default buffer size for socket streams
 #define SOCKBUF_BUFSIZ 1024
 #endif
 

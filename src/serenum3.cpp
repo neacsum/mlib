@@ -7,7 +7,6 @@
 #pragma hdrstop
 #include <utf8/utf8.h>
 
-using namespace std;
 
 namespace mlib {
 
@@ -16,7 +15,7 @@ namespace mlib {
   Enumerates all values under `HKEY_LOCAL_MACHINE\HARDWARE\DEVICEMAP\SERIALCOMM`
   to retrieve available COM ports.
 */
-bool SerEnum_UsingRegistry (vector<int>& ports)
+bool SerEnum_UsingRegistry (std::vector<int>& ports)
 {
   HKEY comm_key;
   if (utf8::RegOpenKey (HKEY_LOCAL_MACHINE, "HARDWARE\\DEVICEMAP\\SERIALCOMM", comm_key, KEY_READ)

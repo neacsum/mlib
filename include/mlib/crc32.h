@@ -13,8 +13,8 @@
 
 namespace mlib {
 
-void crc32_update (BYTE byte, DWORD* crc);
-DWORD crc32 (const void* block, size_t sz);
+void crc32_update (unsigned char byte, uint32_t* crc);
+uint32_t crc32 (const void* block, size_t sz);
 
 } //namespace mlib
 

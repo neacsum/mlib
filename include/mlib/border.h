@@ -30,7 +30,7 @@ public:
 private:
   std::deque<dpoint> vertex;
   dpoint closing;
-  int closing_outside;
+  bool closing_outside;
 };
 
 } // namespace mlib

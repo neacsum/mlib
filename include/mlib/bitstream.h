@@ -20,19 +20,23 @@ class bitstream
 public:
   bitstream (std::iostream& str, unsigned int pack);
 
-  bool read ();         ///< Read the next bit
-  void write (int val); ///< Write a bit to stream
+  /// Read the next bit
+  bool read ();
+
+  /// Read a number of bits
+  int read (size_t sz, bool is_signed = false);
+
+  /// Write a bit to stream
+  void write (bool val);
+
+  /// Write a number of bits.
+  void write (int val, size_t sz);
+
   void flush ();
 
-  /// Read a variable number of bits
-  int mread (unsigned int sz, bool is_signed = false);
-
-  /// Write a variable number of bits.
-  void mwrite (int val, unsigned int sz);
-
 protected:
-  const unsigned int packing;
-  std::iostream& s;
+  const unsigned int packing; //!< number of used bits per byte
+  std::iostream& s;           //!< underlining (byte) stream
 
   /// Encode bit field in a byte
   virtual void encode (unsigned char bits, char& chr);

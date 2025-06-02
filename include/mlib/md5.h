@@ -1,4 +1,7 @@
 #pragma once
+
+///  \file md5.h MD5 hash algorithm
+
 /*
   Copyright (C) 1999, 2002 Aladdin Enterprises.  All rights reserved.
 
@@ -21,8 +24,6 @@
   L. Peter Deutsch
   ghost@aladdin.com
 
- */
-/*
   Independent implementation of MD5 (RFC 1321).
 
   This code implements the MD5 Algorithm defined in RFC 1321, whose
@@ -57,27 +58,28 @@
  * efficiently on either one than if ARCH_IS_BIG_ENDIAN is defined.
  */
 
-namespace mlib {
-typedef unsigned char md5_byte_t; /* 8-bit byte */
-typedef unsigned int md5_word_t;  /* 32-bit word */
 
+  
+namespace mlib {
+
+/// Wrapper for MD5 hasher
 class md5
 {
 public:
-  // Initialize the algorithm.
+  /// Initialize the algorithm.
   md5 ();
 
-  // Append a string to the message.
-  void append (const md5_byte_t* data, size_t nbytes);
+  /// Append a string to the message.
+  void append (const BYTE* data, size_t nbytes);
 
-  // Finish the message and return the digest.
-  void finish (md5_byte_t digest[16]);
+  /// Finish the message and return the digest.
+  void finish (BYTE digest[16]);
 
 private:
-  void process (const md5_byte_t* data /*[64]*/);
-  md5_word_t count[2]; /* message length in bits, lsw first */
-  md5_word_t abcd[4];  /* digest buffer */
-  md5_byte_t buf[64];  /* accumulate block */
+  void process (const BYTE* data /*[64]*/);
+  UINT count[2]; /* message length in bits, lsw first */
+  UINT abcd[4];  /* digest buffer */
+  BYTE buf[64];  /* accumulate block */
 };
 
 

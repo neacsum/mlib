@@ -40,6 +40,7 @@ public:
 class manual_event : public event
 {
 public:
+  /// Constructor
   explicit manual_event (bool signaled = false, const std::string& name = std::string ())
     : event (true, signaled, name){};
 };
@@ -48,6 +49,7 @@ public:
 class auto_event : public event
 {
 public:
+  /// Constructor
   explicit auto_event (bool signaled = false, const std::string& name = std::string ())
     : event (false, signaled, name){};
 
@@ -55,9 +57,7 @@ public:
   bool is_signaled () override;
 };
 
-/*!
-  Automatic events are set back to signaled state because testing resets them.
-*/
+///  Automatic events are set back to signaled state because testing resets them.
 inline bool auto_event::is_signaled ()
 {
   bool result = syncbase::is_signaled ();

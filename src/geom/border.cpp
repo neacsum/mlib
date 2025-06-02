@@ -74,6 +74,7 @@ Border::Border (const char* fname)
   closing_outside = !inside (closing.x, closing.y);
 }
 
+/// Add a new border point
 void Border::add (double x, double y)
 {
   dpoint p;
@@ -82,6 +83,12 @@ void Border::add (double x, double y)
   vertex.push_back (p);
 }
 
+/*!
+  Add border closing point.
+
+  Location of this point determines what is considered "inside" when clipping
+  using this border. 
+*/
 void Border::close (double x, double y)
 {
   closing.x = x;
@@ -102,7 +109,7 @@ void Border::close (double x, double y)
 */
 bool Border::inside (double x, double y)
 {
-  int c = 0;
+  bool c = false;
 
   deque<dpoint>::iterator pi = vertex.begin ();
   deque<dpoint>::iterator pj = vertex.end ();

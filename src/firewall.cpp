@@ -11,16 +11,16 @@ namespace mlib {
 BSTR ConvertStringToBSTR (const char* in);
 
 static errfac default_firewall_errors ("Firewall error");
-static errfac* errors = &default_firewall_errors;
+errfac* firewall::fw_errptr = &default_firewall_errors;
 
 errfac& firewall::Errors ()
 {
-  return *errors;
+  return *fw_errptr;
 }
 
 void firewall::Errors (errfac& facility)
 {
-  errors = &facility;
+  fw_errptr = &facility;
 }
 
 #define FWERC(A)   erc ((A), Errors())

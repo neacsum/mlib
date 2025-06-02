@@ -39,8 +39,8 @@ private:
   INetFwMgr* fwmgr;
   INetFwPolicy* fwpolicy;
   INetFwProfile* fwprofile;
+  static errfac* fw_errptr;
 };
 
-extern errfac* fw_errptr;
 
 }; // namespace mlib

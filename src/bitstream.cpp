@@ -11,15 +11,17 @@ using namespace std;
 namespace mlib {
 
 /*!
-  \class bitstream
+  \class mlib::bitstream
 
   This class allows reading and writing of bit fields from or to a byte stream.
   It allows for different byte encodings using the protected encode/decode functions.
 
-  \remarks Maximum field width is limited to 32 bits.
+  \remarks Maximum field width is limited to `sizeof(int) * CHAR_BIT` (32 or 64 bits).
 */
 
 /*!
+  Constructor
+
   \param str    Underlining iostream
   \param pack   Number of bits per byte
 */
@@ -32,7 +34,7 @@ bitstream::bitstream (std::iostream& str, unsigned int pack)
 
 /*!
   Read a single bit from stream. If there are no more bits available in current
-  byte tries to get a new byte and decodes it using #decode function.
+  byte, tries to get a new byte and decodes it using decode() function.
 
   \return Bit value
 
@@ -46,7 +48,7 @@ bool bitstream::read ()
     if (!s.get (next))
       return false;
     decode (buffer, next);
-    nbits = packing;
+    nbits = packing *CHAR_BIT;
   }
   bool val = buffer & (1 << (packing - 1));
   nbits--;
@@ -55,13 +57,13 @@ bool bitstream::read ()
 }
 
 /*!
-  If it has accumulated enough bits calls #encode function to encode them and
+  If it has accumulated enough bits calls encode() function to encode them and
   writes a new byte to underlining stream.
 
   \param val    Bit value to write
 
 */
-void bitstream::write (int val)
+void bitstream::write (bool val)
 {
   if (nbits == packing)
   {
@@ -95,12 +97,12 @@ void bitstream::flush ()
 }
 
 /*!
-  Invokes #write function repeatedly to write each bit.
+  Invokes bit write function repeatedly to write each bit.
 
   \param val    Value to write (0 to 2<sup>sz</sup>-1 )
   \param sz     Width of bit field
 */
-void bitstream::mwrite (int val, unsigned int sz)
+void bitstream::write (int val, size_t sz)
 {
   unsigned int mask = 1 << (sz - 1);
   for (unsigned int i = 0; i < sz; i++)
@@ -111,14 +113,14 @@ void bitstream::mwrite (int val, unsigned int sz)
 }
 
 /*!
-  Invokes #read function repeatedly to read all bits.
+  Invokes  bit read function repeatedly to read all bits.
 
   \param sz         Width of bit field
-  \param sign       "true" if bit field should be interpreted as a signed value.
+  \param sign       `true` if first bit should be interpreted as a sign value.
   \return           value (0 to 2<sup>sz</sup>-1 or -2<sup>sz-1</sup> to 2<sup>sz-1</sup>)
 
 */
-int bitstream::mread (unsigned int sz, bool sign)
+int bitstream::read (size_t sz, bool sign)
 {
   int val = read () ? (sign ? -1 : 1) : 0;
   for (unsigned int i = 1; i < sz; i++)

@@ -1112,7 +1112,7 @@ void connection::respond (unsigned int code, const std::string& reason)
   - server name is HTTP_SERVER_NAME
 */
 server::server (unsigned short port, unsigned int maxconn)
-  : tcpserver (port, HTTP_SERVER_NAME, maxconn)
+  : tcpserver (port, maxconn, HTTP_SERVER_NAME)
   , root (std::filesystem::current_path())
   , defuri (HTTP_DEFAULT_URI)
   , timeout (HTTP_TIMEOUT)

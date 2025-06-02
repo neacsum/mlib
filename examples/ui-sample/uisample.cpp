@@ -7,7 +7,7 @@
   the systray. To end the program right click on the systray icon and select
   "Exit".
 
-  (c) Mircea Neacsu 2017-2022
+  (c) Mircea Neacsu 2017-2025
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
@@ -28,11 +28,10 @@
   SOFTWARE.
 */
 
-#include <mlib/jbridge.h>
-#include <utf8/utf8.h>
 #include <assert.h>
-#include <mlib/asset.h>
-#include <mlib/trace.h>
+
+#include <mlib/mlib.h>
+#include <utf8/utf8.h>
 
 #include "resource.h"
 
