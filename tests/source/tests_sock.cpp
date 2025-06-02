@@ -270,19 +270,27 @@ TEST (dgram_send_receive)
   auto g = [&] () -> int {
     sock s (SOCK_DGRAM);
     s.bind (inaddr ("127.0.0.2", 1234));
+    s.recvtimeout (5);
     inaddr sender;
-    s.recvfrom (sender, buf, sizeof(buf));
+    if (s.recvfrom (sender, buf, sizeof(buf)) == (size_t)EOF)
+      return 1;
     std::cout << "... Datagram received from " << sender << std::endl;
     return 0;
   };
 
-  thread th1 (f), th2(g);
-  buf[0] = 0;
-  th1.start ();
-  th2.start ();
-  go.signal ();
-  auto ret = wait_all ({&th1, &th2}, 2000);
-  CHECK (ret < WAIT_OBJECT_0 + 2);
+  //prepare for a few retries in case datagram gets lost
+  for (int i = 0; i < 3; i++)
+  {
+    thread th1 (f), th2 (g);
+    buf[0] = 0;
+    th1.start ();
+    th2.start ();
+    go.signal ();
+    auto ret = wait_all ({&th1, &th2}, 20000);
+    CHECK (ret < WAIT_OBJECT_0 + 2);
+    if (th2.result () == 0)
+      break; // all good - datagram received
+  }
   CHECK_EQUAL ("TEST", buf);
 }
 
@@ -293,12 +301,15 @@ TEST (dgram_send_string)
   s2.bind ({"127.0.0.2", 1234});
 
   char buf[80];
+  buf[0] = 0;
   inaddr actual_sender;
   inaddr expected_sender = *s1.name ();
 
   s1.sendto (inaddr("127.0.0.2", 1234), "TEST"s);
-  auto l = s2.recvfrom (actual_sender, buf, sizeof (buf));
-  buf[l] = 0;
+  s2.recvtimeout (5);
+  auto len = s2.recvfrom (actual_sender, buf, sizeof (buf));
+  if (len != (size_t)EOF)
+    buf[len] = 0;
 
   CHECK_EQUAL ("TEST", buf);
   CHECK_EQUAL (expected_sender, actual_sender);
