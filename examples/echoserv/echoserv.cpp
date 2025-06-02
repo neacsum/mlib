@@ -27,7 +27,7 @@
   SOFTWARE.
 */
 
-#include <mlib/tcpserver.h>
+#include <mlib/mlib.h>
 #include <conio.h>
 
 using namespace std;
@@ -35,7 +35,7 @@ using namespace mlib;
 
 #pragma comment (lib, "mlib")
 
-tcpserver srv (0, "Echo server", 2);
+tcpserver srv (0, 2, "Echo server");
 
 int main (int argc, char** argv)
 {
@@ -49,13 +49,13 @@ int main (int argc, char** argv)
     [](sock conn)->int {
       sockstream strm (conn);
       std::string line;
-      cout << "Connection from " << *conn.peer () << " socket " << conn.handle() << endl;
+      cout << "Connection from " << *conn.peer () << endl;
 
       //echo each line
       while (getline (strm, line))
         strm << line << endl;
 
-      cout << "Terminated connection to " << *conn.peer () << " socket " << conn.handle () << endl;
+      cout << "Terminated connection to " << *conn.peer () << endl;
       return 0;
     }
   );
@@ -69,8 +69,7 @@ int main (int argc, char** argv)
     srv.terminate ();
     return 1;
   }
-  cout << "Echo server waiting for connections on " << srv.socket ().name () << endl;
-  cout << "Timeout is " << srv.timeout () << " seconds." << endl;
+  cout << "Echo server waiting for connections on " << *srv.socket ().name () << endl;
   cout << "Press any key to exit..." << endl;
 
   while (_kbhit ())
