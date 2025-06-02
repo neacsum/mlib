@@ -15,8 +15,6 @@ namespace mlib {
 
   This class allows reading and writing of bit fields from or to a byte stream.
   It allows for different byte encodings using the protected encode/decode functions.
-
-  \remarks Maximum field width is limited to `sizeof(int) * CHAR_BIT` (32 or 64 bits).
 */
 
 /*!
@@ -47,8 +45,8 @@ bool bitstream::read ()
     char next;
     if (!s.get (next))
       return false;
-    decode (buffer, next);
-    nbits = packing *CHAR_BIT;
+    buffer = decode (next);
+    nbits = packing;
   }
   bool val = buffer & (1 << (packing - 1));
   nbits--;
@@ -67,8 +65,7 @@ void bitstream::write (bool val)
 {
   if (nbits == packing)
   {
-    char next;
-    encode (buffer, next);
+    char next = encode (buffer);
     s << next;
     buffer = 0;
     nbits = 0;
@@ -87,9 +84,8 @@ void bitstream::flush ()
 {
   if (nbits)
   {
-    char next;
-    encode (buffer, next);
-    s << next;
+    char next = encode (buffer);
+    s << next; 
     buffer = 0;
     nbits = 0;
   }

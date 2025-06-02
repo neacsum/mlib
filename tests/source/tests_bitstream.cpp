@@ -49,26 +49,26 @@ SUITE (bitstreams)
     NMEAstream (std::iostream& is) : bitstream (is, 6) {};
 
   protected:
-    void decode (unsigned char &bits, char chr);
-    void encode (unsigned char bits, char& chr);
+    unsigned char decode (char chr) override;
+    char encode (unsigned char bits);
   };
 
-  void NMEAstream::decode (unsigned char &bits, char chr)
+  unsigned char NMEAstream::decode (char chr)
   {
     chr += 0x28;
     if (chr < 0)
       chr += 0x20;
     else
       chr += 0x28;
-    bits = (unsigned char)(chr & 0x3f);
+    return (unsigned char)(chr & 0x3f);
   }
 
-  void NMEAstream::encode (unsigned char bits, char& chr)
+  char NMEAstream::encode (unsigned char bits)
   {
     static const char tbl[] =
       "0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVW'abcdefghijklmnopqrstuvw";
     bits &= 0x3f;
-    chr = tbl[bits];
+    return tbl[bits];
   }
 
   //Decoding sample string from NMEA standard (page 83)

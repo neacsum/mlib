@@ -39,10 +39,10 @@ protected:
   std::iostream& s;           //!< underlining (byte) stream
 
   /// Encode bit field in a byte
-  virtual void encode (unsigned char bits, char& chr);
+  virtual char encode (unsigned char bits);
 
   /// Decode bit field from a byte
-  virtual void decode (unsigned char& bits, char chr);
+  virtual unsigned char decode (char chr);
 
 private:
   unsigned char buffer;
@@ -52,21 +52,22 @@ private:
 /*!
   The default implementation packs the bit field in the LSB of byte.
   \param bits     bit field to encode
-  \param chr      encoded byte
+  \return         encoded byte
 */
-inline void bitstream::encode (unsigned char bits, char& chr)
+inline 
+char bitstream::encode (unsigned char bits)
 {
-  chr = (bits & (1 << packing) - 1);
+  return (bits & (1 << packing) - 1);
 }
 
 /*!
   The default implementation unpacks the bit field from the LSB of byte.
-  \param bits     resulting bit field
   \param chr      encoded byte
+  \return         resulting bit field
 */
-inline void bitstream::decode (unsigned char& bits, char chr)
+inline unsigned char bitstream::decode (char chr)
 {
-  bits = (chr & (1 << packing) - 1);
+  return (chr & (1 << packing) - 1);
 }
 
 }; // namespace mlib
