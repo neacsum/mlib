@@ -94,7 +94,7 @@ erc jbridge::json_end (json::node& obj)
     ss << fixed << obj;
     client ().add_ohdr ("Cache-Control", "no-cache, no-store");
     client ().add_ohdr ("Content-Type", "application/json");
-    client ().add_ohdr ("Content-Length", to_string(ss.str ().size ()));
+    client ().add_ohdr ("Content-Length", std::to_string(ss.str ().size ()));
     client().respond (200);
     client ().out () << ss.str () << endl;
   }
@@ -250,7 +250,7 @@ void jbridge::not_found (const char* varname)
 {
   string tmp = "Unknown variable "s + varname;
   client ().add_ohdr ("Content-Type", "text/plain");
-  client ().add_ohdr ("Content-Length", to_string(tmp.size ()));
+  client ().add_ohdr ("Content-Length", std::to_string(tmp.size ()));
   client ().respond (410, tmp.c_str ());
 
   client ().out () << tmp;

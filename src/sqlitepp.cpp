@@ -1017,7 +1017,7 @@ static void set_erc_message (erc& err, sqlite3* db)
   if (db)
   {
     const char* file = sqlite3_db_filename (db, "main");
-    string s = "Error " + to_string (err.code ()) + ' ' + sqlite3_errmsg (db);
+    string s = "Error " + std::to_string (err.code ()) + ' ' + sqlite3_errmsg (db);
     if (file && strlen (file))
       s += " Database: " + string (file);
     err.message (s);

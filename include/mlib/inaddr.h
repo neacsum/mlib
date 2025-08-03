@@ -23,7 +23,7 @@ namespace mlib {
 class inaddr
 {
 public:
-  inaddr (unsigned long host = INADDR_ANY, unsigned short port = 0);
+  explicit inaddr (unsigned long host = INADDR_ANY, unsigned short port = 0);
   inaddr (const std::string& hostname, unsigned short port);
   inaddr (const std::string& hostname, const std::string& service,
           const std::string& proto = std::string ());
@@ -117,17 +117,18 @@ inline bool inaddr::operator!= (const inaddr& other) const
   return (!operator== (other));
 }
 
-} // namespace mlib
-
 /// Convert an address to a string in format '`<hostname\>:\<port\>`
 inline std::string to_string (const mlib::inaddr& addr)
 {
-  return std::string (addr.ntoa ()) + ':' + std::to_string(addr.port ());
+  return std::string (addr.ntoa ()) + ':' + std::to_string (addr.port ());
 }
 /// Serialize an address as '\<hostname\>:\<port\>'
 inline std::ostream& operator<< (std::ostream& strm, const mlib::inaddr& addr)
 {
-  strm << to_string(addr);
+  strm << to_string (addr);
   return strm;
 }
+
+} // namespace mlib
+
 

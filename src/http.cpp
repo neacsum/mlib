@@ -244,7 +244,7 @@ void connection::run ()
         }
         ka_cli = min (ka_srv, ka_cli);
         ws->recvtimeout (ka_cli);
-        add_ohdr ("Keep-Alive", "timeout="s + to_string (ka_cli));
+        add_ohdr ("Keep-Alive", "timeout="s + std::to_string (ka_cli));
       }
       if (method_ == "POST" || method_ == "PUT")
       {
@@ -416,7 +416,7 @@ void connection::serve401 (const std::string& realm)
 
 
   add_ohdr ("WWW-Authenticate", "Basic realm=\"" + realm + "\"");
-  add_ohdr ("Content-Length", to_string (std401.size()));
+  add_ohdr ("Content-Length", std::to_string (std401.size()));
   add_ohdr ("Content-Type", "text/html");
   respond (401);
   ws << std401;
@@ -513,7 +513,7 @@ void connection::serve404 (const char* text)
   if (!text)
     text = std404;
 
-  add_ohdr ("Content-Length", to_string (strlen(text)));
+  add_ohdr ("Content-Length", std::to_string (strlen(text)));
   add_ohdr ("Content-Type", "text/html");
   respond (404);
   ws << text;
@@ -861,7 +861,7 @@ int connection::serve_file (const std::filesystem::path& file)
   len = ftell (fin);
   fseek (fin, 0, SEEK_SET);
   TRACE8 ("http::connection::serve_file - File %s size %d", fname.c_str (), len);
-  add_ohdr ("Content-Length", to_string(len));
+  add_ohdr ("Content-Length", std::to_string(len));
   auto file_time = std::filesystem::last_write_time (file);
   auto tp = std::chrono::clock_cast<std::chrono::system_clock> (file_time);
   std::time_t cftime = std::chrono::system_clock::to_time_t (tp);
