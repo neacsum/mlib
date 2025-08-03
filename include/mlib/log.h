@@ -81,38 +81,34 @@
 
 #define LOG_PORT 514  //!< port number for logger (same as SYSLOG service)
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
 
-  /// Close connection to logger.
-  void closelog (void);
+/// Close connection to logger.
+void closelog (void);
 
-  /// Open connection to logger.
-  void openlog (const char* ident, int option = 0, int facility = LOG_USER);
+/// Open connection to logger.
+void openlog (const char* ident, int option = 0, int facility = LOG_USER);
 
-  /// Set the log mask level.
-  int setlogmask (int mask);
+/// Set the log mask level.
+int setlogmask (int mask);
 
-  /// Set option flags
-  int setlogopt (int opt);
+/// Set option flags
+int setlogopt (int opt);
 
-  /// Generate a log message using FMT string and option arguments.
-  void syslog (int facility_priority, const char* fmt, ...);
+/// Generate a log message using FMT string and option arguments.
+void syslog (int priority, const char* fmt, ...);
 
-  /// Generate a log message at debug level using FMT string and option arguments.
-  bool syslog_debug (const char* fmt, ...);
+/// String-oriented version of syslog function
+void syslog (int priority, const std::string& msg);
 
-  /// Default log options - combination of LOGOPT_... flags
-  extern int log_defaultopt;
+/// Generate a log message at debug level using FMT string and option arguments.
+bool syslog_debug (const char* fmt, ...);
 
-  /// Destination host for UDP datagrams. Default is "localhost"
-  extern char log_servhostname[_MAX_PATH];
+/// Default log options - combination of LOGOPT_... flags
+extern int log_defaultopt;
 
-  /// Log filename if LOGOPT_FILE flag is set
-  extern char log_fname[_MAX_PATH];
+/// Destination host for UDP datagrams. Default is "localhost"
+extern char log_servhostname[_MAX_PATH];
 
-#ifdef __cplusplus
-}
-#endif
+/// Log filename if LOGOPT_FILE flag is set
+extern char log_fname[_MAX_PATH];
+

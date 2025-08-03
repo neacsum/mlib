@@ -36,6 +36,7 @@
 #define DEFAULT_FACILITY   LOG_USER
 
 static char local_hostname[_MAX_PATH];
+static size_t log_hdr (int fac_pri, char* dgram_buf);
 
 int log_defaultopt = DEFAULT_FLAGS;
 int log_defaultmask = DEFAULT_PRIMASK;
@@ -59,9 +60,6 @@ struct LOG
 /// \endcond
 
 static LOG* proclog = 0; // default process log
-
-static const char* month[] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun",
-                              "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
 
 // prototypes
 static void logger_addr (LOG* plog);
@@ -195,6 +193,20 @@ void openlog (const char* ident, int option, int facility)
 done:;
 }
 
+static size_t log_hdr (int fac_pri, char* dgram_buf)
+{
+  static const char* month[] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                                "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+
+  auto t = time (nullptr);
+  auto tm = localtime (&t);
+  size_t len = sprintf (dgram_buf, "<%d>%s %2d %02d:%02d:%02d %s %s%s: ", fac_pri,
+    month[tm->tm_mon - 1], tm->tm_mday, tm->tm_hour, tm->tm_min, tm->tm_sec,
+    local_hostname, proclog->ident ? proclog->ident : processname (0), proclog->str_pid);
+
+  return len;
+}
+
 static void logger_addr (LOG* plog)
 {
   char host[MAX_PATH];
@@ -256,20 +268,26 @@ void closelog ()
 
 /**
   \ingroup syslog
-  \param facility_priority combined facility and priority value. See below.
-  \param fmt                printf-like format string
-  \param ...                any other arguments required by format
+  \param priority   combined facility and priority value. See below.
+  \param fmt        printf-like format string
+  \param ...        any other arguments required by format
 
   If the corresponding priority bit in log mask is set, (see setlogmask())
   syslog submits the message with the facility and priority for processing.
 
   The message is prepended with an identification string set in openlog() or
-  by the program name if openlog hasn't been called.
+  by the program name if openlog() hasn't been called.
 
-  The macro LOG_MAKEPRI generates a facility/priority from  a facility and a
-  priority, as in the following example:
+  The priority argument is formed by ORing together a facility value and a 
+  level value.  If no facility value is ORed into priority, then the default
+  value set by openlog() is used, or, if there was no preceding openlog() call,
+  a default of LOG_USER is employed.
 
+  The macro LOG_MAKEPRI can be used to generate a facility/priority from a
+  facility and a priority, as in the following example:
+\verbatim
           LOG_MAKEPRI(LOG_USER, LOG_WARNING)
+\endverbatim
 
   Example:
 \verbatim
@@ -277,28 +295,22 @@ void closelog ()
           "Unable to make network connection to %s.", host );
 \endverbatim
  */
-void syslog (int facility_priority, const char* fmt, ...)
+void syslog (int priority, const char* fmt, ...)
 {
-  SYSTEMTIME stm;
   va_list ap;
-  int len;
   char datagram[LOG_DGRAM_SIZE + 3];
   if (!proclog)
     openlog (NULL, 0, 0);
 
-  int prm = LOG_MASK (facility_priority & LOG_PRIMASK);
+  int prm = LOG_MASK (priority & LOG_PRIMASK);
   if (!(prm & proclog->mask))
     return;
 
-  if (!(facility_priority & LOG_FACMASK))
-    facility_priority |= proclog->facility;
+  if (!(priority & LOG_FACMASK))
+    priority |= proclog->facility;
 
+  auto len = log_hdr (priority, datagram);
   va_start (ap, fmt);
-  GetLocalTime (&stm);
-  len =
-    sprintf (datagram, "<%d>%s %2d %02d:%02d:%02d %s %s%s: ", facility_priority,
-             month[stm.wMonth - 1], stm.wDay, stm.wHour, stm.wMinute, stm.wSecond, local_hostname,
-             proclog->ident ? proclog->ident : processname (0), proclog->str_pid);
   vsnprintf (datagram + len, LOG_DGRAM_SIZE - len, fmt, ap);
 
   if (proclog->sock != INVALID_SOCKET)
@@ -316,11 +328,40 @@ void syslog (int facility_priority, const char* fmt, ...)
   }
 }
 
+void syslog (int priority, const std::string& msg)
+{
+  char hdr[256];
+  if (!proclog)
+    openlog (NULL, 0, 0);
+
+  int prm = LOG_MASK (priority & LOG_PRIMASK);
+  if (!(prm & proclog->mask))
+    return;
+
+  if (!(priority & LOG_FACMASK))
+    priority |= proclog->facility;
+
+  auto len = log_hdr (priority, hdr);
+  std::string dgram{hdr};
+  dgram += msg;
+  if (proclog->sock != INVALID_SOCKET)
+    sendto (proclog->sock, dgram.c_str(), (int)dgram.size (), 0, 
+      (SOCKADDR*)&proclog->sa_logger, sizeof (SOCKADDR_IN));
+
+  dgram += "\n";
+  if (proclog->option & LOGOPT_OUTDEBUG)
+    OutputDebugString (utf8::widen (dgram).c_str ());
+
+  if (proclog->file)
+  {
+    fwrite (dgram.c_str (), sizeof (char), dgram.size (), proclog->file);
+    fflush (proclog->file);
+  }
+}
+
 bool syslog_debug (const char* fmt, ...)
 {
-  SYSTEMTIME stm;
   va_list ap;
-  int len;
   char datagram[LOG_DGRAM_SIZE + 3];
   if (!proclog)
     openlog (NULL, 0, 0);
@@ -332,16 +373,12 @@ bool syslog_debug (const char* fmt, ...)
   int facility_priority = proclog->facility | LOG_DEBUG;
 
   va_start (ap, fmt);
-  GetLocalTime (&stm);
-  len =
-    sprintf (datagram, "<%d>%s %2d %02d:%02d:%02d %s %s%s: ", facility_priority,
-             month[stm.wMonth - 1], stm.wDay, stm.wHour, stm.wMinute, stm.wSecond, local_hostname,
-             proclog->ident ? proclog->ident : processname (0), proclog->str_pid);
+  auto len = log_hdr (facility_priority, datagram);
   vsnprintf (datagram + len, LOG_DGRAM_SIZE - len, fmt, ap);
 
   if (proclog->sock != INVALID_SOCKET)
-    sendto (proclog->sock, datagram, (int)strlen (datagram), 0, (SOCKADDR*)&proclog->sa_logger,
-            sizeof (SOCKADDR_IN));
+    sendto (proclog->sock, datagram, (int)strlen (datagram), 0, 
+      (SOCKADDR*)&proclog->sa_logger, sizeof (SOCKADDR_IN));
 
   strcat (datagram, "\n");
   if (proclog->option & LOGOPT_OUTDEBUG)
@@ -357,6 +394,7 @@ bool syslog_debug (const char* fmt, ...)
 
 /*!
   \ingroup syslog
+
   The setlogmask() function sets this logmask for the current process,
   and returns the previous mask. If the mask argument is 0,
   the current logmask is not modified.
@@ -415,6 +453,7 @@ int setlogmask (int mask)
 
 /**
   \ingroup syslog
+
   \param opt can be any combination of LOGOPT_... values.
 
   For instance
