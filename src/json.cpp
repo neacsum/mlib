@@ -70,11 +70,10 @@ node::node (const node& other)
     break;
   case type::array: {
     new (&arr) nodes_array (other.arr.size ());
-    size_t i = 0;
-    for (auto n = other.arr.begin (); n != other.arr.end (); ++n, ++i)
+    for (size_t i = 0; i < other.arr.size (); ++i)
     {
-      auto v = n->get ();
-      arr [i] = make_unique<node> (*v);
+      const auto& n = *other.arr[i].get ();
+      arr[i] = make_unique<node> (n);
     }
     break;
   }
@@ -330,7 +329,38 @@ void node::erase (const std::string& name)
   }
 }
 
+/*!
+   If node is an object and has a child with the given name, returns 
+   a pointer to child node. Otherwise returns `nullptr`
+*/
+const node* node::find (const std::string& name) const
+{
+  if (t != type::object)
+    return nullptr;
+  auto n = obj.find (name);
+  if (n != obj.end ())
+    return &*n->second;
+  else
+    return nullptr;
+}
+
+/*!
+   If node is an object and has a child with the given name, returns
+   a pointer to child node. Otherwise returns `nullptr`
+*/
+node* node::find (const std::string& name)
+{
+  if (t != type::object)
+    return nullptr;
+  auto n = obj.find (name);
+  if (n != obj.end ())
+    return &*n->second;
+  else
+    return nullptr;
+}
+
 // Parsing helper functions ---------------------------------------------------
+
 // Check if character is whitespace
 static bool is_ws (char c)
 {
@@ -777,21 +807,13 @@ erc node::write (std::ostream& os, int flags, int spaces, int level) const
 
   case type::array:
     os << "[";
-    if ((flags & JSON_FMT_INDENT) != 0)
+    for (size_t i = 0; i < arr.size (); ++i)
     {
-      os << endl;
-      os << fill;
-    }
-    for (auto ptr = arr.begin (); ptr != arr.end ();)
-    {
-      (*ptr++)->write (os, flags, spaces, level);
-      if (ptr != arr.end ())
+      if (i)
         os << ',';
       if ((flags & JSON_FMT_INDENT) != 0)
-      {
-        os << endl;
-        os << fill;
-      }
+        os << endl << fill;
+      arr[i]->write (os, flags, spaces, level);
     }
     os << ']';
     break;

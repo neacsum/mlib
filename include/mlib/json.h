@@ -121,7 +121,7 @@ public:
     }
 
     /// Dereference value
-    reference operator* ()
+    reference operator* () const
     {
       if (target.t == type::object)
       {
@@ -142,7 +142,7 @@ public:
     }
 
     /// Value pointer
-    pointer operator->()
+    pointer operator->() const
     {
       if (target.t == type::object)
       {
@@ -367,6 +367,9 @@ public:
 
   // other operations
   bool has (const std::string& name) const;
+  const node* find (const std::string& name) const;
+  node* find (const std::string& name);
+
   void erase (const std::string& name);
   void clear (type t = type::null);
   type kind () const;

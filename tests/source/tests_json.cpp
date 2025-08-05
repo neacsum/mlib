@@ -743,6 +743,11 @@ TEST (rfc8259)
   json::node data;
   data.read (in);
   CHECK_EQUAL (800, data["Image"]["Width"].to_num());
+  auto ptr = data["Image"].find ("Thumbnail");
+  CHECK (ptr);
+  CHECK_EQUAL (125, ptr->at ("Height").to_num ());
+  ptr = data["Image"].find ("Title");
+  CHECK_EQUAL ("View from 15th Floor", ptr->to_str ());
 
   in = R"([
         {
