@@ -118,6 +118,8 @@ public:
   long         enumevents () const;
   void         linger (bool on_off, unsigned short seconds) const;
   bool         linger (unsigned short* seconds = 0) const;
+  void         nodelay (bool on_off);
+  bool         nodelay () const;
 
   /// Return error facility used by all sock-derived classes.
   static errfac& Errors ();
@@ -689,6 +691,21 @@ inline bool sock::linger (unsigned short* seconds) const
   if (seconds)
     *seconds = opt.l_linger;
   return (opt.l_onoff == 0);
+}
+
+/// Set TCP_NODELAY option
+inline void sock::nodelay (bool on_off)
+{
+  int value = on_off;
+  setopt (TCP_NODELAY, &value, sizeof (int), IPPROTO_TCP);
+}
+
+/// Return status of TCP_NODELAY option
+inline bool sock::nodelay () const
+{
+  int value;
+  getopt (TCP_NODELAY, &value, sizeof (int), IPPROTO_TCP);
+  return (value != 0);
 }
 
 /// Return an error code with the value returned by WSAGetLastError
