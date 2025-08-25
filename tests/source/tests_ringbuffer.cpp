@@ -218,6 +218,7 @@ SUITE (RingBuffer)
     // VERIFY: end points one after the object pushed
     CHECK_EQUAL (100, *--eptr);
   }
+
   TEST (const_buffer)
   {
     ring_buffer<int> b1 (10);
@@ -292,9 +293,9 @@ SUITE (RingBuffer)
 
   TEST (addition)
   {
-    const ring_buffer<int> testbuf ({ 100, 101, 102 });
+    ring_buffer<int> testbuf ({ 100, 101, 102 });
 
-    auto it1 = testbuf.begin ();
+    ring_buffer<int>::iterator it1 = testbuf.begin ();
 
     // VERIFY: increment and addition give the same result
     auto it2 = it1++ + 1;
@@ -412,6 +413,7 @@ SUITE (RingBuffer)
     //VERIFY: container becomes empty after popping (last) object
     testbuf.pop_front ();
     CHECK (testbuf.empty ());
+
   }
 
   TEST (size)
@@ -474,7 +476,46 @@ SUITE (RingBuffer)
     }
   }
 
-// Usage and performance samples
+  TEST (erase_empty_buffer)
+  {
+    ring_buffer<int> testbuf;
+    auto iter = testbuf.cbegin ();
+    auto result = testbuf.erase (iter);
+    CHECK (iter == result);
+  }
+
+  TEST (erase)
+  {
+    ring_buffer<int> testbuf (5);
+    testbuf.push_back (100);
+    testbuf.push_back (101);
+    testbuf.push_back (102);
+
+    auto iter = testbuf.cbegin ();
+    auto result = testbuf.erase (iter);
+    CHECK_EQUAL (101, *result);
+    result = testbuf.erase (result);
+    CHECK_EQUAL (102, *result);
+    result = testbuf.erase (result);
+#if _DEBUG
+    CHECK_THROW (*result, std::range_error);
+#endif
+    CHECK (testbuf.empty ());
+    testbuf.push_back (103);
+    CHECK_EQUAL (103, testbuf.front ());
+
+    testbuf.clear ();
+    for (int i = 0; i < 7; i++)
+      testbuf.push_back (200 + i);
+    iter = testbuf.begin () + 1; //should be 203
+    result = testbuf.erase (iter);
+    CHECK_EQUAL (202, *result++);
+    CHECK_EQUAL (204, *result);
+    CHECK_EQUAL (202, testbuf.front ());
+  }
+
+
+  // Usage and performance samples
 
   //Using ring buffer with a standard algorithm
   TEST (find_algorithm)

@@ -28,10 +28,14 @@
 #include "poly.h"
 #include "ringbuf.h"
 #include "rotmat.h"
-#include "sqlitepp.h"
 #include "statpars.h"
 #include "stopwatch.h"
 #include "trace.h"
+
+// sqlite3 wrappers needs SQLITE3 headers
+#if __has_include("sqlite3/sqlite3.h")
+#include "sqlitepp.h"
+#endif
 
 // Windows specific stuff
 #ifdef _MSC_VER
