@@ -86,6 +86,7 @@ public:
   erc          bind () const;
   erc          connect (const inaddr& peer) const;
   erc          connect (const inaddr& peer, int wp_sec) const;
+  bool         connected () const;
   erc          listen (int num = SOMAXCONN) const;
   erc          accept (sock& client, inaddr* sa = nullptr) const;
   erc          accept (sock& client, int wp_sec, inaddr* sa = nullptr) const;
@@ -309,6 +310,12 @@ inline erc sock::connect (const inaddr& peer) const
     return last_error ();
 
   return erc::success;
+}
+
+/// Check is socket is connected
+inline bool sock::connected () const
+{
+  return is_writeready (0);
 }
 
 /// Permits an incoming connection attempt on the socket.

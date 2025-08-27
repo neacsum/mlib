@@ -297,12 +297,16 @@ erc sock::connect (const inaddr& peer, int wp_sec) const
   if (!sl || sl->handle == INVALID_SOCKET)
     return erc (WSAENOTSOCK, Errors());
 
-  if (is_writeready (wp_sec))
+  int ret = ::connect (sl->handle, peer, sizeof (peer));
+  if (ret && (ret = WSAGetLastError ()) == WSAEWOULDBLOCK)
   {
-    ::connect (sl->handle, peer, sizeof (peer));
-    return last_error ();
+    if (!is_writeready (wp_sec))
+      return erc (WSAETIMEDOUT, Errors (), erc::info);
   }
-  return erc (WSAETIMEDOUT, Errors(), erc::info);
+  else if (ret)
+    return last_error ();
+
+  return erc::success;
 }
 
 /*!
