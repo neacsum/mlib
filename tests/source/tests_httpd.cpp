@@ -461,31 +461,24 @@ HttpServerFixture::HttpServerFixture ()
       answer += '\n';
       cout << text << endl;
     }
-
+    cout << "End of response" << endl;
     return 1;
   };
 }
 
 HttpServerFixture::~HttpServerFixture ()
 {
-  srv.terminate ();
   remove ("index.html");
 }
 
 TEST_FIXTURE (HttpServerFixture, OkAnswer)
 {
-  try
-  {
-    mlib::thread client (cfunc);
-    client.start ();
-    client.wait ();
-    CHECK_EQUAL (200, status_code);
-  }
-  catch (mlib::erc& e)
-  {
-    //This test fails When running under GitHub actions
-    cout << "Test OkAnswer exception 0x" << hex << (int)e << dec << endl;
-  }
+  mlib::thread client (cfunc);
+  Sleep (1000);
+  client.start ();
+  CHECK (client.wait (2000) != WAIT_TIMEOUT);
+  CHECK_EQUAL (200, status_code);
+  srv.terminate ();
 }
 
 TEST_FIXTURE (HttpServerFixture, Answer404)
@@ -494,8 +487,9 @@ TEST_FIXTURE (HttpServerFixture, Answer404)
 
   mlib::thread client (cfunc);
   client.start ();
-  client.wait ();
+  CHECK (client.wait (200) != WAIT_TIMEOUT);
   CHECK_EQUAL (404, status_code);
+  srv.terminate ();
 }
 
 TEST_FIXTURE (HttpServerFixture, Answer401)
@@ -504,8 +498,9 @@ TEST_FIXTURE (HttpServerFixture, Answer401)
 
   mlib::thread client (cfunc);
   client.start ();
-  client.wait ();
+  CHECK (client.wait (200) != WAIT_TIMEOUT);
   CHECK_EQUAL (401, status_code);
+  srv.terminate ();
 }
 
 TEST_FIXTURE (HttpServerFixture, AuthOk)
@@ -516,8 +511,9 @@ TEST_FIXTURE (HttpServerFixture, AuthOk)
 
   mlib::thread client (cfunc);
   client.start ();
-  client.wait ();
+  CHECK (client.wait (200) != WAIT_TIMEOUT);
   CHECK_EQUAL (200, status_code);
+  srv.terminate ();
 }
 
 TEST_FIXTURE (HttpServerFixture, HttpBadPassword)
@@ -528,8 +524,9 @@ TEST_FIXTURE (HttpServerFixture, HttpBadPassword)
 
   mlib::thread client (cfunc);
   client.start ();
-  client.wait ();
+  CHECK (client.wait (200) != WAIT_TIMEOUT);
   CHECK_EQUAL (401, status_code);
+  srv.terminate ();
 }
 
 } //end suite

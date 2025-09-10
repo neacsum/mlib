@@ -129,6 +129,12 @@ UINT _stdcall thread::entryProc (thread* th)
     th->stat = state::ending;
     th->term ();
   }
+  catch (erc& x)
+  {
+    th->pex = std::make_exception_ptr (x);
+    TRACE ("Thread %s[0x%x] caught erc %d - %s", th->name ().c_str (), th->id_, (int)x,
+           x.message ().c_str ());
+  }
   catch (...)
   {
     th->pex = std::current_exception ();

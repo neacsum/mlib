@@ -127,8 +127,9 @@ TEST (connect_timeout)
   UTPP_TIME_CONSTRAINT (timeout * 1000 + 100);
 
   sock a (SOCK_STREAM);
+  a.blocking (false);
   inaddr nonexistent ("198.51.100.1", 80); //per RFC5737 
-  auto result = a.connect (nonexistent, timeout);
+  auto result = a.connect (nonexistent, {timeout, 0});
   CHECK_EQUAL (WSAETIMEDOUT, result);
 }
 
@@ -137,7 +138,7 @@ TEST (accept_timeout)
   sock s(SOCK_STREAM), cl;
   s.bind (inaddr ("localhost", 0));
   s.listen ();
-  auto result = s.accept (cl, 1);
+  auto result = s.accept (cl, {1, 0});
   CHECK_EQUAL (WSAETIMEDOUT, result);
 }
 
@@ -329,11 +330,11 @@ TEST (sock_readready)
   thread th (f);
   sock s (SOCK_DGRAM);
   s.bind (inaddr ("127.0.0.2", 1234));
-  CHECK (!s.is_readready (0));
+  CHECK (!s.is_readready ());
 
   th.start ();
   sent.wait ();
-  CHECK (s.is_readready (0));
+  CHECK (s.is_readready ());
 }
 
 // This is a liberal transcription of the sample code from recv documentation

@@ -68,19 +68,19 @@ public:
   int          sendtimeout () const;
   int          recvtimeout (int wp_sec) const;
   int          recvtimeout () const;
-  bool         is_readready (int wp_sec, int wp_usec = 0) const;
-  bool         is_writeready (int wp_sec, int wp_usec = 0) const;
-  bool         is_exceptionpending (int wp_sec, int wp_usec = 0) const;
+  bool         is_readready (const timeval& tv = {0,0}) const;
+  bool         is_writeready (const timeval& tv= {0, 0}) const;
+  bool         is_exceptionpending (const timeval& tv= {0,0}) const;
   unsigned int nread () const;
 
   erc          bind (const inaddr&) const;
   erc          bind () const;
   erc          connect (const inaddr& peer) const;
-  erc          connect (const inaddr& peer, int wp_sec) const;
+  erc          connect (const inaddr& peer, const timeval& tv) const;
   bool         connected () const;
   erc          listen (int num = SOMAXCONN) const;
   erc          accept (sock& client, inaddr* sa = nullptr) const;
-  erc          accept (sock& client, int wp_sec, inaddr* sa = nullptr) const;
+  erc          accept (sock& client, const timeval& tv, inaddr* sa = nullptr) const;
   checked<inaddr>  name () const;
   checked<inaddr>  peer () const;
 
@@ -187,7 +187,7 @@ inline erc sock::connect (const inaddr& peer) const
 /// Check is socket is connected
 inline bool sock::connected () const
 {
-  return is_writeready (0);
+  return is_writeready ({0, 0});
 }
 
 /// Permits an incoming connection attempt on the socket.
