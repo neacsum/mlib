@@ -1,10 +1,3 @@
-/*
-  Copyright (c) Mircea Neacsu (2014-2025) Licensed under MIT License.
-  This file is part of MLIB project. See LICENSE file for full license terms.
-*/
-
-/// \file wsockstream.h Definition of mlib::sock and related classes
-
 #pragma once
 
 #if __has_include("defs.h")
@@ -12,16 +5,14 @@
 #endif
 
 #include "safe_winsock.h"
-#include <iostream>
-
-#include <mlib/errorcode.h>
-#include <mlib/inaddr.h>
-
-#include <assert.h>
+#include "errorcode.h"
+#include "inaddr.h"
 
 namespace mlib {
 
 // clang-format off
+/// \{
+/// \ingroup sockets
 /// Encapsulation of a Windows socket
 class sock
 {
@@ -145,134 +136,15 @@ private:
   friend struct sock_initializer;
 };
 
-/// Extraction operator shows socket handle
-inline std::ostream& operator<< (std::ostream& strm, const sock& s)
-{
-  strm << s.handle ();
-  return strm;
-}
-
-#if !defined(SOCKBUF_BUFSIZ)
-/// Default buffer size for socket streams
-#define SOCKBUF_BUFSIZ 1024
-#endif
-
-/// Provide functions required by `streambuf` interface using an underlying socket
-class sockbuf : public sock, public std::streambuf
-{
-public:
-  // constructors
-  sockbuf (SOCKET soc = INVALID_SOCKET);
-  sockbuf (int type, int domain = AF_INET, int proto = 0);
-  sockbuf (const sockbuf&);
-  sockbuf (const sock& soc);
-
-  virtual ~sockbuf ();
-  sockbuf& operator= (const sockbuf&);
-
-protected:
-  /// \name Redefined virtuals from parent `streambuf`
-  ///\{
-  virtual int             underflow () override;
-  virtual int             overflow (int c = EOF) override;
-  virtual int             sync () override;
-  virtual std::streambuf* setbuf (char* buf, std::streamsize sz) override;
-  virtual std::streamsize showmanyc () override;
-  ///\}
-
-private:
-  enum flags
-  {
-    allocbuf = 0x0002,  ///< locally allocated buffer
-    no_reads = 0x0004,  ///< write only flag
-    no_writes = 0x0008, ///< read only flag
-    eof_seen = 0x0010   ///< read EOF condition
-  };
-
-  int x_flags;
-  int ibsize; // input buffer size
-};
-// clang-format on
-
-/// \{
-/// \ingroup sockets
-
-/*!
-  \class generic_sockstream
-
-  An IO stream using a sockbuf object as the underlying streambuf.
-  The streambuf object can be retrieved using rdbuf() function or the -> operator.
-*/
-
-template <class strm>
-class generic_sockstream : public strm
-{
-public:
-  /// Default constructor
-  generic_sockstream ()
-    : strm (new sockbuf ()){};
-
-  /// Create from an existing sockbuf
-  generic_sockstream (const sockbuf& sb)
-    : strm (new sockbuf (sb)){};
-
-  /// Create from an existing socket
-  generic_sockstream (const sock& s)
-    : strm (new sockbuf (s)){};
-
-  /// Create a SOCK_STREAM or SOCK_DGRAM  stream
-  generic_sockstream (int type, int domain = AF_INET, int proto = 0)
-    : strm (new sockbuf (type, domain, proto)){};
-
-  /// Create a SOCK_STREAM connected to a remote peer
-  generic_sockstream (const inaddr& remote, int type = SOCK_STREAM);
-
-  ~generic_sockstream ();
-
-  /// Return the buffer used by this stream
-  sockbuf* rdbuf ()
-  {
-    return (sockbuf*)std::ios::rdbuf ();
-  }
-  /// Return the buffer used by this stream
-  sockbuf* operator->()
-  {
-    return rdbuf ();
-  }
-};
-
-template <class strm>
-generic_sockstream<strm>::generic_sockstream (const inaddr& remote, int type)
-  : strm (new sockbuf ())
-{
-  rdbuf ()->open (type);
-  rdbuf ()->connect (remote);
-}
-
-template <class strm>
-generic_sockstream<strm>::~generic_sockstream ()
-{
-  delete std::ios::rdbuf ();
-}
-
-/// Input socket stream
-typedef generic_sockstream<std::istream> isockstream;
-
-/// Output socket stream
-typedef generic_sockstream<std::ostream> osockstream;
-
-/// Bidirectional socket stream
-typedef generic_sockstream<std::iostream> sockstream;
-
-/// \}
-
 /*---------------------- support classes ------------------------------------*/
 /// Keeps an instance counter for calls to WSAStartup/WSACleanup
+/// \ingroup sockets
 static struct sock_initializer
 {
   sock_initializer ();
   ~sock_initializer ();
 } sock_nifty_counter;
+
 
 /*==================== INLINE FUNCTIONS ===========================*/
 
@@ -753,3 +625,11 @@ inline sock::mflags operator| (sock::mflags f1, sock::mflags f2)
 }
 
 } // namespace mlib
+
+/// Extraction operator shows socket handle
+inline std::ostream& operator<< (std::ostream& strm, const mlib::sock& s)
+{
+  strm << s.handle ();
+  return strm;
+}
+

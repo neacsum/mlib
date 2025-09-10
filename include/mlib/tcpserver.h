@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "wsockstream.h"
+#include "sockstream.h"
 #include "inaddr.h"
 #include "thread.h"
 #include "event.h"

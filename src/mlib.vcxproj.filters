@@ -75,9 +75,6 @@
     <ClInclude Include="..\include\mlib\thread.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\mlib\wsockstream.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\mlib\firewall.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -162,6 +159,15 @@
     <ClInclude Include="..\include\mlib\hex.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\mlib\sockbuf.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\mlib\sockstream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\mlib\sock.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="base64.cpp">
@@ -227,9 +233,6 @@
     <ClCompile Include="thread.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="wsockstream.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="wtimer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -276,6 +279,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="md5.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="sock.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

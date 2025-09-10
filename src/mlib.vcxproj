@@ -200,6 +200,9 @@
     <ClInclude Include="..\include\mlib\semaphore.h" />
     <ClInclude Include="..\include\mlib\serenum.h" />
     <ClInclude Include="..\include\mlib\shmem.h" />
+    <ClInclude Include="..\include\mlib\sock.h" />
+    <ClInclude Include="..\include\mlib\sockbuf.h" />
+    <ClInclude Include="..\include\mlib\sockstream.h" />
     <ClInclude Include="..\include\mlib\sqlitepp.h" />
     <ClInclude Include="..\include\mlib\statpars.h" />
     <ClInclude Include="..\include\mlib\stopwatch.h" />
@@ -209,7 +212,6 @@
     <ClInclude Include="..\include\mlib\thread.h" />
     <ClInclude Include="..\include\mlib\trace.h" />
     <ClInclude Include="..\include\mlib\tvops.h" />
-    <ClInclude Include="..\include\mlib\wsockstream.h" />
     <ClInclude Include="..\include\mlib\wtimer.h" />
     <ClInclude Include="..\include\utils.h" />
   </ItemGroup>
@@ -253,6 +255,7 @@
     <ClCompile Include="serenum2.cpp" />
     <ClCompile Include="serenum3.cpp" />
     <ClCompile Include="shmem.cpp" />
+    <ClCompile Include="sock.cpp" />
     <ClCompile Include="sqlitepp.cpp" />
     <ClCompile Include="statpars.cpp" />
     <ClCompile Include="syncbase.cpp" />
@@ -260,7 +263,6 @@
     <ClCompile Include="thread.cpp" />
     <ClCompile Include="tvops.cpp" />
     <ClCompile Include="utils.cpp" />
-    <ClCompile Include="wsockstream.cpp" />
     <ClCompile Include="wtimer.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
