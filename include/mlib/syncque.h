@@ -171,7 +171,7 @@ public:
         }
       }
     }
-    result = std::queue<M, C>::front (); // get the message
+    result = std::move(std::queue<M, C>::front ()); // get the message
     std::queue<M, C>::pop ();
     if (limit != INFINITE)
       prod_sema.signal (); // signal producers there is space available
