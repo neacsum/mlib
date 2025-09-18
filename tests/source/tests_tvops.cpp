@@ -62,4 +62,16 @@ SUITE (tvops)
     tv1 = fromsystime (st1);
     tolocaltime (tv1, &st1);
   }
+
+  TEST (chrono)
+  {
+    using namespace std::chrono;
+
+    auto dur = 3s + 200ms + 500us;
+    timeval tv = from_chrono (dur);
+    CHECK_EQUAL (3, tv.tv_sec);
+    CHECK_EQUAL (200500, tv.tv_usec);
+    microseconds dur2 = to_chrono (tv);
+    CHECK_EQUAL (dur, dur2);
+  }
 }

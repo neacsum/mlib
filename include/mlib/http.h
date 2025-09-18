@@ -17,7 +17,7 @@
 #define HTTP_MAX_HEADER 8192
 
 /// Default timeout interval while waiting for a client request
-#define HTTP_TIMEOUT 30
+#define HTTP_TIMEOUT 30s
 
 /// \name Error codes
 ///\{
@@ -242,8 +242,8 @@ public:
   void default_uri (const std::string& name);
   const std::string& default_uri () const;
 
-  void keep_alive (unsigned int seconds);
-  unsigned int keep_alive () const;
+  void keep_alive (std::chrono::seconds secs);
+  std::chrono::seconds keep_alive () const;
 
   static void add_mime_type (const std::string& ext, const std::string& type, bool shtml = false);
   static void delete_mime_type (const std::string& ext);
@@ -333,7 +333,7 @@ private:
 
   std::filesystem::path root;
   std::string defuri;
-  unsigned int timeout;
+  std::chrono::seconds timeout;
 
   friend class connection;
 };
@@ -613,14 +613,14 @@ const std::string& server::default_uri () const
 
 /// Set timeout value for keep-alive connections
 inline 
-void server::keep_alive (unsigned int seconds)
+void server::keep_alive (std::chrono::seconds secs)
 {
-  timeout = seconds;
+  timeout = secs;
 }
 
 /// Return timeout value for keep-alive connections
 inline
-unsigned int server::keep_alive () const
+std::chrono::seconds server::keep_alive () const
 {
   return timeout;
 }

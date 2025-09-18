@@ -64,23 +64,23 @@ public:
   template <typename T>
   size_t       sendto (const sockaddr& sa, std::basic_string<T> buf, mflags msgf = mflags::none) const;
 
-  int          sendtimeout (int wp_sec) const;
-  int          sendtimeout () const;
-  int          recvtimeout (int wp_sec) const;
-  int          recvtimeout () const;
-  bool         is_readready (const timeval& tv = {0,0}) const;
-  bool         is_writeready (const timeval& tv= {0, 0}) const;
-  bool         is_exceptionpending (const timeval& tv= {0,0}) const;
+  void                      sendtimeout (std::chrono::milliseconds tmo) const;
+  std::chrono::milliseconds sendtimeout () const;
+  void                      recvtimeout (std::chrono::milliseconds tmo) const;
+  std::chrono::milliseconds recvtimeout () const;
+  bool         is_readready (std::chrono::milliseconds tmo = std::chrono::milliseconds{0}) const;
+  bool         is_writeready (std::chrono::milliseconds tmo = std::chrono::milliseconds{0}) const;
+  bool         is_exceptionpending (std::chrono::milliseconds tmo = std::chrono::milliseconds{0}) const;
   unsigned int nread () const;
 
   erc          bind (const inaddr&) const;
   erc          bind () const;
   erc          connect (const inaddr& peer) const;
-  erc          connect (const inaddr& peer, const timeval& tv) const;
+  erc          connect (const inaddr& peer, std::chrono::milliseconds tmo) const;
   bool         connected () const;
   erc          listen (int num = SOMAXCONN) const;
   erc          accept (sock& client, inaddr* sa = nullptr) const;
-  erc          accept (sock& client, const timeval& tv, inaddr* sa = nullptr) const;
+  erc          accept (sock& client, std::chrono::milliseconds tmo, inaddr* sa = nullptr) const;
   checked<inaddr>  name () const;
   checked<inaddr>  peer () const;
 
@@ -149,30 +149,35 @@ static struct sock_initializer
 /*==================== INLINE FUNCTIONS ===========================*/
 
 /// Default constructor creates a closed socket
-inline sock::sock ()
+inline 
+sock::sock ()
   : sl{nullptr}
 {}
 
 /// Retrieve Windows socket handle
-inline HANDLE sock::handle () const
+inline 
+HANDLE sock::handle () const
 {
   return sl ? (HANDLE)sl->handle : INVALID_HANDLE_VALUE;
 }
 
 /// Conversion operator 
-inline sock::operator SOCKET () const
+inline
+sock::operator SOCKET () const
 {
   return sl ? sl->handle : INVALID_SOCKET;
 }
 
 /// Check if socket is opened
-inline bool sock::is_open () const
+inline
+bool sock::is_open () const
 {
   return sl && sl->handle != INVALID_SOCKET;
 }
 
 /// Establishes a connection to specified peer
-inline erc sock::connect (const inaddr& peer) const
+inline
+erc sock::connect (const inaddr& peer) const
 {
   if (!sl || sl->handle == INVALID_SOCKET)
     return erc (WSAENOTSOCK, Errors());
@@ -185,13 +190,15 @@ inline erc sock::connect (const inaddr& peer) const
 }
 
 /// Check is socket is connected
-inline bool sock::connected () const
+inline
+bool sock::connected () const
 {
-  return is_writeready ({0, 0});
+  return is_writeready ();
 }
 
 /// Permits an incoming connection attempt on the socket.
-inline erc sock::accept (sock& client, inaddr* addr) const
+inline
+erc sock::accept (sock& client, inaddr* addr) const
 {
   if (!sl || sl->handle == INVALID_SOCKET)
     return erc (WSAENOTSOCK, Errors());
@@ -205,7 +212,8 @@ inline erc sock::accept (sock& client, inaddr* addr) const
 }
 
 /// Places the socket in a state in which it is listening for incoming connections.
-inline erc sock::listen (int num) const
+inline
+erc sock::listen (int num) const
 {
   if (!sl || sl->handle == INVALID_SOCKET)
     return erc (WSAENOTSOCK, Errors());
@@ -245,62 +253,55 @@ size_t sock::sendto (const sockaddr& sa, std::basic_string<T> buf, mflags msgf) 
 
 /*!
   Set send timeout value
-  \param  wp_sec    timeout value in seconds
-  \retval Previous timeout value in seconds
+  \param  tmo    timeout value in milliseconds
 */
-inline int sock::sendtimeout (int wp_sec) const
+inline
+void sock::sendtimeout (std::chrono::milliseconds tmo) const
 {
-  if (!sl || sl->handle == INVALID_SOCKET)
-    return erc (WSAENOTSOCK, Errors());
+  assert (sl && sl->handle != INVALID_SOCKET);
 
-  int oldwtmo;
   int optlen = sizeof (int);
-  getsockopt (sl->handle, SOL_SOCKET, SO_SNDTIMEO, (char*)&oldwtmo, &optlen);
-  wp_sec *= 1000;
-  setsockopt (sl->handle, SOL_SOCKET, SO_SNDTIMEO, (char*)&wp_sec, optlen);
-  return oldwtmo / 1000;
+  int par = (int)tmo.count();
+  setsockopt (sl->handle, SOL_SOCKET, SO_SNDTIMEO, (char*)&par, optlen);
 }
 
 ///  Returns the send timeout value
-inline int sock::sendtimeout () const
+inline
+std::chrono::milliseconds sock::sendtimeout () const
 {
-  if (!sl || sl->handle == INVALID_SOCKET)
-    return erc (WSAENOTSOCK, Errors());
+  assert (sl && sl->handle != INVALID_SOCKET);
 
-  int oldwtmo;
+  int tmo;
   int optlen = sizeof (int);
-  getsockopt (sl->handle, SOL_SOCKET, SO_SNDTIMEO, (char*)&oldwtmo, &optlen);
-  return oldwtmo / 1000;
+  getsockopt (sl->handle, SOL_SOCKET, SO_SNDTIMEO, (char*)&tmo, &optlen);
+  return std::chrono::milliseconds(tmo);
 }
 
 /*!
   Set receive timeout value
-  \param  wp_sec    timeout value in seconds
-  \retval Previous timeout value in seconds
+  \param  tmo    timeout value in milliseconds
 */
-inline int sock::recvtimeout (int wp_sec) const
+inline
+void sock::recvtimeout (std::chrono::milliseconds tmo) const
 {
-  if (!sl || sl->handle == INVALID_SOCKET)
-    return erc (WSAENOTSOCK, Errors());
+  assert (sl && sl->handle != INVALID_SOCKET);
 
-  int oldrtmo;
   int optlen = sizeof (int);
-  getsockopt (sl->handle, SOL_SOCKET, SO_RCVTIMEO, (char*)&oldrtmo, &optlen);
-  wp_sec *= 1000;
-  setsockopt (sl->handle, SOL_SOCKET, SO_RCVTIMEO, (char*)&wp_sec, optlen);
-  return oldrtmo / 1000;
+  int par = (int)tmo.count();
+
+  setsockopt (sl->handle, SOL_SOCKET, SO_RCVTIMEO, (char*)&par, optlen);
 }
 
 ///  Returns the send timeout value
-inline int sock::recvtimeout () const
+inline
+std::chrono::milliseconds sock::recvtimeout () const
 {
-  if (!sl || sl->handle == INVALID_SOCKET)
-    return erc (WSAENOTSOCK, Errors());
+  assert (sl && sl->handle != INVALID_SOCKET);
 
-  int oldrtmo;
+  int tmo;
   int optlen = sizeof (int);
-  getsockopt (sl->handle, SOL_SOCKET, SO_RCVTIMEO, (char*)&oldrtmo, &optlen);
-  return oldrtmo / 1000;
+  getsockopt (sl->handle, SOL_SOCKET, SO_RCVTIMEO, (char*)&tmo, &optlen);
+  return std::chrono::milliseconds (tmo);
 }
 
 /*!
@@ -312,7 +313,8 @@ inline int sock::recvtimeout () const
 
   \return Size of returned option
 */
-inline int sock::getopt (int op, void* buf, int len, int level) const
+inline
+int sock::getopt (int op, void* buf, int len, int level) const
 {
   if (!sl || sl->handle == INVALID_SOCKET)
     return erc (WSAENOTSOCK, Errors());
@@ -330,7 +332,8 @@ inline int sock::getopt (int op, void* buf, int len, int level) const
   \param  len   size of buffer
   \param  level level at which the option is defined
 */
-inline erc sock::setopt (int op, void* buf, int len, int level) const
+inline
+erc sock::setopt (int op, void* buf, int len, int level) const
 {
   if (!sl || sl->handle == INVALID_SOCKET)
     return erc (WSAENOTSOCK, Errors());
@@ -344,7 +347,8 @@ inline erc sock::setopt (int op, void* buf, int len, int level) const
 /*!
   Return socket type (SOCK_DGRAM or SOCK_STREAM)
 */
-inline int sock::gettype () const
+inline
+int sock::gettype () const
 {
   int ty = 0;
   getopt (SO_TYPE, &ty, sizeof (ty));
@@ -360,7 +364,8 @@ inline int sock::gettype () const
   A successful call using the socket does not reset the socket based error code
   returned by this function.
 */
-inline int sock::clearerror () const
+inline
+int sock::clearerror () const
 {
   int err = 0;
   getopt (SO_ERROR, &err, sizeof (err));
@@ -368,7 +373,8 @@ inline int sock::clearerror () const
 }
 
 /// Return the debug flag.
-inline bool sock::debug () const
+inline
+bool sock::debug () const
 {
   BOOL old;
   getopt (SO_DEBUG, &old, sizeof (old));
@@ -376,14 +382,16 @@ inline bool sock::debug () const
 }
 
 /// Set the debug flag
-inline void sock::debug (bool b) const
+inline
+void sock::debug (bool b) const
 {
   BOOL opt = b;
   setopt (SO_DEBUG, &opt, sizeof (opt));
 }
 
 /// Return the "reuse address" flag
-inline bool sock::reuseaddr () const
+inline
+bool sock::reuseaddr () const
 {
   BOOL old;
   getopt (SO_REUSEADDR, &old, sizeof (old));
@@ -391,14 +399,16 @@ inline bool sock::reuseaddr () const
 }
 
 /// Set the "reuse address" flag
-inline void sock::reuseaddr (bool b) const
+inline
+void sock::reuseaddr (bool b) const
 {
   BOOL opt = b;
   setopt (SO_REUSEADDR, &opt, sizeof (opt));
 }
 
 /// Return "keep alive" flag
-inline bool sock::keepalive () const
+inline
+bool sock::keepalive () const
 {
   BOOL old;
   getopt (SO_KEEPALIVE, &old, sizeof (old));
@@ -406,14 +416,16 @@ inline bool sock::keepalive () const
 }
 
 /// Set "keep alive" flag
-inline void sock::keepalive (bool b) const
+inline
+void sock::keepalive (bool b) const
 {
   BOOL opt = b;
   setopt (SO_KEEPALIVE, &opt, sizeof (opt));
 }
 
 /// Return status of "don't route" flag
-inline bool sock::dontroute () const
+inline
+bool sock::dontroute () const
 {
   BOOL old;
   getopt (SO_DONTROUTE, &old, sizeof (old));
@@ -421,14 +433,16 @@ inline bool sock::dontroute () const
 }
 
 /// Turn on or off the "don't route" flag
-inline void sock::dontroute (bool b) const
+inline
+void sock::dontroute (bool b) const
 {
   BOOL opt = b;
   setopt (SO_DONTROUTE, &opt, sizeof (opt));
 }
 
 /// Return "broadcast" option
-inline bool sock::broadcast () const
+inline
+bool sock::broadcast () const
 {
   BOOL old;
   getopt (SO_BROADCAST, &old, sizeof (old));
@@ -441,7 +455,8 @@ inline bool sock::broadcast () const
   \note Socket semantics require that an application set this option
   before attempting to send a datagram to broadcast address.
 */
-inline void sock::broadcast (bool b) const
+inline
+void sock::broadcast (bool b) const
 {
   BOOL opt = b;
   setopt (SO_BROADCAST, &opt, sizeof (opt));
@@ -451,7 +466,8 @@ inline void sock::broadcast (bool b) const
   Return the status of the OOB_INLINE flag.
   If set, OOB data is being received in the normal data stream.
 */
-inline bool sock::oobinline () const
+inline
+bool sock::oobinline () const
 {
   BOOL old;
   getopt (SO_OOBINLINE, &old, sizeof (old));
@@ -462,14 +478,16 @@ inline bool sock::oobinline () const
   Set the status of the OOB_INLINE flag.
   If set, OOB data is being received in the normal data stream.
 */
-inline void sock::oobinline (bool b) const
+inline
+void sock::oobinline (bool b) const
 {
   BOOL opt = b;
   setopt (SO_OOBINLINE, &opt, sizeof (opt));
 }
 
 /// Return buffer size for send operations.
-inline int sock::sendbufsz () const
+inline
+int sock::sendbufsz () const
 {
   int old = 0;
   getopt (SO_SNDBUF, &old, sizeof (old));
@@ -477,13 +495,15 @@ inline int sock::sendbufsz () const
 }
 
 /// Set buffer size for send operations.
-inline void sock::sendbufsz (size_t sz) const
+inline
+void sock::sendbufsz (size_t sz) const
 {
   setopt (SO_SNDBUF, &sz, sizeof (sz));
 }
 
 /// Return buffer size for receive operations
-inline int sock::recvbufsz () const
+inline
+int sock::recvbufsz () const
 {
   int old = 0;
   getopt (SO_RCVBUF, &old, sizeof (old));
@@ -491,7 +511,8 @@ inline int sock::recvbufsz () const
 }
 
 /// Set buffer size for receive operations
-inline void sock::recvbufsz (size_t sz) const
+inline
+void sock::recvbufsz (size_t sz) const
 {
   setopt (SO_RCVBUF, &sz, sizeof (sz));
 }
@@ -501,7 +522,8 @@ inline void sock::recvbufsz (size_t sz) const
   sock objects are created by default as blocking sockets. They can be turned
   into non-blocking sockets using this function.
 */
-inline void sock::blocking (bool on_off)
+inline
+void sock::blocking (bool on_off)
 {
   if (!sl || sl->handle == INVALID_SOCKET)
     throw erc (WSAENOTSOCK, Errors());
@@ -526,7 +548,8 @@ inline void sock::blocking (bool on_off)
 
   The function automatically sets socket to nonblocking mode.
 */
-inline erc sock::setevent (HANDLE evt, long mask) const
+inline
+erc sock::setevent (HANDLE evt, long mask) const
 {
   if (!sl || sl->handle == INVALID_SOCKET)
     return erc (WSAENOTSOCK, Errors());
@@ -542,7 +565,8 @@ inline erc sock::setevent (HANDLE evt, long mask) const
   The function reports only network activity and errors for which setevent()
   has been called.
 */
-inline long sock::enumevents () const
+inline
+long sock::enumevents () const
 {
   if (!sl || sl->handle == INVALID_SOCKET)
     throw erc (WSAENOTSOCK, Errors());
@@ -554,7 +578,8 @@ inline long sock::enumevents () const
 }
 
 /// Turn on or off linger mode and lingering timeout.
-inline void sock::linger (bool on_off, unsigned short seconds) const
+inline
+void sock::linger (bool on_off, unsigned short seconds) const
 {
   struct linger opt;
   opt.l_onoff = on_off;
@@ -563,7 +588,8 @@ inline void sock::linger (bool on_off, unsigned short seconds) const
 }
 
 /// Return linger mode and lingering timeout.
-inline bool sock::linger (unsigned short* seconds) const
+inline
+bool sock::linger (unsigned short* seconds) const
 {
   struct linger opt;
   getopt (SO_LINGER, &opt, sizeof (opt));
@@ -573,14 +599,16 @@ inline bool sock::linger (unsigned short* seconds) const
 }
 
 /// Set TCP_NODELAY option
-inline void sock::nodelay (bool on_off)
+inline
+void sock::nodelay (bool on_off)
 {
   int value = on_off;
   setopt (TCP_NODELAY, &value, sizeof (int), IPPROTO_TCP);
 }
 
 /// Return status of TCP_NODELAY option
-inline bool sock::nodelay () const
+inline
+bool sock::nodelay () const
 {
   int value;
   getopt (TCP_NODELAY, &value, sizeof (int), IPPROTO_TCP);
@@ -588,7 +616,8 @@ inline bool sock::nodelay () const
 }
 
 /// Return an error code with the value returned by WSAGetLastError
-inline erc sock::last_error ()
+inline
+erc sock::last_error ()
 {
   int code = WSAGetLastError ();
   if (!code)
@@ -603,7 +632,8 @@ inline erc sock::last_error ()
    Returns `true` if both objects point to the same underlining socket control
    structure
 */
-inline bool sock::operator== (const sock& other) const
+inline
+bool sock::operator== (const sock& other) const
 {
   return (sl == other.sl);
 }
@@ -613,13 +643,15 @@ inline bool sock::operator== (const sock& other) const
 
    Returns `false` if both objects have the same handle
 */
-inline bool sock::operator!= (const sock& other) const
+inline
+bool sock::operator!= (const sock& other) const
 {
   return !operator== (other);
 }
 
 /// Bitwise OR operator for send message flags
-inline sock::mflags operator| (sock::mflags f1, sock::mflags f2)
+inline 
+sock::mflags operator| (sock::mflags f1, sock::mflags f2)
 {
   return (sock::mflags) ((int)f1 | (int)f2);
 }
@@ -627,7 +659,8 @@ inline sock::mflags operator| (sock::mflags f1, sock::mflags f2)
 } // namespace mlib
 
 /// Extraction operator shows socket handle
-inline std::ostream& operator<< (std::ostream& strm, const mlib::sock& s)
+inline 
+std::ostream& operator<< (std::ostream& strm, const mlib::sock& s)
 {
   strm << s.handle ();
   return strm;

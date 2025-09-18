@@ -5,6 +5,7 @@
 
 using namespace mlib;
 using namespace std::literals::string_literals;
+using namespace std::chrono_literals;
 
 SUITE (sockets)
 {
@@ -123,13 +124,14 @@ TEST (sock_send_string)
 
 TEST (connect_timeout)
 {
-  int timeout = 3; //timeout in seconds
-  UTPP_TIME_CONSTRAINT (timeout * 1000 + 100);
+  using namespace std::chrono;
+  auto timeout = 3s + 100ms; //timeout in seconds
+  UTPP_TIME_CONSTRAINT (timeout);
 
   sock a (SOCK_STREAM);
   a.blocking (false);
   inaddr nonexistent ("198.51.100.1", 80); //per RFC5737 
-  auto result = a.connect (nonexistent, {timeout, 0});
+  auto result = a.connect (nonexistent, 3s);
   CHECK_EQUAL (WSAETIMEDOUT, result);
 }
 
@@ -138,7 +140,8 @@ TEST (accept_timeout)
   sock s(SOCK_STREAM), cl;
   s.bind (inaddr ("localhost", 0));
   s.listen ();
-  auto result = s.accept (cl, {1, 0});
+  UTPP_TIME_CONSTRAINT (1s+100ms);
+  auto result = s.accept (cl, 1s);
   CHECK_EQUAL (WSAETIMEDOUT, result);
 }
 
@@ -170,12 +173,12 @@ TEST (timeout_values)
 {
   sock s (SOCK_STREAM);
 
-  int to = 3;
+  auto to = 3s;
   s.recvtimeout (to);
-  s.sendtimeout (to+1);
+  s.sendtimeout (to+1s);
 
   CHECK_EQUAL (to, s.recvtimeout ());
-  CHECK_EQUAL (to + 1, s.sendtimeout ());
+  CHECK_EQUAL (to + 1s, s.sendtimeout ());
 }
 
 TEST (sock_type)
@@ -271,7 +274,7 @@ TEST (dgram_send_receive)
   auto g = [&] () -> int {
     sock s (SOCK_DGRAM);
     s.bind (inaddr ("127.0.0.2", 1234));
-    s.recvtimeout (5);
+    s.recvtimeout (5s);
     inaddr sender;
     if (s.recvfrom (sender, buf, sizeof(buf)) == (size_t)EOF)
       return 1;
@@ -307,7 +310,7 @@ TEST (dgram_send_string)
   inaddr expected_sender = *s1.name ();
 
   s1.sendto (inaddr("127.0.0.2", 1234), "TEST"s);
-  s2.recvtimeout (5);
+  s2.recvtimeout (5s);
   auto len = s2.recvfrom (actual_sender, buf, sizeof (buf));
   if (len != (size_t)EOF)
     buf[len] = 0;

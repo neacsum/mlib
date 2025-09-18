@@ -133,7 +133,7 @@ void tcpserver::run ()
     if (end_req) // bail out?
       continue;
 
-    if (srv_sock.is_readready ({0, 0}))
+    if (srv_sock.is_readready ())
     {
       /// - check if server can accept more connections
       if (limit && (contab.size () >= limit))
@@ -303,7 +303,7 @@ void tcpserver::termconn (sock& conn_sock, thread* th)
 
       // read and discard any pending data
       char buf[256];
-      while (conn_sock.is_readready ({0, 0}) && conn_sock.recv (buf, sizeof (buf)) != EOF)
+      while (conn_sock.is_readready () && conn_sock.recv (buf, sizeof (buf)) != EOF)
         ;
       conn_sock.close ();
     }

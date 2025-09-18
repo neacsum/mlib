@@ -287,12 +287,12 @@ erc sock::bind () const
 /*!
   Establishes a connection to a specified address
   \param  peer   address of peer
-  \param  tv     timeout interval
+  \param  tmo    timeout interval
 
   Waits the specified interval for a connection to be established.
   If it is not established the function returns WSAETIMEDOUT.
 */
-erc sock::connect (const inaddr& peer, const timeval& tv) const
+erc sock::connect (const inaddr& peer, std::chrono::milliseconds tmo) const
 {
   if (!sl || sl->handle == INVALID_SOCKET)
     return erc (WSAENOTSOCK, Errors());
@@ -300,7 +300,7 @@ erc sock::connect (const inaddr& peer, const timeval& tv) const
   int ret = ::connect (sl->handle, peer, sizeof (peer));
   if (ret && (ret = WSAGetLastError ()) == WSAEWOULDBLOCK)
   {
-    if (!is_writeready (tv))
+    if (!is_writeready (tmo))
       return erc (WSAETIMEDOUT, Errors (), erc::info);
   }
   else if (ret)
@@ -313,20 +313,20 @@ erc sock::connect (const inaddr& peer, const timeval& tv) const
   Permits an incoming connection attempt on the socket.
 
   \param  client  socket for communication with connected peer.
-  \param  tv      timeout interval
+  \param  tmo      timeout interval
   \param  addr    optional pointer to address of the connecting peer.
 
   The function waits the specified interval for a connecting peer.
   If no connection request is made the function returns WSAETIMEDOUT.
 */
-erc sock::accept (sock& client, const timeval& tv, inaddr* addr) const
+erc sock::accept (sock& client, const std::chrono::milliseconds tmo, inaddr* addr) const
 {
   if (!sl || sl->handle == INVALID_SOCKET)
     return erc (WSAENOTSOCK, Errors());
 
   sockaddr sa;
   int len = sizeof (sa);
-  if (is_readready (tv))
+  if (is_readready (tmo))
     client = sock (::accept (sl->handle, &sa, &len));
   else
   {
@@ -476,7 +476,7 @@ size_t sock::sendto (const sockaddr& sa, const void* buf, size_t len, mflags msg
 /*!
   Check if socket is "readable".
 
-  If \p tv is not 0, the function waits the specified time for the
+  If \p tmo is not 0, the function waits the specified time for the
   socket to become "readable".
 
   If the socket is currently in the listen state, it will be marked as readable
@@ -485,7 +485,7 @@ size_t sock::sendto (const sockaddr& sa, const void* buf, size_t len, mflags msg
   means that queued data is available for reading such that a call to recv() or
   recvfrom() is guaranteed not to block.
 */
-bool sock::is_readready (const timeval& tv) const
+bool sock::is_readready (std::chrono::milliseconds tmo) const
 {
   if (!sl || sl->handle == INVALID_SOCKET)
     return false;
@@ -493,7 +493,7 @@ bool sock::is_readready (const timeval& tv) const
   fd_set fds;
   FD_ZERO (&fds);
   FD_SET (sl->handle, &fds);
-
+  timeval tv = from_chrono (tmo);
   int ret = ::select (FD_SETSIZE, &fds, 0, 0, &tv);
   if (ret == SOCKET_ERROR)
   {
@@ -506,7 +506,7 @@ bool sock::is_readready (const timeval& tv) const
 /*!
   Check if socket is "writable".
 
-  If \p tv is not 0, the function waits the specified time for the socket 
+  If \p tmo is not 0, the function waits the specified time for the socket 
   to become "writable".
 
   If the socket is processing a connect call, the socket is writable if the
@@ -514,7 +514,7 @@ bool sock::is_readready (const timeval& tv) const
   processing a connect call, being writable means a send() or sendto()
   are guaranteed to succeed.
 */
-bool sock::is_writeready (const timeval& tv) const
+bool sock::is_writeready (std::chrono::milliseconds tmo) const
 {
   if (!sl || sl->handle == INVALID_SOCKET)
     return false;
@@ -522,7 +522,7 @@ bool sock::is_writeready (const timeval& tv) const
   fd_set fds;
   FD_ZERO (&fds);
   FD_SET (sl->handle, &fds);
-
+  auto tv = from_chrono (tmo);
   int ret = ::select (FD_SETSIZE, 0, &fds, 0, &tv);
   if (ret == SOCKET_ERROR)
   {
@@ -535,9 +535,9 @@ bool sock::is_writeready (const timeval& tv) const
 /*!
   Check if socket has OOB data or any exceptional error conditions.
 
-  If tv is not 0, the function waits the specified time.
+  If tmo is not 0, the function waits the specified time.
 */
-bool sock::is_exceptionpending (const timeval& tv) const
+bool sock::is_exceptionpending (std::chrono::milliseconds tmo) const
 {
   if (!sl || sl->handle == INVALID_SOCKET)
     return false;
@@ -545,7 +545,7 @@ bool sock::is_exceptionpending (const timeval& tv) const
   fd_set fds;
   FD_ZERO (&fds);
   FD_SET (sl->handle, &fds);
-
+  auto tv = from_chrono (tmo);
   int ret = ::select (FD_SETSIZE, 0, 0, &fds, &tv);
   if (ret == SOCKET_ERROR)
   {

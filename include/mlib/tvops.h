@@ -14,6 +14,7 @@
 #include <winsock2.h>
 #include <assert.h>
 #include <ostream>
+#include <chrono>
 
 /// \addtogroup tvops
 /// @{
@@ -183,6 +184,25 @@ timeval fromdouble (double d)
   return tv;
 }
 
+/// Conversion from a chrono duration
+template <typename T>
+timeval from_chrono (const T& dur)
+{
+  using namespace std::chrono;
+  auto sec = duration_cast<seconds>(dur);
+  auto us = duration_cast<microseconds> (dur - sec);
+  return timeval{(long)sec.count (), (long)us.count ()};
+}
+
+/// Conversion to a chrono duration in microseconds
+inline
+std::chrono::microseconds to_chrono (const timeval& tv)
+{
+  using namespace std::chrono;
+  return seconds (tv.tv_sec) + microseconds (tv.tv_usec);
+}
+
+
 /// Multiplication by an integer
 inline
 timeval operator* (const timeval& op1, int op2)
@@ -220,4 +240,4 @@ inline ::std::ostream& operator<< (::std::ostream& os, const timeval& tv)
   return os;
 }
 
-/// @}
+  /// @}

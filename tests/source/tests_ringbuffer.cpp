@@ -593,7 +593,6 @@ SUITE (RingBuffer)
   TEST (assignment_timming)
   {
     UnitTest::Timer t;
-    int ms;
 #ifdef _DEBUG
     size_t sz = 1000000;
 #else
@@ -603,7 +602,7 @@ SUITE (RingBuffer)
 
     t.Start ();
     build_random_vector (random_vector, (unsigned int)sz);
-    std::cout << "Random vector prepared in " << t.GetTimeInMs () << "ms\n";
+    std::cout << "Random vector prepared in " << t.GetTimeInMs () << endl;
 
     {
       ring_buffer<kvstruct> test_container (sz);
@@ -611,8 +610,8 @@ SUITE (RingBuffer)
       t.Start ();
       for (auto& kv : random_vector)
         test_container.push_back (kv);
-      int ms = t.GetTimeInMs ();
-      std::cout << "ring_buffer push_back of " << sz << " elements in " << ms << "ms\n";
+      auto ms = t.GetTimeInMs ();
+      std::cout << "ring_buffer push_back of " << sz << " elements in " << ms << endl;
       std::cout << "size is " << sz * sizeof (kvstruct) / 1024 << "kb\n";
     }
 
@@ -622,8 +621,8 @@ SUITE (RingBuffer)
       t.Start ();
       for (auto const& kv : random_vector)
         test_container.push_back (kv);
-      ms = t.GetTimeInMs ();
-      std::cout << "vector push_back of " << sz << " elements in " << ms << "ms\n";
+      auto ms = t.GetTimeInMs ();
+      std::cout << "vector push_back of " << sz << " elements in " << ms << endl;
     }
 
     {
@@ -633,8 +632,8 @@ SUITE (RingBuffer)
       t.Start ();
       for (auto const& kv : random_vector)
         test_container.push_back (kv);
-      ms = t.GetTimeInMs ();
-      std::cout << "vector with reserve push_back of " << sz << " elements in " << ms << "ms\n";
+      auto ms = t.GetTimeInMs ();
+      std::cout << "vector with reserve push_back of " << sz << " elements in " << ms << endl;
     }
 
     {
@@ -643,8 +642,8 @@ SUITE (RingBuffer)
       t.Start ();
       for (auto& kv : random_vector)
         test_container.push_back (kv);
-      ms = t.GetTimeInMs ();
-      std::cout << "list push_back of " << sz << " elements in " << ms << "ms\n";
+      auto ms = t.GetTimeInMs ();
+      std::cout << "list push_back of " << sz << " elements in " << ms << endl;
     }
 
     {
@@ -656,8 +655,8 @@ SUITE (RingBuffer)
 
       t.Start ();
       test_vector = test_container;
-      ms = t.GetTimeInMs ();
-      std::cout << "ring to vector conversion of " << sz << " elements in " << ms << "ms\n";
+      auto ms = t.GetTimeInMs ();
+      std::cout << "ring to vector conversion of " << sz << " elements in " << ms << endl;
       CHECK (test_vector == random_vector);
     }
   }

@@ -10,28 +10,27 @@ TEST (SerEnum_Test)
   vector<int>ports, ports1, ports2;
   vector<string> names1;
   UnitTest::Timer timer;
-  int dt;
 
   timer.Start ();
   SerEnum_UsingCreateFile (ports);
-  dt = timer.GetTimeInMs ();
-  printf ("\nCOM Ports according to CreateFile (%d msec):\n", dt);
-  for (size_t i = 0; i < ports.size (); i++)
-    printf ("COM%d\n", ports[i]);
+  auto dt = timer.GetTimeInMs ();
+  cout << "\nCOM Ports according to CreateFile (" << dt << "):\n";
+  for (auto& i : ports)
+    cout << "COM" << i << endl;
 
   timer.Start ();
   SerEnum_UsingSetupAPI (ports1, names1);
   dt = timer.GetTimeInMs ();
   CHECK_EQUAL (ports.size (), ports1.size());
-  printf ("\nCOM Ports according to SetupAPI (%d msec):\n", dt);
+  cout << "\nCOM Ports according to SetupAPI (" << dt << "):\n" ;
   for (size_t i = 0; i < ports1.size (); i++)
-    printf ("COM%d - %s\n", ports1[i], names1[i].c_str ());
+    cout << "COM" << ports1[i] << " - "<< names1[i] << endl;
 
   timer.Start ();
   SerEnum_UsingRegistry (ports2);
   dt = timer.GetTimeInMs ();
   CHECK_EQUAL (ports.size (), ports2.size ());
-  printf ("\nCOM Ports according to Registry (%d msec):\n", dt);
-  for (size_t i = 0; i < ports2.size (); i++)
-    printf ("COM%d\n", ports2[i]);
+  cout << "\nCOM Ports according to Registry (" << dt <<"):\n";
+  for (auto& i : ports2)
+    cout << "COM" << i << endl;
 }

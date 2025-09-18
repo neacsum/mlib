@@ -29,12 +29,7 @@ namespace mlib {
 */
 bool dprintf (const char* fmt, ...)
 {
-#ifndef _WIN32
   static std::mutex dpr_lock;
-#else
-  static mlib::criticalsection dpr_lock;
-#endif
-
   char buffer[MAX_DPRINTF_CHARS];
   size_t sz;
   int r;
@@ -57,7 +52,7 @@ bool dprintf (const char* fmt, ...)
 #ifdef _WIN32
   strcat_s (buffer, "\n");
   wchar_t* out;
-  mlib::lock l (dpr_lock);
+  std::lock_guard<std::mutex> l (dpr_lock);
 
   int wsz = MultiByteToWideChar (CP_UTF8, 0, buffer, -1, 0, 0);
   if (wsz && (out = (wchar_t*)malloc (wsz * sizeof (wchar_t))))

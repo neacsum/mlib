@@ -21,29 +21,29 @@ SUITE (ipow)
     t.Start ();
     for (int i = 0; i < NMAX; i++)
       ix = ipow (i, exp);
-    long long dt1 = t.GetTimeInUs ();
+    auto dt1 = t.GetTimeInUs ();
     t.Start ();
     for (int i = 0; i < NMAX; i++)
       dx = ipow ((double)i, exp);
-    long long dt2 = t.GetTimeInUs ();
+    auto dt2 = t.GetTimeInUs ();
     t.Start ();
     for (int i = 0; i < NMAX; i++)
       dx = pow ((double)i, exp);
-    long long dt3 = t.GetTimeInUs ();
+    auto dt3 = t.GetTimeInUs ();
     t.Start ();
     for (int i = 0; i < NMAX; i++)
       dx = pow ((double)i, (double)exp);
-    long long dt4 = t.GetTimeInUs ();
+    auto dt4 = t.GetTimeInUs ();
     t.Start ();
     for (int i = 0; i < NMAX; i++)
       dx = pow (i, exp);
-    long long dt5 = t.GetTimeInUs ();
+    auto dt5 = t.GetTimeInUs ();
 
     // Check timer
     t.Start ();
     Sleep (1000);
-    long long dt0 = t.GetTimeInUs ();
-    cout << endl << "One second has " << dt0 << " usec" << endl;
+    auto dt0 = t.GetTimeInUs ();
+    cout << endl << "One second has " << dt0 << endl;
 
     cout << "Pow " << exp << " results (usec): " << endl <<
       " ipow - integer base, integer power - " << dt1 << endl <<
@@ -60,23 +60,23 @@ SUITE (ipow)
     t.Start ();
     for (int i = 0; i < NMAX; i++)
       ix = squared (i);
-    long long dt1 = t.GetTimeInUs ();
+    auto dt1 = t.GetTimeInUs ();
     t.Start ();
     for (int i = 0; i < NMAX; i++)
       dx = squared ((double)i);
-    long long dt2 = t.GetTimeInUs ();
+    auto dt2 = t.GetTimeInUs ();
     t.Start ();
     for (int i = 0; i < NMAX; i++)
       dx = pow ((double)i, 2);
-    long long dt3 = t.GetTimeInUs ();
+    auto dt3 = t.GetTimeInUs ();
     t.Start ();
     for (int i = 0; i < NMAX; i++)
       dx = pow ((double)i, (double)2);
-    long long dt4 = t.GetTimeInUs ();
+    auto dt4 = t.GetTimeInUs ();
     t.Start ();
     for (int i = 0; i < NMAX; i++)
       dx = pow (i, 2);
-    long long dt5 = t.GetTimeInUs ();
+    auto dt5 = t.GetTimeInUs ();
 
     cout << "Squared results (usec): " << endl
          << " squared - integer base - " << dt1 << endl
@@ -93,23 +93,23 @@ SUITE (ipow)
     t.Start ();
     for (int i = 0; i < NMAX; i++)
       ix = cubed (i);
-    long long dt1 = t.GetTimeInUs ();
+    auto dt1 = t.GetTimeInUs ();
     t.Start ();
     for (int i = 0; i < NMAX; i++)
       dx = cubed ((double)i);
-    long long dt2 = t.GetTimeInUs ();
+    auto dt2 = t.GetTimeInUs ();
     t.Start ();
     for (int i = 0; i < NMAX; i++)
       dx = pow ((double)i, 3);
-    long long dt3 = t.GetTimeInUs ();
+    auto dt3 = t.GetTimeInUs ();
     t.Start ();
     for (int i = 0; i < NMAX; i++)
       dx = pow ((double)i, (double)3);
-    long long dt4 = t.GetTimeInUs ();
+    auto dt4 = t.GetTimeInUs ();
     t.Start ();
     for (int i = 0; i < NMAX; i++)
       dx = pow (i, 3);
-    long long dt5 = t.GetTimeInUs ();
+    auto dt5 = t.GetTimeInUs ();
 
     cout << "Cubed results (usec): " << endl
          << " cubed - integer base - " << dt1 << endl

@@ -232,7 +232,7 @@ void connection::run ()
       {
         /* set timeout to whatever client wants but not more than what the
            server accepts */
-        unsigned int ka_srv = parent.keep_alive ();
+        unsigned int ka_srv = (unsigned int)parent.keep_alive ().count();
         unsigned int ka_cli = UINT_MAX;
         if (has_ihdr ("Keep-Alive"))
         {
@@ -243,7 +243,7 @@ void connection::run ()
             ka_cli = stoi (ka_str.substr (t));
         }
         ka_cli = min (ka_srv, ka_cli);
-        ws->recvtimeout (ka_cli);
+        ws->recvtimeout (std::chrono::seconds(ka_cli));
         add_ohdr ("Keep-Alive", "timeout="s + std::to_string (ka_cli));
       }
       if (method_ == "POST" || method_ == "PUT")
