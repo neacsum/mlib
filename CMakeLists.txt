@@ -11,6 +11,7 @@ project (mlib
 set(CMAKE_CXX_STANDARD 20)
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   add_compile_options(-fno-char8_t)
+  add_compile_definitions ("_TRACE")
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
   add_compile_options ("/Zc:char8_t-" "/utf-8")
   add_compile_definitions ("_UNICODE")
@@ -30,7 +31,8 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 add_executable (mlib_test)
 add_dependencies(mlib_test mlib)
 add_subdirectory(tests/source)
-target_link_libraries(mlib_test mlib ${CMAKE_SOURCE_DIR}/lib/libutf8.a)
+target_link_directories (mlib_test PRIVATE ${CMAKE_SOURCE_DIR}/lib/${CMAKE_C_COMPILER_ARCHITECTURE_ID}/${CMAKE_BUILD_TYPE})
+target_link_libraries(mlib_test PRIVATE mlib libutf8.a libsqlite3.a)
 
 endif()
 

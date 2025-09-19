@@ -14,7 +14,7 @@
 
 /// \defgroup tvops Operations with timeval structures
 
-
+#ifdef _WIN32
 ///  Convert from UTC system time to Unix time scale (UTC form 01/01/70)
 timeval fromsystime (const SYSTEMTIME& st)
 {
@@ -65,6 +65,7 @@ void tolocaltime (const timeval& tv, SYSTEMTIME* st)
   ft -= (__int64)zone_bias ().tv_sec * 10000000i64;
   FileTimeToSystemTime ((FILETIME*)&ft, st);
 }
+#endif
 
 /*!
   Following an arithmetic operation, brings timeval structure to a canonical

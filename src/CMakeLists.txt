@@ -9,12 +9,15 @@ target_sources(mlib PRIVATE
   crc32.cpp
   dprintf.cpp
   hex.cpp
+  inaddr.cpp
   json.cpp
   md5.cpp
   nmea.cpp
   options.cpp
+  sock.cpp  
   sqlitepp.cpp
   statpars.cpp
+  tvops.cpp
 )
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
@@ -25,7 +28,6 @@ target_sources(mlib PRIVATE
   event.cpp
   firewall.cpp
   httpd.cpp
-  inaddr.cpp
   jbridge.cpp
   log.cpp
   mutex.cpp
@@ -38,8 +40,7 @@ target_sources(mlib PRIVATE
   syncbase.cpp
   tcpserver.cpp
   thread.cpp
-  tvops.cpp
-  wsockstream.cpp
+  sockstream.cpp
   wtimer.cpp
 )
 endif ()

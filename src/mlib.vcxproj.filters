@@ -120,9 +120,6 @@
     <ClInclude Include="..\include\mlib\mlib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\mlib\rdir.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\mlib\statpars.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -249,9 +246,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="nmea.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="rdir.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="dprintf.cpp">

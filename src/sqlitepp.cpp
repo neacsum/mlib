@@ -111,17 +111,18 @@ Database& Database::copy (Database& src)
 }
 
 /*!
-  Return an empty string if database is not opened or there is no database
+  Return an empty path if database is not opened or there is no database
   connection with that name or if the database is a temporary or in-memory
-  database. Otherwise returns the filename of the database that was attached
+  database. Otherwise returns the file path of the database that was attached
   using an SQL ATTACH statement.
 */
-string Database::filename (const string& schema) const
+std::filesystem::path
+Database::path (const string& schema) const
 {
   const char* pfn = 0;
   if (db)
     pfn = sqlite3_db_filename (handle (), schema.c_str ());
-  return pfn ? pfn : string ();
+  return pfn ? pfn : filesystem::path();
 }
 
 /*!

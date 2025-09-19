@@ -18,7 +18,7 @@ SUITE (statpars)
   {
     statpars p;
     double v[] = { 4, 9, 11, 12, 17, 5, 8, 12, 14 };
-    p.add (v, _countof (v));
+    p.add (v, std::size (v));
     CHECK_CLOSE (4.17665469538, p.stdev (), 1e-11); //according to my HP48
   }
 

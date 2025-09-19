@@ -16,6 +16,7 @@
 #include <memory>
 #include <cassert>
 #include <cstring>
+#include <filesystem>
 
 #include "safe_winsock.h"
 #include <sqlite3/sqlite3.h>
@@ -243,8 +244,8 @@ public:
   /// Return a Query object containing the first prepared statement of the given SQL text
   checked<Query> make_query_multiple (std::string& sql);
 
-  /// Return filename of a database connection
-  std::string filename (const std::string& schema = "main") const;
+  /// Return file path of a database connection
+  std::filesystem::path path (const std::string& schema = "main") const;
 
   /// Return schema name for a database connection
   std::string schema (int n) const;

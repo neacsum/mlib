@@ -68,8 +68,8 @@ public:
   }
 
   /// Build a sockbuf object and the attached socket with the given parameters
-  sockbuf (int type, int domain, int proto)
-    : sock(type, domain, proto)
+  sockbuf (sock::type t, int domain, int proto)
+    : sock(t, domain, proto)
     , x_flags (0)
   {
     setbuf (0, SOCKBUF_BUFSIZ);
@@ -109,7 +109,7 @@ public:
     {
       overflow ();
       shutdown (shut_readwrite).deactivate (); // ignore any errors
-      close ().deactivate ();                  // ignore errors
+      close ();
     }
 
     if (x_flags & flags::allocbuf)

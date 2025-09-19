@@ -4,6 +4,7 @@
 
 
 #include <iostream>
+#include <thread>
 
 using namespace mlib;
 using namespace std;
@@ -41,7 +42,7 @@ SUITE (ipow)
 
     // Check timer
     t.Start ();
-    Sleep (1000);
+    std::this_thread::sleep_for (1s);
     auto dt0 = t.GetTimeInUs ();
     cout << endl << "One second has " << dt0 << endl;
 
@@ -143,7 +144,7 @@ SUITE (poly)
     //coeffs for (X+1)^3
     int cube[] { 1,3,3,1 };
 
-    int v = poly (2, cube, _countof(cube));
+    int v = poly (2, cube, std::size(cube));
     CHECK_EQUAL (27, v);
 
     // f(x) = x^4 + 2x^3 + 3x^2 + 4x + 5

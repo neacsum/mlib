@@ -7,6 +7,7 @@
 #include "safe_winsock.h"
 #include "errorcode.h"
 #include "inaddr.h"
+#include "tvops.h"
 
 namespace mlib {
 
@@ -17,6 +18,14 @@ namespace mlib {
 class sock
 {
 public:
+  /// socket types
+  enum type
+  {
+    stream = SOCK_STREAM,
+    dgram = SOCK_DGRAM,
+    raw = SOCK_RAW
+  };
+
   /// operation blocked by shutdown function
   enum shuthow
   {
@@ -37,21 +46,20 @@ public:
 
   sock ();
   explicit sock (SOCKET soc);
-  explicit sock (int type, int domain = AF_INET, int proto = 0);
+  explicit sock (type t, int domain = AF_INET, int proto = 0);
   sock (const sock&);
   sock (sock&&);
 
   virtual ~sock ();
   sock& operator= (const sock&);
   sock& operator= (sock&&);
-
   HANDLE       handle () const;
   bool         operator== (const sock& other) const;
   bool         operator!= (const sock& other) const;
   operator     SOCKET () const;
 
-  virtual erc  open (int type, int domain = AF_INET, int proto = 0);
-  virtual erc  close ();
+  virtual erc  open (type t, int domain = AF_INET, int proto = 0);
+  virtual void close ();
   virtual erc  shutdown (shuthow sh) const;
 
   virtual bool is_open () const;
@@ -106,8 +114,10 @@ public:
   int          recvbufsz () const;
   void         recvbufsz (size_t sz) const;
   void         blocking (bool on_off);
+#ifdef _WIN32
   erc          setevent (HANDLE evt, long mask) const;
   long         enumevents () const;
+#endif
   void         linger (bool on_off, unsigned short seconds) const;
   bool         linger (unsigned short* seconds = 0) const;
   void         nodelay (bool on_off);
@@ -158,7 +168,7 @@ sock::sock ()
 inline 
 HANDLE sock::handle () const
 {
-  return sl ? (HANDLE)sl->handle : INVALID_HANDLE_VALUE;
+  return sl ? (HANDLE)(std::intptr_t)sl->handle : INVALID_HANDLE_VALUE;
 }
 
 /// Conversion operator 
@@ -183,7 +193,7 @@ erc sock::connect (const inaddr& peer) const
     return erc (WSAENOTSOCK, Errors());
 
   int ret = ::connect (sl->handle, peer, sizeof (peer));
-  if (ret == SOCKET_ERROR)
+  if (ret == INVALID_SOCKET)
     return last_error ();
 
   return erc::success;
@@ -204,7 +214,7 @@ erc sock::accept (sock& client, inaddr* addr) const
     return erc (WSAENOTSOCK, Errors());
 
   sockaddr sa;
-  int len = sizeof (sa);
+  socklen_t len = sizeof (sa);
   client = sock (::accept (sl->handle, &sa, &len));
   if (addr)
     *addr = sa;
@@ -260,8 +270,13 @@ void sock::sendtimeout (std::chrono::milliseconds tmo) const
 {
   assert (sl && sl->handle != INVALID_SOCKET);
 
-  int optlen = sizeof (int);
+#ifdef _WIN32
+  socklen_t optlen = sizeof (int);
   int par = (int)tmo.count();
+#else
+  socklen_t optlen = sizeof(timeval);
+  timeval par = from_chrono (tmo);
+#endif
   setsockopt (sl->handle, SOL_SOCKET, SO_SNDTIMEO, (char*)&par, optlen);
 }
 
@@ -271,10 +286,17 @@ std::chrono::milliseconds sock::sendtimeout () const
 {
   assert (sl && sl->handle != INVALID_SOCKET);
 
+#ifdef _WIN32
+  socklen_t optlen = sizeof (int);
   int tmo;
-  int optlen = sizeof (int);
   getsockopt (sl->handle, SOL_SOCKET, SO_SNDTIMEO, (char*)&tmo, &optlen);
   return std::chrono::milliseconds(tmo);
+#else
+  socklen_t optlen = sizeof(timeval);
+  timeval tv;
+  getsockopt (sl->handle, SOL_SOCKET, SO_SNDTIMEO, (char*)&tv, &optlen);
+  return std::chrono::duration_cast<std::chrono::milliseconds>(to_chrono (tv));
+#endif
 }
 
 /*!
@@ -285,10 +307,13 @@ inline
 void sock::recvtimeout (std::chrono::milliseconds tmo) const
 {
   assert (sl && sl->handle != INVALID_SOCKET);
-
-  int optlen = sizeof (int);
+#ifdef _WIN32
+  socklen_t optlen = sizeof (int);
   int par = (int)tmo.count();
-
+#else
+  socklen_t optlen = sizeof(timeval);
+  timeval par = from_chrono (tmo);
+#endif
   setsockopt (sl->handle, SOL_SOCKET, SO_RCVTIMEO, (char*)&par, optlen);
 }
 
@@ -297,11 +322,17 @@ inline
 std::chrono::milliseconds sock::recvtimeout () const
 {
   assert (sl && sl->handle != INVALID_SOCKET);
-
+#ifdef _WIN32
+  socklen_t optlen = sizeof (int);
   int tmo;
-  int optlen = sizeof (int);
   getsockopt (sl->handle, SOL_SOCKET, SO_RCVTIMEO, (char*)&tmo, &optlen);
   return std::chrono::milliseconds (tmo);
+#else
+  socklen_t optlen = sizeof(timeval);
+  timeval tv;
+  getsockopt (sl->handle, SOL_SOCKET, SO_RCVTIMEO, (char*)&tv, &optlen);
+  return std::chrono::duration_cast<std::chrono::milliseconds> (to_chrono(tv));
+#endif
 }
 
 /*!
@@ -319,7 +350,7 @@ int sock::getopt (int op, void* buf, int len, int level) const
   if (!sl || sl->handle == INVALID_SOCKET)
     return erc (WSAENOTSOCK, Errors());
 
-  int rlen = len;
+  socklen_t rlen = len;
   if (::getsockopt (sl->handle, level, op, (char*)buf, &rlen) == SOCKET_ERROR)
     last_error ().raise ();
   return rlen;
@@ -378,7 +409,7 @@ bool sock::debug () const
 {
   BOOL old;
   getopt (SO_DEBUG, &old, sizeof (old));
-  return (old != FALSE);
+  return (old != 0);
 }
 
 /// Set the debug flag
@@ -395,7 +426,7 @@ bool sock::reuseaddr () const
 {
   BOOL old;
   getopt (SO_REUSEADDR, &old, sizeof (old));
-  return (old != FALSE);
+  return (old != 0);
 }
 
 /// Set the "reuse address" flag
@@ -412,7 +443,7 @@ bool sock::keepalive () const
 {
   BOOL old;
   getopt (SO_KEEPALIVE, &old, sizeof (old));
-  return (old != FALSE);
+  return (old != 0);
 }
 
 /// Set "keep alive" flag
@@ -429,7 +460,7 @@ bool sock::dontroute () const
 {
   BOOL old;
   getopt (SO_DONTROUTE, &old, sizeof (old));
-  return (old != FALSE);
+  return (old != 0);
 }
 
 /// Turn on or off the "don't route" flag
@@ -446,7 +477,7 @@ bool sock::broadcast () const
 {
   BOOL old;
   getopt (SO_BROADCAST, &old, sizeof (old));
-  return (old != FALSE);
+  return (old != 0);
 }
 
 /*!
@@ -471,7 +502,7 @@ bool sock::oobinline () const
 {
   BOOL old;
   getopt (SO_OOBINLINE, &old, sizeof (old));
-  return (old != FALSE);
+  return (old != 0);
 }
 
 /*!
@@ -533,6 +564,7 @@ void sock::blocking (bool on_off)
     last_error ().raise ();
 }
 
+#ifdef _WIN32
 /*!
   Associate an event object with this socket.
 
@@ -576,6 +608,7 @@ long sock::enumevents () const
     last_error ().raise ();
   return netev.lNetworkEvents;
 }
+#endif
 
 /// Turn on or off linger mode and lingering timeout.
 inline
@@ -619,7 +652,11 @@ bool sock::nodelay () const
 inline
 erc sock::last_error ()
 {
+#ifdef _WIN32
   int code = WSAGetLastError ();
+#else
+  int code = errno;
+#endif
   if (!code)
     return erc::success;
   else

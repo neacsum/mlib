@@ -11,7 +11,7 @@
 #include "defs.h"
 #endif
 
-#include <winsock2.h>
+#include "safe_winsock.h"
 #include <assert.h>
 #include <ostream>
 #include <chrono>
@@ -89,17 +89,18 @@ inline auto operator<=> (const timeval& t1, const timeval& t2)
 #endif
 
 // conversion to/from microseconds
-LONGLONG
-usec64 (const timeval& tv);
-timeval fromusec (LONGLONG us);
+long long usec64 (const timeval& tv);
+timeval fromusec (long long us);
 
 // conversion to seconds
 double secd (const timeval& tv);
 
+#ifdef _WIN32
 timeval fromsystime (const SYSTEMTIME& st);
 void tosystime (const timeval& tv, SYSTEMTIME* st);
 void tolocaltime (const timeval& tv, SYSTEMTIME* st);
 timeval zone_bias ();
+#endif
 
 void normalize (timeval& tv);
 
@@ -159,14 +160,14 @@ double secd (const timeval& tv)
 
 /// Conversion to 64-bit microseconds
 inline
-LONGLONG usec64 (const timeval& tv)
+long long usec64 (const timeval& tv)
 {
-  return (LONGLONG)tv.tv_sec * 1000000L + (LONGLONG)tv.tv_usec;
+  return (long long)tv.tv_sec * 1000000L + (long long)tv.tv_usec;
 }
 
 /// Conversion from 64-bit microseconds
 inline
-timeval fromusec (LONGLONG us)
+timeval fromusec (long long us)
 {
   timeval tv;
   tv.tv_sec = (int)(us / 1000000L);

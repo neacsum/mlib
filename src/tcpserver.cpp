@@ -66,7 +66,7 @@ namespace mlib {
   Otherwise, the listening address defaults to 'all interfaces' (`INADDR_ANY`).
 */
 tcpserver::tcpserver (unsigned short port, unsigned int max_conn, const std::string& name)
-  : srv_sock (SOCK_STREAM)
+  : srv_sock (sock::stream)
   , addr (port ? INADDR_ANY : INADDR_LOOPBACK, port)
   , thread (name)
   , limit (max_conn)
@@ -96,7 +96,7 @@ bool tcpserver::init ()
   {
     //if not opened, open it now
     if (!srv_sock.is_open ())
-      srv_sock.open (SOCK_STREAM);
+      srv_sock.open (sock::stream);
 
     //if not bound, bind it now
     if (srv_sock.name () != erc::success)

@@ -6,7 +6,10 @@
 
 #include <mlib/mlib.h>
 #pragma hdrstop
+
+#ifdef _MSC_VER
 #pragma comment(lib, "ws2_32.lib")
+#endif
 
 namespace mlib {
 
@@ -73,22 +76,22 @@ sock::sock (SOCKET soc)
 
 /*!
   Construct a sock object for the specified domain.
-  \param  type      socket type (SOCK_DGRAM or SOCK_STREAM)
+  \param  t         socket type (sock::dgram or sock::stream)
   \param  domain    normally AF_INET for TCP/IP sockets
   \param  proto     protocol
 
   Throws an exception if the socket cannot be created.
 */
-sock::sock (int type, int domain, int proto)
+sock::sock (type t, int domain, int proto)
   : sl (nullptr)
 {
   SOCKET h;
-  if ((h = ::socket (domain, type, proto)) == INVALID_SOCKET)
+  if ((h = ::socket (domain, t, proto)) == INVALID_SOCKET)
     last_error ().raise ();
 
   sl = new sock_ref;
   sl->handle = h;
-  TRACE9 ("sock::sock (type %d domain %d proto %d)=%x", type, domain, proto, sl->handle);
+  TRACE9 ("sock::sock (type %d domain %d proto %d)=%x", t, domain, proto, sl->handle);
 }
 
 /*!
@@ -163,7 +166,11 @@ sock::~sock ()
     if (sl->handle != INVALID_SOCKET)
     {
       TRACE8 ("sock::~sock -- closesocket(%x)", sl->handle);
-      closesocket (sl->handle);
+#ifdef _WIN32
+      closesocket(sl->handle);
+#else
+      ::close (sl->handle);
+#endif
     }
     delete sl;
     TRACE9 ("sock::~sock deleting sl");
@@ -175,19 +182,13 @@ sock::~sock ()
 
   If the socket was previously opened it calls first close().
 */
-erc sock::open (int type, int domain, int proto)
+erc sock::open (type t, int domain, int proto)
 {
-  TRACE8 ("sock::open (type=%d, domain=%d, proto=%d)", type, domain, proto);
-  if (sl && sl->handle != INVALID_SOCKET)
-  {
-    if (--sl->ref_count == 0)
-      closesocket (sl->handle); // no other references to this handle
-    else
-      sl = nullptr;
-  }
+  TRACE8 ("sock::open (type=%d, domain=%d, proto=%d)", t, domain, proto);
+  close ();
   if (!sl)
     sl = new sock_ref;
-  if ((sl->handle = ::socket (domain, type, proto)) == INVALID_SOCKET)
+  if ((sl->handle = ::socket (domain, t, proto)) == INVALID_SOCKET)
     return last_error ();
   TRACE8 ("sock::open handle=%x", sl->handle);
   return erc::success;
@@ -196,7 +197,7 @@ erc sock::open (int type, int domain, int proto)
 /*!
   Close socket.
 */
-erc sock::close ()
+void sock::close ()
 {
   if (sl && sl->handle != INVALID_SOCKET)
   {
@@ -204,16 +205,17 @@ erc sock::close ()
     if (sl->ref_count == 1)
     {
       // no other references to this handle
-      if (closesocket (sl->handle) == SOCKET_ERROR)
-        return last_error ();
-
+#ifdef _WIN32
+      closesocket (sl->handle);
+#else
+      ::close (sl->handle);
+#endif
       delete sl;
     }
     else
       --sl->ref_count;
     sl = nullptr;
   }
-  return erc::success;
 }
 
 /*!
@@ -230,7 +232,7 @@ checked<inaddr> sock::name () const
   if (!sl || sl->handle == INVALID_SOCKET)
     return {local, erc (WSAENOTSOCK, Errors ())};
 
-  int len = sizeof (sockaddr);
+  socklen_t len = sizeof (sockaddr);
   getsockname (sl->handle, local, &len);
   return {local, last_error ()};
 }
@@ -245,7 +247,7 @@ checked<inaddr> sock::peer () const
   if (!sl || sl->handle == INVALID_SOCKET)
     return {remote, erc (WSAENOTSOCK, Errors ())};
 
-  int len = sizeof (sockaddr);
+  socklen_t len = sizeof (sockaddr);
   getpeername (sl->handle, remote, &len);
   return {remote, last_error ()};
 }
@@ -298,7 +300,7 @@ erc sock::connect (const inaddr& peer, std::chrono::milliseconds tmo) const
     return erc (WSAENOTSOCK, Errors());
 
   int ret = ::connect (sl->handle, peer, sizeof (peer));
-  if (ret && (ret = WSAGetLastError ()) == WSAEWOULDBLOCK)
+  if (ret && ((ret = WSAGetLastError ()) == WSAEWOULDBLOCK || ret == WSAEINPROGRESS))
   {
     if (!is_writeready (tmo))
       return erc (WSAETIMEDOUT, Errors (), erc::info);
@@ -325,7 +327,7 @@ erc sock::accept (sock& client, const std::chrono::milliseconds tmo, inaddr* add
     return erc (WSAENOTSOCK, Errors());
 
   sockaddr sa;
-  int len = sizeof (sa);
+  socklen_t len = sizeof (sa);
   if (is_readready (tmo))
     client = sock (::accept (sl->handle, &sa, &len));
   else
@@ -385,7 +387,7 @@ size_t sock::recvfrom (sockaddr& sa, void* buf, size_t len, mflags msgf) const
     throw erc (WSAENOTSOCK, Errors());
 
   int rval;
-  int sa_len = sizeof (sa);
+  socklen_t sa_len = sizeof (sa);
 
   if ((rval = ::recvfrom (sl->handle, (char*)buf, (int)len, msgf, &sa, &sa_len)) == SOCKET_ERROR)
   {
@@ -585,7 +587,7 @@ erc sock::shutdown (shuthow sh) const
   return erc::success;
 }
 
-
+#ifdef _WIN32
 /*!
   \struct sock_initializer
   \ingroup sockets
@@ -629,6 +631,10 @@ sock_initializer::~sock_initializer ()
   }
   TRACE9 ("sock_initializer::~sock_initializer cnt=%d", sock_initializer_counter);
 }
+#else
+sock_initializer::sock_initializer () {}
+sock_initializer::~sock_initializer () {}
+#endif
 
 // Create an entry in the error table
 #define ENTRY(A)                                                                                   \
@@ -648,7 +654,8 @@ std::string sock_facility::message (const erc& e) const
     int code;
     const char* str;
   } errors[] = {
-    ENTRY (WSA_INVALID_HANDLE),
+#ifdef _WIN32
+    ENTRY(WSA_INVALID_HANDLE),
     ENTRY (WSA_NOT_ENOUGH_MEMORY),
     ENTRY (WSA_INVALID_PARAMETER),
     ENTRY (WSA_OPERATION_ABORTED),
@@ -660,10 +667,7 @@ std::string sock_facility::message (const erc& e) const
     ENTRY (WSAEFAULT),
     ENTRY (WSAEINVAL),
     ENTRY (WSAEMFILE),
-    ENTRY (WSAEWOULDBLOCK),
-    ENTRY (WSAEINPROGRESS),
     ENTRY (WSAEALREADY),
-    ENTRY (WSAENOTSOCK),
     ENTRY (WSAEDESTADDRREQ),
     ENTRY (WSAEMSGSIZE),
     ENTRY (WSAEPROTOTYPE),
@@ -678,14 +682,11 @@ std::string sock_facility::message (const erc& e) const
     ENTRY (WSAENETDOWN),
     ENTRY (WSAENETUNREACH),
     ENTRY (WSAENETRESET),
-    ENTRY (WSAECONNABORTED),
-    ENTRY (WSAECONNRESET),
     ENTRY (WSAENOBUFS),
     ENTRY (WSAEISCONN),
     ENTRY (WSAENOTCONN),
     ENTRY (WSAESHUTDOWN),
     ENTRY (WSAETOOMANYREFS),
-    ENTRY (WSAETIMEDOUT),
     ENTRY (WSAECONNREFUSED),
     ENTRY (WSAELOOP),
     ENTRY (WSAENAMETOOLONG),
@@ -712,10 +713,6 @@ std::string sock_facility::message (const erc& e) const
     ENTRY (WSA_E_NO_MORE),
     ENTRY (WSA_E_CANCELLED),
     ENTRY (WSAEREFUSED),
-    ENTRY (WSAHOST_NOT_FOUND),
-    ENTRY (WSATRY_AGAIN),
-    ENTRY (WSANO_RECOVERY),
-    ENTRY (WSANO_DATA),
     //  ENTRY (WSA_QOS_RECEIVERS),
     //  ENTRY (WSA_QOS_SENDERS),
     //  ENTRY (WSA_QOS_NO_SENDERS),
@@ -727,6 +724,17 @@ std::string sock_facility::message (const erc& e) const
     //  ENTRY (WSA_QOS_BAD_OBJECT),
     //  ENTRY (WSA_QOS_TRAFFIC_CTRL_ERROR),
     //  ENTRY (WSA_QOS_GENERIC_ERROR),
+#endif
+    ENTRY (WSAENOTSOCK),
+    ENTRY (WSAETIMEDOUT),
+    ENTRY (WSAEINPROGRESS),
+    ENTRY (WSAEWOULDBLOCK),
+    ENTRY (WSAECONNABORTED),
+    ENTRY (WSAECONNRESET),
+    ENTRY (WSAHOST_NOT_FOUND),
+    ENTRY (WSATRY_AGAIN),
+    ENTRY (WSANO_RECOVERY),
+    ENTRY (WSANO_DATA),
     {0, 0},
   };
 

@@ -19,21 +19,21 @@ TEST (sock_ctor_invalid)
 
 TEST (sock_ctor_valid)
 {
-  sock s(SOCK_DGRAM);
+  sock s(sock::dgram);
   CHECK (s.is_open ());
   EXPECT_NE (INVALID_HANDLE_VALUE, s.handle ());
 }
 
 TEST (sock_ctor_copy)
 {
-  sock s (SOCK_DGRAM);
+  sock s (sock::dgram);
   sock s1 (s);
   EXPECT_EQ (s1.handle (), s.handle ());
 }
 
 TEST (sock_ctor_move)
 {
-  sock s (SOCK_DGRAM);
+  sock s (sock::dgram);
   HANDLE sh = s.handle ();
   sock s1 = std::move(s);
   EXPECT_EQ (s1.handle (), sh);
@@ -42,7 +42,7 @@ TEST (sock_ctor_move)
 
 TEST (sock_assign)
 {
-  sock s (SOCK_DGRAM);
+  sock s (sock::dgram);
   sock s1;
 
   s1 = s;
@@ -51,7 +51,7 @@ TEST (sock_assign)
 
 TEST (sock_move_assign)
 {
-  sock s (SOCK_DGRAM);
+  sock s (sock::dgram);
   HANDLE sh = s.handle ();
   sock s1;
 
@@ -62,7 +62,7 @@ TEST (sock_move_assign)
 
 TEST (sock_open)
 {
-  sock s1 (SOCK_DGRAM), s2;
+  sock s1 (sock::dgram), s2;
   CHECK (s1.is_open () && !s2.is_open ());
 
   s2 = s1;
@@ -70,7 +70,7 @@ TEST (sock_open)
   CHECK_EQUAL (s1, s2); //socket equality operator
 
   //opening an opened socket receives a new handle
-  s2.open (SOCK_DGRAM);
+  s2.open (sock::dgram);
   CHECK (s2.is_open ());
   CHECK (s1.handle () != s2.handle ());
   CHECK (s1 != s2);
@@ -78,29 +78,31 @@ TEST (sock_open)
 
 TEST (sock_close)
 {
-  sock s1 (SOCK_DGRAM), s2;
+  sock s1 (sock::dgram), s2;
   CHECK (s1.is_open () && !s2.is_open ());
 
   s2 = s1;
   CHECK_EQUAL (s1.handle (), s2.handle ());
 
-  SOCKET h1 = (SOCKET)s1.handle ();
+  SOCKET h1 = (SOCKET)(std::intptr_t)s1.handle ();
 
   s1.close ();
   CHECK (!s1.is_open ());
   CHECK (s2.is_open ());
 
-  CHECK_EQUAL (erc::success, s1.close ()); // closing a closed socket is harmless
+  s1.close (); // closing a closed socket is harmless
   
   s2.close ();
   CHECK (!s2.is_open ());
+#ifdef _WIN32
   CHECK_EQUAL (SOCKET_ERROR, closesocket (h1));
   CHECK_EQUAL (WSAENOTSOCK, WSAGetLastError ());
+#endif
 }
 
 TEST (sock_send_string)
 {
-  sock s (SOCK_STREAM), c1 (SOCK_STREAM), c2;
+  sock s (sock::stream), c1 (sock::stream), c2;
   s.bind (inaddr ("localhost", 0));
   s.listen ();
 
@@ -128,7 +130,7 @@ TEST (connect_timeout)
   auto timeout = 3s + 100ms; //timeout in seconds
   UTPP_TIME_CONSTRAINT (timeout);
 
-  sock a (SOCK_STREAM);
+  sock a (sock::stream);
   a.blocking (false);
   inaddr nonexistent ("198.51.100.1", 80); //per RFC5737 
   auto result = a.connect (nonexistent, 3s);
@@ -137,7 +139,7 @@ TEST (connect_timeout)
 
 TEST (accept_timeout)
 {
-  sock s(SOCK_STREAM), cl;
+  sock s(sock::stream), cl;
   s.bind (inaddr ("localhost", 0));
   s.listen ();
   UTPP_TIME_CONSTRAINT (1s+100ms);
@@ -147,7 +149,7 @@ TEST (accept_timeout)
 
 TEST (accept_ok)
 {
-  sock s (SOCK_STREAM), c1 (SOCK_STREAM), c2;
+  sock s (sock::stream), c1 (sock::stream), c2;
   s.bind (inaddr ("localhost", 0));
   s.listen ();
 
@@ -159,7 +161,7 @@ TEST (accept_ok)
 
 TEST (accept_ok2)
 {
-  sock s (SOCK_STREAM), c1 (SOCK_STREAM), c2;
+  sock s (sock::stream), c1 (sock::stream), c2;
   s.bind (inaddr ("localhost", 0));
   s.listen ();
 
@@ -171,7 +173,7 @@ TEST (accept_ok2)
 
 TEST (timeout_values)
 {
-  sock s (SOCK_STREAM);
+  sock s (sock::stream);
 
   auto to = 3s;
   s.recvtimeout (to);
@@ -183,13 +185,16 @@ TEST (timeout_values)
 
 TEST (sock_type)
 {
-  sock s1 (SOCK_STREAM);
-  sock s2 (SOCK_DGRAM);
-  sock s3 (SOCK_RAW, AF_INET, IPPROTO_ICMP);
+  sock s1 (sock::stream);
+  CHECK_EQUAL (sock::stream, s1.gettype ());
 
-  CHECK_EQUAL (SOCK_STREAM, s1.gettype());
-  CHECK_EQUAL (SOCK_DGRAM, s2.gettype ());
+  sock s2 (sock::dgram);
+  CHECK_EQUAL (sock::dgram, s2.gettype ());
+
+#ifdef _WIN32
+  sock s3 (sock::raw, AF_INET, IPPROTO_ICMP);
   CHECK_EQUAL (SOCK_RAW, s3.gettype ());
+#endif
 }
 
 TEST (inaddr_basic1)
@@ -207,6 +212,7 @@ TEST (inaddr_bcast)
 TEST (inaddr_port_string)
 {
   inaddr lh ("localhost", "1234");
+
   CHECK_EQUAL (1234, lh.port ());
 
   auto err = lh.port ("http");
@@ -214,7 +220,11 @@ TEST (inaddr_port_string)
   CHECK_EQUAL (80, lh.port ());
   
   err = lh.port ("blah");
+#ifdef _WIN32
   CHECK_EQUAL (WSANO_DATA, err);
+#else
+  CHECK_EQUAL (WSAHOST_NOT_FOUND, err);
+#endif
 }
 
 TEST (inaddr_assignment)
@@ -259,12 +269,13 @@ TEST (inaddr_dns_fail_3)
   CHECK_EQUAL (WSAHOST_NOT_FOUND, e);
 }
 
+#ifdef _WIN32
 TEST (dgram_send_receive)
 {
   auto_event go;
   char buf[80];
   auto f = [&]() -> int {
-    sock s (SOCK_DGRAM);
+    sock s (sock::dgram);
     go.wait ();
     std::cout << "Sending datagram...";
     s.sendto (inaddr ("127.0.0.2", 1234), "TEST", 5);
@@ -272,7 +283,7 @@ TEST (dgram_send_receive)
   };
 
   auto g = [&] () -> int {
-    sock s (SOCK_DGRAM);
+    sock s (sock::dgram);
     s.bind (inaddr ("127.0.0.2", 1234));
     s.recvtimeout (5s);
     inaddr sender;
@@ -298,9 +309,79 @@ TEST (dgram_send_receive)
   CHECK_EQUAL ("TEST", buf);
 }
 
+TEST (sock_readready)
+{
+  auto_event sent;
+  auto f = [&] () -> int {
+    sock s (sock::dgram);
+    s.connect (inaddr ("127.0.0.1", 1234));
+    s.sendto (inaddr ("127.0.0.2", 1234), "TEST", 5);
+    sent.signal ();
+    return 0;
+  };
+
+  thread th (f);
+  sock s (sock::dgram);
+  s.bind (inaddr ("127.0.0.2", 1234));
+  CHECK (!s.is_readready ());
+
+  th.start ();
+  sent.wait ();
+  CHECK (s.is_readready ());
+}
+
+TEST (stream_send_receive)
+{
+  unsigned short port;
+  char buf[80];
+  auto f = [&] () -> int {
+    sock s (sock::stream);
+    s.bind (inaddr ("127.0.0.1", 0));
+    port = s.name ()->port ();
+    s.listen ();
+    inaddr who;
+
+    sock client;
+    s.accept (client, &who);
+    std::cout << "Incoming connection from " << who << std::endl;
+    sockstream ss (client);
+    ss << "TEST STREAM" << std::endl;
+    Sleep (1000);
+    return 0;
+  };
+
+  auto g = [&] () -> int {
+    sockstream ss (sock::stream);
+    Sleep (1000);
+    ss->connect (inaddr ("127.0.0.1", port));
+    ss.getline (buf, sizeof (buf));
+    return 0;
+  };
+
+  thread th1 (f), th2 (g);
+  buf[0] = 0;
+  th1.start ();
+  th2.start ();
+
+  try
+  {
+    auto ret = wait_all ({&th1, &th2}, 4000);
+    std::cout << "wait_all return=" << ret << std::endl;
+    CHECK (ret < WAIT_OBJECT_0 + 2);
+  }
+  catch (erc& x)
+  {
+    ABORT_EX (0, "Error : %d - %s", (int)x, x.message ().c_str ());
+  }
+
+  CHECK_EQUAL ("TEST STREAM", buf);
+}
+
+#endif
+
 TEST (dgram_send_string)
 {
-  sock s1 (SOCK_DGRAM), s2 (SOCK_DGRAM);
+  sock s1 (sock::dgram), s2 (sock::dgram);
   s1.connect ({"127.0.0.1", 1234});
   s2.bind ({"127.0.0.2", 1234});
 
@@ -319,32 +400,12 @@ TEST (dgram_send_string)
   CHECK_EQUAL (expected_sender, actual_sender);
 }
 
-TEST (sock_readready)
-{
-  auto_event sent;
-  auto f = [&] () -> int {
-    sock s (SOCK_DGRAM);
-    s.connect (inaddr ("127.0.0.1", 1234));
-    s.sendto (inaddr ("127.0.0.2", 1234), "TEST", 5);
-    sent.signal ();
-    return 0;
-  };
-
-  thread th (f);
-  sock s (SOCK_DGRAM);
-  s.bind (inaddr ("127.0.0.2", 1234));
-  CHECK (!s.is_readready ());
-
-  th.start ();
-  sent.wait ();
-  CHECK (s.is_readready ());
-}
 
 // This is a liberal transcription of the sample code from recv documentation
 // https://learn.microsoft.com/en-us/windows/win32/api/winsock2/nf-winsock2-recv
 TEST (sample_recv)
 {
-  sock ConnectSocket (SOCK_STREAM), BindSocket (SOCK_STREAM), AcceptSocket(SOCK_STREAM);
+  sock ConnectSocket (sock::stream), BindSocket (sock::stream), AcceptSocket(sock::stream);
   constexpr int DEFAULT_BUFLEN = 512, DEFAULT_PORT = 27015;
 
   const char *sendbuf = "this is a test";
@@ -358,7 +419,7 @@ TEST (sample_recv)
     BindSocket.accept (AcceptSocket);
 
     int iResult = (int)ConnectSocket.send (sendbuf, strlen (sendbuf));
-    printf ("Bytes Sent: %ld\n", iResult);
+    printf ("Bytes Sent: %d\n", iResult);
 
     ConnectSocket.shutdown (sock::shut_write);
 
@@ -376,53 +437,6 @@ TEST (sample_recv)
     ABORT_EX (0, "Error : %d - %s", (int)x, x.message().c_str());
   }
   
-}
-
-TEST (stream_send_receive)
-{
-  unsigned short port;
-  char buf[80];
-  auto f = [&] () -> int {
-    sock s(SOCK_STREAM);
-    s.bind (inaddr("127.0.0.1",0));
-    port = s.name ()->port();
-    s.listen ();
-    inaddr who;
-
-    sock client;
-    s.accept (client, &who);
-    std::cout << "Incoming connection from " << who << std::endl;
-    sockstream ss (client);
-    ss << "TEST STREAM" << std::endl;
-    Sleep (1000);
-    return 0;
-  };
-
-  auto g = [&] () -> int {
-    sockstream ss (SOCK_STREAM);
-    Sleep (1000);
-    ss->connect (inaddr("127.0.0.1", port));
-    ss.getline (buf, sizeof(buf));
-    return 0;
-  };
-
-  thread th1 (f), th2 (g);
-  buf[0] = 0;
-  th1.start ();
-  th2.start ();
-
-  try
-  {
-    auto ret = wait_all ({&th1, &th2}, 4000);
-    std::cout << "wait_all return=" << ret << std::endl;
-    CHECK (ret < WAIT_OBJECT_0 + 2);
-  }
-  catch (erc& x)
-  {
-    ABORT_EX (0, "Error : %d - %s", (int)x, x.message().c_str());
-  }
-
-  CHECK_EQUAL ("TEST STREAM", buf);
 }
 
 #if 0
@@ -443,14 +457,14 @@ TEST (tcp_server_maxconn)
 
   for (int i = 0; i < 3; i++)
   {
-    clients[i]->open (SOCK_STREAM);
+    clients[i]->open (sock::stream);
     clients[i]->connect (inaddr ("127.0.0.1", serv_port));
     std::string s;
     clients[i] >> s;
   }
   try
   {
-    sock ss (SOCK_STREAM);
+    sock ss (sock::stream);
     ss.connect (inaddr ("127.0.0.1", serv_port));  
   }
   catch (erc &x)

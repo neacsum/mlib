@@ -1,0 +1,6 @@
+﻿extensions: designer.cs generated.cs
+extensions: .c .cpp .h
+/*
+  Copyright (c) Mircea Neacsu (2014-%currentyear%) Licensed under MIT License.
+  This file is part of MLIB project. See LICENSE file for full license terms.
+*/

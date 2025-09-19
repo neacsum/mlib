@@ -30,6 +30,9 @@
 #include "poly.h"
 #include "ringbuf.h"
 #include "rotmat.h"
+#include "sock.h"
+#include "sockbuf.h"
+#include "sockstream.h"
 #include "statpars.h"
 #include "stopwatch.h"
 #include "trace.h"
@@ -54,11 +57,7 @@
 #include "semaphore.h"
 #include "serenum.h"
 #include "shmem.h"
-#include "sock.h"
-#include "sockbuf.h"
-#include "sockstream.h"
 #include "syncque.h"
-#include "tvops.h"
 #include "wtimer.h"
 
 #if !defined(NODEFAULTLIB)

@@ -3,7 +3,7 @@
   This file is part of MLIB project. See LICENSE file for full license terms.
 */
 
-/// \file sockstream.h Definition of `sockstram`, `isockstream` and `osockstream` classes.
+/// \file sockstream.h Definition of `sockstream`, `isockstream` and `osockstream` classes.
 
 #pragma once
 
@@ -48,11 +48,11 @@ public:
     : std::basic_iostream<T> (new sockbuf<T> (s)){};
 
   /// Create a SOCK_STREAM or SOCK_DGRAM  stream
-  explicit generic_sockstream (int type, int domain = AF_INET, int proto = 0)
-    : std::basic_iostream<T> (new sockbuf<T> (type, domain, proto)){};
+  explicit generic_sockstream (sock::type t, int domain = AF_INET, int proto = 0)
+    : std::basic_iostream<T> (new sockbuf<T> (t, domain, proto)){};
 
   /// Create a SOCK_STREAM connected to a remote peer
-  explicit generic_sockstream (const inaddr& remote, int type = SOCK_STREAM);
+  explicit generic_sockstream (const inaddr& remote, sock::type t = sock::stream);
 
   ~generic_sockstream ();
 
@@ -69,10 +69,10 @@ public:
 };
 
 template <typename T>
-generic_sockstream<T>::generic_sockstream (const inaddr& remote, int type)
+generic_sockstream<T>::generic_sockstream (const inaddr& remote, sock::type t)
   : std::basic_iostream<T> (new sockbuf<T> ())
 {
-  rdbuf ()->open (type);
+  rdbuf ()->open (t);
   rdbuf ()->connect (remote);
 }
 

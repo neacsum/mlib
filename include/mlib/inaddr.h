@@ -14,6 +14,7 @@
 
 #include "safe_winsock.h"
 #include <ostream>
+#include <cstring>
 
 #include "errorcode.h"
 
@@ -107,7 +108,7 @@ inline inaddr& inaddr::operator= (const inaddr& rhs)
 /// Equality operator
 inline bool inaddr::operator== (const inaddr& other) const
 {
-  return (sa.sin_addr.S_un.S_addr == other.sa.sin_addr.S_un.S_addr)
+  return (sa.sin_addr.s_addr == other.sa.sin_addr.s_addr)
          && (sa.sin_port == other.sa.sin_port);
 }
 

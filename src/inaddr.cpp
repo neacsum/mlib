@@ -10,6 +10,15 @@ namespace mlib {
 
 sock_initializer init;
 
+inline static DWORD h_error ()
+{
+#ifdef _WIN32
+  return WSAGetLastError ();
+#else
+  return (DWORD)h_errno;
+#endif
+}
+
 /*!
   \class inaddr
   \ingroup sockets
@@ -49,7 +58,7 @@ inaddr::inaddr (const std::string& hostname, unsigned short port)
   {
     HOSTENT* he;
     if (NULL == (he = gethostbyname (hostname.c_str ())))
-      sock::last_error ().raise ();
+      throw erc (h_error (), sock::Errors ());
     else
       memcpy (&sa.sin_addr, he->h_addr_list[0], he->h_length);
   }
@@ -73,7 +82,7 @@ inaddr::inaddr (const std::string& hostname, const std::string& service, const s
   {
     HOSTENT* he;
     if (NULL == (he = gethostbyname (hostname.c_str ())))
-      sock::last_error ().raise ();
+      throw erc (h_error (), sock::Errors ());
     else
       memcpy (&sa.sin_addr, he->h_addr_list[0], he->h_length);
   }
@@ -84,7 +93,7 @@ inaddr::inaddr (const std::string& hostname, const std::string& service, const s
   \param service service name
   \param proto protocol name
 
-  The \p name parameter can be either one of the well-known service names or a
+  The \p service parameter can be either one of the well-known service names or a
   numeric port value. If it is a numeric value, the function converts it to a
   port number using the `strtoul` function.
 */
@@ -101,7 +110,7 @@ erc inaddr::port (const std::string& service, const std::string& proto)
   const char* pproto = proto.empty () ? nullptr : proto.c_str ();
   struct servent* serv = getservbyname (service.c_str (), pproto);
   if (!serv)
-    return sock::last_error ();
+    return erc (h_error (), sock::Errors ());
 
   sa.sin_port = serv->s_port;
   return erc::success;
@@ -119,9 +128,9 @@ erc inaddr::host (const std::string& hostname)
   {
     HOSTENT* he = gethostbyname (hostname.c_str ());
     if (he == NULL)
-      return sock::last_error ();
-    else
-      memcpy (&sa.sin_addr, he->h_addr_list[0], he->h_length);
+      return erc (h_error (), sock::Errors ());
+
+    memcpy (&sa.sin_addr, he->h_addr_list[0], he->h_length);
   }
   return erc::success;
 }
@@ -134,16 +143,13 @@ std::string inaddr::hostname () const
   HOSTENT* he = gethostbyaddr ((char*)&sa.sin_addr, sizeof (sa.sin_addr), AF_INET);
   if (he == NULL)
   {
-    DWORD err = WSAGetLastError ();
-    if (err == WSAHOST_NOT_FOUND || err == WSANO_DATA || err == WSANO_RECOVERY
-        || err == WSATRY_AGAIN)
-      // Seems like a DNS problem; make a char string from dotted address.
-      return inet_ntoa (sa.sin_addr);
-    else
-    {
-      sock::last_error ().raise ();
-      return "0.0.0.0";
-    }
+    DWORD err = h_error();
+    if (err && err != WSAHOST_NOT_FOUND && err != WSANO_DATA && err != WSANO_RECOVERY
+        && err != WSATRY_AGAIN)
+      throw erc (err, sock::Errors ());
+
+    // Seems like a DNS problem; make a char string from dotted address.
+    return inet_ntoa (sa.sin_addr);
   }
   else
     return he->h_name;
@@ -158,7 +164,7 @@ unsigned inaddr::localhost ()
   HOSTENT* hostent;
   sockaddr_in lcl_addr;
   sockaddr_in rmt_addr;
-  int addr_size = sizeof (sockaddr);
+  socklen_t addr_size = sizeof (sockaddr);
   SOCKET sock;
 
   // Init local address (to zero)
@@ -183,7 +189,11 @@ unsigned inaddr::localhost ()
     rmt_addr.sin_addr.s_addr = inet_addr ("128.127.50.1");
     if (connect (sock, (sockaddr*)&rmt_addr, sizeof (sockaddr)) != SOCKET_ERROR)
       getsockname (sock, (sockaddr*)&lcl_addr, &addr_size); // Get local address
+#ifdef _WIN32
     closesocket (sock);                                     // we're done with the socket
+#else
+    close (sock);
+#endif
   }
   return ntohl ((lcl_addr.sin_addr.s_addr));
 }

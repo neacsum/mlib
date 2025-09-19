@@ -2,7 +2,7 @@
 #include <mlib/mlib.h>
 #pragma hdrstop
 #include <iostream>
-#include <utf8/utf8.h>
+#include <filesystem>
 
 using namespace mlib;
 
@@ -42,11 +42,11 @@ TEST (DbReadonly)
 TEST(DbFilename)
 {
   Database db("testdb.sqlite");
-  auto s = db.filename();
-  auto ss = s.substr(s.rfind('\\') + 1);
+  auto s = db.path();
+  auto ss = s.filename();
   CHECK_EQUAL(ss, "testdb.sqlite");
   db.close();
-  utf8::remove(s);
+  std::filesystem::remove (s);
 }
 
 
@@ -56,7 +56,7 @@ TEST(Db_make_query_ok)
   db.exec("CREATE TABLE tab (col);"
     "INSERT INTO tab VALUES (123)");
   auto q = db.make_query("SELECT * FROM tab");
-  CHECK_EQUAL(ERROR_SUCCESS, q.code());
+  CHECK_EQUAL(erc::success, q.code());
   q->step();
   CHECK_EQUAL(123, q->column_int(0));
   q->clear();
@@ -105,7 +105,7 @@ TEST(db_make_query_multiple)
   CHECK_EQUAL(2, count);
 
   checked<Query> q = db.make_query("SELECT * FROM tab");
-  CHECK_EQUAL(ERROR_SUCCESS, q.code());
+  CHECK_EQUAL(erc::success, q.code());
   q->step();
   CHECK_EQUAL(123, q->column_int(0));
 }
@@ -122,7 +122,7 @@ TEST (DbExecStatements)
   CHECK_EQUAL(123, q.column_int(0));
   q.clear();
   db.close();
-  utf8::remove ("testdb.sqlite");
+  std::filesystem::remove ("testdb.sqlite");
 }
 
 //Copy an existing database
@@ -423,7 +423,7 @@ TEST (method_schema)
   CHECK_EQUAL(0, db1.exec ("ATTACH 'disk2.db' AS schema2"));
   CHECK_EQUAL ("main", db1.schema (0));
   CHECK_EQUAL ("schema2", db1.schema (2));
-  CHECK_EQUAL (utf8::fullpath("disk2.db"), db1.filename (db1.schema (2)));
+  CHECK (std::filesystem::equivalent ("disk2.db", db1.path (db1.schema (2))));
  
   db1.close ();
   remove ("disk1.db");
