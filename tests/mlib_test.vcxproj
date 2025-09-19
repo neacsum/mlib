@@ -35,7 +35,6 @@
     <ClCompile Include="source\tests_json.cpp" />
     <ClCompile Include="source\tests_main.cpp" />
     <ClCompile Include="source\tests_options.cpp" />
-    <ClCompile Include="source\tests_rdir.cpp" />
     <ClCompile Include="source\tests_ringbuffer.cpp" />
     <ClCompile Include="source\tests_serenum.cpp" />
     <ClCompile Include="source\tests_shmem.cpp" />

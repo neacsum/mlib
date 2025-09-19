@@ -1,9 +1,11 @@
-#pragma once
-/*!
-  \file mlib.h Uber-include file for mlib library
-
-  (c) Mircea Neacsu 2019
+/*
+  Copyright (c) Mircea Neacsu (2014-2025) Licensed under MIT License.
+  This file is part of MLIB project. See LICENSE file for full license terms.
 */
+
+///  \file mlib.h Uber-include file for mlib library
+
+#pragma once
 
 #if __has_include("defs.h")
 #include "defs.h"
@@ -31,6 +33,7 @@
 #include "statpars.h"
 #include "stopwatch.h"
 #include "trace.h"
+#include "tvops.h"
 
 // sqlite3 wrappers needs SQLITE3 headers
 #if __has_include("sqlite3/sqlite3.h")
@@ -48,7 +51,6 @@
 #include "jbridge.h"
 #include "log.h"
 #include "mutex.h"
-#include "rdir.h"
 #include "semaphore.h"
 #include "serenum.h"
 #include "shmem.h"
