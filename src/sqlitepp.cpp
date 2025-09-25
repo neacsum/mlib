@@ -58,10 +58,10 @@ Database::Database ()
   \param  name      database name
   \param  flags     open flags
 */
-Database::Database (const std::string& name, openflags flags)
+Database::Database (const std::filesystem::path& name, openflags flags)
 {
   sqlite3* pdb;
-  int rc = sqlite3_open_v2 (name.c_str (), &pdb, static_cast<int> (flags), 0);
+  int rc = sqlite3_open_v2 (name.string ().c_str (), &pdb, static_cast<int> (flags), 0);
   db.reset (pdb, sqlite3_close);
   if ((rc) != SQLITE_OK)
   {
@@ -159,10 +159,10 @@ bool Database::is_readonly ()
   \param name     Database name
   \param flags    Combination of openflags flags
 */
-erc Database::open (const string& name, openflags flags)
+erc Database::open (const std::filesystem::path& name, openflags flags)
 {
   sqlite3* pdb;
-  auto rc = sqlite3_open_v2 (name.c_str (), &pdb, static_cast<int> (flags), 0);
+  auto rc = sqlite3_open_v2 (name.string().c_str (), &pdb, static_cast<int> (flags), 0);
   db.reset (pdb, sqlite3_close);
   if (rc != SQLITE_OK)
   {

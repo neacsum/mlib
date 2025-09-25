@@ -194,7 +194,7 @@ public:
   Database ();
 
   /// Open a database specified by name
-  Database (const std::string& name, openflags flags = openflags::create);
+  Database (const std::filesystem::path& name, openflags flags = openflags::create);
 
   /// Copy database content
   Database& copy (Database& src);
@@ -230,7 +230,7 @@ public:
   sqlite3_int64 total_changes ();
 
   /// Open database connection
-  erc open (const std::string& name, openflags flags = openflags::create);
+  erc open (const std::filesystem::path& name, openflags flags = openflags::create);
 
   /// Close database connection
   erc close ();
