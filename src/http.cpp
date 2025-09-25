@@ -1616,7 +1616,7 @@ const std::string& server::guess_mimetype (const std::filesystem::path& fn, bool
     }
   }
   shtml = false;
-  return knowntypes[0].type;
+  return knowntypes["html"].type; //default to HTML 
 }
 
 /*!

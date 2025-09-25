@@ -14,6 +14,8 @@
 
 namespace mlib {
 
+static std::mutex dpr_lock;
+
 /*!  
 
   On Windows platform, the function  uses the `OutputDebugString` API call to
@@ -29,7 +31,6 @@ namespace mlib {
 */
 bool dprintf (const char* fmt, ...)
 {
-  static std::mutex dpr_lock;
   char buffer[MAX_DPRINTF_CHARS];
   size_t sz;
   int r;
@@ -52,7 +53,7 @@ bool dprintf (const char* fmt, ...)
 #ifdef _WIN32
   strcat_s (buffer, "\n");
   wchar_t* out;
-  std::lock_guard<std::mutex> l (dpr_lock);
+//  std::lock_guard<std::mutex> l (dpr_lock);
 
   int wsz = MultiByteToWideChar (CP_UTF8, 0, buffer, -1, 0, 0);
   if (wsz && (out = (wchar_t*)malloc (wsz * sizeof (wchar_t))))
@@ -70,5 +71,6 @@ bool dprintf (const char* fmt, ...)
   return true;
 #endif
 }
+
 
 } // namespace mlib
