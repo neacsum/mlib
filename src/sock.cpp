@@ -211,10 +211,10 @@ void sock::close ()
       ::close (sl->handle);
 #endif
       delete sl;
+      sl = nullptr;
     }
     else
       --sl->ref_count;
-    sl = nullptr;
   }
 }
 
