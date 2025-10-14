@@ -8,8 +8,6 @@
 
 namespace mlib {
 
-sock_initializer init;
-
 inline static DWORD h_error ()
 {
 #ifdef _WIN32

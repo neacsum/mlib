@@ -149,11 +149,12 @@ private:
 /*---------------------- support classes ------------------------------------*/
 /// Keeps an instance counter for calls to WSAStartup/WSACleanup
 /// \ingroup sockets
-static struct sock_initializer
+struct sock_initializer
 {
   sock_initializer ();
   ~sock_initializer ();
-} sock_nifty_counter;
+};
+inline sock_initializer sock_nifty_counter;
 
 
 /*==================== INLINE FUNCTIONS ===========================*/

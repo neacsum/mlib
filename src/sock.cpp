@@ -49,9 +49,6 @@ int sock_initializer_counter = 0;
   \defgroup sockets Networking Objects
 */
 
-// The initialization object
-static sock_initializer init;
-
 /*!
   \class sock
   \ingroup sockets
@@ -161,20 +158,8 @@ sock& sock::operator= (sock&& rhs)
 */
 sock::~sock ()
 {
-  if (sl && --sl->ref_count == 0)
-  {
-    if (sl->handle != INVALID_SOCKET)
-    {
-      TRACE8 ("sock::~sock -- closesocket(%x)", sl->handle);
-#ifdef _WIN32
-      closesocket(sl->handle);
-#else
-      ::close (sl->handle);
-#endif
-    }
-    delete sl;
-    TRACE9 ("sock::~sock deleting sl");
-  }
+  TRACE9 ("sock::~sock");
+  close ();
 }
 
 /*!
@@ -186,8 +171,7 @@ erc sock::open (type t, int domain, int proto)
 {
   TRACE8 ("sock::open (type=%d, domain=%d, proto=%d)", t, domain, proto);
   close ();
-  if (!sl)
-    sl = new sock_ref;
+  sl = new sock_ref;
   if ((sl->handle = ::socket (domain, t, proto)) == INVALID_SOCKET)
     return last_error ();
   TRACE8 ("sock::open handle=%x", sl->handle);
@@ -199,23 +183,24 @@ erc sock::open (type t, int domain, int proto)
 */
 void sock::close ()
 {
-  if (sl && sl->handle != INVALID_SOCKET)
+  if (!sl)
+    return;
+
+  if (!--sl->ref_count)
   {
-    TRACE8 ("sock::close (%x)", sl->handle);
-    if (sl->ref_count == 1)
+    // no other references to this handle
+    if (sl->handle != INVALID_SOCKET)
     {
-      // no other references to this handle
+      TRACE8 ("sock::close (%x)", sl->handle);
 #ifdef _WIN32
       closesocket (sl->handle);
 #else
       ::close (sl->handle);
 #endif
-      delete sl;
-      sl = nullptr;
     }
-    else
-      --sl->ref_count;
+    delete sl;
   }
+  sl = nullptr;
 }
 
 /*!
@@ -257,7 +242,8 @@ checked<inaddr> sock::peer () const
 */
 erc sock::bind (const inaddr& sa) const
 {
-  assert (sl && sl->handle != INVALID_SOCKET);
+  if (!sl || sl->handle == INVALID_SOCKET)
+    return erc (WSAENOTSOCK, Errors ());
 
   TRACE8 ("sock::bind (%x) to %s:%d", sl->handle, sa.ntoa (), sa.port ());
   if (::bind (sl->handle, sa, sizeof (sa)) == SOCKET_ERROR)
@@ -596,9 +582,10 @@ erc sock::shutdown (shuthow sh) const
   When the first instance is created it calls WSAStartup and WSACleanup is
   called when the last instance is destroyed.
 
-  It uses the "Nifty Counter" (https://en.wikibooks.org/wiki/More_C%2B%2B_Idioms/Nifty_Counter)
-  idiom to ensure Winsock library is properly
-  initialized before usage. The header file wsockstream.h contains a declaration
+  It uses the [Nifty Counter](https://en.wikibooks.org/wiki/More_C%2B%2B_Idioms/Nifty_Counter)
+  idiom to ensure Winsock library is properly initialized before usage.
+  
+  The header file sock.h contains a declaration
   of the static object `sock_nifty_counter`. Because it is a static object there
   will be one such object in each translation unit that includes the header file.
   Moreover, because it is declared before any other global object in that translation
