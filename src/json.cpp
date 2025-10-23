@@ -57,6 +57,7 @@ node::node (type t_)
 /// Copy constructor
 node::node (const node& other)
   : t (other.t)
+  , fmt (other.fmt ? std::make_unique <std::string>(*other.fmt) : 0)
 {
   switch (t)
   {
@@ -96,6 +97,7 @@ node::node (node&& other)
   size_t sz = sizeof (node);
   memmove (this, &other, sz);
   other.t = type::null;
+  other.fmt.release ();
 }
 
 // Destructor
@@ -132,6 +134,7 @@ node& node::operator= (const node& rhs)
       logic = rhs.logic;
       break;
     }
+    fmt = rhs.fmt?std::make_unique<std::string>(*rhs.fmt) : 0;
   }
   return *this;
 }
@@ -143,6 +146,7 @@ node& node::operator= (node&& rhs)
   {
     memmove (this, &rhs, sizeof (node));
     rhs.t = type::null;
+    rhs.fmt.release ();
   }
   return *this;
 }
@@ -276,6 +280,19 @@ const node& node::at (size_t index) const
     mlib::erc (ERR_JSON_MISSING, Errors(), mlib::erc::critical).raise ();
     return null_node;
   }
+}
+
+/*!
+  Append an element at the end of an array
+*/
+void node::push_back (const node& n)
+{
+  if (t == type::null)
+    clear (type::array);
+  else if (t != type::array)
+    mlib::erc (ERR_JSON_INVTYPE, Errors ()).raise ();
+
+  arr.emplace_back (make_unique<node>(n));
 }
 
 /// Equality operator
@@ -753,14 +770,15 @@ static void quote (ostream& os, const std::string& s, int flags)
   }
 }
 
-// formatting flags
-int ostream_flags = ios_base::xalloc ();
 /*
+  Formatting flags
+
   Structure of formatting flags word (long):
   -----------------+----------------+
   | flags (8bits)  | spaces (8bits) |
   +----------------+----------------+
 */
+static int ostream_flags = ios_base::xalloc ();
 
 /*!
   Write node to a stream.
@@ -769,8 +787,10 @@ int ostream_flags = ios_base::xalloc ();
   \param spaces number of spaces to indent. If 0 uses tabs instead of spaces
   \param level starting indentation level
 */
-erc node::write (std::ostream& os, int flags, int spaces, int level) const
+erc node::write (std::ostream& os, int flags, int spaces, int level, const std::string_view format) const
 {
+  auto my_fmt = fmt ? *fmt : format; //propagate passed format if
+                                     //this node doesn't have its own
   string fill;
   ++level;
   if (spaces == 0)
@@ -792,7 +812,7 @@ erc node::write (std::ostream& os, int flags, int spaces, int level) const
       os << '"';
       quote (os, ptr->first, flags);
       os << "\":";
-      ptr->second->write (os, flags, spaces, level);
+      ptr->second->write (os, flags, spaces, level, my_fmt);
       ++ptr;
       if (ptr != obj.end ())
         os << ',';
@@ -813,7 +833,7 @@ erc node::write (std::ostream& os, int flags, int spaces, int level) const
         os << ',';
       if ((flags & JSON_FMT_INDENT) != 0)
         os << endl << fill;
-      arr[i]->write (os, flags, spaces, level);
+      arr[i]->write (os, flags, spaces, level, fmt? *fmt : format);
     }
     os << ']';
     break;
@@ -825,6 +845,22 @@ erc node::write (std::ostream& os, int flags, int spaces, int level) const
     break;
 
   case type::numeric:
+    if (!my_fmt.empty ())
+    {
+      if (num == floor (num))
+      {
+        try {
+          long long lln = (long long)num;
+          os << std::vformat (my_fmt, make_format_args (lln));
+          break;
+        }
+        catch (std::format_error&) {}
+      }
+      try {
+        os << std::vformat (my_fmt, make_format_args (num));
+        break;
+      } catch (std::format_error&) {}
+    }
     if (num == floor (num))
       os << (long long)num;
     else
@@ -842,11 +878,16 @@ erc node::write (std::ostream& os, int flags, int spaces, int level) const
   return erc::success;
 }
 
-/// Write node to a string
+/*! 
+  Write node to a string
+  \param s output string
+  \param flags formatting flags
+  \param spaces number of spaces to indent. If 0 uses tabs instead of spaces
+*/
 mlib::erc node::write (std::string& s, int flags, int spaces) const
 {
   ostringstream os;
-  auto ret = write (os, flags, spaces, 0);
+  auto ret = write (os, flags, spaces, 0, fmt?*fmt : std::string_view());
   if (ret == erc::success)
     s = os.str ();
   return ret;
@@ -884,7 +925,28 @@ string node::to_str () const
   if (t == type::string)
     return str;
   else if (t == type::numeric)
-    return std::to_string (num);
+  {
+    if (fmt)
+    {
+      if (num == floor (num))
+      {
+        //try with an integral format first
+        long long lln = (long long)num;
+        try {
+          return std::vformat (*fmt, make_format_args (lln));
+        } catch (std::format_error&) {}
+      }
+      // ... then with a floating-point format
+      try {
+        return std::vformat (*fmt, make_format_args (num));
+      }catch (std::format_error&) {}
+    }
+    // leave default conversion do the job
+    if (num == floor (num))
+      return std::to_string((long long)num);
+    else
+      return std::to_string (num);
+  }
   else if (t == type::boolean)
     return logic ? "true" : "false";
 
@@ -941,7 +1003,7 @@ std::ostream& noutf8 (std::ostream& os)
 std::ostream& operator<< (std::ostream& os, const node& n)
 {
   long fmt = os.iword (json::ostream_flags);
-  n.write (os, fmt >> 8, fmt & 0xff);
+  n.write (os, fmt >> 8, fmt & 0xff, 0, n.fmt? *n.fmt : string_view());
   return os;
 }
 

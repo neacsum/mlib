@@ -30,6 +30,7 @@ constexpr int max_string_length = 8192;
 #define JSON_FMT_INDENT     0x01 //!< Indent JSON string when writing
 #define JSON_FMT_QUOTESLASH 0x02 //!< Quote all solidus ('/') characters
 #define JSON_FMT_UTF8       0x04 //!< Do not encode UTF8 characters
+
 // JSON error codes
 #define ERR_JSON_INVTYPE  -1 //!< invalid node type
 #define ERR_JSON_TOOMANY  -2 //!< too many descendants
@@ -349,6 +350,7 @@ public:
   const node& operator[] (size_t index) const;
   node& at (size_t index);
   const node& at (size_t index) const;
+  void push_back (const node& n);
 
   const_iterator begin () const;
   iterator begin ();
@@ -362,8 +364,7 @@ public:
   // streaming (encoding/decoding)
   mlib::erc read (std::istream& s);
   mlib::erc read (const std::string& s);
-  mlib::erc write (std::ostream& os, int flags = 0, int spaces = 0, int level = 0) const;
-  mlib::erc write (std::string& s, int flags = 0, int spaces = 0) const;
+  mlib::erc write (std::string& s, int flags=0, int spaces=0) const;
 
   // other operations
   bool has (const std::string& name) const;
@@ -374,8 +375,12 @@ public:
   void clear (type t = type::null);
   type kind () const;
   int size () const;
+  void format (const std::string& f);
+  const std::string_view format () const;
 
 private:
+  mlib::erc write (std::ostream& os, int flags, int spaces, int level,
+                   const std::string_view format) const;
   type t;
   union {
     nodes_map obj;
@@ -384,6 +389,9 @@ private:
     double num;
     bool logic;
   };
+  std::unique_ptr <std::string> fmt;
+
+  friend std::ostream& operator<< (std::ostream& os, const node& n);
 };
 
 /// Constructor for a string type node
@@ -571,6 +579,18 @@ inline int node::size () const
          : (t == type::array) ? (int)arr.size ()
          : (t != type::null)  ? 1
                               : 0;
+}
+
+/// Set output format for numerical values
+inline void node::format (const std::string& f)
+{
+  fmt.reset (f.empty () ? nullptr : new std::string(f));
+}
+
+/// Return output format for numerical values
+inline const std::string_view node::format () const
+{
+  return fmt? *fmt : std::string_view();
 }
 
 /// inequality operator

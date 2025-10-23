@@ -66,6 +66,42 @@ TEST (Write_fixed_manip)
   CHECK_EQUAL ("123000000000.000 1.23e+11", ss.str ());
 }
 
+TEST (Write_with_format)
+{
+  json::node n;
+  n[0] = 123E9 + 1e-5;
+  n[1] = 123E9 + 1e-5;
+  n[0].format("{:.3f}");
+  n[1].format("{:.4e}");
+  stringstream ss;
+  ss << n[0] << " " << n[1];
+  CHECK_EQUAL ("123000000000.000 1.2300e+11", ss.str ());
+}
+
+TEST (Write_with_array_format)
+{
+  json::node n;
+  n.format (" {:.3f}");
+  n[0] = 123E9 + 1e-5;
+  n[1] = 123E9 + 1e-5;
+  stringstream ss;
+  ss << n;
+  CHECK_EQUAL ("[ 123000000000.000, 123000000000.000]", ss.str ());
+}
+
+TEST (Write_array_format_and_element_format)
+{
+  json::node n;
+  n.format ("{:.3f}");
+  n[0] = 123E9 + 1e-5;
+  n[1] = 123E9 + 1e-5;
+  n[1].format ("{:.4e}");
+  stringstream ss;
+  ss << n;
+  CHECK_EQUAL ("[123000000000.000,1.2300e+11]", ss.str ());
+}
+
+
 TEST (Write_integers)
 {
   json::node n;
@@ -120,23 +156,45 @@ TEST (copy_constructor)
   CHECK_EQUAL (n1, n2);
 }
 
+TEST (func_to_str)
+{
+  json::node n;
+  n = "abc";
+  CHECK_EQUAL ("abc", n.to_str ());
+  n = 1.001;
+  n.format ("{:3d}");
+  // integer format for float number is invalid, uses default
+  CHECK_EQUAL ("1.001000", n.to_str ());
+  n = 2;
+  n.format ("{:.3f}");
+  // float format for integer number is ok
+  CHECK_EQUAL ("2.000", n.to_str ());
+  n = 3e5+0.01;
+  //float format for float number
+  CHECK_EQUAL ("300000.010", n.to_str ());
+}
+
 
 TEST (move_constructor)
 {
   json::node n1;
   n1.read (R"({"asd":"sdf"})");
+  n1.format ("some format");
   json::node n2 = std::move (n1);
   CHECK_EQUAL (json::type::null, n1.kind ());
   CHECK_EQUAL ("sdf", static_cast<string>(n2["asd"]));
+  CHECK_EQUAL ("some format", n2.format ());
 }
 
 TEST (move_assignment)
 {
   json::node n1, n2;
   n1.read (R"({"asd":"sdf"})");
+  n1.format ("some format");
   n2 = std::move (n1);
   CHECK_EQUAL (json::type::null, n1.kind ());
   CHECK_EQUAL ("sdf", static_cast<string>(n2["asd"]));
+  CHECK_EQUAL ("some format", n2.format ());
 }
 
 TEST (num_vector_assignment)
@@ -609,6 +667,17 @@ TEST (ArrayNodeCreation)
   cout << n3 << endl;
 }
 
+TEST (ArrayNode_push_back)
+{
+  json::node arr;
+  arr.push_back (1);
+  arr.push_back ("str");
+
+  CHECK_EQUAL (2, arr.size ());
+  CHECK_EQUAL (1, arr[0].to_num ());
+  CHECK_EQUAL ("str", arr[1].to_str ());
+}
+
 TEST (StreamRead)
 {
   string in1 = R"({
@@ -783,6 +852,10 @@ TEST (rfc8259)
 
   data = true;
   CHECK_EQUAL (true, data.to_bool ());
+
+
 }
 
+
+//-----------------------------------------------------------------------------
 }  //end suite
