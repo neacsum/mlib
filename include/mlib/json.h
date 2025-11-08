@@ -370,6 +370,8 @@ public:
   bool has (const std::string& name) const;
   const node* find (const std::string& name) const;
   node* find (const std::string& name);
+  node* search_key (const std::string& name);
+  const node* search_key (const std::string& name) const;
 
   void erase (const std::string& name);
   void clear (type t = type::null);
@@ -617,6 +619,17 @@ inline node& node::at (const std::string& name)
 inline node& node::at (size_t index)
 {
   return const_cast<node&> (static_cast<const node&> (*this).at (index));
+}
+
+/*!
+  Search all descendant nodes for the given key name.
+  \param name key name
+  \return pointer to descendant node or `nullptr` if not found
+*/
+inline
+const node* node::search_key (const std::string& name) const
+{
+  return const_cast<node*>(this)->search_key(name);
 }
 
 /// \cond not_documented

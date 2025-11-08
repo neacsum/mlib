@@ -362,7 +362,7 @@ const node* node::find (const std::string& name) const
 }
 
 /*!
-   If node is an object and has a child with the given name, returns
+   If node is an object and has a child with the given key name, returns
    a pointer to child node. Otherwise returns `nullptr`
 */
 node* node::find (const std::string& name)
@@ -374,6 +374,38 @@ node* node::find (const std::string& name)
     return &*n->second;
   else
     return nullptr;
+}
+
+/*!
+  Search all descendant nodes for the given key name.
+  \param name key name
+  \return pointer to descendant node or `nullptr` if not found
+*/
+node* node::search_key (const std::string& name)
+{
+  node* ret = nullptr;
+  if (t == type::array)
+  {
+    for (auto& n : arr)
+    {
+      auto ret = n->search_key (name);
+      if (ret)
+        return ret;
+    }
+  }
+  else if (t == type::object)
+  {
+    for (auto& n : obj)
+    {
+      if (n.first == name)
+        return n.second.get ();
+      else if (n.second->t == type::array || n.second->t == type::object)
+        ret = n.second->search_key (name);
+      if (ret)
+        return ret;
+    }
+  }
+  return nullptr;
 }
 
 // Parsing helper functions ---------------------------------------------------

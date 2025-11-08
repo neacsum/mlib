@@ -678,6 +678,55 @@ TEST (ArrayNode_push_back)
   CHECK_EQUAL ("str", arr[1].to_str ());
 }
 
+TEST (object_search)
+{
+  string in = R"({
+  "encoding" : "UTF-8",
+  "plug-ins" : [
+    "python",
+      "c++",
+      "ruby"
+  ] ,
+  "indent" : { "length" : 3, "use_space" : true }})";
+  json::node n;
+  n.read (in);
+
+  auto r = n.search_key ("use_space");
+  CHECK (r);
+  CHECK (r->to_bool ());
+}
+
+TEST (array_search)
+{
+  string in = R"([
+        {
+           "precision": "zip",
+           "Latitude":  37.7668,
+           "Longitude": -122.3959,
+           "Address":   "",
+           "City":      "SAN FRANCISCO",
+           "State":     "CA",
+           "Zip":       "94107",
+           "Country":   "US"
+        },
+        {
+           "precision": "zip",
+           "Latitude":  37.371991,
+           "Longitude": -122.026020,
+           "Address":   "",
+           "City":      "SUNNYVALE",
+           "State":     "CA",
+           "Zip":       "94085",
+           "Country":   "US"
+        }
+      ])";
+  json::node n;
+  n.read (in);
+
+  auto r = n.search_key ("City");
+  CHECK (r);
+  CHECK (r->to_str () == "SAN FRANCISCO");
+}
 TEST (StreamRead)
 {
   string in1 = R"({
