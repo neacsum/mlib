@@ -166,7 +166,6 @@
   <ItemGroup>
     <ClInclude Include="..\include\mlib\asset.h" />
     <ClInclude Include="..\include\mlib\base64.h" />
-    <ClInclude Include="..\include\mlib\basename.h" />
     <ClInclude Include="..\include\mlib\biosuuid.h" />
     <ClInclude Include="..\include\mlib\bitstream.h" />
     <ClInclude Include="..\include\mlib\border.h" />
@@ -217,7 +216,6 @@
   <ItemGroup>
     <ClCompile Include="asset.cpp" />
     <ClCompile Include="base64.cpp" />
-    <ClCompile Include="basename.cpp" />
     <ClCompile Include="biosuuid.cpp" />
     <ClCompile Include="bitstream.cpp" />
     <ClCompile Include="convert.cpp" />

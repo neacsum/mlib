@@ -27,11 +27,10 @@ target_sources(mlib PRIVATE
   biosuuid.cpp
   event.cpp
   firewall.cpp
-  httpd.cpp
+  http.cpp
   jbridge.cpp
   log.cpp
   mutex.cpp
-  rdir.cpp
   semaphore.cpp
   serenum1.cpp
   serenum2.cpp
@@ -40,7 +39,6 @@ target_sources(mlib PRIVATE
   syncbase.cpp
   tcpserver.cpp
   thread.cpp
-  sockstream.cpp
   wtimer.cpp
 )
 endif ()

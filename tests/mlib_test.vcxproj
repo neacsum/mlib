@@ -26,7 +26,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="source\tests_basename.cpp" />
     <ClCompile Include="source\tests_convert.cpp" />
     <ClCompile Include="source\tests_crc32.cpp" />
     <ClCompile Include="source\tests_errorcode.cpp" />

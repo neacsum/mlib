@@ -47,7 +47,6 @@
 #ifdef _MSC_VER
 
 #include "asset.h"
-#include "basename.h"
 #include "chull.h"
 #include "firewall.h"
 #include "http.h"
