@@ -31,6 +31,7 @@
 #include <assert.h>
 
 #include <mlib/mlib.h>
+#include <shellapi.h>
 #include <utf8/utf8.h>
 
 #include "resource.h"
@@ -44,6 +45,7 @@ using namespace mlib;
 
 #define SERVER_WNDCLASSNAME   L"uisample"
 #define WM_TRAYNOTIFY     (WM_USER+1)
+
 
 //globals
 HINSTANCE           hInst;

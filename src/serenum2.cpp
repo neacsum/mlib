@@ -7,6 +7,7 @@
 #pragma hdrstop
 #include <utf8/utf8.h>
 
+#include <Ntddser.h>
 #include <SetupAPI.h>
 #pragma comment(lib, "setupapi.lib")
 
