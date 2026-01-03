@@ -201,7 +201,7 @@ static size_t log_hdr (int fac_pri, char* dgram_buf)
   auto t = time (nullptr);
   auto tm = localtime (&t);
   size_t len = sprintf (dgram_buf, "<%d>%s %2d %02d:%02d:%02d %s %s%s: ", fac_pri,
-    month[tm->tm_mon - 1], tm->tm_mday, tm->tm_hour, tm->tm_min, tm->tm_sec,
+    month[tm->tm_mon], tm->tm_mday, tm->tm_hour, tm->tm_min, tm->tm_sec,
     local_hostname, proclog->ident ? proclog->ident : processname (0), proclog->str_pid);
 
   return len;
