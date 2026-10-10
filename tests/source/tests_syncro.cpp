@@ -139,4 +139,35 @@ TEST (event_is_signaled)
   CHECK (!evt_manual.is_signaled ());
 }
 
+TEST (critical_section_copy)
+{
+  struct cs_thread : public thread
+  {
+    cs_thread (criticalsection cs)
+      : thread ()
+      , mycs (cs) {};
+    criticalsection mycs;
+
+    void run () override
+    {
+      mycs.enter ();
+      Sleep (10);
+      mycs.leave ();
+    }
+  };
+
+  criticalsection cs;
+  cs_thread th1 (cs), th2(cs);
+  cs.enter ();
+  th1.start ();
+  th2.start ();
+  Sleep (100);
+  CHECK (th1.is_running ()); //still running
+  CHECK (th2.is_running ());
+  cs.leave ();
+  Sleep (100);
+  CHECK (th1.is_signaled ()); //should have finished
+  CHECK (th2.is_signaled ());
+}
+
 }

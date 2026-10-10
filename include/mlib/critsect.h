@@ -27,17 +27,13 @@ class criticalsection
 {
 public:
   criticalsection ();
-  ~criticalsection ();
   virtual void enter ();
   virtual bool try_enter ();
   virtual void leave ();
 
 private:
-  CRITICAL_SECTION section;
+  std::shared_ptr<CRITICAL_SECTION> section;
 
-  // critical sections cannot be copied or assigned
-  criticalsection (const criticalsection&) = delete;
-  criticalsection& operator= (const criticalsection&) = delete;
 };
 
 /*!
@@ -86,31 +82,27 @@ private:
 /// Initializes critical section object
 inline criticalsection::criticalsection ()
 {
-  InitializeCriticalSection (&section);
-}
-
-/// Deletes the critical section object
-inline criticalsection::~criticalsection ()
-{
-  DeleteCriticalSection (&section);
+  auto sect = new CRITICAL_SECTION;
+  InitializeCriticalSection (sect);
+  section = std::shared_ptr<CRITICAL_SECTION> (sect, DeleteCriticalSection);
 }
 
 /// Enter critical section
 inline void criticalsection::enter ()
 {
-  EnterCriticalSection (&section);
+  EnterCriticalSection (section.get());
 }
 
 /// Return \b true if critical section was entered
 inline bool criticalsection::try_enter ()
 {
-  return (TryEnterCriticalSection (&section) != 0);
+  return (TryEnterCriticalSection (section.get()) != 0);
 }
 
 /// Leave critical section
 inline void criticalsection::leave ()
 {
-  LeaveCriticalSection (&section);
+  LeaveCriticalSection (section.get());
 }
 
 inline lock::lock (criticalsection& cs)
