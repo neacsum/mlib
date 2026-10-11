@@ -1,0 +1,52 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/samples/">
+    <Project Path="examples/echoclient/echoclient.vcxproj" Id="9323758a-c082-4b02-866e-8cb7afd4ac60">
+      <BuildDependency Project="src/mlib.vcxproj" />
+    </Project>
+    <Project Path="examples/echoserv/echoserv.vcxproj" Id="4c13ecfa-df53-48fb-984b-c228fb82bb65">
+      <BuildDependency Project="src/mlib.vcxproj" />
+    </Project>
+    <Project Path="examples/error_codes/error_codes.vcxproj" Id="6f661b2d-bb25-4df1-ab86-13f0a82241bc">
+      <BuildDependency Project="src/mlib.vcxproj" />
+    </Project>
+    <Project Path="examples/http_auth/http_auth.vcxproj" Id="f023bbe4-499e-47bd-b88e-339d14d8ddb6">
+      <BuildDependency Project="src/mlib.vcxproj" />
+    </Project>
+    <Project Path="examples/http_handler1/http_handler1.vcxproj" Id="322c1126-59f8-4868-950a-7e133339ee19">
+      <BuildDependency Project="src/mlib.vcxproj" />
+    </Project>
+    <Project Path="examples/http_handler2/http_handler2.vcxproj" Id="5f58ca7c-9d3a-4218-8f5d-5af59dfd55d4">
+      <BuildDependency Project="src/mlib.vcxproj" />
+    </Project>
+    <Project Path="examples/opt-sample/opt-sample.vcxproj" Id="22de7a88-8069-4dd6-8a76-af96eda9f950">
+      <BuildDependency Project="src/mlib.vcxproj" />
+    </Project>
+    <Project Path="examples/prodcons/prodcons.vcxproj" Id="88e973ef-701a-4306-955b-39073cc4aa3d">
+      <BuildDependency Project="src/mlib.vcxproj" />
+    </Project>
+    <Project Path="examples/ui-echo/ui-echo.vcxproj" Id="9ce2843d-a8d2-4648-8a0f-57b433ec0295">
+      <BuildDependency Project="src/mlib.vcxproj" />
+    </Project>
+    <Project Path="examples/ui-sample/ui-sample.vcxproj" Id="b12e80a7-75c8-4ee7-86c2-62252dc28c12">
+      <BuildDependency Project="src/mlib.vcxproj" />
+    </Project>
+    <Project Path="examples/wol/wol.vcxproj" Id="3b18cd74-e136-4e64-b4d2-8d312f6f29ab">
+      <BuildDependency Project="src/mlib.vcxproj" />
+    </Project>
+    <Project Path="examples/yacb/yacb.vcxproj" Id="1e05ead9-9c78-4ff2-a4e0-006beb57df44">
+      <BuildDependency Project="src/mlib.vcxproj" />
+    </Project>
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path="readme.md" />
+    <File Path="tools/doxygen/main.md" />
+  </Folder>
+  <Project Path="src/mlib.vcxproj" Id="f9e11aa9-fab8-40d8-96d9-f92c5725762b" />
+  <Project Path="tests/mlib_test.vcxproj" Id="f32484d8-7598-4833-be1a-27a35cf8e5de">
+    <BuildDependency Project="src/mlib.vcxproj" />
+  </Project>
+</Solution>

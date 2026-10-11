@@ -63,15 +63,12 @@ TEST (shared_pointer)
   typedef async_queue<int> int_queue;
   typedef std::shared_ptr<int_queue> queue_ptr;
 
-  int_queue myqueue (20);
-
-  queue_ptr ptr1(&myqueue);
-  auto ptr2 = std::make_shared<int_queue> (20);
-  auto ptr3 = ptr1;
+  auto ptr1 = std::make_shared<int_queue> (20);
+  auto ptr2 = ptr1;
 
   ptr1->produce (10);
   int x;
-  ptr3->consume (x, 0);
+  ptr2->consume (x, 0);
   CHECK_EQUAL (10, x);
 }
 
