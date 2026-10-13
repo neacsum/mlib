@@ -86,8 +86,8 @@ private:
   \note The default size of async_queue is `INFINITE` and it can grow up to the
   available memory.
 */
-template <class M, class C = std::deque<M>>
-class async_queue : protected std::queue<M, C>
+template <class M, class C = std::queue<M>>
+class async_queue : protected C
 {
 public:
   /// Crates a queue with the given maximum size
@@ -99,40 +99,50 @@ public:
   }
 
   /// Append an element to queue
-  /// \return _true_ if the element was appended or _false_ if a timeout occurred.
+  /// \return `true` if the element was appended or `false` if a timeout occurred.
   virtual bool produce (const M& obj, DWORD timeout = INFINITE)
   {
+    update.enter ();
     if (limit < INFINITE)
     {
       // Bounded queue. See if there is enough space to produce
-      stopwatch t; // need a stopwatch to count cumulated wait time
-      if (timeout != INFINITE)
-        t.start ();
-      update.enter ();
-      while (std::queue<M, C>::size () >= limit)
+      if (timeout == 0)
       {
-        update.leave ();
-        if (timeout != INFINITE)
+        //Don't wait if there is no space
+        if (C::size () >= limit)
         {
+          update.leave ();
+          return false;
+        }
+      }
+      else if (timeout == INFINITE)
+      {
+        //wait forever to get space
+        while (C::size () >= limit)
+        {
+          update.leave ();
+          prod_sema.wait ();
+          update.enter ();
+        }
+      }
+      else
+      {
+        stopwatch t; // need a stopwatch to count cumulated wait time
+        t.start ();
+        while (C::size () >= limit)
+        {
+          update.leave ();
           int t_wait = timeout - (int)t.lap_msec ();
           if (t_wait < 0 || prod_sema.wait (t_wait) == WAIT_TIMEOUT)
             return false;
+          update.enter ();
         }
-        else
-          prod_sema.wait ();
-        update.enter ();
       }
-      std::queue<M, C>::push (obj);
-      cons_sema.signal ();
-      update.leave ();
     }
-    else
-    {
-      // Unbounded queue. Producer will always be successful
-      lock l (update);              // take control of the queue
-      std::queue<M, C>::push (obj); // put a copy of the object at the end
-      cons_sema.signal ();          // and signal the semaphore
-    }
+    C::push (obj);       // put a copy of the object at the end
+    cons_sema.signal (); // and signal the semaphore
+    update.leave ();
+
     return true;
   }
 
@@ -140,13 +150,32 @@ public:
   /// Return _true_ if an element was extracted or _false_ if a timeout occurred.
   virtual bool consume (M& result, int timeout = INFINITE)
   {
-    if (timeout != INFINITE)
+    update.enter ();
+    if (timeout == 0)
+    {
+      //no wait
+      if (C::empty ())
+      {
+        update.leave ();
+        return false;
+      }
+    }
+    else if (timeout == INFINITE)
+    {
+      //wait forever
+      while (C::empty ())
+      {
+        update.leave ();
+        cons_sema.wait (); // wait for a producer
+        update.enter ();
+      }
+    }
+    else
     {
       stopwatch t;
       int t_wait;
       t.start ();
-      update.enter ();
-      while (std::queue<M, C>::empty ())
+      while (C::empty ())
       {
         update.leave ();
         t_wait = timeout - (int)t.lap_msec ();
@@ -156,23 +185,8 @@ public:
         update.enter ();
       }
     }
-    else
-    {
-      update.enter ();
-      if (std::queue<M, C>::empty ())
-      {
-        while (1)
-        {
-          update.leave ();
-          cons_sema.wait (); // wait for a producer
-          update.enter ();
-          if (!std::queue<M, C>::empty ())
-            break;
-        }
-      }
-    }
-    result = std::move(std::queue<M, C>::front ()); // get the message
-    std::queue<M, C>::pop ();
+    result = std::move(C::front ()); // get the message
+    C::pop ();
     if (limit != INFINITE)
       prod_sema.signal (); // signal producers there is space available
 
@@ -184,21 +198,21 @@ public:
   bool empty ()
   {
     lock l (update);
-    return std::queue<M, C>::empty ();
+    return C::empty ();
   }
 
   /// Return _true_ if queue is at capacity
   bool full ()
   {
     lock l (this->update);
-    return (std::queue<M, C>::size () == limit);
+    return (C::size () == limit);
   }
 
   /// Return queue size
   size_t size ()
   {
     lock l (update);
-    return std::queue<M, C>::size ();
+    return C::size ();
   }
 
 protected:
@@ -207,5 +221,95 @@ protected:
   semaphore cons_sema;    ///< consumers' semaphore counts down until queue is empty
   criticalsection update; ///< critical section protects queue's integrity
 };
+
+/*!
+  A template class that implements "asynchronous ring buffer".
+  These are producer/consumer buffers which can hold "messages" and deliver
+  them in FIFO order. Attempting to consume from an empty buffer will block
+  the calling thread until a message arrives. Producing in a full buffer replaces
+  the "oldest" element with the new one.
+*/
+template <class M>
+class async_buffer : protected mlib::ring_buffer<M>
+{
+public:
+  /// Crates a buffer with the given maximum size
+  async_buffer (size_t limit_)
+    : ring_buffer<M> (limit_)
+  {
+  }
+
+  /// Append an element to buffer
+  virtual void produce (const M& obj)
+  {
+    lock l (update);
+    auto prev_sz = ring_buffer<M>::size ();
+    ring_buffer<M>::push_back (obj);
+    if (ring_buffer<M>::size () != prev_sz)
+      sema.signal ();
+  }
+
+  /// Extract the first element in queue
+  /// Return _true_ if an element was extracted or _false_ if a timeout occurred.
+  virtual bool consume (M& result, int timeout = INFINITE)
+  {
+    bool ret = false;
+    if (timeout == 0)
+    {
+      update.enter ();
+      {
+        if (!ring_buffer<M>::empty ())
+        {
+          result = ring_buffer<M>::front ();
+          ring_buffer<M>::pop_front ();
+          ret = true;
+        }
+        update.leave ();
+      }
+      return ret;
+    }
+    if (timeout != INFINITE)
+    {
+      stopwatch t;
+      int t_wait;
+      t.start ();
+      update.enter ();
+      while (ring_buffer<M>::empty ())
+      {
+        update.leave ();
+        t_wait = timeout - (int)t.lap_msec ();
+        // give up or wait for a producer
+        if (t_wait <= 0 || sema.wait (t_wait) == WAIT_TIMEOUT)
+          return false;
+        update.enter ();
+      }
+    }
+    else
+    {
+      update.enter ();
+      if (ring_buffer<M>::empty ())
+      {
+        while (1)
+        {
+          update.leave ();
+          sema.wait (); // wait for a producer
+          update.enter ();
+          if (!ring_buffer<M>::empty ())
+            break;
+        }
+      }
+    }
+    result = std::move (ring_buffer<M>::front ()); // get the message
+    ring_buffer<M>::pop_front ();
+
+    update.leave ();
+    return true;
+  }
+
+protected:
+  semaphore sema;         ///< semaphore counts buffer size
+  criticalsection update; ///< critical section protects buffer's integrity
+};
+
 
 } // namespace mlib

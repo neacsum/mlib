@@ -23,6 +23,11 @@ template <class T>
 class ring_buffer
 {
 public:
+  using value_type = typename T;
+  using reference = typename T&;
+  using const_reference = typename T const&;
+  using size_type = typename size_t;
+
   /// Iterator through the circular buffer
   class const_iterator
   {
@@ -532,7 +537,7 @@ public:
   }
 
   /// Return true if buffer is empty
-  bool empty (void)
+  bool empty (void) const
   {
     return (sz == 0);
   }
@@ -544,7 +549,7 @@ public:
   }
 
   /// Return maximum buffer size
-  size_t capacity (void) const
+  size_t capacity () const
   {
     return cap;
   };
