@@ -194,14 +194,14 @@ public:
     return true;
   }
 
-  /// Return _true_ if queue is empty
+  /// Return `true` if queue is empty
   bool empty ()
   {
     lock l (update);
     return C::empty ();
   }
 
-  /// Return _true_ if queue is at capacity
+  /// Return `true` if queue is at capacity
   bool full ()
   {
     lock l (this->update);
@@ -233,7 +233,7 @@ template <class M>
 class async_buffer : protected mlib::ring_buffer<M>
 {
 public:
-  /// Crates a buffer with the given maximum size
+  /// Creates a buffer with the given maximum size
   async_buffer (size_t limit_)
     : ring_buffer<M> (limit_)
   {
@@ -250,7 +250,7 @@ public:
   }
 
   /// Extract the first element in queue
-  /// Return _true_ if an element was extracted or _false_ if a timeout occurred.
+  /// Return `true` if an element was extracted or `false` if a timeout occurred.
   virtual bool consume (M& result, int timeout = INFINITE)
   {
     bool ret = false;
@@ -304,6 +304,36 @@ public:
 
     update.leave ();
     return true;
+  }
+
+  /// Return `true` if buffer is empty
+  bool empty ()
+  {
+    return ring_buffer<M>::empty ();
+  }
+
+  /// Return `true` if buffer is at capacity
+  bool full () const
+  {
+    return ring_buffer<M>::full();
+  }
+
+  /// Return buffer size
+  size_t size () const
+  {
+    return ring_buffer<M>::size ();
+  }
+ 
+  /// Remove all elements from buffer
+  void clear ()
+  {
+    lock l (update);
+    if (!ring_buffer<M>::empty ())
+    {
+      ring_buffer<M>::clear ();
+      while (sema.is_signaled ()) //drain semaphore
+        ;
+    }
   }
 
 protected:

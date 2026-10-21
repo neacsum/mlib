@@ -157,8 +157,27 @@ TEST (silo_filling)
   consumer.start ();
   producer.start ();
   consumer.wait ();
-  cout << "Silo - producer missed " << missed << " bushels" << endl;
+  std::cout << "Silo - producer missed " << missed << " bushels" << endl;
   CHECK (missed > 0);
+}
+
+TEST (ringbuf_basic)
+{
+  async_buffer<int> buf (3);
+
+  CHECK (buf.empty ());
+  buf.produce (1);
+  buf.produce (2);
+  CHECK (!buf.empty ());
+  CHECK (!buf.full ());
+  buf.produce (3);
+  CHECK (buf.full ());
+
+  buf.clear ();
+  CHECK (buf.empty ());
+
+  int val;
+  CHECK (!buf.consume (val, 0));
 }
 
 TEST (ringbuf_silo)
@@ -170,7 +189,7 @@ TEST (ringbuf_silo)
   std::vector<int> consumed;
 
   async_buffer<int> silo (5);
-
+  
   mlib::thread producer ([&] () -> int {
     for (int i = 0; i < bushels; i++)
     {
