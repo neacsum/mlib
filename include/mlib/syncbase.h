@@ -138,7 +138,13 @@ inline DWORD syncbase::wait_msg (DWORD limit_msec, DWORD mask)
   return MsgWaitForMultipleObjects (1, &hl->handle_, FALSE, limit_msec, mask);
 }
 
-/// Check if object is signaled
+/*!
+  Check if object is signaled 
+  \return `true` if the object was in a signaled state.
+
+  \note For certain objects like semaphores or automatic events, checking if
+  they are in a signal state **can** change their state.
+*/
 inline syncbase::operator bool ()
 {
   return is_signaled ();
@@ -148,6 +154,8 @@ inline syncbase::operator bool ()
   Try to wait on the object.
 
   Returns \b true if the object was in a signaled state.
+  \note For certain objects like semaphores or automatic events, checking if
+  they are in a signal state **can** change their state.
 */
 inline bool syncbase::is_signaled ()
 {
