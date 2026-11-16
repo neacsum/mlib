@@ -8,7 +8,8 @@
   "depends": [
     {
       "name": "utf8",
-      "uri": "https://github.com/neacsum/utf8.git"
+      "uri": "https://github.com/neacsum/utf8.git",
+      "branch": "VS2022"
     },
     {
       "name": "utpp",
@@ -16,7 +17,8 @@
     },
     {
       "name": "sqlite3",
-      "uri": "https://github.com/neacsum/sqlite3.git"
+      "uri": "https://github.com/neacsum/sqlite3.git",
+      "branch": "VS2022"
     }
   ]
 }
