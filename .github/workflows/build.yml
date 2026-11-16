@@ -19,8 +19,11 @@ jobs:
           name: cpm.exe
           url: https://github.com/neacsum/cpm/releases/latest/download/cpm.exe
       
+      - name: Checkout code
+        uses: actions/checkout@v5
+
       - name: Build libraries
-        run: cpm -v --proto https -u https://github.com/neacsum/mlib.git -r $HOME mlib
+        run: cpm -v mlib
         
       - name: Build and run tests
         shell: cmd
