@@ -25,8 +25,7 @@ jobs:
         
       - name: Build and run tests
         shell: cmd
-        run: |
-          %USERPROFILE%\mlib\build.bat tests
+        run: build.bat tests
         
       - name: Save tests result
         if: ${{ success() || failure() }}
