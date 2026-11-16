@@ -12,6 +12,7 @@
 #include "defs.h"
 #endif
 #include "safe_winsock.h"
+#include <memory>
 
 namespace mlib {
 
