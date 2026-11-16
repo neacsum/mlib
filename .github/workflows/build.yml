@@ -23,7 +23,7 @@ jobs:
         uses: actions/checkout@v5
 
       - name: Build libraries
-        run: cpm -v mlib
+        run: cpm -v
         
       - name: Build and run tests
         shell: cmd
